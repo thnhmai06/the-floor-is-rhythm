@@ -1,3 +1,7 @@
+# Project development folder
+.vs
+out
+
 #! C++
 # Prerequisites
 *.d
