@@ -1,7 +1,11 @@
 #include "main.h"
 
-int main()
+int main(int argc, char *argv[])
 {
-	std::cout << "Hello World!";
+	SDL_Init(SDL_INIT_VIDEO);
+	IMG_Init(IMG_INIT_PNG);
+	TTF_Init();
+
+	SDL_Quit();
 	return 0;
 }

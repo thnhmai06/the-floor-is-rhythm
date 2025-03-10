@@ -1,6 +1,7 @@
 # Project development folder
 .vs
-out
+obj
+bin
 
 #! C++
 # Prerequisites
