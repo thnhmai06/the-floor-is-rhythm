@@ -71,14 +71,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>./include;C:\lib\SDL2_ttf-2.24.0\include;C:\lib\SDL2-2.32.2\include;C:\lib\SDL2_image-2.8.8\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\lib\SDL2_image-2.8.8\lib\x64;C:\lib\SDL2_ttf-2.24.0\lib\x64;C:\lib\SDL2-2.32.2\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\lib\SDL2_mixer-2.8.1\include;./include;C:\lib\SDL2_ttf-2.24.0\include;C:\lib\SDL2-2.32.2\include;C:\lib\SDL2_image-2.8.8\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\lib\SDL2_mixer-2.8.1\lib\x64;C:\lib\SDL2_image-2.8.8\lib\x64;C:\lib\SDL2_ttf-2.24.0\lib\x64;C:\lib\SDL2-2.32.2\lib\x64;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>./include;C:\lib\SDL2_ttf-2.24.0\include;C:\lib\SDL2-2.32.2\include;C:\lib\SDL2_image-2.8.8\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\lib\SDL2_image-2.8.8\lib\x86;C:\lib\SDL2_ttf-2.24.0\lib\x86;C:\lib\SDL2-2.32.2\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\lib\SDL2_mixer-2.8.1\include;./include;C:\lib\SDL2_ttf-2.24.0\include;C:\lib\SDL2-2.32.2\include;C:\lib\SDL2_image-2.8.8\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\lib\SDL2_mixer-2.8.1\lib\x86;C:\lib\SDL2_image-2.8.8\lib\x86;C:\lib\SDL2_ttf-2.24.0\lib\x86;C:\lib\SDL2-2.32.2\lib\x86;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -141,9 +141,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\audio.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\audio.h" />
     <ClInclude Include="include\main.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
