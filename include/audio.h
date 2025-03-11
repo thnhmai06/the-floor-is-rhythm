@@ -112,9 +112,8 @@ struct Mixer {
 			if (location != memory.end()) return location->second;
 
 			// Nap file
-			Mix_Music* audio = nullptr;
-			audio = Mix_LoadMUS(file_path);
-			if (audio == nullptr)
+			Mix_Music* audio = Mix_LoadMUS(file_path);
+			if (audio == NULL)
 			{
 				//TODO: Expection: Can't play audio
 				return nullptr;
@@ -157,9 +156,8 @@ struct Mixer {
 			if (location != memory.end()) return location->second;
 
 			// Nạp file
-			Mix_Music* audio = nullptr;
-			audio = Mix_LoadWAV(file_path);
-			if (audio == nullptr)
+			Mix_Music* audio = Mix_LoadWAV(file_path);
+			if (audio == NULL)
 			{
 				//TODO: Expection: Can't play audio
 				return nullptr;
