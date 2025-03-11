@@ -28,8 +28,8 @@ const int BUFFER_SIZE = 256; // Kích cỡ Chunksize của mỗi buffer.
 struct Audio_Memory: std::unordered_map<const char*, Mix_Music*>
 {
 	/**
-		* @brief Giai phong am thanh trong bo nho.
-		* @param file_path Ten file am thanh.
+		* @brief Giải phóng âm thanh trong bộ nhớ.
+		* @param file_path Tên file âm thanh.
 		*/
 	void free(const char* file_path)
 	{
@@ -39,7 +39,7 @@ struct Audio_Memory: std::unordered_map<const char*, Mix_Music*>
 		this->erase(value);
 	}
 	/**
-	* @brief Giai phong TAT CA am thanh trong bo nho.
+	* @brief Giải phóng TẤT CẢ âm thanh trong bộ nhớ.
 	*/
 	void free_all()
 	{
