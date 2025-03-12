@@ -55,10 +55,10 @@ static int get_real_volume(const int v)
 struct Audio_Memory: std::unordered_map<const char*, Mix_Music*>
 {
 	/**
-		* @brief Giải phóng âm thanh trong bộ nhớ.
-		* @ingroup audio memory
-		* @param file_path Tên file âm thanh.
-		*/
+	 * @brief Giải phóng âm thanh trong bộ nhớ.
+	 * @ingroup audio memory
+	 * @param file_path Tên file âm thanh.
+	 */
 	void free(const char* file_path)
 	{
 		const auto value = this->find(file_path);
