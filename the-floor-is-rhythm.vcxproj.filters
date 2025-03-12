@@ -21,10 +21,7 @@
     <ClCompile Include="src\audio.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\convert\osu\beatmap.h">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\convert\osu\beatmap.cpp">
+    <ClCompile Include="src\convert\osu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -36,6 +33,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\beatmap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\convert\osu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

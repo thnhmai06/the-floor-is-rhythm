@@ -150,14 +150,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="include\convert\osu\beatmap.h" />
     <ClCompile Include="src\audio.cpp" />
-    <ClCompile Include="src\convert\osu\beatmap.cpp" />
+    <ClCompile Include="src\convert\osu.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\audio.h" />
     <ClInclude Include="include\beatmap.h" />
+    <ClInclude Include="include\convert\osu.h" />
     <ClInclude Include="include\main.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

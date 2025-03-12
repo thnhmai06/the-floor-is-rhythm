@@ -8,8 +8,12 @@
 
 #include <cmath>
 #include <string>
+#include <fstream>
 
- /**
+constexpr std::string SPACING = "=";
+constexpr std::string ENDED = ""; // TODO: Nghĩ ra một cái End mỗi category thật ngầu lòi :v
+
+/**
   *
   * @brief Kiểm tra biến có bằng giá trị không? (float)
   * @param var Biến cần so sánh
@@ -18,17 +22,40 @@
   */
 static bool is_equal(const float& var, const float value)
 {
-	constexpr float EPSILON = 0.01;
+	constexpr float EPSILON = 0.01;  // NOLINT(clang-diagnostic-implicit-float-conversion)
 	return abs(var - value) <= EPSILON;
 }
 
-class General
+struct General
 {
+private:
+	constexpr std::string GENERAL = "[General]";
+	constexpr std::string AUDIO_FILE = "AudioFilename";
+	constexpr std::string MUSIC_DELAY = "AudioLeadIn";
+	constexpr std::string PREVIEW_TIMESTAMP = "PreviewTime";
+	constexpr std::string EPILEPSY_WARNING = "EpilepsyWarning";
+
 public:
 	std::string audio_file;
 	int start_music_delay;
 	int preview_timestamp;
 	bool epilepsy_warning;
+
+	void print(std::ofstream& writer) const
+	{
+		writer << GENERAL << '\n';
+		writer << AUDIO_FILE << SPACING << audio_file << '\n';
+		writer << MUSIC_DELAY << SPACING << start_music_delay << '\n';
+		writer << PREVIEW_TIMESTAMP << SPACING << preview_timestamp << '\n';
+		writer << EPILEPSY_WARNING << SPACING << epilepsy_warning << '\n';
+		writer << ENDED << "\n\n";
+	}
+};
+
+struct Metadata
+{
+	std::string title, artist, creator, version, source, convert_from;
+	//std::vector<std::string> tags; TODO: Query tag DS
 };
 
 /**
@@ -36,14 +63,14 @@ public:
  * @ingroup beatmap
  * @brief Biểu diễn độ khó của beatmap
  */
-class Difficulty
+struct Difficulty
 {
 	/**
 	 * @class Approach_Rate
 	 * @ingroup beatmap difficulty
 	 * @brief Biểu diễn AR của map (Thời gian tiếp cận)
 	 */
-	class Approach_Rate
+	struct Approach_Rate
 	{
 		// Follow: https://osu.ppy.sh/wiki/en/Beatmap/Approach_rate
 		// yeah, this game is "based" on osu! lmfao
@@ -52,9 +79,9 @@ class Difficulty
 		constexpr float FADE_IN_AR5 = 800;
 
 	public:
-		float value, preempt_time, fade_in_time;
+		float value = -1, preempt_time = -1, fade_in_time = -1;
 
-		explicit Approach_Rate(const float value)
+		void apply(const float value)
 		{
 			this->value = value;
 
@@ -74,11 +101,14 @@ class Difficulty
 				fade_in_time = FADE_IN_AR5 - 500 * float(value - 5) / 5;
 			}
 		}
-	};
 
-	class Health
+		Approach_Rate() = default;
+		Approach_Rate(const float value) { apply(value); }
+	} ar;
+
+	struct Health
 	{
-
+		// TODO: here
 	};
 
 	/**
@@ -86,7 +116,7 @@ class Difficulty
 	 * @ingroup beatmap difficulty
 	 * @brief Biểu diễn OD của map (Khoảng thời gian chấp nhận là chính xác hơn).
 	 */
-	class Overall_Difficulty
+	struct Overall_Difficulty
 	{
 		// Follow: https://osu.ppy.sh/wiki/en/Beatmap/Overall_difficulty
 	private:
@@ -98,26 +128,29 @@ class Difficulty
 		constexpr int MULTIPLY_BAD = 10;
 		// other = miss
 	public:
-		float value, accept_perfect, accept_good, accept_bad;
+		float value = -1, perfect = -1, good = -1, bad = -1;
 
-		explicit Overall_Difficulty(const float value)
+		void apply(const float value)
 		{
 			this->value = value;
-			accept_perfect = BASE_PERFECT - value * MULTIPLY_PERFECT;
-			accept_good = BASE_GOOD - value * MULTIPLY_GOOD;
-			accept_bad = BASE_BAD - value * MULTIPLY_BAD;
+			perfect = BASE_PERFECT - value * MULTIPLY_PERFECT;
+			good = BASE_GOOD - value * MULTIPLY_GOOD;
+			bad = BASE_BAD - value * MULTIPLY_BAD;
 		}
-	};
+
+		Overall_Difficulty() = default;
+		Overall_Difficulty(const float value) { apply(value); }
+	} od;
 
 	/**
 	 * @class HP_Drain_Rate
 	 * @ingroup beatmap difficulty
 	 * @brief Biểu diễn HP của map (Độ tụt HP khi bấm không chính xác).
 	 */
-	class HP_Drain_Rate
+	struct HP_Drain_Rate
 		// Follow Rules: https://osu.ppy.sh/wiki/en/Gameplay/Health#osu!taiko
 	{
-		// later, i have no idea with math
+		// TODO: later, i have no idea with math
 	};
 };
 

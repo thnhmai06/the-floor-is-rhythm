@@ -6,7 +6,6 @@
     "sdl2",
     "sdl2-image",
     "sdl2-mixer",
-    "sdl2-ttf",
-    "simpleini"
+    "sdl2-ttf"
   ]
 }
