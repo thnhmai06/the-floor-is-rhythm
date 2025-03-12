@@ -14,11 +14,11 @@
 
 //! Settings: (Low-offset Profile)
 //Volume
-const int DEFAULT_MASTER_VOLUME = 80; // Volume mặc định khi khởi tạo bộ Mixer
+const int DEFAULT_MASTER_VOLUME = 80; // Volume mặc định khi khởi tạo bộ Audio_Mixer
 const int DEFAULT_MUSIC_VOLUME = 80; // Volume mặc định khi khởi tạo Music
-const int DEFAULT_HITSOUND_VOLUME = 80; // Volume mặc định khi khởi tạo Hitsound
+const int DEFAULT_HITSOUND_VOLUME = 80; // Volume mặc định khi khởi tạo Effect
 //Audio
-const int MAX_CHANNELS = 8; // Giới hạn số kênh phát Hitsound tối đa (1 kênh chạy 1 value)
+const int MAX_CHANNELS = 8; // Giới hạn số kênh phát Effect tối đa (mỗi một channel chạy 1 effect)
 const int SAMPLE_FREQUENCY = 48000; // Tần số âm thanh mẫu
 const int AUDIO_FORMAT = AUDIO_F32; // Format Âm thanh
 const int MONO = 1, STEREO = 2; // Phát âm thanh từ 1 hay 2 phía (L-R)
@@ -49,13 +49,14 @@ static int get_real_volume(const int v)
 
 /**
  * @class Audio_Memory audio.h
- * @ingroup audio
+ * @ingroup audio memory
  * @brief Lớp quản lý Bộ nhớ cho các Âm thanh đã được tải.
  */
 struct Audio_Memory: std::unordered_map<const char*, Mix_Music*>
 {
 	/**
 		* @brief Giải phóng âm thanh trong bộ nhớ.
+		* @ingroup audio memory
 		* @param file_path Tên file âm thanh.
 		*/
 	void free(const char* file_path)
@@ -67,6 +68,7 @@ struct Audio_Memory: std::unordered_map<const char*, Mix_Music*>
 	}
 	/**
 	* @brief Giải phóng TẤT CẢ âm thanh trong bộ nhớ.
+	* @ingroup audio memory
 	*/
 	void free_all()
 	{
@@ -75,11 +77,12 @@ struct Audio_Memory: std::unordered_map<const char*, Mix_Music*>
 	}
 	/**
 		 * @brief	Tải audio vào bộ nhớ.
+		 * @ingroup audio memory
 		 * @param	file_path: Vị trí file Music.
-		 * @param	is_load_as_hitsound: 1 - Hitsound, 0 - Music.
+		 * @param	is_load_as_effect: 1 - Effect, 0 - Music.
 		 * @return	Mix_Music*: Âm thanh đã được nạp, nullptr nếu ko nạp dc.
 		 */
-	Mix_Music* load(const char* file_path, const bool is_load_as_hitsound)
+	Mix_Music* load(const char* file_path, const bool is_load_as_effect)
 	{
 		// Nếu âm thanh đã được tải thì ko cần nạp nữa
 		auto location = this->find(file_path);
@@ -87,7 +90,7 @@ struct Audio_Memory: std::unordered_map<const char*, Mix_Music*>
 
 		// Nạp âm thanh
 		Mix_Music* audio;
-		if (!is_load_as_hitsound) audio = Mix_LoadMUS(file_path);
+		if (!is_load_as_effect) audio = Mix_LoadMUS(file_path);
 		else audio = Mix_LoadWAV(file_path);
 		if (audio == NULL)
 		{
@@ -100,17 +103,17 @@ struct Audio_Memory: std::unordered_map<const char*, Mix_Music*>
 };
 
 /**
- * @class Mixer audio.h
+ * @class Audio_Mixer audio.h
  * @ingroup audio
  * @brief Bộ trộn Âm thanh.
  */
-struct Mixer {
+struct Audio_Mixer {
 	int volume;
 
 	 /**
 	  * @brief Set/Lấy giá trị Volume của Audio cụ thể
 	  * @ingroup audio mixer volume
-	  * @param audio: Music/Hitsound muốn thao tác.
+	  * @param audio: Music/Effect muốn thao tác.
 	  * @param value Giá trị cần set, -1 nếu cần Lấy giá trị.
 	  * @return int: Giá trị trước khi set.
 	  */
@@ -179,6 +182,38 @@ struct Mixer {
 			return Mix_PlayMusic(audio, -1);
 		}
 
+		/**
+		 * @brief Kiểm tra xem có bài nhạc nào đang phát không.
+		 * @ingroup audio music
+		 * @return bool: Có bài nhạc đang phát không?
+		 * @note Bài đang tạm dừng cũng được tính là có bài đang phát.
+		 */
+		static bool has_song_playing() { return (Mix_PlayingMusic() != 0); }
+
+		/**
+		 * @brief Bài đang phát có đang được phát không.
+		 * @ingroup audio music
+		 * @return bool: Bài đang phát có phát không?
+		 */
+		static bool is_playing() { return has_song_playing() && (Mix_PausedMusic() == 1); }
+
+		/**
+		 * @brief Tạm dừng Music
+		 * @ingroup audio music
+		 */
+		static void pause() { Mix_PauseMusic(); }
+		/**
+		 * @brief Tiếp tục Music
+		 * @ingroup audio music
+		 */
+		static void resume() { Mix_ResumeMusic(); }
+		/**
+		 * @brief Dừng Music
+		 * @ingroup audio music
+		 * @return int: 0 - Thành công, -1 - Lỗi (vd ko có nhạc đang phát) 
+		 */
+		static int stop() { return Mix_HaltMusic(); }
+
 		Music()
 		{
 			set_volume(DEFAULT_MUSIC_VOLUME);
@@ -186,18 +221,18 @@ struct Mixer {
 	} music;
 
 	/**
-	 * @class Hitsound
+	 * @class Effect
 	 * @ingroup audio mixer
-	 * @brief Lớp quản lý Các hitsound (wav).
+	 * @brief Lớp quản lý Các effect (wav).
 	 */
-	struct Hitsound
+	struct Effect
 	{
 		Audio_Memory memory;
 		int volume;
 
 		/**
-		 * @brief Set/Lấy giá trị Hitsound Volume
-		 * @ingroup audio hitssound volume
+		 * @brief Set/Lấy giá trị Effect Volume
+		 * @ingroup audio effect volume
 		 * @param value Giá trị cần set, -1 nếu cần lấy giá trị.
 		 * @return int: Giá trị trung bình volume các channels.
 		 */
@@ -208,10 +243,10 @@ struct Mixer {
 		}
 
 		/**
-		 * @brief	Tải Hitsound vào bộ nhớ.
-		 * @ingroup audio hitsound
-		 * @param	file_path: Vi tri file Hitsound (wav).
-		 * @return	Mix_Music*: Con trỏ tới Hitsound đã đươc load. nullptr nếu bị lỗi.
+		 * @brief	Tải Effect vào bộ nhớ.
+		 * @ingroup audio effect
+		 * @param	file_path: Vi tri file Effect (wav).
+		 * @return	Mix_Music*: Con trỏ tới Effect đã đươc load. nullptr nếu bị lỗi.
 		 */
 		bool load(const char* file_path)
 		{
@@ -219,9 +254,9 @@ struct Mixer {
 		}
 
 		/**
-		 * @brief Phát Hitsound được lưu trong bộ nhớ.
-		 * @param file_path: Vi tri file Hitsound (wav).
-		 * @return int: Channel mà hitsound được phát, -1 nếu bị lỗi.
+		 * @brief Phát Effect được lưu trong bộ nhớ.
+		 * @param file_path: Vi tri file Effect (wav).
+		 * @return int: Channel mà effect được phát, -1 nếu bị lỗi.
 		 */
 		int play(const char* file_path) const
 		{
@@ -229,19 +264,19 @@ struct Mixer {
 			return Mix_PlayChannel(-1, audio, 0);
 		}
 
-		Hitsound()
+		Effect()
 		{
 			set_volume(DEFAULT_HITSOUND_VOLUME);
 		}
-	} hitsound;
+	} effect;
 
-	Mixer()
+	Audio_Mixer()
 	{
 		Mix_Init(MIX_INIT_MP3);
 		SDL_Init(SDL_INIT_AUDIO);
 		Mix_AllocateChannels(MAX_CHANNELS);
 		if (Mix_OpenAudio(SAMPLE_FREQUENCY, AUDIO_FORMAT, STEREO, BUFFER_SIZE) < 0) {
-			// TODO: Expectation: Cannot init Mixer
+			// TODO: Expectation: Cannot init Audio_Mixer
 		}
 
 		// After init
@@ -250,7 +285,7 @@ struct Mixer {
 	
 	void quit()
 	{
-		hitsound.memory.free_all();
+		effect.memory.free_all();
 		music.memory.free_all();
 		Mix_Quit();
 	}
