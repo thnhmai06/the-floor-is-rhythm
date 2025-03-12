@@ -71,13 +71,13 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>./include;$(IncludePath)</IncludePath>
+    <IncludePath>./vcpkg_installed/x64-windows/include/;./include;$(IncludePath)</IncludePath>
     <LibraryPath>.\vcpkg_installed\x64-windows\lib\manual-link;./vcpkg_installed/x64-windows/lib/;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>./include;$(IncludePath)</IncludePath>
+    <IncludePath>./vcpkg_installed/x86-windows/include/;./include;$(IncludePath)</IncludePath>
     <LibraryPath>.\vcpkg_installed\x86-windows\lib\manual-link;./vcpkg_installed/x86-windows/lib/;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)obj\$(Platform)\$(Configuration)\</IntDir>
@@ -150,11 +150,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="include\convert\osu\beatmap.h" />
     <ClCompile Include="src\audio.cpp" />
+    <ClCompile Include="src\convert\osu\beatmap.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\audio.h" />
+    <ClInclude Include="include\beatmap.h" />
     <ClInclude Include="include\main.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
