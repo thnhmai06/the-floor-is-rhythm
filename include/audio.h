@@ -16,9 +16,9 @@
 //Volume
 const int DEFAULT_MASTER_VOLUME = 80; // Volume mặc định khi khởi tạo bộ Audio_Mixer
 const int DEFAULT_MUSIC_VOLUME = 80; // Volume mặc định khi khởi tạo Music
-const int DEFAULT_HITSOUND_VOLUME = 80; // Volume mặc định khi khởi tạo Effect
+const int DEFAULT_HITSOUND_VOLUME = 80; // Volume mặc định khi khởi tạo Effects
 //Audio
-const int MAX_CHANNELS = 8; // Giới hạn số kênh phát Effect tối đa (mỗi một channel chạy 1 effect)
+const int MAX_CHANNELS = 8; // Giới hạn số kênh phát Effects tối đa (mỗi một channel chạy 1 effect)
 const int SAMPLE_FREQUENCY = 48000; // Tần số âm thanh mẫu
 const int AUDIO_FORMAT = AUDIO_F32; // Format Âm thanh
 const int MONO = 1, STEREO = 2; // Phát âm thanh từ 1 hay 2 phía (L-R)
@@ -48,81 +48,12 @@ static int get_real_volume(const int v)
 }
 
 /**
- * @class Audio_Memory audio.h
- * @ingroup audio memory
- * @brief Lớp quản lý Bộ nhớ cho các Âm thanh đã được tải.
- */
-struct Audio_Memory: std::unordered_map<const char*, Mix_Music*>
-{
-	/**
-	 * @brief Giải phóng âm thanh trong bộ nhớ.
-	 * @ingroup audio memory
-	 * @param file_path Tên file âm thanh.
-	 */
-	void free(const char* file_path)
-	{
-		const auto value = this->find(file_path);
-		auto audio = value->second;
-		Mix_FreeMusic(audio);
-		this->erase(value);
-	}
-	/**
-	* @brief Giải phóng TẤT CẢ âm thanh trong bộ nhớ.
-	* @ingroup audio memory
-	*/
-	void free_all()
-	{
-		for (const auto& item: *this) Mix_FreeMusic(item.second);
-		this->clear();
-	}
-	/**
-		 * @brief	Tải audio vào bộ nhớ.
-		 * @ingroup audio memory
-		 * @param	file_path: Vị trí file Music.
-		 * @param	is_load_as_effect: 1 - Effect, 0 - Music.
-		 * @return	Mix_Music*: Âm thanh đã được nạp, nullptr nếu ko nạp dc.
-		 */
-	Mix_Music* load(const char* file_path, const bool is_load_as_effect)
-	{
-		// Nếu âm thanh đã được tải thì ko cần nạp nữa
-		auto location = this->find(file_path);
-		if (location != this->end()) return location->second;
-
-		// Nạp âm thanh
-		Mix_Music* audio;
-		if (!is_load_as_effect) audio = Mix_LoadMUS(file_path);
-		else audio = Mix_LoadWAV(file_path);
-		if (audio == NULL)
-		{
-			//TODO: Expection: Can't play audio
-			return nullptr;
-		}
-		this->insert({ file_path, audio });
-		return audio;
-	}
-};
-
-/**
  * @class Audio_Mixer audio.h
  * @ingroup audio
  * @brief Bộ trộn Âm thanh.
  */
 struct Audio_Mixer {
 	int volume;
-
-	 /**
-	  * @brief Set/Lấy giá trị Volume của Audio cụ thể
-	  * @ingroup audio mixer volume
-	  * @param audio: Music/Effect muốn thao tác.
-	  * @param value Giá trị cần set, -1 nếu cần Lấy giá trị.
-	  * @return int: Giá trị trước khi set.
-	  */
-	static int set_audio_volume(Mix_Music* audio, const int value = -1)
-	{
-		if (value < 0) return get_real_volume(Mix_VolumeChunk(audio, -1));
-		return get_real_volume(Mix_VolumeChunk(audio, get_volume(value)));
-	}
-
 	/**
 	 * @brief Set/Lấy giá trị Master Volume
 	 * @ingroup audio mixer volume
@@ -142,7 +73,57 @@ struct Audio_Mixer {
 	 */
 	struct Music
 	{
-		Audio_Memory memory;
+		/**
+		 * @class Memory audio.h
+		 * @ingroup audio music memory
+		 * @brief Lớp quản lý Bộ nhớ cho các Music đã được tải.
+		 */
+		struct Memory : std::unordered_map<const char*, Mix_Music*>
+		{
+			/**
+			 * @brief Giải phóng Music trong bộ nhớ.
+			 * @ingroup audio music memory
+			 * @param file_path Tên file Music.
+			 */
+			void free(const char* file_path)
+			{
+				const auto value = this->find(file_path);
+				auto audio = value->second;
+				Mix_FreeMusic(audio);
+				this->erase(value);
+			}
+			/**
+			* @brief Giải phóng TẤT CẢ Music trong bộ nhớ.
+			* @ingroup audio music memory
+			*/
+			void free_all()
+			{
+				for (const auto& item : *this) Mix_FreeMusic(item.second);
+				this->clear();
+			}
+			/**
+				 * @brief	Tải audio vào bộ nhớ.
+				 * @ingroup audio music memory
+				 * @param	file_path: Vị trí file Music.
+				 * @return	Mix_Music*: Music đã được nạp, nullptr nếu ko nạp dc.
+				 */
+			Mix_Music* load(const char* file_path)
+			{
+				// Nếu Music đã được tải thì ko cần nạp nữa
+				auto location = this->find(file_path);
+				if (location != this->end()) return location->second;
+
+				// Nạp âm thanh
+				Mix_Music* audio = Mix_LoadMUS(file_path);
+				if (audio == NULL)
+				{
+					//TODO: Expection: Can't play audio
+					return nullptr;
+				}
+				this->insert({ file_path, audio });
+				return audio;
+			}
+		} memory;
 		int volume;
 
 		/**
@@ -165,7 +146,7 @@ struct Audio_Mixer {
 		 */
 		bool load(const char* file_path)
 		{
-			return memory.load(file_path, false);
+			return memory.load(file_path);
 		}
 
 		/**
@@ -221,17 +202,68 @@ struct Audio_Mixer {
 	} music;
 
 	/**
-	 * @class Effect
+	 * @class Effects
 	 * @ingroup audio mixer
 	 * @brief Lớp quản lý Các effect (wav).
 	 */
-	struct Effect
+	struct Effects
 	{
-		Audio_Memory memory;
+		/**
+		 * @class Memory audio.h
+		 * @ingroup audio effects memory
+		 * @brief Lớp quản lý Bộ nhớ cho các Effect đã được tải.
+		 */
+		struct Memory : std::unordered_map<const char*, Mix_Chunk*>
+		{
+			/**
+			 * @brief Giải phóng Effect trong bộ nhớ.
+			 * @ingroup audio effects memory
+			 * @param file_path Tên file Effect.
+			 */
+			void free(const char* file_path)
+			{
+				const auto value = this->find(file_path);
+				const auto audio = value->second;
+				Mix_FreeChunk(audio);
+				this->erase(value);
+			}
+
+			/**
+			* @brief Giải phóng TẤT CẢ Effect trong bộ nhớ.
+			* @ingroup audio effects memory
+			*/
+			void free_all()
+			{
+				for (const auto &[key, value] : *this) Mix_FreeChunk(value);
+				this->clear();
+			}
+			/**
+				 * @brief	Tải audio vào bộ nhớ.
+				 * @ingroup audio effects memory
+				 * @param	file_path: Vị trí file Music.
+				 * @return	Mix_Music*: Effect đã được nạp, nullptr nếu ko nạp dc.
+				 */
+			Mix_Chunk* load(const char* file_path)
+			{
+				// Nếu Effect đã được tải thì ko cần nạp nữa
+				auto location = this->find(file_path);
+				if (location != this->end()) return location->second;
+
+				// Nạp Effect
+				Mix_Chunk* audio = Mix_LoadWAV(file_path);
+				if (audio == NULL)
+				{
+					//TODO: Expection: Can't play audio
+					return nullptr;
+				}
+				this->insert({ file_path, audio });
+				return audio;
+			}
+		} memory;
 		int volume;
 
 		/**
-		 * @brief Set/Lấy giá trị Effect Volume
+		 * @brief Set/Lấy giá trị Effect Volume Tổng thể
 		 * @ingroup audio effect volume
 		 * @param value Giá trị cần set, -1 nếu cần lấy giá trị.
 		 * @return int: Giá trị trung bình volume các channels.
@@ -243,6 +275,20 @@ struct Audio_Mixer {
 		}
 
 		/**
+		 * @brief Set/Lấy giá trị Volume của Effect cụ thể
+		 * @ingroup audio effect volume
+		 * @param file_name: Tên file Effect muốn thao tác.
+		 * @param value Giá trị cần set, -1 nếu cần Lấy giá trị.
+		 * @return int: Giá trị trước khi set.
+		 */
+		int set_effect_volume(const char* file_name, const int value = -1) const
+		{
+			const auto audio = memory.find(file_name)->second;
+			if (value < 0) return get_real_volume(Mix_VolumeChunk(audio, -1));
+			return get_real_volume(Mix_VolumeChunk(audio, get_volume(value)));
+		}
+
+		/**
 		 * @brief	Tải Effect vào bộ nhớ.
 		 * @ingroup audio effect
 		 * @param	file_path: Vi tri file Effect (wav).
@@ -250,7 +296,7 @@ struct Audio_Mixer {
 		 */
 		bool load(const char* file_path)
 		{
-			return memory.load(file_path, true);
+			return memory.load(file_path);
 		}
 
 		/**
@@ -264,7 +310,7 @@ struct Audio_Mixer {
 			return Mix_PlayChannel(-1, audio, 0);
 		}
 
-		Effect()
+		Effects()
 		{
 			set_volume(DEFAULT_HITSOUND_VOLUME);
 		}
