@@ -439,5 +439,5 @@ FodyWeavers.xsd
 vcpkg-manifest-install.log
 
 ## Manifest Mode
-external/vcpkg-installed/
-/vcpkg_installed/x64-windows
+dependencies/vcpkg-installed/
+vcpkg-installed/
