@@ -74,20 +74,22 @@
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)obj\$(Platform)\$(Configuration)\</IntDir>
     <IncludePath>./include;$(IncludePath)</IncludePath>
+    <LibraryPath>.\dependencies\vcpkg_installed\$(PlatformTarget)-windows\lib\manual-link;.\dependencies\vcpkg_installed\$(PlatformTarget)-windows\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)obj\$(Platform)\$(Configuration)\</IntDir>
     <IncludePath>./include;$(IncludePath)</IncludePath>
+    <LibraryPath>.\dependencies\vcpkg_installed\$(PlatformTarget)-windows\lib\manual-link;.\dependencies\vcpkg_installed\$(PlatformTarget)-windows\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnableManifest>true</VcpkgEnableManifest>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <VcpkgInstalledDir>.\dependencies\vcpkg-installed</VcpkgInstalledDir>
+    <VcpkgInstalledDir>.\dependencies\vcpkg_installed</VcpkgInstalledDir>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <VcpkgInstalledDir>.\dependencies\vcpkg-installed</VcpkgInstalledDir>
+    <VcpkgInstalledDir>.\dependencies\vcpkg_installed</VcpkgInstalledDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
