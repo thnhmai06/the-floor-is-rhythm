@@ -49,7 +49,8 @@ struct General
 struct Metadata
 {
 	std::string title, artist, creator, difficulty_name, source;
-	std::unordered_set<std::string> tags;
+	//std::unordered_set<std::string> tags; TODO: Tìm CTDL Phù hợp cho truy vấn tìm kiếm beatmap
+	std::vector<std::string> tags;
 
 	void print(std::ofstream& writter) const
 	{

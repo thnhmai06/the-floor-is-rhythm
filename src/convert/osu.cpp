@@ -33,6 +33,7 @@ static Metadata convert_metadata(const Parser::MetadataSection& metadata)
 	result.creator = metadata.Creator;
 	result.difficulty_name = metadata.Version;
 	result.source = metadata.Source;
+	result.tags = metadata.Tags;
 	return result;
 }
 
