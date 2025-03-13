@@ -1,0 +1,3 @@
+[submodule "external/pkg/osu-parser"]
+	path = external/pkg/osu-parser
+	url = https://github.com/JustCabbage/osu-parser.git

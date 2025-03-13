@@ -5,6 +5,7 @@
 
 namespace osu
 {
+	// https://osu.ppy.sh/wiki/en/Client/File_formats
 	constexpr char SPACING = ':';
 
 	namespace General
