@@ -11,7 +11,7 @@
 #include <fstream>
 #include <format.h>
 #include <unordered_set>
-using tlir::SPACING, tlir::AND, tlir::ENDED;
+using tfir::SPACING, tfir::AND, tfir::ENDED;
 
 /**
   *
@@ -29,13 +29,13 @@ static bool is_equal(const float& var, const float value)
 struct General
 {
 	std::string audio_file;
-	int start_music_delay;
-	int preview_timestamp;
-	bool epilepsy_warning;
+	int start_music_delay = 0;
+	int preview_timestamp = 0;
+	bool epilepsy_warning = 0;
 
 	void print(std::ofstream& writer) const
 	{
-		using namespace tlir::General;
+		using namespace tfir::General;
 
 		writer << HEADER << '\n';
 		writer << AUDIO_FILE << SPACING << audio_file << '\n';
@@ -53,7 +53,7 @@ struct Metadata
 
 	void print(std::ofstream& writter) const
 	{
-		using namespace tlir::Metadata;
+		using namespace tfir::Metadata;
 
 		// Chuyển unordered_set thành string
 		std::string str_tags;
@@ -80,7 +80,7 @@ struct BasicDifficulty
 
 	void print(std::ofstream& writer) const
 	{
-		using namespace tlir::Difficulty;
+		using namespace tfir::Difficulty;
 
 		writer << HEADER << '\n';
 		writer << AR << SPACING << ar << '\n';
@@ -111,7 +111,7 @@ struct Difficulty
 
 		void apply(const float v)
 		{
-			using namespace tlir::Difficulty::AR_calculation;
+			using namespace tfir::Difficulty::AR_calculation;
 
 			value = v;
 			if (is_equal(v, 5))
@@ -151,7 +151,7 @@ struct Difficulty
 
 		void apply(const float v)
 		{
-			using namespace tlir::Difficulty::OD_calculation;
+			using namespace tfir::Difficulty::OD_calculation;
 
 			value = v;
 			perfect = Base::PERFECT - v * Multiply::PERFECT;
@@ -185,7 +185,7 @@ struct Difficulty
 
 	void print(std::ofstream& writer) const
 	{
-		using namespace  tlir::Difficulty;
+		using namespace  tfir::Difficulty;
 
 		writer << HEADER << '\n';
 		writer << AR << SPACING << ar.value << '\n';

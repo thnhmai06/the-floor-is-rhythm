@@ -36,7 +36,7 @@ namespace osu
 		constexpr std::string_view HP = "HPDrainRate";
 	}
 }
-namespace tlir
+namespace tfir
 {
 	namespace CONVERSION
 	{
