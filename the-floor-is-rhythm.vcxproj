@@ -78,7 +78,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>./dependencies/pkg/osu-parser/include;./dependencies/vcpkg-installed/x86-windows/include/;./include;$(IncludePath)</IncludePath>
-    <LibraryPath>.\external\vcpkg-installed\x86-windows\lib\manual-link;./external/vcpkg-installed/x86-windows/lib/;./external/pkg/osu-parser/include;$(LibraryPath)</LibraryPath>
+    <LibraryPath>.\dependencies\vcpkg-installed\x86-windows\lib\manual-link;./dependencies/vcpkg-installed/x86-windows/lib/;./dependencies/pkg/osu-parser/include;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
