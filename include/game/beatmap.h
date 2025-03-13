@@ -9,12 +9,9 @@
 #include <cmath>
 #include <string>
 #include <fstream>
-#include <iostream>
+#include <format.h>
 #include <unordered_set>
-
-constexpr std::string_view SPACING = "=";
-constexpr std::string_view ENDED = ";end";
-constexpr char AND = ',';
+using tlir::SPACING, tlir::AND, tlir::ENDED;
 
 /**
   *
@@ -31,14 +28,6 @@ static bool is_equal(const float& var, const float value)
 
 struct General
 {
-private:
-	const std::string_view GENERAL = "[General]";
-	const std::string_view AUDIO_FILE = "AudioFilename";
-	const std::string_view MUSIC_DELAY = "AudioLeadIn";
-	const std::string_view PREVIEW_TIMESTAMP = "PreviewTime";
-	const std::string_view EPILEPSY_WARNING = "EpilepsyWarning";
-
-public:
 	std::string audio_file;
 	int start_music_delay;
 	int preview_timestamp;
@@ -46,7 +35,9 @@ public:
 
 	void print(std::ofstream& writer) const
 	{
-		writer << GENERAL << '\n';
+		using namespace tlir::General;
+
+		writer << HEADER << '\n';
 		writer << AUDIO_FILE << SPACING << audio_file << '\n';
 		writer << MUSIC_DELAY << SPACING << start_music_delay << '\n';
 		writer << PREVIEW_TIMESTAMP << SPACING << preview_timestamp << '\n';
@@ -57,20 +48,13 @@ public:
 
 struct Metadata
 {
-private:
-	const std::string_view METADATA = "[Metadata]";
-	const std::string_view TITLE = "Title";
-	const std::string_view ARTIST = "Artist";
-	const std::string_view CREATOR = "Creator";
-	const std::string_view DIFF_NAME = "DifficultyName";
-	const std::string_view SOURCE = "Source";
-	const std::string_view TAGS = "Tags";
-public:
 	std::string title, artist, creator, difficulty_name, source;
 	std::unordered_set<std::string> tags;
 
 	void print(std::ofstream& writter) const
 	{
+		using namespace tlir::Metadata;
+
 		// Chuyển unordered_set thành string
 		std::string str_tags;
 		for (auto &tag: tags)
@@ -79,7 +63,7 @@ public:
 			str_tags.append(tag);
 		}
 
-		writter << METADATA << '\n';
+		writter << HEADER << '\n';
 		writter << TITLE << SPACING << title << '\n';
 		writter << ARTIST << SPACING << artist << '\n';
 		writter << CREATOR << SPACING << creator << '\n';
@@ -90,6 +74,22 @@ public:
 	}
 };
 
+struct BasicDifficulty
+{
+	float ar = -1, od = -1, hp = -1;
+
+	void print(std::ofstream& writer) const
+	{
+		using namespace tlir::Difficulty;
+
+		writer << HEADER << '\n';
+		writer << AR << SPACING << ar << '\n';
+		writer << HP << SPACING << hp << '\n';
+		writer << OD << SPACING << od << '\n';
+		writer << ENDED << "\n\n";
+	}
+};
+
 /**
  * @class Difficulty
  * @ingroup beatmap
@@ -97,13 +97,6 @@ public:
  */
 struct Difficulty
 {
-private:
-	const std::string_view DIFFICULTY = "[Difficulty]";
-	const std::string_view HP = "HPDrainRate";
-	const std::string_view OD = "OverallDifficulty";
-	const std::string_view AR = "ApproachRate";
-
-public:
 	/**
 	 * @class Approach_Rate
 	 * @ingroup beatmap difficulty
@@ -113,17 +106,14 @@ public:
 	{
 		// Follow: https://osu.ppy.sh/wiki/en/Beatmap/Approach_rate
 		// yeah, this game is "based" on osu! lmfao
-	private:
-		const float PREEMPT_AR5 = 1200;
-		const float FADE_IN_AR5 = 800;
 
-	public:
 		float value = -1, preempt_time = -1, fade_in_time = -1;
 
 		void apply(const float v)
 		{
-			value = v;
+			using namespace tlir::Difficulty::AR_calculation;
 
+			value = v;
 			if (is_equal(v, 5))
 			{
 				preempt_time = PREEMPT_AR5;
@@ -155,22 +145,18 @@ public:
 	{
 		// Follow: https://osu.ppy.sh/wiki/en/Beatmap/Overall_difficulty
 	private:
-		const int BASE_PERFECT = 80; // 300
-		const int BASE_GOOD = 140; // 100
-		const int BASE_BAD = 200; // 50
-		const int MULTIPLY_PERFECT = 6;
-		const int MULTIPLY_GOOD = 8;
-		const int MULTIPLY_BAD = 10;
 		// other = miss
 	public:
 		float value = -1, perfect = -1, good = -1, bad = -1;
 
 		void apply(const float v)
 		{
+			using namespace tlir::Difficulty::OD_calculation;
+
 			value = v;
-			perfect = BASE_PERFECT - v * MULTIPLY_PERFECT;
-			good = BASE_GOOD - v * MULTIPLY_GOOD;
-			bad = BASE_BAD - v * MULTIPLY_BAD;
+			perfect = Base::PERFECT - v * Multiply::PERFECT;
+			good = Base::GOOD - v * Multiply::GOOD;
+			bad = Base::BAD - v * Multiply::BAD;
 		}
 		void apply() { apply(value); }
 
@@ -199,11 +185,21 @@ public:
 
 	void print(std::ofstream& writer) const
 	{
-		writer << DIFFICULTY << '\n';
+		using namespace  tlir::Difficulty;
+
+		writer << HEADER << '\n';
 		writer << AR << SPACING << ar.value << '\n';
 		writer << HP << SPACING << hp.value << '\n';
 		writer << OD << SPACING << od.value << '\n';
 		writer << ENDED << "\n\n";
+	}
+
+	Difficulty() = default;
+	Difficulty(const BasicDifficulty basic)
+	{
+		ar.apply(basic.ar);
+		od.apply(basic.od);
+		hp.apply(basic.hp);
 	}
 };
 
