@@ -2,10 +2,9 @@
 
 int main(int argc, char *argv[])
 {
-	SDL_Init(SDL_INIT_VIDEO);
-	IMG_Init(IMG_INIT_PNG);
-	TTF_Init();
-
-	SDL_Quit();
+	OSU_H::convert(
+		"D:\\PROGRAM\\osu!\\Songs\\2287992 Camellia - Operation_ Zenithfall\\Camellia - Operation Zenithfall (Mir) [Final Mission].osu", 
+		"D:\\output.txt"
+	);
 	return 0;
 }

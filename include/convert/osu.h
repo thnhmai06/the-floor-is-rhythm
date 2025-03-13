@@ -4,8 +4,6 @@
 #include <fstream>
 #include "beatmap.h"
 
-static General convert_general(std::ifstream&, std::string&);
-static Difficulty convert_difficulty(std::ifstream&, std::string&);
-static Metadata convert_metadata(std::ifstream&, std::string&);
+void convert(const char* file_name, const char* output);
 
 #endif
