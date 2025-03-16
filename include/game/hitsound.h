@@ -1,41 +1,30 @@
-#ifndef GAME_HITSOUND_H
+﻿#ifndef GAME_HITSOUND_H
 #define GAME_HITSOUND_H
 
-struct Hitsound
+#include <osu!parser/Parser/Structures/Beatmap/HitObject.hpp>
+// lưu trữ Hitsound và Hitsample dựa trên cấu trúc của osu!
+// (mình là người viết ra mấy đống này mà xD)
+
+
+struct Hitsound : Parser::Hitsound
 {
-	struct Type
+	Hitsound& operator= (const Parser::Hitsound& hs)
 	{
-		const int WHISTLE = 2;
-		const int FINISH = 4;
-		const int CLAP = 8;
+		Whistle = hs.Whistle;
+		Finish = hs.Finish;
+		Clap = hs.Clap;
 
-		int value = 0;
-		bool whistle = false;
-		bool finish = false;
-		bool clap = false;
-
-		void apply(int v)
-		{
-			value = v;
-			if (v > CLAP)
-			{
-				clap = true;
-				v -= CLAP;
-			}
-			if (v > FINISH) {
-				finish = true;
-				v -= FINISH;
-			}
-			if (v > WHISTLE)
-			{
-				whistle = true;
-				v -= WHISTLE;
-			}
-		}
-
-		Type() = default;
-		Type(const int value) { apply(value); }
-	};
+		return *this;
+	}
 };
+struct HitSample : Parser::HitObject::HitSample
+{
+	HitSample& operator= (const Parser::HitObject::HitSample& hs)
+	{
+		Filename = hs.Filename;
+		Volume = hs.Volume;
 
+		return *this;
+	}
+};
 #endif

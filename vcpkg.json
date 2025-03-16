@@ -1,7 +1,4 @@
 {
-  "name": "the-floor-is-rhythm",
-  "version": "1.0.0",
-  "homepage": "https://github.com/thnhmai06/the-floor-is-rhythm",
   "dependencies": [
     "sdl2",
     "sdl2-image",

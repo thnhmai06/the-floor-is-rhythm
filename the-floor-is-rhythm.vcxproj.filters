@@ -18,10 +18,7 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\audio.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\convert\osu.cpp">
+    <ClCompile Include="src\convert\osu\beatmap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="include\game\object.h">
@@ -30,21 +27,21 @@
     <ClCompile Include="include\game\hitsound.h">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="include\utilities.h">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\main.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\audio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\game\beatmap.h">
+    <ClInclude Include="include\game\metadata.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\convert\osu.h">
+    <ClInclude Include="include\convert\osu\beatmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\format.h">
+    <ClInclude Include="include\file_format.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
