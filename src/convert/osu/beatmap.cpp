@@ -8,12 +8,14 @@
 
 static uint8_t get_direction_jump(const uint8_t colour_hax)
 {
+	constexpr uint8_t NO_ROTATE = 0;
 	constexpr uint8_t ROTATE_90 = 1;
 	constexpr uint8_t ROTATE_270 = 3;
 
 	// Loại bỏ hai hướng là cùng phương là hướng hiện tại và hướng ngược với nó
 	// Ta còn lại hai hướng phương vuông góc, colour_hax sẽ quyết định là hướng nào (vì còn 2 hướng nên quyết định bằng tính chẵn lẻ)
-	// colour_hax: 0 -> 7 (4 chẵn, 4 lẻ), nên xác suất là như nhau (trừ khi beatmap bên osu có ít màu combo hơn thì xác xuất nó khác)
+	// colour_hax: 1 -> 7 (3 cùng tính chẵn lẻ, 4 không cùng) nên xác suất là như nhau khi đầy đủ (trừ khi bên beatmap osu lẻ combo color)
+	if (colour_hax == 0) return NO_ROTATE;
 	return Utilities::is_bit_enabled(colour_hax, 1) ? ROTATE_90 : ROTATE_270;
 }
 static Metadata::General convert_general(const Parser::GeneralSection& general)
