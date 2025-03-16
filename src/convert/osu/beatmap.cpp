@@ -90,5 +90,7 @@ void convert(const char* file_name, const char* output)
 			convert_hitobject_floor(object).write(writer);
 		else convert_hitobject_slider(object).write(writer);
 	}
+	writer << tfir::SECTION_END << '\n';
+
 	writer.close();
 }
