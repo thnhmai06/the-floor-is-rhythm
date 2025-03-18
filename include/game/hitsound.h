@@ -21,8 +21,11 @@ struct HitSample : Parser::HitObject::HitSample
 {
 	HitSample& operator= (const Parser::HitObject::HitSample& hs)
 	{
-		Filename = hs.Filename;
+		NormalSet = hs.NormalSet;
+		AdditionSet = hs.AdditionSet;
+		Index = hs.Index;
 		Volume = hs.Volume;
+		Filename = hs.Filename;
 
 		return *this;
 	}

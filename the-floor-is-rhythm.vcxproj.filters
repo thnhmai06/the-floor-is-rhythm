@@ -30,6 +30,9 @@
     <ClCompile Include="include\utilities.h">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="dependencies\osu-parser\include\osu!parser\Parser\Structures\Beatmap\Sections\ColourSection.hpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\audio.h">

@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <fstream>
 #include <vector>
+#include <SDL2/SDL_pixels.h>
 #include "file_format.h"
 #include "game/hitsound.h"
 

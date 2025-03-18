@@ -152,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="dependencies\osu-parser\include\osu!parser\Parser\Structures\Beatmap\Sections\ColourSection.hpp" />
     <ClCompile Include="include\game\hitsound.h" />
     <ClCompile Include="include\game\object.h" />
     <ClCompile Include="src\convert\osu\beatmap.cpp" />
