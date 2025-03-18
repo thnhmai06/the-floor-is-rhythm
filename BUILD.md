@@ -13,6 +13,7 @@ Trước khi tiến hành build, hãy đảm bảo bạn đã cài đặt các c
 📥 Tải mã nguồn từ GitHub:
 ```sh
 git clone https://github.com/thnhmai06/the-floor-is-rhythm.git --recursive
+cd the-floor-is-rhythm
 ```
 📌 *Lưu ý: Thêm `--recursive` để tải cả submodules!*
 
