@@ -1,10 +1,9 @@
 ﻿/**
- *	@file beatmap.h
+ *	@file metadata.h
  *	@brief Các lớp biểu diễn các thành phần Beatmap
  *	@author Mai Thành (@thnhmai06)
  */
-#ifndef GAME_METADATA_H
-#define GAME_METADATA_H
+#pragma once
 
 #include <cmath>
 #include <string>
@@ -207,4 +206,3 @@ namespace Metadata
 	};
 
 }
-#endif

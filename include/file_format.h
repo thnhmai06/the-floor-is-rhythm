@@ -1,5 +1,4 @@
-#ifndef FILEFORMAT_H
-#define FILEFORMAT_H
+#pragma once
 
 #include <string_view>
 
@@ -111,4 +110,3 @@ namespace tfir
 
 		}
 	}
-#endif

@@ -1,5 +1,4 @@
-﻿#ifndef GAME_HITSOUND_H
-#define GAME_HITSOUND_H
+﻿#pragma once
 
 #include <osu!parser/Parser/Structures/Beatmap/HitObject.hpp>
 // lưu trữ Hitsound và Hitsample dựa trên cấu trúc của osu!
@@ -30,4 +29,3 @@ struct HitSample : Parser::HitObject::HitSample
 		return *this;
 	}
 };
-#endif

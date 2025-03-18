@@ -4,9 +4,7 @@
  *@author Mai Thành (@thnhmai06)
  */
 // ♫ Camellia - Operation: Zenithfall
-
-#ifndef AUDIO_H
-#define AUDIO_H
+#pragma once
 
 #include <unordered_map>
 #include <SDL2/SDL.h>
@@ -336,4 +334,3 @@ struct Audio_Mixer {
 		Mix_Quit();
 	}
 };
-#endif // AUDIO_H

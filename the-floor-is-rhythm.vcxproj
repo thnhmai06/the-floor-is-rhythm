@@ -158,6 +158,7 @@
     <ClCompile Include="src\convert\osu\beatmap.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="include\utilities.h" />
+    <ClCompile Include="src\render\object.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\audio.h" />
