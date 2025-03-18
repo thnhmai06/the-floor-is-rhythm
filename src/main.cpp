@@ -1,9 +1,9 @@
 #include <iostream>
-#include <convert/osu/beatmap.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_opengl.h>
 
-constexpr int SCREEN_WIDTH = 640;
-constexpr int SCREEN_HEIGHT = 480;
+constexpr int32_t SCREEN_WIDTH = 640;
+constexpr int32_t SCREEN_HEIGHT = 480;
 
 void wait_key_pressed()
 {
@@ -14,13 +14,8 @@ void wait_key_pressed()
 	}
 }
 
-int main(int argc, char *argv[])
+int32_t main(int32_t argc, char *argv[])
 {
-	/*CONVERT_OSU_BEATMAP_H::convert(
-		"D:\\PROGRAM\\osu!\\Songs\\2287992 Camellia - Operation_ Zenithfall\\Camellia - Operation Zenithfall (Mir) [Final Mission].osu", 
-		"D:\\output.tfd"
-	);*/
-	// init
 	SDL_Window* window = nullptr;
 	SDL_Renderer* renderer = nullptr;
 	SDL_Init(SDL_INIT_EVERYTHING);
@@ -34,9 +29,9 @@ int main(int argc, char *argv[])
 
 	// draw rect
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-	constexpr int SIZE = 100;
-	constexpr int POS_X = 200;
-	constexpr int POS_Y = 200;
+	constexpr int32_t SIZE = 100;
+	constexpr int32_t POS_X = 200;
+	constexpr int32_t POS_Y = 200;
 	SDL_Rect rect = { POS_X, POS_Y, SIZE, SIZE };
 	SDL_RenderDrawRect(renderer, &rect);
 	SDL_RenderPresent(renderer);

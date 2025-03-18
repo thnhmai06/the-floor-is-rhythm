@@ -28,7 +28,7 @@ namespace HitObject
 
 	struct Floor
 	{
-		int time = 0;
+		int32_t time = 0;
 		uint8_t direction_jump = 0;
 		uint8_t combo_jump = 0;
 		Hitsound hitsound;
@@ -45,12 +45,12 @@ namespace HitObject
 	{
 		struct Curve
 		{
-			int add_time = 0; // CurveTime = time + add_time
+			int32_t add_time = 0; // CurveTime = time + add_time
 			uint8_t direction_jump = 0;
 		};
 
-		int time = 0;
-		int end_time = 0;
+		int32_t time = 0;
+		int32_t end_time = 0;
 		uint8_t direction_jump = 0;
 		std::vector<Curve> curves;
 		uint8_t combo_jump = 0;

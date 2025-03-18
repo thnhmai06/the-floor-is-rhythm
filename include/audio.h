@@ -12,15 +12,15 @@
 
 //! Settings: (Low-offset Profile)
 //Volume
-const int DEFAULT_MASTER_VOLUME = 80; // Volume mặc định khi khởi tạo bộ Audio_Mixer
-const int DEFAULT_MUSIC_VOLUME = 80; // Volume mặc định khi khởi tạo Music
-const int DEFAULT_HITSOUND_VOLUME = 80; // Volume mặc định khi khởi tạo Effects
+const int32_t DEFAULT_MASTER_VOLUME = 80; // Volume mặc định khi khởi tạo bộ Audio_Mixer
+const int32_t DEFAULT_MUSIC_VOLUME = 80; // Volume mặc định khi khởi tạo Music
+const int32_t DEFAULT_HITSOUND_VOLUME = 80; // Volume mặc định khi khởi tạo Effects
 //Audio
-const int MAX_CHANNELS = 8; // Giới hạn số kênh phát Effects tối đa (mỗi một channel chạy 1 effect)
-const int SAMPLE_FREQUENCY = 48000; // Tần số âm thanh mẫu
-const int AUDIO_FORMAT = AUDIO_F32; // Format Âm thanh
-const int MONO = 1, STEREO = 2; // Phát âm thanh từ 1 hay 2 phía (L-R)
-const int BUFFER_SIZE = 256; // Kích cỡ Chunksize của mỗi buffer.
+const int32_t MAX_CHANNELS = 8; // Giới hạn số kênh phát Effects tối đa (mỗi một channel chạy 1 effect)
+const int32_t SAMPLE_FREQUENCY = 48000; // Tần số âm thanh mẫu
+const int32_t AUDIO_FORMAT = AUDIO_F32; // Format Âm thanh
+const int32_t MONO = 1, STEREO = 2; // Phát âm thanh từ 1 hay 2 phía (L-R)
+const int32_t BUFFER_SIZE = 256; // Kích cỡ Chunksize của mỗi buffer.
 
 /**
  * @brief Chuyển đối Thực tế -> SDL_Mixer
@@ -28,7 +28,7 @@ const int BUFFER_SIZE = 256; // Kích cỡ Chunksize của mỗi buffer.
  * @param v Giá trị thực tế.
  * @return int: Giá trị theo SDL_Mixer.
 */
-static int get_volume(const int v)
+static int32_t get_volume(const int32_t v)
 {
 	if (v < 0) return -1;
 	return (MIX_MAX_VOLUME * v) / 100;
@@ -40,7 +40,7 @@ static int get_volume(const int v)
  * @param v Giá trị SDL_Mixer
  * @return int: Giá trị Thực tế
  */
-static int get_real_volume(const int v)
+static int32_t get_real_volume(const int32_t v)
 {
 	return (v * 100) / MIX_MAX_VOLUME;
 }
@@ -51,14 +51,14 @@ static int get_real_volume(const int v)
  * @brief Bộ trộn Âm thanh.
  */
 struct Audio_Mixer {
-	int volume;
+	int32_t volume;
 	/**
 	 * @brief Set/Lấy giá trị Master Volume
 	 * @ingroup audio mixer volume
 	 * @param value Giá trị cần set, -1 nếu cần lấy giá trị.
 	 * @return int: Giá trị trước khi set.
 	 */
-	int set_volume(const int value = -1)
+	int32_t set_volume(const int32_t value = -1)
 	{
 		if (value >= 0) volume = value;
 		return get_real_volume(Mix_MasterVolume(get_volume(value)));
@@ -122,7 +122,7 @@ struct Audio_Mixer {
 				return audio;
 			}
 		} memory;
-		int volume;
+		int32_t volume;
 
 		/**
 		 * @brief Set/Lấy giá trị Music Volume
@@ -130,7 +130,7 @@ struct Audio_Mixer {
 		 * @param value Giá trị cần set, -1 nếu cần Lấy giá trị.
 		 * @return int: Giá trị trước khi set.
 		*/
-		int set_volume(const int value = -1)
+		int32_t set_volume(const int32_t value = -1)
 		{
 			if (value >= 0) volume = value;
 			return get_real_volume(Mix_VolumeMusic(get_volume(value)));
@@ -154,7 +154,7 @@ struct Audio_Mixer {
 		 * @param while_playing_another: Có phát khi có bài khác đang phát không?
 		 * @return int: 0 nếu Thành công, -1 nếu Thất bại
 		 */
-		int play(const char* file_path, const bool while_playing_another = true) const
+		int32_t play(const char* file_path, const bool while_playing_another = true) const
 		{
 			if (!while_playing_another && Mix_PlayingMusic() == 1) return -1;
 			const auto audio = memory.find(file_path)->second;
@@ -191,7 +191,7 @@ struct Audio_Mixer {
 		 * @ingroup audio music
 		 * @return int: 0 - Thành công, -1 - Lỗi (vd ko có nhạc đang phát) 
 		 */
-		static int stop() { return Mix_HaltMusic(); }
+		static int32_t stop() { return Mix_HaltMusic(); }
 
 		Music()
 		{
@@ -258,7 +258,7 @@ struct Audio_Mixer {
 				return audio;
 			}
 		} memory;
-		int volume;
+		int32_t volume;
 
 		/**
 		 * @brief Set/Lấy giá trị Effect Volume Tổng thể
@@ -266,7 +266,7 @@ struct Audio_Mixer {
 		 * @param value Giá trị cần set, -1 nếu cần lấy giá trị.
 		 * @return int: Giá trị trung bình volume các channels.
 		 */
-		int set_volume(const int value = -1)
+		int32_t set_volume(const int32_t value = -1)
 		{
 			if (value >= 0) volume = value;
 			return get_real_volume(Mix_Volume(-1, get_volume(value)));
@@ -279,7 +279,7 @@ struct Audio_Mixer {
 		 * @param value Giá trị cần set, -1 nếu cần Lấy giá trị.
 		 * @return int: Giá trị trước khi set.
 		 */
-		int set_effect_volume(const char* file_name, const int value = -1) const
+		int32_t set_effect_volume(const char* file_name, const int32_t value = -1) const
 		{
 			const auto audio = memory.find(file_name)->second;
 			if (value < 0) return get_real_volume(Mix_VolumeChunk(audio, -1));
@@ -302,7 +302,7 @@ struct Audio_Mixer {
 		 * @param file_path: Vi tri file Effect (wav).
 		 * @return int: Channel mà effect được phát, -1 nếu bị lỗi.
 		 */
-		int play(const char* file_path) const
+		int32_t play(const char* file_path) const
 		{
 			const auto audio = memory.find(file_path)->second;
 			return Mix_PlayChannel(-1, audio, 0);

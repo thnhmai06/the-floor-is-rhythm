@@ -85,16 +85,16 @@ namespace tfir
 			{
 				namespace Base
 				{
-					constexpr int PERFECT = 80; // 300
-					constexpr int GOOD = 140; // 100
-					constexpr int BAD = 200; // 50
+					constexpr int32_t PERFECT = 80; // 300
+					constexpr int32_t GOOD = 140; // 100
+					constexpr int32_t BAD = 200; // 50
 				}
 
 				namespace Multiply
 				{
-					constexpr int PERFECT = 6; // 300
-					constexpr int GOOD = 8; // 100
-					constexpr int BAD = 10; // 50
+					constexpr int32_t PERFECT = 6; // 300
+					constexpr int32_t GOOD = 8; // 100
+					constexpr int32_t BAD = 10; // 50
 				}
 			}
 		}

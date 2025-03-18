@@ -31,8 +31,8 @@ namespace Metadata
 	struct General
 	{
 		std::string audio_file;
-		int start_music_delay = 0;
-		int preview_timestamp = 0;
+		int32_t start_music_delay = 0;
+		int32_t preview_timestamp = 0;
 		bool epilepsy_warning = 0;
 
 		void write(std::ofstream& writer) const
