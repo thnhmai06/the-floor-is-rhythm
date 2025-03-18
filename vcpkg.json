@@ -1,11 +1,8 @@
 {
   "dependencies": [
-    "sdl2",
-    "sdl2-image",
-    "sdl2-mixer",
-    "sdl2-ttf",
-    "opengl",
-    "glm",
-    "glew"
+    "glew",
+    "sdl3",
+    "sdl3-image",
+    "sdl3-ttf"
   ]
 }

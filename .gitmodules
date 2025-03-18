@@ -1,3 +1,6 @@
 [submodule "dependencies/osu-parser"]
 	path = dependencies/osu-parser
 	url = https://github.com/thnhmai06/osu-parser.git
+[submodule "dependencies/SDL_mixer-build"]
+	path = dependencies/SDL_mixer-build
+	url = https://github.com/thnhmai06/SDL_mixer-build.git

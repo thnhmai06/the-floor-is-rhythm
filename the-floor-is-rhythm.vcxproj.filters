@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\main.cpp">
+    <ClCompile Include="src\example.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\convert\osu\beatmap.cpp">
@@ -48,6 +48,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\file_format.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

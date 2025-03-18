@@ -73,21 +73,19 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)obj\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>.\dependencies\osu-parser\include;./include;$(IncludePath)</IncludePath>
+    <IncludePath>.\dependencies\SDL_mixer-build\include;.\dependencies\osu-parser\include;.\include;$(IncludePath)</IncludePath>
     <LibraryPath>.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib\manual-link;.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)obj\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>.\dependencies\osu-parser\include;./include;$(IncludePath)</IncludePath>
+    <IncludePath>.\dependencies\SDL_mixer-build\include;.\dependencies\osu-parser\include;.\include;$(IncludePath)</IncludePath>
     <LibraryPath>.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib\manual-link;.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnableManifest>true</VcpkgEnableManifest>
   </PropertyGroup>
-  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <VcpkgInstalledDir>.\dependencies\vcpkg_installed</VcpkgInstalledDir>
-  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -101,7 +99,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_ttf.lib;SDL2_image.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -132,7 +130,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_ttf.lib;SDL2_image.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -156,7 +154,7 @@
     <ClCompile Include="include\game\hitsound.h" />
     <ClCompile Include="include\game\object.h" />
     <ClCompile Include="src\convert\osu\beatmap.cpp" />
-    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\example.cpp" />
     <ClCompile Include="include\utilities.h" />
     <ClCompile Include="src\render\object.cpp" />
   </ItemGroup>
@@ -165,6 +163,7 @@
     <ClInclude Include="include\file_format.h" />
     <ClInclude Include="include\game\metadata.h" />
     <ClInclude Include="include\convert\osu\beatmap.h" />
+    <ClInclude Include="include\main.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
