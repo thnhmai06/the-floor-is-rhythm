@@ -443,4 +443,4 @@ vcpkg_installed/
 
 ### Custom ###
 # dependency
-dependencies/*
+dependencies/*/*
