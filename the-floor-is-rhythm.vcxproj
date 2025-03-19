@@ -155,19 +155,29 @@
     <ClCompile Include="dependencies\osu-parser\include\osu!parser\Parser\Structures\Beatmap\Sections\ColourSection.hpp" />
     <ClCompile Include="include\game\hitsound.h" />
     <ClCompile Include="include\game\object.h" />
-    <ClCompile Include="include\logging\init.h" />
+    <ClCompile Include="include\logging.h" />
+    <ClCompile Include="src\audio\buses.cpp" />
+    <ClCompile Include="src\audio\memory.cpp" />
+    <ClCompile Include="src\audio\mixer.cpp" />
     <ClCompile Include="src\convert\osu\beatmap.cpp" />
+    <ClCompile Include="src\logging.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="include\utilities.h" />
     <ClCompile Include="src\render\object.cpp" />
+    <ClCompile Include="src\render\screen.cpp" />
+    <ClCompile Include="src\render\shader\common.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\audio.h" />
+    <ClInclude Include="include\audio\mixer.h" />
+    <ClInclude Include="include\audio\buses.h" />
+    <ClInclude Include="include\audio\memory.h" />
+    <ClInclude Include="include\config.h" />
     <ClInclude Include="include\expections\sdl.h" />
     <ClInclude Include="include\file_format.h" />
     <ClInclude Include="include\game\metadata.h" />
     <ClInclude Include="include\convert\osu\beatmap.h" />
-    <ClInclude Include="include\main.h" />
+    <ClInclude Include="include\render\screen.h" />
+    <ClInclude Include="include\render\shader\common.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

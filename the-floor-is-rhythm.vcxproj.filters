@@ -36,14 +36,29 @@
     <ClCompile Include="src\render\object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\logging\init.h">
+    <ClCompile Include="include\logging.h">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\render\screen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\render\shader\common.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\audio\buses.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\audio\memory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\audio\mixer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\logging.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\audio.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\game\metadata.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -53,10 +68,25 @@
     <ClInclude Include="include\file_format.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\main.h">
+    <ClInclude Include="include\expections\sdl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\expections\sdl.h">
+    <ClInclude Include="include\render\screen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\render\shader\common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\audio\mixer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\audio\buses.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\audio\memory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
