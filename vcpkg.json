@@ -1,8 +1,9 @@
 {
   "dependencies": [
-    "glew",
     "sdl3",
     "sdl3-image",
-    "sdl3-ttf"
+    "sdl3-ttf",
+    "quill",
+    "glm"
   ]
 }

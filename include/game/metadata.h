@@ -1,29 +1,18 @@
 ﻿/**
  *	@file metadata.h
- *	@brief Các lớp biểu diễn các thành phần Beatmap
+ *	@brief Các lớp biểu diễn Metadata của Beatmap
  *	@author Mai Thành (@thnhmai06)
  */
 #pragma once
 
-#include <cmath>
 #include <string>
 #include <fstream>
 #include <unordered_set>
 #include "file_format.h"
-using tfir::SEPARATOR, tfir::AND, tfir::SECTION_END;
+#include "utilities.h"
 
-/**
-  *
-  * @brief Kiểm tra biến có bằng giá trị không? (float)
-  * @param var Biến cần so sánh
-  * @param value Số cần đối chiếu
-  * @return bool: var == value với sai số tối thiểu EPSILON cho phép
-  */
-static bool is_equal(const float& var, const float value)
-{
-	const float EPSILON = 0.01;  // NOLINT(clang-diagnostic-implicit-float-conversion)
-	return abs(var - value) <= EPSILON;
-}
+using tfir::SEPARATOR, tfir::AND, tfir::SECTION_END;
+using Utilities::Math::is_equal_float;
 
 namespace Metadata
 {
@@ -116,7 +105,7 @@ namespace Metadata
 				using namespace tfir::Difficulty::AR_calculation;
 
 				value = v;
-				if (is_equal(v, 5))
+				if (is_equal_float(v, 5))
 				{
 					preempt_time = PREEMPT_AR5;
 					fade_in_time = FADE_IN_AR5;

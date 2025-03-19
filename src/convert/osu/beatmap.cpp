@@ -16,7 +16,7 @@ static uint8_t get_direction_jump(const uint8_t colour_hax)
 	// Ta còn lại hai hướng phương vuông góc, colour_hax sẽ quyết định là hướng nào (vì còn 2 hướng nên quyết định bằng tính chẵn lẻ)
 	// colour_hax: 1 -> 7 (3 cùng tính chẵn lẻ, 4 không cùng) nên xác suất là như nhau khi đầy đủ (trừ khi bên beatmap osu lẻ combo color)
 	if (colour_hax == 0) return NO_ROTATE;
-	return Utilities::is_bit_enabled(colour_hax, 1) ? ROTATE_90 : ROTATE_270;
+	return Utilities::Math::is_bit_enabled(colour_hax, 1) ? ROTATE_90 : ROTATE_270;
 }
 static Metadata::General convert_general(const Parser::GeneralSection& general)
 {

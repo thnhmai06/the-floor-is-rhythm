@@ -95,6 +95,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -126,6 +127,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -153,13 +155,15 @@
     <ClCompile Include="dependencies\osu-parser\include\osu!parser\Parser\Structures\Beatmap\Sections\ColourSection.hpp" />
     <ClCompile Include="include\game\hitsound.h" />
     <ClCompile Include="include\game\object.h" />
+    <ClCompile Include="include\logging\init.h" />
     <ClCompile Include="src\convert\osu\beatmap.cpp" />
-    <ClCompile Include="src\example.cpp" />
+    <ClCompile Include="src\main.cpp" />
     <ClCompile Include="include\utilities.h" />
     <ClCompile Include="src\render\object.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\audio.h" />
+    <ClInclude Include="include\expections\sdl.h" />
     <ClInclude Include="include\file_format.h" />
     <ClInclude Include="include\game\metadata.h" />
     <ClInclude Include="include\convert\osu\beatmap.h" />
