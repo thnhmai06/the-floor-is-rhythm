@@ -21,19 +21,10 @@
     <ClCompile Include="src\convert\osu\beatmap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\game\object.h">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="include\game\hitsound.h">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="include\utilities.h">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dependencies\osu-parser\include\osu!parser\Parser\Structures\Beatmap\Sections\ColourSection.hpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="include\logging.h">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\render\screen.cpp">
@@ -94,6 +85,15 @@
     </ClInclude>
     <ClInclude Include="include\config.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\game\hitsound.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\game\object.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\logging.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

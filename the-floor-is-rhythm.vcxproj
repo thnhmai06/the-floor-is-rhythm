@@ -75,14 +75,14 @@
     <IntDir>$(SolutionDir)obj\$(Platform)\$(Configuration)\</IntDir>
     <IncludePath>.\dependencies\SDL_mixer-build\include;.\dependencies\osu-parser\include;.\include;$(IncludePath)</IncludePath>
     <LibraryPath>.\dependencies\SDL_mixer-build\lib;.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib\manual-link;.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib;$(LibraryPath)</LibraryPath>
-    <SourcePath>$(SourcePath)</SourcePath>
+    <SourcePath>;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)obj\$(Platform)\$(Configuration)\</IntDir>
     <IncludePath>.\dependencies\SDL_mixer-build\include;.\dependencies\osu-parser\include;.\include;$(IncludePath)</IncludePath>
     <LibraryPath>.\dependencies\SDL_mixer-build\lib;.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib\manual-link;.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib;$(LibraryPath)</LibraryPath>
-    <SourcePath>$(SourcePath)</SourcePath>
+    <SourcePath>;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnableManifest>true</VcpkgEnableManifest>
@@ -155,9 +155,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dependencies\osu-parser\include\osu!parser\Parser\Structures\Beatmap\Sections\ColourSection.hpp" />
-    <ClCompile Include="include\game\hitsound.h" />
-    <ClCompile Include="include\game\object.h" />
-    <ClCompile Include="include\logging.h" />
+    <ClInclude Include="include\game\hitsound.h" />
+    <ClInclude Include="include\game\object.h" />
+    <ClInclude Include="include\logging.h" />
     <ClCompile Include="src\audio\buses.cpp" />
     <ClCompile Include="src\audio\memory.cpp" />
     <ClCompile Include="src\audio\mixer.cpp" />

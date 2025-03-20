@@ -1,5 +1,4 @@
 #include "game/hitsound.h" // Header
-#include <osu!parser/Parser/Structures/Beatmap/HitObject.hpp>
 
 //! Hitsound
 Hitsound& Hitsound::operator= (const Parser::Hitsound& hs)
