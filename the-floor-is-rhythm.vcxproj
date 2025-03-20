@@ -160,6 +160,9 @@
     <ClCompile Include="src\audio\memory.cpp" />
     <ClCompile Include="src\audio\mixer.cpp" />
     <ClCompile Include="src\convert\osu\beatmap.cpp" />
+    <ClCompile Include="src\game\hitsound.cpp" />
+    <ClCompile Include="src\game\metadata.cpp" />
+    <ClCompile Include="src\game\object.cpp" />
     <ClCompile Include="src\logging.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="include\utilities.h" />
