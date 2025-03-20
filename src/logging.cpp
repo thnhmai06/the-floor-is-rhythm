@@ -1,30 +1,25 @@
 ﻿#include "logging.h" // Header
-#include <quill/Backend.h>
-#include <quill/Frontend.h>
-#include <quill/sinks/ConsoleSink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <vector>
+#include "utilities.h"
 
-quill::Logger* LogSystem::init(const std::string& name, const bool debug)
+void Logging::init(const std::string name, const spdlog::level::level_enum level, const uint32_t num_backtrace)
 {
-	quill::Backend::start();
+	const std::string log_dir = std::format("{}/{}/", PATH, Utilities::Time::get_current_time());
 
-	// Tạo sink
-	auto console_sink = quill::Frontend::create_or_get_sink<quill::ConsoleSink>("Console");
-	auto file_sink = quill::Frontend::create_or_get_sink<quill::FileSink>("logs\\" + name,
-		[] {
-			quill::FileSinkConfig cfg;
-			cfg.set_open_mode('w');
-			cfg.set_filename_append_option(
-				quill::FilenameAppendOption::StartCustomTimestampFormat,
-				" %Y-%m-%d %H-%M-%S.log"
-			);
-			return cfg;
-		}(), quill::FileEventNotifier{});
+	const auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+	const auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(log_dir + "main.log", true);
+	const auto error_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(log_dir + "error.log", true);
 
-	// Logger của chúng ta đây :3
-	logger = quill::Frontend::create_or_get_logger(name, { console_sink, file_sink });
-	if (debug)
-		logger->set_log_level(quill::LogLevel::Debug);
-	else logger->set_log_level(quill::LogLevel::Info);
+	error_sink->set_level(spdlog::level::err);
+	std::vector<spdlog::sink_ptr> sinks{ console_sink, file_sink, error_sink };
+	const auto logger = std::make_shared<spdlog::logger>(name, sinks.begin(), sinks.end());
 
-	return logger;
+	logger->set_pattern("[%d/%m/%Y %X] %n %^[%l] [thread %t] [%s:%# (%!)] %v%$");
+	logger->set_level(level);
+	logger->enable_backtrace(num_backtrace);
+
+	set_default_logger(logger);
+	spdlog::flush_on(spdlog::level::err);
 }
