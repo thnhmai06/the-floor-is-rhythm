@@ -1,4 +1,5 @@
 #include "game/hitsound.h" // Header
+#include <osu!parser/Parser/Structures/Beatmap/HitObject.hpp>
 
 //! Hitsound
 Hitsound& Hitsound::operator= (const Parser::Hitsound& hs)
@@ -6,6 +7,7 @@ Hitsound& Hitsound::operator= (const Parser::Hitsound& hs)
 	Whistle = hs.Whistle;
 	Finish = hs.Finish;
 	Clap = hs.Clap;
+
 	return *this;
 }
 

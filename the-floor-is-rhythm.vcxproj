@@ -74,13 +74,15 @@
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)obj\$(Platform)\$(Configuration)\</IntDir>
     <IncludePath>.\dependencies\SDL_mixer-build\include;.\dependencies\osu-parser\include;.\include;$(IncludePath)</IncludePath>
-    <LibraryPath>.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib\manual-link;.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>.\dependencies\SDL_mixer-build\lib;.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib\manual-link;.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib;$(LibraryPath)</LibraryPath>
+    <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)obj\$(Platform)\$(Configuration)\</IntDir>
     <IncludePath>.\dependencies\SDL_mixer-build\include;.\dependencies\osu-parser\include;.\include;$(IncludePath)</IncludePath>
-    <LibraryPath>.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib\manual-link;.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>.\dependencies\SDL_mixer-build\lib;.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib\manual-link;.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib;$(LibraryPath)</LibraryPath>
+    <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnableManifest>true</VcpkgEnableManifest>
@@ -100,7 +102,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL3_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -132,7 +134,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL3_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -166,9 +168,8 @@
     <ClCompile Include="src\logging.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="include\utilities.h" />
-    <ClCompile Include="src\render\object.cpp" />
     <ClCompile Include="src\render\screen.cpp" />
-    <ClCompile Include="src\render\shader\common.cpp" />
+    <ClCompile Include="src\render\shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\audio\mixer.h" />
@@ -180,7 +181,7 @@
     <ClInclude Include="include\game\metadata.h" />
     <ClInclude Include="include\convert\osu\beatmap.h" />
     <ClInclude Include="include\render\screen.h" />
-    <ClInclude Include="include\render\shader\common.h" />
+    <ClInclude Include="include\render\shader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

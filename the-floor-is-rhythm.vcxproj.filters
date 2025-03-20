@@ -33,16 +33,13 @@
     <ClCompile Include="dependencies\osu-parser\include\osu!parser\Parser\Structures\Beatmap\Sections\ColourSection.hpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\render\object.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="include\logging.h">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\render\screen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\render\shader\common.cpp">
+    <ClCompile Include="src\render\shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\audio\buses.cpp">
@@ -83,7 +80,7 @@
     <ClInclude Include="include\render\screen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\render\shader\common.h">
+    <ClInclude Include="include\render\shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\audio\mixer.h">

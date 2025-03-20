@@ -45,4 +45,4 @@ namespace HitObject
 
 		void write(std::ofstream& writer) const;
 	};
-};
+}
