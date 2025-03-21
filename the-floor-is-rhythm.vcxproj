@@ -95,9 +95,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,9 +127,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -168,7 +168,7 @@
     <ClCompile Include="src\logging.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="include\utilities.h" />
-    <ClCompile Include="src\render\screen.cpp" />
+    <ClCompile Include="src\render\update.cpp" />
     <ClCompile Include="src\render\shader.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -180,7 +180,8 @@
     <ClInclude Include="include\file_format.h" />
     <ClInclude Include="include\game\metadata.h" />
     <ClInclude Include="include\convert\osu\beatmap.h" />
-    <ClInclude Include="include\render\screen.h" />
+    <ClInclude Include="include\main.h" />
+    <ClInclude Include="include\render\update.h" />
     <ClInclude Include="include\render\shader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

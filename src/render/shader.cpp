@@ -1,15 +1,10 @@
 #include "render/shader.h" // Header
+#include "main.h"
 #include <SDL3/SDL_filesystem.h>
 #include "expections/sdl.h"
 
-using namespace SDL_Exception::Shader;
+using namespace SDL_Exceptions::Shader;
 constexpr char Shader_Location[] = "content/Shaders/Compiled/";
-static const char* Base_Path {};
-
-void init_asset_loader()
-{
-	Base_Path = SDL_GetBasePath();
-}
 
 SDL_GPUShader* load_shader(
 	SDL_GPUDevice* device,

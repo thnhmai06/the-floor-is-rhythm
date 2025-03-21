@@ -1,8 +1,9 @@
 #pragma once
+#include <format>
 #include <stdexcept>
 #include <SDL3/SDL_error.h>
 
-namespace SDL_Exception
+namespace SDL_Exceptions
 {
 	struct SDL_Exception : std::runtime_error
 	{
@@ -21,6 +22,10 @@ namespace SDL_Exception
 		struct SDL_CreateGPUDevice_Failed : SDL_Exception
 		{
 			explicit SDL_CreateGPUDevice_Failed() : SDL_Exception("Creating GPU device failed") {}
+		};
+		struct SDL_CreateRenderer_Failed : SDL_Exception
+		{
+			explicit SDL_CreateRenderer_Failed() : SDL_Exception("Creating renderer failed") {}
 		};
 		struct SDL_ClaimWindowForGPUDevice_Failed : SDL_Exception
 		{
@@ -47,11 +52,30 @@ namespace SDL_Exception
 		};
 		struct SDL_FailedToLoadShaderFromDisk : SDL_Exception
 		{
-			explicit SDL_FailedToLoadShaderFromDisk(const std::string& fullPath) : SDL_Exception("Failed to load shader from disk: " + fullPath) {}
+			explicit SDL_FailedToLoadShaderFromDisk(const std::string& full_path) : SDL_Exception("Failed to load shader from disk: " + full_path) {}
 		};
 		struct SDL_FailedToCreateShader : SDL_Exception
 		{
 			explicit SDL_FailedToCreateShader() : SDL_Exception("Failed to create shader") {}
+		};
+	}
+	namespace Image
+	{
+		struct SDL_CouldntLoadImage : SDL_Exception
+		{
+			explicit SDL_CouldntLoadImage(const std::string& full_path) : SDL_Exception("Couldn't load image: " + full_path) {}
+		};
+		struct SDL_UnsupportedNumberOfChannels : SDL_Exception
+		{
+			explicit SDL_UnsupportedNumberOfChannels(const int32_t& num_channels) :
+				SDL_Exception(std::format("Unsupported number of channels: {}", num_channels)) {}
+		};
+	}
+	namespace Texture
+	{
+		struct SDL_CouldntCreateTexture : SDL_Exception
+		{
+			explicit SDL_CouldntCreateTexture() : SDL_Exception("Couldn't create texture") {}
 		};
 	}
 }
