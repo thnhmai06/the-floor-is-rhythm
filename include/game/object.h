@@ -3,7 +3,7 @@
 #include <vector>
 #include "game/hitsound.h"
 
-namespace HitObject
+namespace HitObjects
 {
 	constexpr uint8_t NUM_COMBOS = 8;
 	constexpr uint8_t NUM_DIRECTIONS = 4;

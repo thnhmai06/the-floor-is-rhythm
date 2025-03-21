@@ -47,9 +47,9 @@ static Metadata::Metadata convert_metadata(const Parser::MetadataSection& metada
 	result.tags = metadata.Tags;
 	return result;
 }
-static HitObject::Slider convert_hitobject_slider(const Parser::HitObject& object)
+static HitObjects::Slider convert_hitobject_slider(const Parser::HitObject& object)
 {
-	HitObject::Slider slider;
+	HitObjects::Slider slider;
 	slider.time = object.Time;
 	slider.end_time = object.EndTime;
 	slider.direction_jump = get_direction_jump(object.Type.ColourHax);
@@ -58,9 +58,9 @@ static HitObject::Slider convert_hitobject_slider(const Parser::HitObject& objec
 	slider.hitsample = object.Hitsample;
 	return slider;
 }
-static HitObject::Floor convert_hitobject_floor(const Parser::HitObject& object)
+static HitObjects::Floor convert_hitobject_floor(const Parser::HitObject& object)
 {
-	HitObject::Floor floor;
+	HitObjects::Floor floor;
 	floor.time = object.Time;
 	floor.direction_jump = get_direction_jump(object.Type.ColourHax);
 	floor.combo_jump = object.Type.ColourHax;
