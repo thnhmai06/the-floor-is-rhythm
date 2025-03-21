@@ -1,6 +1,6 @@
 #include "game/object.h" // Header
 #include <fstream>
-#include "file_format.h"
+#include "rule/file_format.h"
 
 using namespace tfir::HitObjects;
 using tfir::AND;

@@ -1,6 +1,7 @@
 ﻿#include "game/metadata.h" // Header
-#include "file_format.h"
 #include "utilities.h"
+#include "rule/file_format.h"
+#include "rule/difficulty.h"
 
 using tfir::SEPARATOR, tfir::SECTION_END;
 using Utilities::Math::is_equal_float;
@@ -56,7 +57,7 @@ void Metadata::Difficulty::write(std::ofstream& writer) const
 //! Metadata::CalculatedDifficulty::Approach_Rate
 void Metadata::CalculatedDifficulty::Approach_Rate::apply(const float v)
 {
-	using namespace tfir::Difficulty::AR_calculation;
+	using namespace ::Difficulty::AR;
 
 	value = v;
 	if (is_equal_float(v, 5))
@@ -80,7 +81,7 @@ void Metadata::CalculatedDifficulty::Approach_Rate::apply() { apply(value); }
 //! Metadata::CalculatedDifficulty::Overall_Difficulty
 void Metadata::CalculatedDifficulty::Overall_Difficulty::apply(const float v)
 {
-	using namespace tfir::Difficulty::OD_calculation;
+	using namespace ::Difficulty::OD;
 
 	value = v;
 	perfect = Base::PERFECT - v * Multiply::PERFECT;

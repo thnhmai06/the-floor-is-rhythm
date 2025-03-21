@@ -4,7 +4,7 @@
 #include "game/metadata.h"
 #include "game/object.h"
 #include "utilities.h"
-#include "file_format.h"
+#include "rule/file_format.h"
 
 static uint8_t get_direction_jump(const uint8_t colour_hax)
 {

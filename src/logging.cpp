@@ -6,6 +6,7 @@
 
 void Logging::init(const std::string name, const spdlog::level::level_enum level, const uint32_t num_backtrace)
 {
+	constexpr std::string_view PATTERN = "[%d/%m/%Y %X] %n (thread %t) %s:%# (%!) %^[%l] %v%$";
 	const std::string log_dir = std::format("{}/{}/", PATH, Utilities::Time::get_current_time());
 
 	const auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
@@ -16,7 +17,7 @@ void Logging::init(const std::string name, const spdlog::level::level_enum level
 	std::vector<spdlog::sink_ptr> sinks{ console_sink, file_sink, error_sink };
 	const auto logger = std::make_shared<spdlog::logger>(name, sinks.begin(), sinks.end());
 
-	logger->set_pattern("[%d/%m/%Y %X] %n %^[%l] [thread %t] [%s:%# (%!)] %v%$");
+	logger->set_pattern(std::string(PATTERN));
 	logger->set_level(level);
 	logger->enable_backtrace(num_backtrace);
 
