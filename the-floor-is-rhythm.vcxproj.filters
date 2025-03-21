@@ -27,9 +27,6 @@
     <ClCompile Include="dependencies\osu-parser\include\osu!parser\Parser\Structures\Beatmap\Sections\ColourSection.hpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\render\update.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\audio\buses.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -54,6 +51,9 @@
     <ClCompile Include="src\render\texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\render\update.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\game\metadata.h">
@@ -65,10 +65,7 @@
     <ClInclude Include="include\rule\file_format.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\expections\sdl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\render\update.h">
+    <ClInclude Include="include\exceptions\sdl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\audio\mixer.h">
@@ -99,6 +96,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\render\texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\render\update.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

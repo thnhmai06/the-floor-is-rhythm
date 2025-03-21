@@ -1,14 +1,17 @@
 #pragma once
-#include <SDL3/SDL_render.h>
+#include <SDL3_image/SDL_image.h>
+#include <unordered_map>
+#include "logging.h"
 
-struct Texture
+struct TextureMemory : std::unordered_map<std::string, SDL_Texture*>
 {
-	SDL_Renderer* renderer = nullptr;
-	SDL_Texture* texture = nullptr;
-	float size_x;
-	float size_y;
+	SDL_Renderer* renderer;
 
-	Texture(SDL_Renderer* renderer, const char* skin_file, float size_x, float size_y);
-	void render(float where_x, float where_y) const;
-	void destroy() const;
+	SDL_Texture* load(const char* file_path, const std::string& name);
+	void render(const std::string& name, const SDL_FRect* rect) const;
+	void free(const std::string& name);
+	void free_all();
+
+	explicit TextureMemory(SDL_Renderer* renderer) : renderer(renderer) {}
+	~TextureMemory() { free_all(); }
 };

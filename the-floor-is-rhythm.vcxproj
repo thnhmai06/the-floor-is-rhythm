@@ -155,6 +155,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dependencies\osu-parser\include\osu!parser\Parser\Structures\Beatmap\Sections\ColourSection.hpp" />
+    <ClCompile Include="src\render\update.cpp" />
     <ClInclude Include="include\game\hitsound.h" />
     <ClInclude Include="include\game\object.h" />
     <ClInclude Include="include\logging.h" />
@@ -169,21 +170,20 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="include\utilities.h" />
     <ClCompile Include="src\render\texture.cpp" />
-    <ClCompile Include="src\render\update.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\audio\mixer.h" />
     <ClInclude Include="include\audio\buses.h" />
     <ClInclude Include="include\audio\memory.h" />
     <ClInclude Include="include\config.h" />
-    <ClInclude Include="include\expections\sdl.h" />
+    <ClInclude Include="include\exceptions\sdl.h" />
     <ClInclude Include="include\render\texture.h" />
+    <ClInclude Include="include\render\update.h" />
     <ClInclude Include="include\rule\difficulty.h" />
     <ClInclude Include="include\rule\file_format.h" />
     <ClInclude Include="include\game\metadata.h" />
     <ClInclude Include="include\convert\osu\beatmap.h" />
     <ClInclude Include="include\main.h" />
-    <ClInclude Include="include\render\update.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

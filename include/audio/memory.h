@@ -24,6 +24,7 @@ namespace AudioMemory
 		 * @brief Tải audio vào bộ nhớ.
 		 */
 		Mix_Music* load(const char* file_path);
+		~Music() { free_all(); }
 	};
 
     /**
@@ -45,5 +46,6 @@ namespace AudioMemory
          * @brief Tải Effect vào bộ nhớ.
          */
 		Mix_Chunk* load(const char* file_path);
+		~Effects() { free_all(); }
     };
 }

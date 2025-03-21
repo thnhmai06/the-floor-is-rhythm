@@ -1,6 +1,5 @@
 {
   "dependencies": [
-    "glm",
     "sdl3",
     {
       "name": "sdl3-image",

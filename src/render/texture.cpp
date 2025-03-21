@@ -1,26 +1,39 @@
-#include "render/texture.h" // Header
-#include <SDL3_image/SDL_image.h>
+﻿#include "render/texture.h" // Header
+#include <ranges>
 #include "logging.h"
-#include "expections/sdl.h"
+#include "exceptions/sdl.h"
 
-Texture::Texture(SDL_Renderer* renderer, const char* skin_file, const float size_x, const float size_y)
+SDL_Texture* TextureMemory::load(const char* file_path, const std::string& name)
 {
-	this->renderer = renderer;
-	this->size_x = size_x;
-	this->size_y = size_y;
-	texture = IMG_LoadTexture(renderer, skin_file);
-	if (!texture) 
-		THROW_ERROR(SDL_Exceptions::Texture::SDL_CouldntCreateTexture(skin_file));
+	if (auto it = find(name); it != end()) return it->second;
+
+	SDL_Texture* texture = IMG_LoadTexture(this->renderer, file_path);
+	if (!texture)
+		THROW_ERROR(SDL_Exceptions::Texture::IMG_LoadTexture_Failed(file_path));
+
+	insert({ name, texture });
+	return texture;
 }
 
-void Texture::render(const float where_x, const float where_y) const
+void TextureMemory::render(const std::string& name, const SDL_FRect* rect) const
 {
-	const SDL_FRect dst = { where_x, where_y, size_x, size_y };
-	if (!SDL_RenderTexture(renderer, texture, nullptr, &dst))
-		THROW_ERROR(SDL_Exceptions::Texture::SDL_CouldntRenderTexture());
+	if (auto it = find(name); it != end())
+		SDL_RenderTexture(this->renderer, it->second, nullptr, rect);
 }
 
-void Texture::destroy() const
+void TextureMemory::free(const std::string& name)
 {
-	SDL_DestroyTexture(texture);
+	auto it = find(name);
+	if (it != end())
+	{
+		SDL_DestroyTexture(it->second);
+		erase(it);
+	}
+}
+
+void TextureMemory::free_all()
+{
+	for (auto& texture : *this | std::views::values)
+		SDL_DestroyTexture(texture);
+	clear();
 }
