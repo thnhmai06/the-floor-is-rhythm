@@ -1,5 +1,6 @@
 #pragma once
 #include <SDL3/SDL_render.h>
+#include <atomic>
 
 namespace RenderThread
 {

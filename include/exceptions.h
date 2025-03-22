@@ -27,13 +27,13 @@ namespace SDL_Exceptions
 	}
 	namespace Texture
 	{
-		struct SDL_CreateTexture_Failed : SDL_Exception
-		{
-			explicit SDL_CreateTexture_Failed() : SDL_Exception("Couldn't create texture") {}
-		};
 		struct SDL_UpdateTexture_Failed : SDL_Exception
 		{
 			explicit SDL_UpdateTexture_Failed(const char* file_path) : SDL_Exception(std::format("Couldn't update img -> texture: {}", file_path)) {}
+		};
+		struct SDL_RenderTexture_Failed : SDL_Exception
+		{
+			explicit SDL_RenderTexture_Failed(const std::string& name) : SDL_Exception(std::format("Couldn't render texture: {}", name)) {}
 		};
 	}
 }

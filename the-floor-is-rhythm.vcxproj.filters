@@ -107,5 +107,8 @@
     <ClInclude Include="include\thread\render.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\render\layer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

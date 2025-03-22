@@ -171,6 +171,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="include\utilities.h" />
     <ClCompile Include="src\render\texture.cpp" />
+    <ClInclude Include="include\render\layer.h" />
     <ClInclude Include="include\thread\render.h" />
   </ItemGroup>
   <ItemGroup>

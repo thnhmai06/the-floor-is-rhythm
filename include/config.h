@@ -22,3 +22,12 @@ namespace Config
 		}
 	}
 }
+
+namespace Immutable
+{
+	namespace Video
+	{
+		constexpr int32_t LOGICAL_WIDTH = 1280;
+		constexpr int32_t LOGICAL_HEIGHT = 720;
+	}
+}

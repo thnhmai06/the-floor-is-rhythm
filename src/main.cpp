@@ -5,6 +5,7 @@
 #include "logging.h"
 #include "exceptions.h"
 #include "thread/render.h"
+#include "config.h"
 
 constexpr char NAME[] = "The Floor is Rhythm";
 constexpr bool DEBUG_MODE = true;
@@ -13,12 +14,15 @@ static void init(SDL_Window*& window, SDL_Renderer*& renderer)
 {
 	Logging::init("root", DEBUG_MODE ? spdlog::level::debug : spdlog::level::info);
 
-	if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) THROW_CRITICAL(SDL_Exceptions::Init::SDL_InitSDL_Failed());
+	if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) 
+		THROW_CRITICAL(SDL_Exceptions::Init::SDL_InitSDL_Failed());
+
 	window = SDL_CreateWindow(NAME, 1366, 768, SDL_WINDOW_HIDDEN);
 	if (!window) THROW_CRITICAL(SDL_Exceptions::Init::SDL_CreateWindow_Failed());
-	SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
+
 	renderer = SDL_CreateRenderer(window, nullptr);
 	if (!renderer) THROW_CRITICAL(SDL_Exceptions::Init::SDL_CreateRenderer_Failed());
+	SDL_SetRenderLogicalPresentation(renderer, Immutable::Video::LOGICAL_WIDTH, Immutable::Video::LOGICAL_HEIGHT, SDL_LOGICAL_PRESENTATION_STRETCH);
 
 	SPDLOG_INFO("GPU Driver: {}", SDL_GetCurrentVideoDriver());
 	SPDLOG_INFO("Renderer: {}", SDL_GetRendererName(renderer));

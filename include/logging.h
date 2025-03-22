@@ -18,7 +18,7 @@ namespace Logging
 		spdlog::log(spdlog::source_loc{ __FILE__, __LINE__, SPDLOG_FUNCTION }, spdlog::level::critical, (exception).what()); \
 		spdlog::dump_backtrace(); \
 		throw (exception); \
-	} while (0)
+	} while (false)
 
 /**
  * @brief Throw exception ở level ERROR và log tại đúng vị trí throw ra
@@ -29,4 +29,15 @@ namespace Logging
 		spdlog::log(spdlog::source_loc{ __FILE__, __LINE__, SPDLOG_FUNCTION }, spdlog::level::err, (exception).what()); \
 		spdlog::dump_backtrace(); \
 		throw (exception); \
-	} while (0)
+	} while (false)
+
+/**
+ * @brief Chỉ log ERROR nhưng không muốn throw exception
+ * @param exception Exception muốn log ra
+ */
+#define LOG_ERROR(exception) \
+	do {\
+		try {\
+			THROW_ERROR(exception);\
+		} catch (...) {}\
+	} while (false)
