@@ -8,6 +8,7 @@
       ]
     },
     "sdl3-ttf",
-    "spdlog"
+    "spdlog",
+    "stb"
   ]
 }

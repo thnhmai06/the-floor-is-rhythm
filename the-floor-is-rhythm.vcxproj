@@ -178,7 +178,7 @@
     <ClInclude Include="include\audio\buses.h" />
     <ClInclude Include="include\audio\memory.h" />
     <ClInclude Include="include\config.h" />
-    <ClInclude Include="include\exceptions\sdl.h" />
+    <ClInclude Include="include\exceptions.h" />
     <ClInclude Include="include\render\texture.h" />
     <ClInclude Include="include\render\update.h" />
     <ClInclude Include="include\rule\difficulty.h" />

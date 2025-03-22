@@ -1,8 +1,9 @@
 ﻿#include "main.h" // Header
+#define STB_IMAGE_IMPLEMENTATION
 #include <SDL3/SDL_hints.h>
 #include <SDL3/SDL_init.h>
 #include "logging.h"
-#include "exceptions/sdl.h"
+#include "exceptions.h"
 #include "thread/render.h"
 
 constexpr char NAME[] = "The Floor is Rhythm";
