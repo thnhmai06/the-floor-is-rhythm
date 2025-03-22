@@ -14,7 +14,7 @@ int32_t Mixer::set_master_volume(const int32_t value)
 Mixer::Mixer()
 {
 	SDL_Init(SDL_INIT_AUDIO);
-	Mix_Init(MIX_INIT_MP3);
+	Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG);
 	Mix_AllocateChannels(MAX_CHANNELS);
 
 	spec.channels = STEREO;

@@ -5,13 +5,17 @@
 
 SDL_Texture* TextureMemory::load(const char* file_path, const std::string& name)
 {
-	if (auto it = find(name); it != end()) return it->second;
-
 	SDL_Texture* texture = IMG_LoadTexture(this->renderer, file_path);
 	if (!texture)
 		THROW_ERROR(SDL_Exceptions::Texture::IMG_LoadTexture_Failed(file_path));
 
-	insert({ name, texture });
+	insert_or_assign(name, texture);
+	return texture;
+}
+
+SDL_Texture* TextureMemory::load(SDL_Texture* texture, const std::string& name)
+{
+	insert_or_assign(name, texture);
 	return texture;
 }
 

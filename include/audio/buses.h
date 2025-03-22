@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "memory.h"
+#include "audio/memory.h"
 
 namespace AudioBuses
 {
@@ -15,17 +15,12 @@ namespace AudioBuses
 		/**
 		 * @brief Set/Lấy giá trị Music Volume
 		 */
-		int32_t set_volume(const int32_t value = -1);
-
-		/**
-		 * @brief Tải âm thanh (mp3) vào bộ nhớ.
-		 */
-		bool load(const char* file_path);
+		int32_t set_volume(int32_t value = -1);
 
 		/**
 		 * @brief Phát Music đã load trong bộ nhớ.
 		 */
-		int32_t play(const char* file_path, const bool while_playing_another = true) const;
+		bool play(const std::string& name) const;
 
 		/**
 		 * @brief Kiểm tra xem có bài nhạc nào đang phát không.
@@ -65,19 +60,15 @@ namespace AudioBuses
 		/**
 		 * @brief Set/Lấy giá trị tổng thể của Effect Volume.
 		 */
-		int32_t set_volume(const int32_t value = -1);
+		int32_t set_volume(int32_t value = -1);
 		/**
 		 * @brief Set/Lấy giá trị volume của Effect cụ thể.
 		 */
-		int32_t set_effect_volume(const char* file_name, const int32_t value = -1) const;
-		/**
-		 * @brief Tải hiệu ứng âm thanh vào bộ nhớ.
-		 */
-		bool load(const char* file_path);
+		int32_t set_effect_volume(const std::string& name, int32_t value = -1) const;
 		/**
 		 * @brief Phát hiệu ứng âm thanh đã load trong bộ nhớ.
 		 */
-		int32_t play(const char* file_path) const;
+		int32_t play(const std::string& name) const;
 
 		Effects();
 	};

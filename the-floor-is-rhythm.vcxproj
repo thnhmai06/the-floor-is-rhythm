@@ -156,6 +156,7 @@
   <ItemGroup>
     <ClCompile Include="dependencies\osu-parser\include\osu!parser\Parser\Structures\Beatmap\Sections\ColourSection.hpp" />
     <ClCompile Include="src\render\update.cpp" />
+    <ClCompile Include="src\thread\render.cpp" />
     <ClInclude Include="include\game\hitsound.h" />
     <ClInclude Include="include\game\object.h" />
     <ClInclude Include="include\logging.h" />
@@ -170,6 +171,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="include\utilities.h" />
     <ClCompile Include="src\render\texture.cpp" />
+    <ClInclude Include="include\thread\render.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\audio\mixer.h" />
