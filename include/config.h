@@ -25,6 +25,10 @@ namespace Config
 
 namespace Immutable
 {
+	namespace General
+	{
+		constexpr char NAME[] = "The Floor is Rhythm";
+	}
 	namespace Video
 	{
 		constexpr int32_t LOGICAL_WIDTH = 1280;

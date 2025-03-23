@@ -23,7 +23,7 @@ struct TextureMemory : std::unordered_map<std::string, SDL_Texture*>
 	SDL_Renderer* renderer;
 	SDL_Texture* load(const char* file_path, const std::string& name);
 	SDL_Texture* load(SDL_Texture* texture, const std::string& name);
-	[[nodiscard]] bool render(const std::string& name, const TextureRenderConfig& config) const;
+	bool render(const std::string& name, const TextureRenderConfig& config) const;
 	void free(const std::string& name);
 	void free_all();
 

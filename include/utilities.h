@@ -4,6 +4,7 @@
 #include <cmath>
 #include <iomanip>
 #include <SDL3_mixer/SDL_mixer.h>
+#include "render/layer.h"
 
 namespace Utilities
 {
@@ -12,7 +13,6 @@ namespace Utilities
 		inline bool is_bit_enabled(const std::int32_t value, const std::int32_t bitmask) { return (value & bitmask) != 0; }
 		inline bool is_equal_float(const float& variable, const float value, const float epsilon = 0.01f) { return abs(variable - value) <= epsilon; }
 	}
-
 	namespace Audio
 	{
 		inline int32_t get_volume(const int32_t v)
@@ -35,6 +35,19 @@ namespace Utilities
 			std::stringstream ss;
 			ss << std::put_time(std::localtime(&time_t_now), format);
 			return ss.str();
+		}
+	}
+	namespace Render
+	{
+		inline void create_memory(std::unique_ptr<TextureMemory>& memory, SDL_Renderer* renderer)
+		{
+			if (!memory) 
+				memory = std::make_unique<TextureMemory>(renderer);
+		}
+		inline void create_layer(std::unique_ptr<Layer>& layer, SDL_Renderer* renderer, TextureMemory* memory)
+		{
+			if (!layer) 
+				layer = std::make_unique<Layer>(renderer, memory);
 		}
 	}
 }

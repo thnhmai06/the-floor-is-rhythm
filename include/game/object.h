@@ -15,7 +15,7 @@ namespace HitObjects
 		DOWN = 2,
 		LEFT = 3
 	};
-	inline Direction get_next_direction(const Direction prev_direction, const uint8_t direction_jump);
+	inline Direction get_next_direction(Direction prev_direction, uint8_t direction_jump);
 
 	struct Floor
 	{

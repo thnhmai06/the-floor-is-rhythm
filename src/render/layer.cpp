@@ -13,10 +13,11 @@ Layer::Layer(SDL_Renderer* renderer, const TextureMemory* memory) : renderer(ren
 	layer = create_layer(renderer);
 }
 
-void Layer::clear(const bool re_create)
+void Layer::free(const bool re_create)
 {
-	SDL_DestroyTexture(layer);
 	objects.clear();
+	SDL_DestroyTexture(layer);
+	config = TextureRenderConfig();
 
 	if (re_create)
 		layer = create_layer(renderer);

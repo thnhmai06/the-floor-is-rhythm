@@ -1,5 +1,4 @@
 ﻿//! Chưa test
-
 #pragma once
 #include <string>
 #include <SDL3/SDL_render.h>
@@ -22,13 +21,13 @@ private:
 	static SDL_Texture* create_layer(SDL_Renderer* renderer);
 
 public:
-	SDL_Texture* layer;
 	SDL_Renderer* renderer;
+	SDL_Texture* layer;
 	TextureRenderConfig config;
 	const TextureMemory* memory;
 	std::list<std::pair<std::string, TextureRenderConfig>> objects;
 
+	void free(bool re_create = true);
+	bool re_draw() const;
 	Layer(SDL_Renderer* renderer, const TextureMemory* memory);
-	void clear(const bool re_create = true);
-	[[nodiscard]] bool re_draw() const;
 };

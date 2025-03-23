@@ -155,9 +155,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dependencies\osu-parser\include\osu!parser\Parser\Structures\Beatmap\Sections\ColourSection.hpp" />
+    <ClCompile Include="src\coremgr.cpp" />
     <ClCompile Include="src\render\layer.cpp" />
     <ClCompile Include="src\render\update.cpp" />
     <ClCompile Include="src\thread\render.cpp" />
+    <ClInclude Include="include\coremgr.h" />
     <ClInclude Include="include\game\hitsound.h" />
     <ClInclude Include="include\game\object.h" />
     <ClInclude Include="include\logging.h" />

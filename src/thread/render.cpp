@@ -1,26 +1,30 @@
 #include "thread/render.h" // Header
-#include "render/texture.h"
+#include "coremgr.h"
+#include "exceptions.h"
 #include "main.h"
 
-int RenderThread::Worker(void* data)
+int32_t RenderThread::worker(void* window)
 {
-	SDL_Renderer* renderer = static_cast<SDL_Renderer*>(data);
-	TextureMemory memory(renderer);
-	memory.load(R"(D:\PROGRAM\osu!\Songs\2287992 Camellia - Operation_ Zenithfall\Camellia_-_Operation_Zenithfall_2560x1440.jpg)", "bg");
+	int32_t result = EXIT_SUCCESS;
+	SDL_Renderer* renderer = Init::renderer(static_cast<SDL_Window*>(window));
 
 	try
 	{
-		SDL_FRect rect = { 40, 40, 100, 100 };
+		LayerSet::init(renderer);
+
 		while (running) {
 			SDL_RenderClear(renderer);
-			memory.render("bg", { .dst_rect = nullptr });
+			LayerSet::render();
 			SDL_RenderPresent(renderer);
 		}
 	} catch (...) {
 		running = false;
-		return EXIT_FAILURE;
+		result = EXIT_FAILURE;
 	}
-	return EXIT_SUCCESS;
+
+	LayerSet::free();
+	CleanUp::renderer(renderer);
+	return result;
 }
 
-SDL_Thread* RenderThread::start_thread(SDL_Renderer*& renderer) { return SDL_CreateThread(Worker, name, renderer); }
+SDL_Thread* RenderThread::start_thread(void* window) { return SDL_CreateThread(worker, NAME, window); }
