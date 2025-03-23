@@ -2,12 +2,9 @@
 
 #pragma once
 #include <string>
-#include <vector>
 #include <SDL3/SDL_render.h>
 #include "texture.h"
 #include "logging.h"
-#include "config.h"
-#include "exceptions.h"
 
 /**
  * Trong SDL3, thật buồn là ta ko có một cấu trúc nào để biểu diễn một Layer :(((\n
@@ -22,38 +19,16 @@ struct Layer
 {
 private:
 	// utilities
-	static SDL_Texture* create_layer(SDL_Renderer* renderer, const TextureMemory* memory)
-	{
-		return SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET,
-			Immutable::Video::LOGICAL_WIDTH, Immutable::Video::LOGICAL_HEIGHT);
-	}
+	static SDL_Texture* create_layer(SDL_Renderer* renderer);
 
 public:
 	SDL_Texture* layer;
 	SDL_Renderer* renderer;
+	TextureRenderConfig config;
 	const TextureMemory* memory;
 	std::list<std::pair<std::string, TextureRenderConfig>> objects;
 
-	Layer(SDL_Renderer* renderer, const TextureMemory* memory) : renderer(renderer), memory(memory)
-	{
-		layer = create_layer(renderer, memory);
-	}
-	void clear(const bool recreate = true)
-	{
-		SDL_DestroyTexture(layer);
-		objects.clear();
-
-		if (recreate)
-			layer = create_layer(renderer, memory);
-	}
-	void draw() const
-	{
-		SDL_SetRenderTarget(renderer, layer);
-		for (const auto& [name, config] : objects)
-		{
-			if (!memory->render(name, config))
-				LOG_ERROR(SDL_Exceptions::Texture::SDL_RenderTexture_Failed(name));
-		}
-		SDL_SetRenderTarget(renderer, nullptr);
-	}
+	Layer(SDL_Renderer* renderer, const TextureMemory* memory);
+	void clear(const bool re_create = true);
+	[[nodiscard]] bool re_draw() const;
 };

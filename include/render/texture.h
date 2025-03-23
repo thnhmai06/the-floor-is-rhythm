@@ -7,6 +7,7 @@ struct TextureRenderConfig
 {
 	SDL_FRect* src_rect = nullptr;
 	SDL_FRect* dst_rect = nullptr;
+	uint8_t alpha = 255;
 
 	struct Rotation
 	{
@@ -20,14 +21,11 @@ struct TextureRenderConfig
 struct TextureMemory : std::unordered_map<std::string, SDL_Texture*>
 {
 	SDL_Renderer* renderer;
-
 	SDL_Texture* load(const char* file_path, const std::string& name);
 	SDL_Texture* load(SDL_Texture* texture, const std::string& name);
-	bool render(const std::string& name, const TextureRenderConfig& config) const;
+	[[nodiscard]] bool render(const std::string& name, const TextureRenderConfig& config) const;
 	void free(const std::string& name);
 	void free_all();
 
 	explicit TextureMemory(SDL_Renderer* renderer) : renderer(renderer) {}
-
-	
 };
