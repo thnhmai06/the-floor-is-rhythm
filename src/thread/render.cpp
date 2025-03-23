@@ -10,11 +10,10 @@ int32_t RenderThread::worker(void* window)
 
 	try
 	{
-		LayerSet::init(renderer);
-
+		WorkingLayer::init(renderer);
 		while (running) {
 			SDL_RenderClear(renderer);
-			LayerSet::render();
+			WorkingLayer::render();
 			SDL_RenderPresent(renderer);
 		}
 	} catch (...) {
@@ -22,7 +21,7 @@ int32_t RenderThread::worker(void* window)
 		result = EXIT_FAILURE;
 	}
 
-	LayerSet::free();
+	WorkingLayer::free();
 	CleanUp::renderer(renderer);
 	return result;
 }

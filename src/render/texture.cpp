@@ -62,5 +62,5 @@ void TextureMemory::free_all()
 {
 	for (const auto& texture : *this | std::views::values)
 		SDL_DestroyTexture(texture);
-	clear();
+	std::unordered_map<std::string, SDL_Texture*>::clear();
 }

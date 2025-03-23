@@ -1,26 +1,29 @@
-#include "render/layer.h" // Header
+﻿#include "render/layer.h" // Header
 #include "exceptions.h"
 #include "config.h"
 
-SDL_Texture* Layer::create_layer(SDL_Renderer* renderer)
+static SDL_Texture* create_layer(SDL_Renderer* renderer)
 {
 	return SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET,
 		Immutable::Video::LOGICAL_WIDTH, Immutable::Video::LOGICAL_HEIGHT);
 }
 
-Layer::Layer(SDL_Renderer* renderer, const TextureMemory* memory) : renderer(renderer), memory(memory)
+Layer::Layer(SDL_Renderer* renderer) : renderer(renderer), memory(renderer)
 {
 	layer = create_layer(renderer);
 }
 
-void Layer::free(const bool re_create)
+void Layer::free(const bool to_initial_state)
 {
 	objects.clear();
 	SDL_DestroyTexture(layer);
 	config = TextureRenderConfig();
 
-	if (re_create)
+	if (to_initial_state)
+	{
 		layer = create_layer(renderer);
+		memory.free_all();
+	}
 }
 
 bool Layer::re_draw() const
@@ -30,7 +33,7 @@ bool Layer::re_draw() const
 	SDL_RenderClear(renderer);
 	for (const auto& [o_name, o_config] : objects)
 	{
-		if (!memory->render(o_name, o_config))
+		if (!memory.render(o_name, o_config))
 			LOG_ERROR(SDL_Exceptions::Texture::SDL_RenderTexture_Failed(o_name));
 	}
 	SDL_SetRenderTarget(renderer, nullptr);

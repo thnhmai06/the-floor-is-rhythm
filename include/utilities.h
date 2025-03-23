@@ -4,7 +4,6 @@
 #include <cmath>
 #include <iomanip>
 #include <SDL3_mixer/SDL_mixer.h>
-#include "render/layer.h"
 
 namespace Utilities
 {
@@ -35,19 +34,6 @@ namespace Utilities
 			std::stringstream ss;
 			ss << std::put_time(std::localtime(&time_t_now), format);
 			return ss.str();
-		}
-	}
-	namespace Render
-	{
-		inline void create_memory(std::unique_ptr<TextureMemory>& memory, SDL_Renderer* renderer)
-		{
-			if (!memory) 
-				memory = std::make_unique<TextureMemory>(renderer);
-		}
-		inline void create_layer(std::unique_ptr<Layer>& layer, SDL_Renderer* renderer, TextureMemory* memory)
-		{
-			if (!layer) 
-				layer = std::make_unique<Layer>(renderer, memory);
 		}
 	}
 }

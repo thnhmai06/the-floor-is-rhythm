@@ -16,18 +16,13 @@
  */
 struct Layer
 {
-private:
-	// utilities
-	static SDL_Texture* create_layer(SDL_Renderer* renderer);
-
-public:
 	SDL_Renderer* renderer;
 	SDL_Texture* layer;
 	TextureRenderConfig config;
-	const TextureMemory* memory;
+	TextureMemory memory;
 	std::list<std::pair<std::string, TextureRenderConfig>> objects;
 
-	void free(bool re_create = true);
+	void free(bool to_initial_state = true);
 	bool re_draw() const;
-	Layer(SDL_Renderer* renderer, const TextureMemory* memory);
+	explicit Layer(SDL_Renderer* renderer);
 };

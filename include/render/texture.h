@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <SDL3_image/SDL_image.h>
 #include <unordered_map>
 #include "logging.h"
@@ -26,6 +26,6 @@ struct TextureMemory : std::unordered_map<std::string, SDL_Texture*>
 	bool render(const std::string& name, const TextureRenderConfig& config) const;
 	void free(const std::string& name);
 	void free_all();
-
+	void clear() { free_all(); } // Tránh gọi nhầm hàm clear() của std::unordered_map
 	explicit TextureMemory(SDL_Renderer* renderer) : renderer(renderer) {}
 };
