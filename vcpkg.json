@@ -4,11 +4,13 @@
     {
       "name": "sdl3-image",
       "features": [
-        "png"
+        "png",
+        "jpeg",
+        "tiff",
+        "webp"
       ]
     },
     "sdl3-ttf",
-    "spdlog",
-    "stb"
+    "spdlog"
   ]
 }

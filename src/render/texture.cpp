@@ -5,12 +5,16 @@
 
 SDL_Texture* TextureMemory::load(const char* file_path, const std::string& name)
 {
-	// Vì SDL_image không hỗ trợ load jpg, nên cần thông qua stb_image
-	/*SDL_Texture* texture = IMG_LoadTexture(this->renderer, file_path);
-	if (!texture)
-		THROW_ERROR(SDL_Exceptions::Texture::IMG_LoadTexture_Failed(file_path));*/
+	SDL_Texture* texture = IMG_LoadTexture(this->renderer, file_path);
 
-	int32_t w, h, channels;
+	if (!texture)
+		THROW_ERROR(SDL_Exceptions::Texture::SDL_LoadTexture_Failed(file_path));
+
+	// Nếu dùng STB_Image
+	//if (!texture)
+		//THROW_ERROR(SDL_Exceptions::Texture::IMG_LoadTexture_Failed(file_path));
+
+	/*int32_t w, h, channels;
 	unsigned char* image = stbi_load(file_path, &w, &h, &channels, desired_channels);
 	if (!image)
 		THROW_ERROR(STBI_Exceptions::Image::STBI_LoadImage_Failed(file_path));
@@ -22,7 +26,7 @@ SDL_Texture* TextureMemory::load(const char* file_path, const std::string& name)
 		THROW_ERROR(SDL_Exceptions::Texture::SDL_UpdateTexture_Failed(file_path));
 	}
 		
-	stbi_image_free(image);
+	stbi_image_free(image);*/
 	return load(texture, name);
 }
 SDL_Texture* TextureMemory::load(SDL_Texture* texture, const std::string& name)
