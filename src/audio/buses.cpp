@@ -3,7 +3,7 @@
 #include "utilities.h"
 
 using namespace Utilities::Audio;
-using namespace Config::Default::Volume;
+using namespace Config::Volume;
 
 //! Music
 int32_t AudioBuses::Music::set_volume(const int32_t value)
@@ -27,7 +27,7 @@ void AudioBuses::Music::pause() { Mix_PauseMusic(); }
 void AudioBuses::Music::resume() { Mix_ResumeMusic(); }
 void AudioBuses::Music::stop() { return Mix_HaltMusic(); }
 
-AudioBuses::Music::Music() { set_volume(MUSIC_VOLUME); }
+AudioBuses::Music::Music() { set_volume(music); }
 
 //! Effects
 int32_t AudioBuses::Effects::set_volume(const int32_t value)
@@ -53,4 +53,4 @@ int32_t AudioBuses::Effects::play(const std::string& name) const
 	return Mix_PlayChannel(-1, audio, 0);
 }
 
-AudioBuses::Effects::Effects() { set_volume(HITSOUND_VOLUME); }
+AudioBuses::Effects::Effects() { set_volume(hitsound); }

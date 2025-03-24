@@ -158,7 +158,7 @@
     <ClCompile Include="src\coremgr.cpp" />
     <ClCompile Include="src\render\layer.cpp" />
     <ClCompile Include="src\render\update.cpp" />
-    <ClCompile Include="src\thread\render.cpp" />
+    <ClCompile Include="src\work\render.cpp" />
     <ClInclude Include="include\coremgr.h" />
     <ClInclude Include="include\game\hitsound.h" />
     <ClInclude Include="include\game\object.h" />
@@ -175,7 +175,7 @@
     <ClCompile Include="include\utilities.h" />
     <ClCompile Include="src\render\texture.cpp" />
     <ClInclude Include="include\render\layer.h" />
-    <ClInclude Include="include\thread\render.h" />
+    <ClInclude Include="include\work\render.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\audio\mixer.h" />

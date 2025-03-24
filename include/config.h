@@ -4,22 +4,16 @@
 
 namespace Config
 {
-	namespace Default
+	namespace Video
 	{
-		namespace Audio
-		{
-			constexpr int32_t MAX_CHANNELS = 8;                // Số kênh phát hiệu ứng tối đa
-			constexpr int32_t SAMPLE_FREQUENCY = 48000;        // Tần số mẫu âm thanh
-			constexpr SDL_AudioFormat AUDIO_FORMAT = SDL_AUDIO_F32LE;        // Format âm thanh
-			constexpr int32_t MONO = 1, STEREO = 2;             // Số kênh âm thanh: 1 hay 2
-			constexpr int32_t BUFFER_SIZE = 256;               // Kích cỡ buffer
-		}
-		namespace Volume
-		{
-			constexpr int32_t MASTER_VOLUME = 80;      // Volume mặc định cho Audio_Mixer
-			constexpr int32_t MUSIC_VOLUME = 80;       // Volume mặc định cho Music
-			constexpr int32_t HITSOUND_VOLUME = 80;      // Volume mặc định cho Effects
-		}
+		inline int32_t width = 1366;
+		inline int32_t height = 768;
+	}
+	namespace Volume
+	{
+		inline int32_t master = 80;
+		inline int32_t music = 80;
+		inline int32_t hitsound = 80;
 	}
 }
 
@@ -28,6 +22,14 @@ namespace Immutable
 	namespace General
 	{
 		constexpr char NAME[] = "The Floor is Rhythm";
+	}
+	namespace Audio
+	{
+		constexpr int32_t MAX_CHANNELS = 8;                // Số kênh phát hiệu ứng tối đa
+		constexpr int32_t SAMPLE_FREQUENCY = 48000;        // Tần số mẫu âm thanh
+		constexpr SDL_AudioFormat AUDIO_FORMAT = SDL_AUDIO_F32LE;        // Format âm thanh
+		constexpr int32_t MONO = 1, STEREO = 2;             // Số kênh âm thanh: 1 hay 2
+		constexpr int32_t BUFFER_SIZE = 256;               // Kích cỡ buffer
 	}
 	namespace Video
 	{

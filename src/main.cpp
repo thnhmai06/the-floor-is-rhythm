@@ -2,7 +2,7 @@
 #include <SDL3/SDL_init.h>
 #include "logging.h"
 #include "exceptions.h"
-#include "thread/render.h"
+#include "work/render.h"
 #include "coremgr.h"
 
 constexpr bool DEBUG_MODE = true;
@@ -17,15 +17,9 @@ int32_t main(int32_t argc, char* argv[])
 	// Window
 	SDL_Window* window = Init::window();
 
-	// Renderer
-	SDL_Thread* thread = RenderThread::start_thread(window);
+	// Render
+	result = render(window);
 
-	// Check quit
-	SDL_Event quit_event;
-	while (running)
-		if (SDL_PollEvent(&quit_event) && quit_event.type == SDL_EVENT_QUIT) running = false;
-
-	SDL_WaitThread(thread, &result);
 	CleanUp::window(window);
 	return result;
 }

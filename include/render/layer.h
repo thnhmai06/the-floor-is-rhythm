@@ -3,26 +3,35 @@
 #include <string>
 #include <SDL3/SDL_render.h>
 #include "texture.h"
-#include "logging.h"
 
 /**
  * Trong SDL3, thật buồn là ta ko có một cấu trúc nào để biểu diễn một Layer :(((\n
- * Vì vậy, ý tưởng của mình là tạo một layer nhưng bản chất là một texture, sau
- * đó chuyển target render lên layer để render những gì muốn vẽ lên layer đó.\n
- * Sau đó chuyển target về window (ban đầu) để render cái layer đó lên.
+ * Vì vậy, ý tưởng của mình là tạo một cấu trúc quản lý các objects giống như Layer,
+ * và render trực tiếp lên màn hình.
+ * Cấu trúc này sẽ có Config chung để có thể đồng loạt thay đổi các objects. \n
  *
- * @note - Mặc dù Layer bản chất là Texture, nhưng texture này KHÔNG NÊN được quản lý bởi TextureMemory.\n
- * Hãy để Layer tự quản lý texture này!
+ * Tại sao không dùng SDL_Texture* đại diện cho Layer? \n
+ * Vì nó sẽ render texture ra Layer đó, rồi mới render Layer ra
+ * màn hình chính. Như vậy giống như việc ta render 2 lần vậy.
+ * (Vấn đề về Hiệu suất và Overhead)
  */
 struct Layer
 {
+private:
+	void to_absolute_object(TextureRenderConfig& object) const;
+	void to_relative_object(TextureRenderConfig& object) const;
+
+public:
 	SDL_Renderer* renderer;
-	SDL_Texture* layer;
-	TextureRenderConfig config;
+	struct Config
+	{
+		SDL_FRect* dst_rect = nullptr;
+		uint8_t alpha = 255;
+	} config;
 	TextureMemory memory;
 	std::list<std::pair<std::string, TextureRenderConfig>> objects;
 
-	void free(bool to_initial_state = true);
-	bool re_draw() const;
+	void render();
 	explicit Layer(SDL_Renderer* renderer);
+	void free(bool to_initial_state = true);
 };

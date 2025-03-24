@@ -3,8 +3,8 @@
 #include "config.h"
 
 using namespace Utilities::Audio;
-using namespace Config::Default::Audio;
-using Config::Default::Volume::MASTER_VOLUME;
+using namespace Immutable::Audio;
+using Config::Volume::master;
 
 int32_t Mixer::set_master_volume(const int32_t value)
 {
@@ -26,7 +26,7 @@ Mixer::Mixer()
 	}
 
 	// Sau khi khởi tạo, đặt master volume
-	set_master_volume(MASTER_VOLUME);
+	set_master_volume(master);
 }
 void Mixer::quit()
 {

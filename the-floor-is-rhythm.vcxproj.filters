@@ -54,7 +54,7 @@
     <ClCompile Include="src\render\update.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\thread\render.cpp">
+    <ClCompile Include="src\work\render.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\render\layer.cpp">
@@ -110,7 +110,7 @@
     <ClInclude Include="include\render\update.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\thread\render.h">
+    <ClInclude Include="include\work\render.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\render\layer.h">
