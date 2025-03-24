@@ -1,5 +1,4 @@
-#pragma once
-#include <string_view>
+﻿#pragma once
 
 namespace osu
 {
@@ -47,7 +46,6 @@ namespace tfir
 	constexpr std::string_view FORMAT_VERSION = "tfir file format v1";
 	constexpr char SEPARATOR = '=';
 	constexpr char AND = ',';
-	constexpr char SECTION_END = ';';
 
 	namespace General
 	{
@@ -77,12 +75,16 @@ namespace tfir
 	namespace HitObjects
 	{
 		constexpr std::string_view HEADER = "[HitObjects]";
-		namespace Type
+		enum class Type : bool
 		{
-			constexpr bool FLOOR = 0;
-			constexpr bool SLIDER = 1;
+			FLOOR = 0,
+			SLIDER = 1
+		};
+		namespace Slider
+		{
+			constexpr char AND = '|';
+			constexpr char CURVE_AND = ':';
 		}
-		constexpr char SLIDER_AND = '|';
 
 	}
 }

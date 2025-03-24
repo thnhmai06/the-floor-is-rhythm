@@ -1,6 +1,8 @@
-﻿#include "convert/osu/beatmap.h" // Header
+﻿#include "file/osu/osu_beatmap.h" // Header
 #include <osu!parser/Parser.hpp>
 #include <fstream>
+#include "exceptions.h"
+#include "logging.h"
 #include "game/metadata.h"
 #include "game/object.h"
 #include "utilities.h"
@@ -47,9 +49,9 @@ static Metadata::Metadata convert_metadata(const Parser::MetadataSection& metada
 	result.tags = metadata.Tags;
 	return result;
 }
-static HitObjects::Slider convert_hitobject_slider(const Parser::HitObject& object)
+static HitObject::Slider convert_hitobject_slider(const Parser::HitObject& object)
 {
-	HitObjects::Slider slider;
+	HitObject::Slider slider;
 	slider.time = object.Time;
 	slider.end_time = object.EndTime;
 	slider.direction_jump = get_direction_jump(object.Type.ColourHax);
@@ -58,9 +60,9 @@ static HitObjects::Slider convert_hitobject_slider(const Parser::HitObject& obje
 	slider.hitsample = object.Hitsample;
 	return slider;
 }
-static HitObjects::Floor convert_hitobject_floor(const Parser::HitObject& object)
+static HitObject::Floor convert_hitobject_floor(const Parser::HitObject& object)
 {
-	HitObjects::Floor floor;
+	HitObject::Floor floor;
 	floor.time = object.Time;
 	floor.direction_jump = get_direction_jump(object.Type.ColourHax);
 	floor.combo_jump = object.Type.ColourHax;
@@ -68,31 +70,34 @@ static HitObjects::Floor convert_hitobject_floor(const Parser::HitObject& object
 	floor.hitsample = object.Hitsample;
 	return floor;
 }
+static HitObjects convert_hitobjects(const std::vector<Parser::HitObject>& objects)
+{
+	HitObjects result;
+	for (const Parser::HitObject& object : objects)
+	{
+		const auto back_itr = (result.empty()) ? (result.end()) : (std::prev(result.end()));
+		if (object.Type.HitCircle)
+			result.emplace_hint(back_itr, object.Time, HitObject::Floor{ convert_hitobject_floor(object) });
+		else result.emplace_hint(back_itr, object.Time, HitObject::Slider{ convert_hitobject_slider(object) });
+	}
+	return result;
+}
 
-void convert(const char* file_name, const char* output)
+void convert_beatmap(const char* file_name, const char* output)
 {
 	Parser::Beatmap beatmap(file_name);
 	std::ofstream writer(output);
-	if (!writer) { return; } //TODO: Exception: Không tạo được file
-
+	if (!writer)
+		THROW_ERROR(File_Exceptions::File_Open_Failed(output));
 	// Version
 	writer << tfir::FORMAT_VERSION << '\n';
 	writer << tfir::CONVERT::osu::VERSION << beatmap.Version << '\n';
 	writer << '\n';
-	// Metadata
+	// Contents
 	convert_general(beatmap.General).write(writer);
 	convert_difficulty(beatmap.Difficulty).write(writer);
 	convert_metadata(beatmap.Metadata).write(writer);
-
-	// HitObjects
-	writer << tfir::HitObjects::HEADER << '\n';
-	for (Parser::HitObject& object : beatmap.HitObjects)
-	{
-		if (object.Type.HitCircle) 
-			convert_hitobject_floor(object).write(writer);
-		else convert_hitobject_slider(object).write(writer);
-	}
-	writer << tfir::SECTION_END << '\n';
+	convert_hitobjects(beatmap.HitObjects).write(writer);
 
 	writer.close();
 }

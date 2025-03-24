@@ -1,9 +1,13 @@
 #pragma once
 #include <cstdint>
+#include <map>
+#include <variant>
 #include <vector>
 #include "game/hitsound.h"
+#include "exceptions.h"
+#include "logging.h"
 
-namespace HitObjects
+namespace HitObject
 {
 	constexpr uint8_t NUM_COMBOS = 8;
 	constexpr uint8_t NUM_DIRECTIONS = 4;
@@ -45,4 +49,10 @@ namespace HitObjects
 
 		void write(std::ofstream& writer) const;
 	};
+	struct HitObject : std::variant<Floor, Slider> {};
 }
+
+struct HitObjects : std::multimap<int32_t, HitObject::HitObject>
+{
+	void write(std::ofstream& writer) const;
+};

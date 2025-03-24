@@ -1,5 +1,6 @@
 #pragma once
 #include <format>
+#include <cerrno>
 #include <stdexcept>
 #include <SDL3/SDL_error.h>
 
@@ -35,4 +36,20 @@ namespace SDL_Exceptions
 			explicit SDL_RenderTexture_Failed(const std::string& name) : SDL_Exception(std::format("Couldn't render texture: {}", name)) {}
 		};
 	}
+	namespace Audio
+	{
+		
+	}
+}
+
+namespace File_Exceptions
+{
+	struct File_Exception : std::runtime_error
+	{
+		explicit File_Exception(const char* file_path, const std::string& message) : std::runtime_error(std::format("{} ({}): {}", message, file_path , strerror(errno))) {}
+	};
+	struct File_Open_Failed : File_Exception
+	{
+		explicit File_Open_Failed(const char* file_path) : File_Exception(file_path, "Couldn't Open file") {}
+	};
 }

@@ -154,19 +154,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="dependencies\osu-parser\include\osu!parser\Parser\Structures\Beatmap\Sections\ColourSection.hpp" />
     <ClCompile Include="src\coremgr.cpp" />
+    <ClCompile Include="src\file\tfir\tfir_beatmap.cpp" />
     <ClCompile Include="src\render\layer.cpp" />
     <ClCompile Include="src\render\update.cpp" />
     <ClCompile Include="src\work\render.cpp" />
     <ClInclude Include="include\coremgr.h" />
+    <ClInclude Include="include\file\tfir\tfir_beatmap.h" />
     <ClInclude Include="include\game\hitsound.h" />
     <ClInclude Include="include\game\object.h" />
     <ClInclude Include="include\logging.h" />
     <ClCompile Include="src\audio\buses.cpp" />
     <ClCompile Include="src\audio\memory.cpp" />
     <ClCompile Include="src\audio\mixer.cpp" />
-    <ClCompile Include="src\convert\osu\beatmap.cpp" />
+    <ClCompile Include="src\file\osu\osu_beatmap.cpp" />
     <ClCompile Include="src\game\hitsound.cpp" />
     <ClCompile Include="src\game\metadata.cpp" />
     <ClCompile Include="src\game\object.cpp" />
@@ -188,7 +189,7 @@
     <ClInclude Include="include\rule\difficulty.h" />
     <ClInclude Include="include\rule\file_format.h" />
     <ClInclude Include="include\game\metadata.h" />
-    <ClInclude Include="include\convert\osu\beatmap.h" />
+    <ClInclude Include="include\file\osu\osu_beatmap.h" />
     <ClInclude Include="include\main.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

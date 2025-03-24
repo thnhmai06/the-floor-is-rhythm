@@ -36,4 +36,38 @@ namespace Utilities
 			return ss.str();
 		}
 	}
+	namespace String
+	{
+		inline std::string trim(std::string str)
+		{
+			unsigned long long start = 0;
+			for (const auto &c: str)
+			{
+				if (c == ' ' || c == '\t' || c == '\n' || c == '\r') start++;
+				else break;
+			}
+			if (str.empty()) return str;
+			while (str.back() == ' ' || str.back() == '\t' || str.back() == '\n' || str.back() == '\r') str.pop_back();
+			return str.substr(start);
+		}
+		inline std::vector<std::string> split(const std::string& input, char delimiter = ',', bool only_two_part = false)
+		{
+			std::vector<std::string> result;
+			std::stringstream stream(input);
+			std::string current_line;
+			if (only_two_part)
+			{
+				std::getline(stream, current_line, delimiter);
+				result.push_back(trim(current_line));
+				std::getline(stream, current_line);
+				result.push_back(trim(current_line));
+			}
+			else
+			{
+				while (std::getline(stream, current_line, delimiter))
+					result.push_back(trim(current_line));
+			}
+			return result;
+		}
+	}
 }
