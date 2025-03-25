@@ -8,7 +8,7 @@ namespace Skin_Filename
 	{
 		constexpr std::string_view NAME = "cursor";
 		constexpr std::string_view TAIL = "cursortail";
-		constexpr std::unordered_map<Direction, std::string_view> DIRECTION
+		const std::unordered_map<Direction, std::string_view> DIRECTION
 		= {
 			{Direction::RIGHT, "c_right"},
 			{Direction::UP, "c_up"},
@@ -28,7 +28,7 @@ namespace Skin_Filename
 			constexpr std::string_view CURVE = "slidercurve";
 			constexpr std::string_view END = "sliderend";
 		}
-		constexpr std::unordered_map<Direction, std::string_view> DIRECTION
+		const std::unordered_map<Direction, std::string_view> DIRECTION
 		= {
 			{Direction::RIGHT, "d_right"},
 			{Direction::UP, "d_up"},
