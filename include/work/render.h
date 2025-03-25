@@ -18,14 +18,14 @@ namespace Current_Layers
 	}
 	static void render_all()
 	{
-		background->render();
-		playground->render();
-		hud->render();
+		if (background) background->render();
+		if (playground) playground->render();
+		if (hud) hud->render();
 	}
-	static void free_all()
+	static void clear_all(const bool to_initial_state = false)
 	{
-		if (background) background->free();
-		if (playground) playground->free();
-		if (hud) hud->free();
+		if (background) background->clear(to_initial_state);
+		if (playground) playground->clear(to_initial_state);
+		if (hud) hud->clear(to_initial_state);
 	}
 }

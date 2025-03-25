@@ -4,6 +4,15 @@
 #include <SDL3/SDL_render.h>
 #include "texture.h"
 
+struct RenderObject
+{
+	virtual ~RenderObject() = default;
+	std::string name;
+	TextureRenderConfig config;
+
+	virtual void render(const TextureMemory& memory) const;
+};
+
 /**
  * Trong SDL3, thật buồn là ta ko có một cấu trúc nào để biểu diễn một Layer :(((\n
  * Vì vậy, ý tưởng của mình là tạo một cấu trúc quản lý các objects giống như Layer,
@@ -29,9 +38,9 @@ public:
 		uint8_t alpha = 255;
 	} config;
 	TextureMemory memory;
-	std::list<std::pair<std::string, TextureRenderConfig>> objects;
+	std::list<RenderObject> objects;
 
 	void render();
 	explicit Layer(SDL_Renderer* renderer);
-	void free(bool to_initial_state = true);
+	void clear(bool to_initial_state = false);
 };

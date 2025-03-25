@@ -18,13 +18,7 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\file\osu\beatmap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="include\utilities.h">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dependencies\osu-parser\include\osu!parser\Parser\Structures\Beatmap\Sections\ColourSection.hpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\audio\buses.cpp">
@@ -51,9 +45,6 @@
     <ClCompile Include="src\render\texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\render\update.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\work\render.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -63,15 +54,18 @@
     <ClCompile Include="src\coremgr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\file\tfir\beatmap.cpp">
+    <ClCompile Include="src\file\tfir\tfir_beatmap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\file\osu\osu_beatmap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\render\playground\r_cursor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\game\metadata.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\file\osu\beatmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\rule\file_format.h">
@@ -110,9 +104,6 @@
     <ClInclude Include="include\render\texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\render\update.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\work\render.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -122,7 +113,19 @@
     <ClInclude Include="include\coremgr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\file\tfir\beatmap.h">
+    <ClInclude Include="include\file\tfir\tfir_beatmap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\file\osu\osu_beatmap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\render\playground\r_cursor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\game\g_cursor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rule\skin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -15,6 +15,11 @@ namespace Config
 		inline int32_t music = 80;
 		inline int32_t hitsound = 80;
 	}
+	namespace Cursor
+	{
+		inline int32_t size = 48;
+		inline int32_t direction_size = 32;
+	}
 }
 
 namespace Immutable

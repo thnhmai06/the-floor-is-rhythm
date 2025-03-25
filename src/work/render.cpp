@@ -41,7 +41,7 @@ int32_t render(SDL_Window* window)
 		running = false;
 		result = EXIT_FAILURE;
 	}
-	Current_Layers::free_all();
+	Current_Layers::clear_all(true);
 	CleanUp::renderer(renderer);
 
 	return result;

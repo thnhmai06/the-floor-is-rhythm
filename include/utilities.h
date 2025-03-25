@@ -11,6 +11,7 @@ namespace Utilities
 	{
 		inline bool is_bit_enabled(const std::int32_t value, const std::int32_t bitmask) { return (value & bitmask) != 0; }
 		inline bool is_equal_float(const float& variable, const float value, const float epsilon = 0.01f) { return abs(variable - value) <= epsilon; }
+		inline float move_centre(const float size, const float window_size) { return (window_size - size) / 2; }
 	}
 	namespace Audio
 	{

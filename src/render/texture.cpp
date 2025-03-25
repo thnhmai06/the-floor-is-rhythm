@@ -41,7 +41,7 @@ bool TextureMemory::render(const std::string& name, const TextureRenderConfig& c
 	{
 		SDL_SetTextureAlphaMod(it->second, config.alpha);
 		if (config.rotation.has_value())
-			return SDL_RenderTextureRotated(renderer, it->second, config.src_rect, config.dst_rect,
+			return SDL_RenderTextureRotated(renderer, it->second, config..src_rect, config.dst_rect,
 				config.rotation->angle, config.rotation->center, config.rotation->flip);
 		return SDL_RenderTexture(renderer, it->second, config.src_rect, config.dst_rect);
 	}

@@ -7,18 +7,19 @@
 #include "exceptions.h"
 #include "logging.h"
 
+enum class Direction : uint8_t
+{
+	RIGHT = 0,
+	UP = 1,
+	DOWN = 2,
+	LEFT = 3
+};
+
 namespace HitObject
 {
 	constexpr uint8_t NUM_COMBOS = 8;
 	constexpr uint8_t NUM_DIRECTIONS = 4;
 
-	enum class Direction : uint8_t
-	{
-		RIGHT = 0,
-		UP = 1,
-		DOWN = 2,
-		LEFT = 3
-	};
 	inline Direction get_next_direction(Direction prev_direction, uint8_t direction_jump);
 
 	struct Floor
