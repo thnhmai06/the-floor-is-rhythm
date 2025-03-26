@@ -33,6 +33,7 @@ private:
 
 public:
 	SDL_Renderer* renderer;
+	bool visible = true;
 	struct Config
 	{
 		SDL_FRect* dst_rect = nullptr;

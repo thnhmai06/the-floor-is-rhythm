@@ -6,8 +6,6 @@ int32_t render(SDL_Window* window)
 {
 	int32_t result = EXIT_SUCCESS;
 
-	SDL_Renderer* renderer = Init::renderer(window);
-	Current_Layers::init_all(renderer);
 
 	//// test
 	//Current_Layers::background->memory.load(
@@ -24,6 +22,8 @@ int32_t render(SDL_Window* window)
 	//auto obj_dstrect = SDL_FRect{ 100, 100, 60, 40 };
 	//obj->second.dst_rect = &obj_dstrect;
 	
+	SDL_Renderer* renderer = Init::renderer(window);
+	Current_Layers::init_all(renderer);
 	try
 	{
 		SDL_Event quit_event;

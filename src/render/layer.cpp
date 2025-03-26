@@ -81,6 +81,7 @@ void Layer::to_relative_object(TextureRenderConfig& object) const
 }
 void Layer::render()
 {
+	if (!visible) return;
 	for (auto& object : objects)
 	{
 		// i hate this job
