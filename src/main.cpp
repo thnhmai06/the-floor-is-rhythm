@@ -21,7 +21,7 @@ int32_t main(int32_t argc, char* argv[])
 	SDL_Window* window = Init::window();
 
 	// Render
-	/*result = render(window);*/
+	//result = render(window);
 	convert_beatmap(
 		R"(D:\PROGRAM\osu!\Songs\2287992 Camellia - Operation_ Zenithfall\Camellia - Operation Zenithfall (Mir) [Final Mission].osu)",
 		R"(D:\output.tfd)");

@@ -1,7 +1,8 @@
-﻿//! Chưa test
-#pragma once
+﻿#pragma once
 #include <string>
 #include <SDL3/SDL_render.h>
+#include "utilities.h"
+#include "config.h"
 #include "texture.h"
 
 struct RenderObject
@@ -37,6 +38,17 @@ public:
 		SDL_FRect* dst_rect = nullptr;
 		uint8_t alpha = 255;
 	} config;
+	struct Camera
+	{
+		SDL_FPoint centre = {
+			Utilities::Math::centre(0, Immutable::Video::LOGICAL_WIDTH),
+			Utilities::Math::centre(0, Immutable::Video::LOGICAL_HEIGHT)
+		};
+		float zoom = 1;
+
+		void move_into_camera(TextureRenderConfig& object) const;
+		void move_out_camera(TextureRenderConfig& object) const;
+	} camera;
 	TextureMemory memory;
 	std::list<RenderObject> objects;
 

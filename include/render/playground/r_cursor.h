@@ -9,10 +9,9 @@ namespace RenderObjects
 	struct Cursor : RenderObject
 	{
 		std::string tail;
-		TextureRenderConfig direction_config;
 		SDL_FRect dst_rect = {
-			Utilities::Math::move_centre(Config::Cursor::size,Immutable::Video::LOGICAL_WIDTH),
-			Utilities::Math::move_centre(Config::Cursor::size,Immutable::Video::LOGICAL_HEIGHT),
+			Utilities::Math::centre(Config::Cursor::size,Immutable::Video::LOGICAL_WIDTH),
+			Utilities::Math::centre(Config::Cursor::size,Immutable::Video::LOGICAL_HEIGHT),
 			static_cast<float>(Config::Cursor::size), static_cast<float>(Config::Cursor::size)
 		};
 
@@ -22,8 +21,8 @@ namespace RenderObjects
 	struct CursorDirection : RenderObject
 	{
 		SDL_FRect dst_rect = {
-			Utilities::Math::move_centre(Config::Cursor::direction_size,Immutable::Video::LOGICAL_WIDTH),
-			Utilities::Math::move_centre(Config::Cursor::direction_size,Immutable::Video::LOGICAL_HEIGHT),
+			Utilities::Math::centre(Config::Cursor::direction_size,Immutable::Video::LOGICAL_WIDTH),
+			Utilities::Math::centre(Config::Cursor::direction_size,Immutable::Video::LOGICAL_HEIGHT),
 			static_cast<float>(Config::Cursor::direction_size), static_cast<float>(Config::Cursor::direction_size)
 		};
 
