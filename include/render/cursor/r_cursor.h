@@ -1,7 +1,7 @@
 #pragma once
 #include "render/layer.h"
 #include "game/hitobject.h"
-#include "config.h"
+#include "rule/config.h"
 #include "utilities.h"
 
 namespace RenderObjects
@@ -10,8 +10,8 @@ namespace RenderObjects
 	{
 		std::string tail;
 		SDL_FRect dst_rect = {
-			Utilities::Math::centre(static_cast<float>(Config::Cursor::size),Immutable::Video::LOGICAL_WIDTH),
-			Utilities::Math::centre(static_cast<float>(Config::Cursor::size),Immutable::Video::LOGICAL_HEIGHT),
+			Utilities::Math::centre(static_cast<float>(Config::Cursor::size),ImmutableConfig::Video::LOGICAL_WIDTH),
+			Utilities::Math::centre(static_cast<float>(Config::Cursor::size),ImmutableConfig::Video::LOGICAL_HEIGHT),
 			static_cast<float>(Config::Cursor::size), static_cast<float>(Config::Cursor::size)
 		};
 
@@ -21,8 +21,8 @@ namespace RenderObjects
 	struct CursorDirection : RenderObject::RenderObject
 	{
 		SDL_FRect dst_rect = {
-			Utilities::Math::centre(static_cast<float>(Config::Cursor::direction_size),Immutable::Video::LOGICAL_WIDTH),
-			Utilities::Math::centre(static_cast<float>(Config::Cursor::direction_size),Immutable::Video::LOGICAL_HEIGHT),
+			Utilities::Math::centre(static_cast<float>(Config::Cursor::direction_size),ImmutableConfig::Video::LOGICAL_WIDTH),
+			Utilities::Math::centre(static_cast<float>(Config::Cursor::direction_size),ImmutableConfig::Video::LOGICAL_HEIGHT),
 			static_cast<float>(Config::Cursor::direction_size), static_cast<float>(Config::Cursor::direction_size)
 		};
 

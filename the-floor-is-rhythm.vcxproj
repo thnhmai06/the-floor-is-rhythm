@@ -189,10 +189,9 @@
     <ClInclude Include="include\audio\mixer.h" />
     <ClInclude Include="include\audio\buses.h" />
     <ClInclude Include="include\audio\memory.h" />
-    <ClInclude Include="include\config.h" />
+    <ClInclude Include="include\rule\config.h" />
     <ClInclude Include="include\exceptions.h" />
     <ClInclude Include="include\render\texture.h" />
-    <ClInclude Include="include\rule\difficulty.h" />
     <ClInclude Include="include\rule\file_format.h" />
     <ClInclude Include="include\game\metadata.h" />
     <ClInclude Include="include\file\osu\osu_beatmap.h" />

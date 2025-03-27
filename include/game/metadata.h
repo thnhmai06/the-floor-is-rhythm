@@ -84,16 +84,7 @@ namespace Metadata
 			HPDrainRate() = default;
 			HPDrainRate(const float value) { apply(value); }
 		} hp;
-		struct Velocity
-		{
-			float value = 1.4f;
-
-			void apply(const float& v);
-			void apply() { apply(value); }
-
-			Velocity() = default;
-			Velocity(const float value) { apply(value); }
-		} velocity;
+		float velocity = 1.4f;
 
 		void apply(const Difficulty& basic);
 		void write(std::ofstream& writer) const;

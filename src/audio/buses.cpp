@@ -1,5 +1,5 @@
 ﻿#include "audio/buses.h" // Header
-#include "config.h"
+#include "rule/config.h"
 #include "utilities.h"
 
 using namespace Utilities::Audio;

@@ -1,9 +1,9 @@
 ﻿#include "audio/mixer.h" // Header
 #include "utilities.h"
-#include "config.h"
+#include "rule/config.h"
 
 using namespace Utilities::Audio;
-using namespace Immutable::Audio;
+using namespace ImmutableConfig::Audio;
 using Config::Volume::master;
 
 int32_t Mixer::set_master_volume(const int32_t value)

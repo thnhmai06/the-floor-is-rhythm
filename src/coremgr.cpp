@@ -1,12 +1,12 @@
 #include "coremgr.h" // Header
-#include "config.h"
+#include "rule/config.h"
 #include "exceptions.h"
 #include "logging.h"
 
 //! Init
 SDL_Window* Init::window()
 {
-	const auto window = SDL_CreateWindow(Immutable::General::NAME, 1366, 768,
+	const auto window = SDL_CreateWindow(ImmutableConfig::General::NAME, 1366, 768,
 		SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_HIGH_PIXEL_DENSITY);
 	if (!window)
 		THROW_CRITICAL(SDL_Exceptions::Init::SDL_CreateWindow_Failed());
@@ -21,7 +21,7 @@ SDL_Renderer* Init::renderer(SDL_Window* window)
 	SPDLOG_INFO("Renderer: {}", SDL_GetRendererName(renderer));
 
 	// Config
-	SDL_SetRenderLogicalPresentation(renderer, Immutable::Video::LOGICAL_WIDTH, Immutable::Video::LOGICAL_HEIGHT, SDL_LOGICAL_PRESENTATION_STRETCH);
+	SDL_SetRenderLogicalPresentation(renderer, ImmutableConfig::Video::LOGICAL_WIDTH, ImmutableConfig::Video::LOGICAL_HEIGHT, SDL_LOGICAL_PRESENTATION_STRETCH);
 
 	return renderer;
 }

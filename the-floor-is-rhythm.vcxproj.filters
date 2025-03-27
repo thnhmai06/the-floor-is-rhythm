@@ -89,7 +89,7 @@
     <ClInclude Include="include\audio\memory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\config.h">
+    <ClInclude Include="include\rule\config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\game\hitsound.h">
@@ -102,9 +102,6 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="include\main.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rule\difficulty.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\render\texture.h">

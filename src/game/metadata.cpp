@@ -1,7 +1,8 @@
 ﻿#include "game/metadata.h" // Header
+
+#include "rule/config.h"
 #include "utilities.h"
 #include "rule/file_format.h"
-#include "rule/difficulty.h"
 
 static constexpr int32_t MINIMUM_LINE_CHARACTERS = 3;
 
@@ -117,24 +118,16 @@ void Metadata::Difficulty::write(std::ofstream& writer) const
 // ::OverallDifficulty
 void Metadata::CalculatedDifficulty::OverallDifficulty::apply(const float& v)
 {
-	using namespace ::Difficulty::OD;
-
 	value = v;
-	perfect = Base::PERFECT - v * Multiply::PERFECT;
-	good = Base::GOOD - v * Multiply::GOOD;
-	bad = Base::BAD - v * Multiply::BAD;
+	perfect = ImmutableConfig::Difficulty::OD::Base::PERFECT - v * ImmutableConfig::Difficulty::OD::Multiply::PERFECT;
+	good = ImmutableConfig::Difficulty::OD::Base::GOOD - v * ImmutableConfig::Difficulty::OD::Multiply::GOOD;
+	bad = ImmutableConfig::Difficulty::OD::Base::BAD - v * ImmutableConfig::Difficulty::OD::Multiply::BAD;
 }
 // ::HPDrainRate
 void Metadata::CalculatedDifficulty::HPDrainRate::apply(const float& v)
 {
 	// Follow Rules: https://osu.ppy.sh/wiki/en/Gameplay/Health#osu!taiko
 	// TODO: later, i have no idea with math
-	value = v;
-}
-// ::Velocity
-void Metadata::CalculatedDifficulty::Velocity::apply(const float& v)
-{
-	// TODO: The same with HP
 	value = v;
 }
 // ::
@@ -145,12 +138,12 @@ void Metadata::CalculatedDifficulty::write(std::ofstream& writer) const
 	writer << HEADER << '\n';
 	writer << HP << tfir_file::Beatmap::SEPARATOR << hp.value << '\n';
 	writer << OD << tfir_file::Beatmap::SEPARATOR << od.value << '\n';
-	writer << VELOCITY << tfir_file::Beatmap::SEPARATOR << velocity.value << '\n';
+	writer << VELOCITY << tfir_file::Beatmap::SEPARATOR << velocity << '\n';
 	writer << '\n';
 }
 void Metadata::CalculatedDifficulty::apply(const Difficulty& basic)
 {
 	od.apply(basic.od);
 	hp.apply(basic.hp);
-	velocity.apply(basic.velocity);
+	velocity = basic.velocity;
 }

@@ -16,6 +16,7 @@ struct TextureRenderConfig
 		SDL_FlipMode flip = SDL_FLIP_NONE;
 	};
 	std::optional<Rotation> rotation;
+	TextureRenderConfig(SDL_FRect* dst = nullptr, uint8_t alpha = 255) : dst_rect(dst), alpha(alpha) {}
 };
 
 struct TextureMemory : std::unordered_map<std::string, SDL_Texture*>
