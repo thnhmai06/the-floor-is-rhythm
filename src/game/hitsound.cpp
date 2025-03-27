@@ -45,7 +45,7 @@ Hitsound::HitSample::HitSample(const std::string& hitsample_str)
 {
 	if (hitsample_str.empty())
 		return; // not written
-	const auto list = Utilities::String::split(hitsample_str, tfir::HitObjects::HitSample::DELIMETER);
+	const auto list = Utilities::String::split(hitsample_str, tfir_file::Beatmap::HitObjects::HitSample::DELIMETER);
 	normal_set = static_cast<SampleSetType>(std::stoi(list[0]));
 	addition_set = static_cast<SampleSetType>(std::stoi(list[1]));
 	index = std::stoi(list[2]);
@@ -56,13 +56,13 @@ std::string Hitsound::HitSample::to_string() const
 {
 	std::string result;
 	result.append(std::to_string(static_cast<int32_t>(normal_set)));
-	result.push_back(tfir::HitObjects::HitSample::DELIMETER);
+	result.push_back(tfir_file::Beatmap::HitObjects::HitSample::DELIMETER);
 	result.append(std::to_string(static_cast<int32_t>(addition_set)));
-	result.push_back(tfir::HitObjects::HitSample::DELIMETER);
+	result.push_back(tfir_file::Beatmap::HitObjects::HitSample::DELIMETER);
 	result.append(std::to_string(index));
-	result.push_back(tfir::HitObjects::HitSample::DELIMETER);
+	result.push_back(tfir_file::Beatmap::HitObjects::HitSample::DELIMETER);
 	result.append(std::to_string(volume));
-	result.push_back(tfir::HitObjects::HitSample::DELIMETER);
+	result.push_back(tfir_file::Beatmap::HitObjects::HitSample::DELIMETER);
 	if (!file_name.empty()) result.append(file_name);
 	return result;
 }

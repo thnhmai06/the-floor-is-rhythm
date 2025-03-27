@@ -33,11 +33,11 @@ static void parse_beatmap(BeatmapFile& beatmap, const std::unordered_map<std::st
 {
 	for (const auto& [header, contents] : sections)
 	{
-		if (header == tfir::General::HEADER) beatmap.general.read(contents);
-		else if (header == tfir::Metadata::HEADER)beatmap.metadata.read(contents);
-		else if (header == tfir::Difficulty::HEADER) beatmap.calculated_difficulty.apply(Metadata::Difficulty(contents));
-		else if (header == tfir::HitObjects::HEADER) beatmap.hit_objects.read(contents);
-		else if (header == tfir::TimingPoints::HEADER) beatmap.timing_points.read(contents);
+		if (header == tfir_file::Beatmap::General::HEADER) beatmap.general.read(contents);
+		else if (header == tfir_file::Beatmap::Metadata::HEADER)beatmap.metadata.read(contents);
+		else if (header == tfir_file::Beatmap::Difficulty::HEADER) beatmap.calculated_difficulty.apply(Metadata::Difficulty(contents));
+		else if (header == tfir_file::Beatmap::HitObjects::HEADER) beatmap.hit_objects.read(contents);
+		else if (header == tfir_file::Beatmap::TimingPoints::HEADER) beatmap.timing_points.read(contents);
 	}
 }
 

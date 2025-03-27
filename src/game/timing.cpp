@@ -5,7 +5,7 @@
 #include "rule/file_format.h"
 #include "utilities.h"
 
-using namespace tfir;
+using namespace tfir_file::Beatmap;
 
 //! UninheritedPoint
 void Timing::UninheritedPoint::read(const std::vector<std::string>& content)

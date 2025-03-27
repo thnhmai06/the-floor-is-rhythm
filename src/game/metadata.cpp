@@ -11,30 +11,30 @@ void Metadata::General::read(const std::vector<std::string>& contents)
 	for (const auto& line : contents)
 	{
 		if (line.size() < MINIMUM_LINE_CHARACTERS) continue;
-		if (line.find(tfir::SEPARATOR) == std::string::npos) continue;
-		const auto content = Utilities::String::split(line, tfir::SEPARATOR, true);
+		if (line.find(tfir_file::Beatmap::SEPARATOR) == std::string::npos) continue;
+		const auto content = Utilities::String::split(line, tfir_file::Beatmap::SEPARATOR, true);
 		if (content.size() <= 1) continue;
 
 		// [0] là key, [1] là value
-		if (content[0] == tfir::General::AUDIO_FILE)
+		if (content[0] == tfir_file::Beatmap::General::AUDIO_FILE)
 			audio_file = content[1];
-		else if (content[0] == tfir::General::MUSIC_DELAY)
+		else if (content[0] == tfir_file::Beatmap::General::MUSIC_DELAY)
 			start_music_delay = std::stoi(content[1]);
-		else if (content[0] == tfir::General::PREVIEW_TIMESTAMP)
+		else if (content[0] == tfir_file::Beatmap::General::PREVIEW_TIMESTAMP)
 			preview_timestamp = std::stoi(content[1]);
-		else if (content[0] == tfir::General::EPILEPSY_WARNING)
+		else if (content[0] == tfir_file::Beatmap::General::EPILEPSY_WARNING)
 			epilepsy_warning = std::stoi(content[1]);
 	}
 }
 void Metadata::General::write(std::ofstream& writer) const
 {
-	using namespace tfir::General;
+	using namespace tfir_file::Beatmap::General;
 
 	writer << HEADER << '\n';
-	writer << AUDIO_FILE << tfir::SEPARATOR << audio_file << '\n';
-	writer << MUSIC_DELAY << tfir::SEPARATOR << start_music_delay << '\n';
-	writer << PREVIEW_TIMESTAMP << tfir::SEPARATOR << preview_timestamp << '\n';
-	writer << EPILEPSY_WARNING << tfir::SEPARATOR << epilepsy_warning << '\n';
+	writer << AUDIO_FILE << tfir_file::Beatmap::SEPARATOR << audio_file << '\n';
+	writer << MUSIC_DELAY << tfir_file::Beatmap::SEPARATOR << start_music_delay << '\n';
+	writer << PREVIEW_TIMESTAMP << tfir_file::Beatmap::SEPARATOR << preview_timestamp << '\n';
+	writer << EPILEPSY_WARNING << tfir_file::Beatmap::SEPARATOR << epilepsy_warning << '\n';
 	writer << '\n';
 }
 
@@ -44,27 +44,27 @@ void Metadata::Metadata::read(const std::vector<std::string>& contents)
 	for (const auto& line : contents)
 	{
 		if (line.size() < MINIMUM_LINE_CHARACTERS) continue;
-		if (line.find(tfir::SEPARATOR) == std::string::npos) continue;
-		const auto content = Utilities::String::split(line, tfir::SEPARATOR, true);
+		if (line.find(tfir_file::Beatmap::SEPARATOR) == std::string::npos) continue;
+		const auto content = Utilities::String::split(line, tfir_file::Beatmap::SEPARATOR, true);
 		if (content.size() <= 1) continue;
 		// [0] là key, [1] là value
-		if (content[0] == tfir::Metadata::TITLE)
+		if (content[0] == tfir_file::Beatmap::Metadata::TITLE)
 			title = content[1];
-		else if (content[0] == tfir::Metadata::ARTIST)
+		else if (content[0] == tfir_file::Beatmap::Metadata::ARTIST)
 			artist = content[1];
-		else if (content[0] == tfir::Metadata::CREATOR)
+		else if (content[0] == tfir_file::Beatmap::Metadata::CREATOR)
 			creator = content[1];
-		else if (content[0] == tfir::Metadata::DIFF_NAME)
+		else if (content[0] == tfir_file::Beatmap::Metadata::DIFF_NAME)
 			difficulty_name = content[1];
-		else if (content[0] == tfir::Metadata::SOURCE)
+		else if (content[0] == tfir_file::Beatmap::Metadata::SOURCE)
 			source = content[1];
-		else if (content[0] == tfir::Metadata::TAGS)
+		else if (content[0] == tfir_file::Beatmap::Metadata::TAGS)
 			tags = Utilities::String::split(content[1], ' ');
 	}
 }
 void Metadata::Metadata::write(std::ofstream& writer) const
 {
-	using namespace tfir::Metadata;
+	using namespace tfir_file::Beatmap::Metadata;
 
 	// Chuyển unordered_set thành string
 	std::string str_tags;
@@ -75,12 +75,12 @@ void Metadata::Metadata::write(std::ofstream& writer) const
 	}
 
 	writer << HEADER << '\n';
-	writer << TITLE << tfir::SEPARATOR << title << '\n';
-	writer << ARTIST << tfir::SEPARATOR << artist << '\n';
-	writer << CREATOR << tfir::SEPARATOR << creator << '\n';
-	writer << DIFF_NAME << tfir::SEPARATOR << difficulty_name << '\n';
-	writer << SOURCE << tfir::SEPARATOR << source << '\n';
-	writer << TAGS << tfir::SEPARATOR << str_tags << '\n';
+	writer << TITLE << tfir_file::Beatmap::SEPARATOR << title << '\n';
+	writer << ARTIST << tfir_file::Beatmap::SEPARATOR << artist << '\n';
+	writer << CREATOR << tfir_file::Beatmap::SEPARATOR << creator << '\n';
+	writer << DIFF_NAME << tfir_file::Beatmap::SEPARATOR << difficulty_name << '\n';
+	writer << SOURCE << tfir_file::Beatmap::SEPARATOR << source << '\n';
+	writer << TAGS << tfir_file::Beatmap::SEPARATOR << str_tags << '\n';
 	writer << '\n';
 }
 
@@ -90,27 +90,32 @@ void Metadata::Difficulty::read(const std::vector<std::string>& contents)
 	for (const auto& line : contents)
 	{
 		if (line.size() < MINIMUM_LINE_CHARACTERS) continue;
-		if (line.find(tfir::SEPARATOR) == std::string::npos) continue;
-		const auto content = Utilities::String::split(line, tfir::SEPARATOR, true);
+		if (line.find(tfir_file::Beatmap::SEPARATOR) == std::string::npos) continue;
+		const auto content = Utilities::String::split(line, tfir_file::Beatmap::SEPARATOR, true);
 		if (content.size() <= 1) continue;
 		// [0] là key, [1] là value
-		if (content[0] == tfir::Difficulty::HP)
-			HP = std::stof(content[1]);
-		else if (content[0] == tfir::Difficulty::OD)
-			OD = std::stof(content[1]);
+		if (content[0] == tfir_file::Beatmap::Difficulty::HP)
+			hp = std::stof(content[1]);
+		else if (content[0] == tfir_file::Beatmap::Difficulty::OD)
+			od = std::stof(content[1]);
+		else if (content[0] == tfir_file::Beatmap::Difficulty::VELOCITY)
+			velocity = std::stof(content[1]);
 	}
 }
 void Metadata::Difficulty::write(std::ofstream& writer) const
 {
-	using namespace tfir::Difficulty;
+	using namespace tfir_file::Beatmap::Difficulty;
 
 	writer << HEADER << '\n';
-	writer << tfir::Difficulty::HP << tfir::SEPARATOR << HP << '\n';
-	writer << tfir::Difficulty::OD << tfir::SEPARATOR << OD << '\n';
+	writer << HP << tfir_file::Beatmap::SEPARATOR << hp << '\n';
+	writer << OD << tfir_file::Beatmap::SEPARATOR << od << '\n';
+	writer << VELOCITY << tfir_file::Beatmap::SEPARATOR << velocity << '\n';
 	writer << '\n';
 }
-//! Metadata::CalculatedDifficulty::Overall_Difficulty
-void Metadata::CalculatedDifficulty::Overall_Difficulty::apply(const float v)
+
+//! Metadata::CalculatedDifficulty
+// ::OverallDifficulty
+void Metadata::CalculatedDifficulty::OverallDifficulty::apply(const float& v)
 {
 	using namespace ::Difficulty::OD;
 
@@ -119,25 +124,33 @@ void Metadata::CalculatedDifficulty::Overall_Difficulty::apply(const float v)
 	good = Base::GOOD - v * Multiply::GOOD;
 	bad = Base::BAD - v * Multiply::BAD;
 }
-//! Metadata::CalculatedDifficulty::HP_Drain_Rate
-void Metadata::CalculatedDifficulty::HP_Drain_Rate::apply(const float v)
+// ::HPDrainRate
+void Metadata::CalculatedDifficulty::HPDrainRate::apply(const float& v)
 {
 	// Follow Rules: https://osu.ppy.sh/wiki/en/Gameplay/Health#osu!taiko
 	// TODO: later, i have no idea with math
 	value = v;
 }
-//! Metadata::CalculatedDifficulty
+// ::Velocity
+void Metadata::CalculatedDifficulty::Velocity::apply(const float& v)
+{
+	// TODO: The same with HP
+	value = v;
+}
+// ::
 void Metadata::CalculatedDifficulty::write(std::ofstream& writer) const
 {
-	using namespace  tfir::Difficulty;
+	using namespace  tfir_file::Beatmap::Difficulty;
 
 	writer << HEADER << '\n';
-	writer << tfir::Difficulty::HP << tfir::SEPARATOR << HP.value << '\n';
-	writer << tfir::Difficulty::OD << tfir::SEPARATOR << OD.value << '\n';
+	writer << HP << tfir_file::Beatmap::SEPARATOR << hp.value << '\n';
+	writer << OD << tfir_file::Beatmap::SEPARATOR << od.value << '\n';
+	writer << VELOCITY << tfir_file::Beatmap::SEPARATOR << velocity.value << '\n';
 	writer << '\n';
 }
 void Metadata::CalculatedDifficulty::apply(const Difficulty& basic)
 {
-	OD.apply(basic.OD);
-	HP.apply(basic.HP);
+	od.apply(basic.od);
+	hp.apply(basic.hp);
+	velocity.apply(basic.velocity);
 }

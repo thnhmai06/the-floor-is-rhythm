@@ -37,7 +37,7 @@ namespace Metadata
 	};
 	struct Difficulty
 	{
-		float OD = -1, HP = -1;
+		float od = -1, hp = -1, velocity = 1.4f;
 		void read(const std::vector<std::string>& contents);
 		void write(std::ofstream& writer) const;
 
@@ -54,37 +54,46 @@ namespace Metadata
 	struct CalculatedDifficulty
 	{
 		/**
-		 * @class Overall_Difficulty
+		 * @class OverallDifficulty
 		 * @ingroup beatmap difficulty
 		 * @brief Biểu diễn OD của map (Khoảng thời gian chấp nhận là chính xác hơn).
 		 */
-		struct Overall_Difficulty
+		struct OverallDifficulty
 		{
 			// Follow: https://osu.ppy.sh/wiki/en/Beatmap/Overall_difficulty
 			float value = -1, perfect = -1, good = -1, bad = -1;
 
-			void apply(float v);
+			void apply(const float& v);
 			void apply() { apply(value); }
 
-			Overall_Difficulty() = default;
-			Overall_Difficulty(const float value) { apply(value); }
-		} OD;
-
+			OverallDifficulty() = default;
+			OverallDifficulty(const float value) { apply(value); }
+		} od;
 		/**
-		 * @class HP_Drain_Rate
+		 * @class HPDrainRate
 		 * @ingroup beatmap difficulty
 		 * @brief Biểu diễn HP của map (Độ tụt HP khi bấm không chính xác).
 		 */
-		struct HP_Drain_Rate
+		struct HPDrainRate
 		{
 			float value = -1;
 
-			void apply(float v);
+			void apply(const float& v);
 			void apply() { apply(value); }
 
-			HP_Drain_Rate() = default;
-			HP_Drain_Rate(const float value) { apply(value); }
-		} HP;
+			HPDrainRate() = default;
+			HPDrainRate(const float value) { apply(value); }
+		} hp;
+		struct Velocity
+		{
+			float value = 1.4f;
+
+			void apply(const float& v);
+			void apply() { apply(value); }
+
+			Velocity() = default;
+			Velocity(const float value) { apply(value); }
+		} velocity;
 
 		void apply(const Difficulty& basic);
 		void write(std::ofstream& writer) const;

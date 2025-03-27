@@ -33,8 +33,9 @@ static Metadata::General convert_general(const Parser::GeneralSection& general)
 static Metadata::Difficulty convert_difficulty(const Parser::DifficultySection& difficulty)
 {
 	Metadata::Difficulty result;
-	if (!difficulty.OverallDifficulty.empty()) result.OD = std::stof(difficulty.OverallDifficulty);
-	if (!difficulty.HPDrainRate.empty()) result.HP = std::stof(difficulty.HPDrainRate);
+	if (!difficulty.OverallDifficulty.empty()) result.od = std::stof(difficulty.OverallDifficulty);
+	if (!difficulty.HPDrainRate.empty()) result.hp = std::stof(difficulty.HPDrainRate);
+	if (!difficulty.SliderMultiplier.empty()) result.velocity = std::stof(difficulty.SliderMultiplier);
 	return result;
 }
 static Metadata::Metadata convert_metadata(const Parser::MetadataSection& metadata)
@@ -45,7 +46,7 @@ static Metadata::Metadata convert_metadata(const Parser::MetadataSection& metada
 	if (!metadata.Creator.empty()) result.creator = metadata.Creator;
 	if (!metadata.Version.empty()) result.difficulty_name = metadata.Version;
 	if (!metadata.Source.empty()) { result.source = metadata.Source; result.source.push_back(' '); }
-	result.source.append(tfir::CONVERT::osu::SOURCE);
+	result.source.append(tfir_file::Beatmap::CONVERT::osu::SOURCE);
 	result.tags = metadata.Tags;
 	return result;
 }
@@ -128,8 +129,8 @@ void convert_beatmap(const char* file_name, const char* output)
 	if (!writer)
 		THROW_ERROR(File_Exceptions::File_Open_Failed(output));
 	// Version
-	writer << tfir::FORMAT_VERSION << '\n';
-	writer << tfir::CONVERT::osu::VERSION << beatmap.Version << '\n';
+	writer << tfir_file::Beatmap::FORMAT_VERSION << '\n';
+	writer << tfir_file::Beatmap::CONVERT::osu::VERSION << beatmap.Version << '\n';
 	writer << '\n';
 	// Contents
 	convert_general(beatmap.General).write(writer);
