@@ -197,9 +197,18 @@
     <ClInclude Include="include\file\osu\osu_beatmap.h" />
     <ClInclude Include="include\main.h" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="dependencies\SDL_mixer-build\bin\SDL3_mixer.dll" />
+  <!-- After Build -->
+   <ItemGroup>
+    <SDL3MixerDLL Include="dependencies\SDL_mixer-build\bin\SDL3_mixer.dll" />
+    <Assets Include="assets\**\*" />
   </ItemGroup>
+    <Target Name="CopySDL3MixerDll" AfterTargets="Build">
+        <Copy SourceFiles="@(SDL3MixerDLL)" DestinationFolder="$(OutDir)" />
+    </Target>
+   <Target Name="CopyAssets" AfterTargets="Build">
+    <MakeDir Directories="$(OutDir)assets" />
+    <Copy SourceFiles="@(Assets)" DestinationFolder="$(OutDir)assets\" />
+  </Target>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
