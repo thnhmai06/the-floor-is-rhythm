@@ -70,7 +70,6 @@ namespace tfir
 		constexpr std::string_view HEADER = "[Difficulty]";
 		constexpr std::string_view HP = "HPDrainRate";
 		constexpr std::string_view OD = "OverallDifficulty";
-		constexpr std::string_view AR = "ApproachRate";
 	}
 	namespace HitObjects
 	{

@@ -105,7 +105,6 @@ void Metadata::Difficulty::write(std::ofstream& writer) const
 	using namespace tfir::Difficulty;
 
 	writer << HEADER << '\n';
-	writer << tfir::Difficulty::AR << tfir::SEPARATOR << AR << '\n';
 	writer << tfir::Difficulty::HP << tfir::SEPARATOR << HP << '\n';
 	writer << tfir::Difficulty::OD << tfir::SEPARATOR << OD << '\n';
 	writer << '\n';
