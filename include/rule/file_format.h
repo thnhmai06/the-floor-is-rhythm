@@ -75,16 +75,18 @@ namespace tfir
 	namespace HitObjects
 	{
 		constexpr std::string_view HEADER = "[HitObjects]";
-		enum class Type : bool
-		{
-			FLOOR = 0,
-			SLIDER = 1
-		};
 		namespace Slider
 		{
 			constexpr char AND = '|';
 			constexpr char CURVE_AND = ':';
 		}
-
+		namespace HitSample
+		{
+			constexpr char DELIMETER = ':';
+		}
+	}
+	namespace TimingPoints
+	{
+		constexpr std::string_view HEADER = "[TimingPoints]";
 	}
 }

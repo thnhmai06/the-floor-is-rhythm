@@ -17,19 +17,32 @@ namespace Metadata
 		int32_t start_music_delay = 0;
 		int32_t preview_timestamp = 0;
 		bool epilepsy_warning = 0;
+		void read(const std::vector<std::string>& contents);
 		void write(std::ofstream& writer) const;
+
+		General() = default;
+		General(const std::vector<std::string>& contents) { read(contents); }
 	};
 	struct Metadata
 	{
 		std::string title, artist, creator, difficulty_name, source;
 		//std::unordered_set<std::string> tags; TODO: Tìm CTDL Phù hợp cho truy vấn tìm kiếm beatmap
 		std::vector<std::string> tags;
+		void read(const std::vector<std::string>& contents);
 		void write(std::ofstream& writer) const;
+
+		Metadata() = default;
+		Metadata(const std::vector<std::string>& contents) { read(contents); }
+
 	};
 	struct Difficulty
 	{
 		float AR = -1, OD = -1, HP = -1;
+		void read(const std::vector<std::string>& contents);
 		void write(std::ofstream& writer) const;
+
+		Difficulty() = default;
+		Difficulty(const std::vector<std::string>& contents) { read(contents); }
 	};
 
 	//! Calculated
@@ -52,8 +65,8 @@ namespace Metadata
 
 			float value = -1, preempt_time = -1, fade_in_time = -1;
 
-			void apply(const float v);
-			void apply();
+			void apply(float v);
+			void apply() { apply(value); }
 
 			Approach_Rate() = default;
 			Approach_Rate(const float value) { apply(value); }
@@ -67,11 +80,10 @@ namespace Metadata
 		struct Overall_Difficulty
 		{
 			// Follow: https://osu.ppy.sh/wiki/en/Beatmap/Overall_difficulty
-		public:
 			float value = -1, perfect = -1, good = -1, bad = -1;
 
-			void apply(const float v);
-			void apply();
+			void apply(float v);
+			void apply() { apply(value); }
 
 			Overall_Difficulty() = default;
 			Overall_Difficulty(const float value) { apply(value); }
@@ -86,17 +98,18 @@ namespace Metadata
 		{
 			float value = -1;
 
-			void apply(const float v);
-			void apply();
+			void apply(float v);
+			void apply() { apply(value); }
 
 			HP_Drain_Rate() = default;
 			HP_Drain_Rate(const float value) { apply(value); }
 		} HP;
 
-		void print(std::ofstream& writer) const;
+		void apply(const Difficulty& basic);
+		void write(std::ofstream& writer) const;
 
 		CalculatedDifficulty() = default;
-		CalculatedDifficulty(const Difficulty basic);
+		CalculatedDifficulty(const Difficulty& basic) { apply(basic); }
 	};
 
 }

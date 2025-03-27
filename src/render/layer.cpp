@@ -1,13 +1,5 @@
 ﻿#include "render/layer.h" // Header
-#include "exceptions.h"
 #include "logging.h"
-
-//! RenderObject
-void RenderObject::render(const TextureMemory& memory) const
-{
-	if (!memory.render(name, config))
-		LOG_ERROR(SDL_Exceptions::Texture::SDL_RenderTexture_Failed(name));
-}
 
 //! Camera
 void Layer::Camera::move_into_camera(TextureRenderConfig& object) const
@@ -100,5 +92,17 @@ void Layer::clear(const bool to_initial_state)
 	{
 		config = Config();
 		memory.free_all();
+	}
+}
+
+//! PlaygroundLayer
+void PlaygroundLayer::render()
+{
+	// For lùi để các object trước được vẽ trên cùng
+	for (auto i = render_range.second; i >= render_range.first; --i)
+	{
+		if (i < 0 || i >= objects.size())
+			continue;
+		objects[i].render(memory);
 	}
 }

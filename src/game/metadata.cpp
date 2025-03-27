@@ -3,7 +3,29 @@
 #include "rule/file_format.h"
 #include "rule/difficulty.h"
 
+static constexpr int32_t MINIMUM_LINE_CHARACTERS = 3;
+
 //! Metadata::General
+void Metadata::General::read(const std::vector<std::string>& contents)
+{
+	for (const auto& line : contents)
+	{
+		if (line.size() < MINIMUM_LINE_CHARACTERS) continue;
+		if (line.find(tfir::SEPARATOR) == std::string::npos) continue;
+		const auto content = Utilities::String::split(line, tfir::SEPARATOR, true);
+		if (content.size() <= 1) continue;
+
+		// [0] là key, [1] là value
+		if (content[0] == tfir::General::AUDIO_FILE)
+			audio_file = content[1];
+		else if (content[0] == tfir::General::MUSIC_DELAY)
+			start_music_delay = std::stoi(content[1]);
+		else if (content[0] == tfir::General::PREVIEW_TIMESTAMP)
+			preview_timestamp = std::stoi(content[1]);
+		else if (content[0] == tfir::General::EPILEPSY_WARNING)
+			epilepsy_warning = std::stoi(content[1]);
+	}
+}
 void Metadata::General::write(std::ofstream& writer) const
 {
 	using namespace tfir::General;
@@ -17,6 +39,29 @@ void Metadata::General::write(std::ofstream& writer) const
 }
 
 //! Metadata::Metadata
+void Metadata::Metadata::read(const std::vector<std::string>& contents)
+{
+	for (const auto& line : contents)
+	{
+		if (line.size() < MINIMUM_LINE_CHARACTERS) continue;
+		if (line.find(tfir::SEPARATOR) == std::string::npos) continue;
+		const auto content = Utilities::String::split(line, tfir::SEPARATOR, true);
+		if (content.size() <= 1) continue;
+		// [0] là key, [1] là value
+		if (content[0] == tfir::Metadata::TITLE)
+			title = content[1];
+		else if (content[0] == tfir::Metadata::ARTIST)
+			artist = content[1];
+		else if (content[0] == tfir::Metadata::CREATOR)
+			creator = content[1];
+		else if (content[0] == tfir::Metadata::DIFF_NAME)
+			difficulty_name = content[1];
+		else if (content[0] == tfir::Metadata::SOURCE)
+			source = content[1];
+		else if (content[0] == tfir::Metadata::TAGS)
+			tags = Utilities::String::split(content[1], ' ');
+	}
+}
 void Metadata::Metadata::write(std::ofstream& writer) const
 {
 	using namespace tfir::Metadata;
@@ -40,6 +85,23 @@ void Metadata::Metadata::write(std::ofstream& writer) const
 }
 
 //! Metadata::Difficulty
+void Metadata::Difficulty::read(const std::vector<std::string>& contents)
+{
+	for (const auto& line : contents)
+	{
+		if (line.size() < MINIMUM_LINE_CHARACTERS) continue;
+		if (line.find(tfir::SEPARATOR) == std::string::npos) continue;
+		const auto content = Utilities::String::split(line, tfir::SEPARATOR, true);
+		if (content.size() <= 1) continue;
+		// [0] là key, [1] là value
+		if (content[0] == tfir::Difficulty::HP)
+			HP = std::stof(content[1]);
+		else if (content[0] == tfir::Difficulty::OD)
+			OD = std::stof(content[1]);
+		else if (content[0] == tfir::Difficulty::AR)
+			AR = std::stof(content[1]);
+	}
+}
 void Metadata::Difficulty::write(std::ofstream& writer) const
 {
 	using namespace tfir::Difficulty;
@@ -73,8 +135,6 @@ void Metadata::CalculatedDifficulty::Approach_Rate::apply(const float v)
 		fade_in_time = FADE_IN_AR5 - 500 * (v - 5) / 5;
 	}
 }
-void Metadata::CalculatedDifficulty::Approach_Rate::apply() { apply(value); }
-
 //! Metadata::CalculatedDifficulty::Overall_Difficulty
 void Metadata::CalculatedDifficulty::Overall_Difficulty::apply(const float v)
 {
@@ -85,8 +145,6 @@ void Metadata::CalculatedDifficulty::Overall_Difficulty::apply(const float v)
 	good = Base::GOOD - v * Multiply::GOOD;
 	bad = Base::BAD - v * Multiply::BAD;
 }
-void Metadata::CalculatedDifficulty::Overall_Difficulty::apply() { apply(value); }
-
 //! Metadata::CalculatedDifficulty::HP_Drain_Rate
 void Metadata::CalculatedDifficulty::HP_Drain_Rate::apply(const float v)
 {
@@ -94,10 +152,8 @@ void Metadata::CalculatedDifficulty::HP_Drain_Rate::apply(const float v)
 	// TODO: later, i have no idea with math
 	value = v;
 }
-void Metadata::CalculatedDifficulty::HP_Drain_Rate::apply() { apply(value); }
-
 //! Metadata::CalculatedDifficulty
-void Metadata::CalculatedDifficulty::print(std::ofstream& writer) const
+void Metadata::CalculatedDifficulty::write(std::ofstream& writer) const
 {
 	using namespace  tfir::Difficulty;
 
@@ -107,7 +163,7 @@ void Metadata::CalculatedDifficulty::print(std::ofstream& writer) const
 	writer << tfir::Difficulty::OD << tfir::SEPARATOR << OD.value << '\n';
 	writer << '\n';
 }
-Metadata::CalculatedDifficulty::CalculatedDifficulty(const Difficulty basic)
+void Metadata::CalculatedDifficulty::apply(const Difficulty& basic)
 {
 	AR.apply(basic.AR);
 	OD.apply(basic.OD);

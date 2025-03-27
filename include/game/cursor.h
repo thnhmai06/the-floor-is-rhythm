@@ -1,10 +1,11 @@
 #pragma once
-#include "game/object.h"
+#include "game/hitobject.h"
 
 namespace GameObjects
 {
 	struct Cursor
 	{
 		Direction direction = Direction::RIGHT;
+		// smt...
 	};
 }

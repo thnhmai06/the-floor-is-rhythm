@@ -39,7 +39,7 @@
     <ClCompile Include="src\game\hitsound.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\game\object.cpp">
+    <ClCompile Include="src\game\hitobject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\render\texture.cpp">
@@ -60,7 +60,13 @@
     <ClCompile Include="src\file\osu\osu_beatmap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\render\playground\r_cursor.cpp">
+    <ClCompile Include="src\render\cursor\r_cursor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\render\playground\r_object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\timing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -89,7 +95,7 @@
     <ClInclude Include="include\game\hitsound.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\game\object.h">
+    <ClInclude Include="include\game\hitobject.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="include\logging.h">
@@ -119,13 +125,19 @@
     <ClInclude Include="include\file\osu\osu_beatmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\render\playground\r_cursor.h">
+    <ClInclude Include="include\render\cursor\r_cursor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\game\g_cursor.h">
+    <ClInclude Include="include\game\cursor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\rule\skin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\render\playground\r_object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\game\timing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,18 +1,10 @@
 ﻿#pragma once
-#include <string>
 #include <SDL3/SDL_render.h>
 #include "utilities.h"
 #include "config.h"
 #include "texture.h"
-
-struct RenderObject
-{
-	virtual ~RenderObject() = default;
-	std::string name;
-	TextureRenderConfig config;
-
-	virtual void render(const TextureMemory& memory) const;
-};
+#include "game/hitobject.h"
+#include "playground/r_object.h"
 
 /**
  * Trong SDL3, thật buồn là ta ko có một cấu trúc nào để biểu diễn một Layer :(((\n
@@ -51,9 +43,19 @@ public:
 		void move_out_camera(TextureRenderConfig& object) const;
 	} camera;
 	TextureMemory memory;
-	std::list<RenderObject> objects;
+	std::list<RenderObject::RenderObject> objects;
 
-	void render();
+	virtual ~Layer() = default;
 	explicit Layer(SDL_Renderer* renderer);
+	virtual void render();
 	void clear(bool to_initial_state = false);
+};
+
+struct PlaygroundLayer final : Layer
+{
+	std::vector<RenderObject::RenderObject> objects;
+	std::pair<unsigned long long, unsigned long long> render_range = { 0, 0 };
+	void render() override;
+
+	PlaygroundLayer(SDL_Renderer* renderer, const HitObject::HitObjects& map) : Layer(renderer) {}
 };

@@ -25,7 +25,7 @@ int32_t main(int32_t argc, char* argv[])
 	convert_beatmap(
 		R"(D:\PROGRAM\osu!\Songs\2287992 Camellia - Operation_ Zenithfall\Camellia - Operation Zenithfall (Mir) [Final Mission].osu)",
 		R"(D:\output.tfd)");
-	BeatmapFile beatmap{ R"(D:\output.tfd)" };
+	BeatmapFile beatmap(R"(D:\output.tfd)");
 
 	CleanUp::window(window);
 	return result;

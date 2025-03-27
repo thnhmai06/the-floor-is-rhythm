@@ -156,14 +156,17 @@
   <ItemGroup>
     <ClCompile Include="src\coremgr.cpp" />
     <ClCompile Include="src\file\tfir\tfir_beatmap.cpp" />
+    <ClCompile Include="src\game\timing.cpp" />
     <ClCompile Include="src\render\layer.cpp" />
-    <ClCompile Include="src\render\playground\r_cursor.cpp" />
+    <ClCompile Include="src\render\cursor\r_cursor.cpp" />
+    <ClCompile Include="src\render\playground\r_object.cpp" />
     <ClCompile Include="src\work\render.cpp" />
     <ClInclude Include="include\coremgr.h" />
     <ClInclude Include="include\file\tfir\tfir_beatmap.h" />
-    <ClInclude Include="include\game\g_cursor.h" />
+    <ClInclude Include="include\game\cursor.h" />
     <ClInclude Include="include\game\hitsound.h" />
-    <ClInclude Include="include\game\object.h" />
+    <ClInclude Include="include\game\hitobject.h" />
+    <ClInclude Include="include\game\timing.h" />
     <ClInclude Include="include\logging.h" />
     <ClCompile Include="src\audio\buses.cpp" />
     <ClCompile Include="src\audio\memory.cpp" />
@@ -171,13 +174,14 @@
     <ClCompile Include="src\file\osu\osu_beatmap.cpp" />
     <ClCompile Include="src\game\hitsound.cpp" />
     <ClCompile Include="src\game\metadata.cpp" />
-    <ClCompile Include="src\game\object.cpp" />
+    <ClCompile Include="src\game\hitobject.cpp" />
     <ClCompile Include="src\logging.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="include\utilities.h" />
     <ClCompile Include="src\render\texture.cpp" />
     <ClInclude Include="include\render\layer.h" />
-    <ClInclude Include="include\render\playground\r_cursor.h" />
+    <ClInclude Include="include\render\cursor\r_cursor.h" />
+    <ClInclude Include="include\render\playground\r_object.h" />
     <ClInclude Include="include\rule\skin.h" />
     <ClInclude Include="include\work\render.h" />
   </ItemGroup>

@@ -1,12 +1,13 @@
 ﻿#include "file/osu/osu_beatmap.h" // Header
 #include <osu!parser/Parser.hpp>
 #include <fstream>
+#include "rule/file_format.h"
+#include "game/metadata.h"
+#include "game/hitobject.h"
+#include "game/timing.h"
 #include "exceptions.h"
 #include "logging.h"
-#include "game/metadata.h"
-#include "game/object.h"
 #include "utilities.h"
-#include "rule/file_format.h"
 
 static uint8_t get_direction_jump(const uint8_t colour_hax)
 {
@@ -49,6 +50,7 @@ static Metadata::Metadata convert_metadata(const Parser::MetadataSection& metada
 	result.tags = metadata.Tags;
 	return result;
 }
+//! HitObjects
 static HitObject::Slider convert_hitobject_slider(const Parser::HitObject& object)
 {
 	HitObject::Slider slider;
@@ -70,15 +72,52 @@ static HitObject::Floor convert_hitobject_floor(const Parser::HitObject& object)
 	floor.hitsample = object.Hitsample;
 	return floor;
 }
-static HitObjects convert_hitobjects(const std::vector<Parser::HitObject>& objects)
+static HitObject::HitObjects convert_hitobjects(const std::vector<Parser::HitObject>& objects)
 {
-	HitObjects result;
-	for (const Parser::HitObject& object : objects)
+	HitObject::HitObjects result;
+	for (const Parser::HitObject& osu_object : objects)
 	{
 		const auto back_itr = (result.empty()) ? (result.end()) : (std::prev(result.end()));
-		if (object.Type.HitCircle)
-			result.emplace_hint(back_itr, object.Time, HitObject::Floor{ convert_hitobject_floor(object) });
-		else result.emplace_hint(back_itr, object.Time, HitObject::Slider{ convert_hitobject_slider(object) });
+		if (osu_object.Type.HitCircle)
+			result.emplace_hint(back_itr, osu_object.Time, HitObject::HitObject(convert_hitobject_floor(osu_object)));
+		else result.emplace_hint(back_itr, osu_object.Time, HitObject::HitObject(convert_hitobject_slider(osu_object)));
+	}
+	return result;
+}
+//! TimingPoints
+static Timing::UninheritedPoint convert_uninherited_point(const Parser::TimingPoint& timing_point)
+{
+	Timing::UninheritedPoint result;
+	result.time = timing_point.Time;
+	result.beat_length = timing_point.BeatLength;
+	result.meter = timing_point.Meter;
+	result.sample_set = static_cast<Hitsound::SampleSetType>(timing_point.SampleSet);
+	result.sample_index = timing_point.SampleIndex;
+	result.volume = timing_point.Volume;
+	result.kiai = timing_point.Effects.kiai;
+	return result;
+}
+static Timing::InheritedPoint convert_inherited_point(const Parser::TimingPoint& timing_point)
+{
+	Timing::InheritedPoint result;
+	result.time = timing_point.Time;
+	result.velocity = (100.0 / (-timing_point.BeatLength));
+	result.meter = timing_point.Meter;
+	result.sample_set = static_cast<Hitsound::SampleSetType>(timing_point.SampleSet);
+	result.sample_index = timing_point.SampleIndex;
+	result.volume = timing_point.Volume;
+	result.kiai = timing_point.Effects.kiai;
+	return result;
+}
+static Timing::TimingPoints convert_timing_points(const std::vector<Parser::TimingPoint>& timing_points)
+{
+	Timing::TimingPoints result;
+	for (const Parser::TimingPoint& timing_point : timing_points)
+	{
+		const auto back_itr = (result.empty()) ? (result.end()) : (std::prev(result.end()));
+		if (timing_point.Uninherited)
+			result.emplace_hint(back_itr, timing_point.Time, Timing::TimingPoint(convert_uninherited_point(timing_point)));
+		else result.emplace_hint(back_itr, timing_point.Time, Timing::TimingPoint(convert_inherited_point(timing_point)));
 	}
 	return result;
 }
@@ -97,6 +136,7 @@ void convert_beatmap(const char* file_name, const char* output)
 	convert_general(beatmap.General).write(writer);
 	convert_difficulty(beatmap.Difficulty).write(writer);
 	convert_metadata(beatmap.Metadata).write(writer);
+	convert_timing_points(beatmap.TimingPoints).write(writer);
 	convert_hitobjects(beatmap.HitObjects).write(writer);
 
 	writer.close();

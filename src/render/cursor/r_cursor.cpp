@@ -1,4 +1,4 @@
-#include "render/playground/r_cursor.h" // Header
+#include "render/cursor/r_cursor.h" // Header
 #include "exceptions.h"
 #include "rule/skin.h"
 
@@ -7,13 +7,13 @@ void RenderObjects::Cursor::render(const TextureMemory& memory) const
 {
 	if (memory.render(tail, config))
 		LOG_ERROR(SDL_Exceptions::Texture::SDL_RenderTexture_Failed(tail));
-	if (!memory.render(name, config))
-		LOG_ERROR(SDL_Exceptions::Texture::SDL_RenderTexture_Failed(name));
+	if (!memory.render(*name, config))
+		LOG_ERROR(SDL_Exceptions::Texture::SDL_RenderTexture_Failed(*name));
 }
 RenderObjects::Cursor::Cursor()
 {
 	// file used
-	name = Skin_Filename::Cursor::NAME;
+	name = &Skin_Filename::Cursor::NAME;
 	tail = Skin_Filename::Cursor::TAIL;
 	// config
 	config.dst_rect = &dst_rect;
@@ -22,7 +22,8 @@ RenderObjects::Cursor::Cursor()
 //! CursorDirection
 std::string RenderObjects::CursorDirection::change_direction(const Direction new_direction)
 {
-	return name = Skin_Filename::Cursor::DIRECTION.find(new_direction)->second;
+	name = &Skin_Filename::Cursor::DIRECTION.find(new_direction)->second;
+	return *name;
 }
 RenderObjects::CursorDirection::CursorDirection()
 {
