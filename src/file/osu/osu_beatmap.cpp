@@ -33,7 +33,6 @@ static Metadata::General convert_general(const Parser::GeneralSection& general)
 static Metadata::Difficulty convert_difficulty(const Parser::DifficultySection& difficulty)
 {
 	Metadata::Difficulty result;
-	if (!difficulty.ApproachRate.empty()) result.AR = std::stof(difficulty.ApproachRate);
 	if (!difficulty.OverallDifficulty.empty()) result.OD = std::stof(difficulty.OverallDifficulty);
 	if (!difficulty.HPDrainRate.empty()) result.HP = std::stof(difficulty.HPDrainRate);
 	return result;

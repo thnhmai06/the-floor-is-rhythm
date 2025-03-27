@@ -3,12 +3,6 @@
 
 namespace Difficulty
 {
-	namespace AR
-	{
-		constexpr float PREEMPT_AR5 = 1200;
-		constexpr float FADE_IN_AR5 = 800;
-	}
-
 	namespace OD
 	{
 		namespace Base

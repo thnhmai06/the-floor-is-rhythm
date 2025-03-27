@@ -71,15 +71,15 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)obj\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)build\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build\objects\$(Platform)\$(Configuration)\</IntDir>
     <IncludePath>.\dependencies\SDL_mixer-build\include;.\dependencies\osu-parser\include;.\include;$(IncludePath)</IncludePath>
     <LibraryPath>.\dependencies\SDL_mixer-build\lib;.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib\manual-link;.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib;$(LibraryPath)</LibraryPath>
     <SourcePath>;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)obj\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)build\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build\objects\$(Platform)\$(Configuration)\</IntDir>
     <IncludePath>.\dependencies\SDL_mixer-build\include;.\dependencies\osu-parser\include;.\include;$(IncludePath)</IncludePath>
     <LibraryPath>.\dependencies\SDL_mixer-build\lib;.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib\manual-link;.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib;$(LibraryPath)</LibraryPath>
     <SourcePath>;$(SourcePath)</SourcePath>
@@ -197,6 +197,9 @@
     <ClInclude Include="include\game\metadata.h" />
     <ClInclude Include="include\file\osu\osu_beatmap.h" />
     <ClInclude Include="include\main.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="dependencies\SDL_mixer-build\bin\SDL3_mixer.dll" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

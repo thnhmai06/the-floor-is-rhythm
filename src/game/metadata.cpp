@@ -98,8 +98,6 @@ void Metadata::Difficulty::read(const std::vector<std::string>& contents)
 			HP = std::stof(content[1]);
 		else if (content[0] == tfir::Difficulty::OD)
 			OD = std::stof(content[1]);
-		else if (content[0] == tfir::Difficulty::AR)
-			AR = std::stof(content[1]);
 	}
 }
 void Metadata::Difficulty::write(std::ofstream& writer) const
@@ -111,29 +109,6 @@ void Metadata::Difficulty::write(std::ofstream& writer) const
 	writer << tfir::Difficulty::HP << tfir::SEPARATOR << HP << '\n';
 	writer << tfir::Difficulty::OD << tfir::SEPARATOR << OD << '\n';
 	writer << '\n';
-}
-
-//! Metadata::CalculatedDifficulty::Approach_Rate
-void Metadata::CalculatedDifficulty::Approach_Rate::apply(const float v)
-{
-	using namespace ::Difficulty::AR;
-
-	value = v;
-	if (Utilities::Math::is_equal_float(v, 5))
-	{
-		preempt_time = PREEMPT_AR5;
-		fade_in_time = FADE_IN_AR5;
-	}
-	else if (v < 5)
-	{
-		preempt_time = PREEMPT_AR5 + 600 * (5 - v) / 5;
-		fade_in_time = FADE_IN_AR5 + 400 * (5 - v) / 5;
-	}
-	else // v > 5
-	{
-		preempt_time = PREEMPT_AR5 - 750 * (v - 5) / 5;
-		fade_in_time = FADE_IN_AR5 - 500 * (v - 5) / 5;
-	}
 }
 //! Metadata::CalculatedDifficulty::Overall_Difficulty
 void Metadata::CalculatedDifficulty::Overall_Difficulty::apply(const float v)
@@ -158,14 +133,12 @@ void Metadata::CalculatedDifficulty::write(std::ofstream& writer) const
 	using namespace  tfir::Difficulty;
 
 	writer << HEADER << '\n';
-	writer << tfir::Difficulty::AR << tfir::SEPARATOR << AR.value << '\n';
 	writer << tfir::Difficulty::HP << tfir::SEPARATOR << HP.value << '\n';
 	writer << tfir::Difficulty::OD << tfir::SEPARATOR << OD.value << '\n';
 	writer << '\n';
 }
 void Metadata::CalculatedDifficulty::apply(const Difficulty& basic)
 {
-	AR.apply(basic.AR);
 	OD.apply(basic.OD);
 	HP.apply(basic.HP);
 }

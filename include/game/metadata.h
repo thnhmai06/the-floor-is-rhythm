@@ -37,7 +37,7 @@ namespace Metadata
 	};
 	struct Difficulty
 	{
-		float AR = -1, OD = -1, HP = -1;
+		float OD = -1, HP = -1;
 		void read(const std::vector<std::string>& contents);
 		void write(std::ofstream& writer) const;
 
@@ -53,25 +53,6 @@ namespace Metadata
 	 */
 	struct CalculatedDifficulty
 	{
-		/**
-		 * @class Approach_Rate
-		 * @ingroup beatmap difficulty
-		 * @brief Biểu diễn AR của map (Thời gian tiếp cận)
-		 */
-		struct Approach_Rate
-		{
-			// Follow: https://osu.ppy.sh/wiki/en/Beatmap/Approach_rate
-			// yeah, this game is "based" on osu! lmfao
-
-			float value = -1, preempt_time = -1, fade_in_time = -1;
-
-			void apply(float v);
-			void apply() { apply(value); }
-
-			Approach_Rate() = default;
-			Approach_Rate(const float value) { apply(value); }
-		} AR;
-
 		/**
 		 * @class Overall_Difficulty
 		 * @ingroup beatmap difficulty
