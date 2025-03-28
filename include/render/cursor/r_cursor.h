@@ -5,7 +5,7 @@
 #include "utilities.h"
 #include "rule/skin.h"
 
-namespace RenderObjects
+namespace RenderObjects::Cursor
 {
 	struct Cursor : RenderObject
 	{

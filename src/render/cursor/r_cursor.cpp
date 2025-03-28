@@ -3,7 +3,7 @@
 #include "logging.h"
 
 //! Cursor
-void RenderObjects::Cursor::render(const Texture::TextureMemory& memory) const
+void RenderObjects::Cursor::Cursor::render(const Texture::TextureMemory& memory) const
 {
 	if (memory.render(*tail, config))
 		LOG_ERROR(SDL_Exceptions::Texture::SDL_RenderTexture_Failed(*tail));
@@ -11,7 +11,7 @@ void RenderObjects::Cursor::render(const Texture::TextureMemory& memory) const
 		LOG_ERROR(SDL_Exceptions::Texture::SDL_RenderTexture_Failed(*name));
 }
 //! CursorDirection
-void RenderObjects::CursorDirection::change_direction(const Direction new_direction)
+void RenderObjects::Cursor::CursorDirection::change_direction(const Direction new_direction)
 {
 	name = &SkinFormat::Cursor::DIRECTION.find(new_direction)->second;
 }
