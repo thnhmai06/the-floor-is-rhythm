@@ -137,5 +137,8 @@
     <ClInclude Include="include\game\timing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\template.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

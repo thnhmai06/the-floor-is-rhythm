@@ -25,7 +25,7 @@ Mixer::Mixer()
 	spec.freq = SAMPLE_FREQUENCY;
 
 	if (!Mix_OpenAudio(0, &spec))
-		THROW_CRITICAL(SDL_Exceptions::Audio::SDL_Audio_CreateMixer_Failed());
+		THROW_CRITICAL(SDLExceptions::Audio::SDL_Audio_CreateMixer_Failed());
 
 	// Sau khi khởi tạo, đặt master volume
 	set_master_volume(master);

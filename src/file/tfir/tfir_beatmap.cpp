@@ -46,7 +46,7 @@ BeatmapFile::BeatmapFile(const char* file_path)
 {
 	std::ifstream reader(file_path);
 	if (!reader)
-		THROW_ERROR(File_Exceptions::File_Open_Failed(file_path));
+		THROW_ERROR(FileExceptions::File_Open_Failed(file_path));
 
 	parse_beatmap(*this, read_content(reader));
 	reader.close();

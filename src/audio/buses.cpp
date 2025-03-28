@@ -1,6 +1,8 @@
 ﻿#include "audio/buses.h" // Header
 #include "rule/config.h"
 #include "template.h"
+#include "logging.h"
+#include "exceptions.h"
 #include "utilities.h"
 
 using namespace Utilities::Audio;
@@ -12,15 +14,16 @@ int32_t AudioBus<Music>::set_volume(const int32_t value)
 	if (value >= 0) volume = value;
 	return get_real_volume(Mix_VolumeMusic(get_volume(value)));
 }
-bool AudioBus<Music>::play(const std::string& name) const
+void AudioBus<Music>::play(const std::string& name) const
 {
 	if (has_song_playing()) stop();
 
 	const auto it = memory.find(name);
-	if (it == memory.end()) return false;
+	if (it == memory.end()) 
+		THROW_ERROR(SDLExceptions::Audio::SDL_Audio_PlayMusic_Failed(name));
 
-	Music audio = it->second;
-	return Mix_PlayMusic(audio, -1);
+	if (!Mix_PlayMusic(it->second, -1))
+		THROW_ERROR(SDLExceptions::Audio::SDL_Audio_PlayMusic_Failed(name));
 }
 bool AudioBus<Music>::has_song_playing() { return (Mix_PlayingMusic() != 0); }
 bool AudioBus<Music>::is_playing() { return has_song_playing() && (Mix_PausedMusic() == 1); }
@@ -46,8 +49,11 @@ int32_t AudioBus<Effect>::set_effect_volume(const std::string& name, const int32
 int32_t AudioBus<Effect>::play(const std::string& name) const
 {
 	const auto it = memory.find(name);
-	if (it == memory.end()) return -1;
+	if (it == memory.end())
+		THROW_ERROR(SDLExceptions::Audio::SDL_Audio_PlayEffect_Failed(name));
 
-	Effect audio = it->second;
-	return Mix_PlayChannel(-1, audio, 0);
+	const int32_t result = Mix_PlayChannel(-1, it->second, 0);
+	if (result < 0)
+		THROW_ERROR(SDLExceptions::Audio::SDL_Audio_PlayEffect_Failed(name));
+	return result;
 }

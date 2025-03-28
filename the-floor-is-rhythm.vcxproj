@@ -183,6 +183,7 @@
     <ClInclude Include="include\render\cursor\r_cursor.h" />
     <ClInclude Include="include\render\playground\r_object.h" />
     <ClInclude Include="include\rule\skin.h" />
+    <ClInclude Include="include\template.h" />
     <ClInclude Include="include\work\render.h" />
   </ItemGroup>
   <ItemGroup>

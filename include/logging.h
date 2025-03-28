@@ -41,3 +41,14 @@ namespace Logging
 			THROW_ERROR(exception);\
 		} catch (...) {}\
 	} while (false)
+
+/**
+ * Chỉ log WARNING nhưng không muốn throw exception
+ * @param exception Exception muốn log ra
+ */
+#define LOG_WARNNING(exception) \
+	do {\
+		try {\
+			spdlog::log(spdlog::source_loc{ __FILE__, __LINE__, SPDLOG_FUNCTION }, spdlog::level::warn, (exception).what()); \
+		} catch (...) {}\
+	} while (false)

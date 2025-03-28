@@ -1,6 +1,8 @@
 #include "game/hitobject.h" // Header
 #include <fstream>
 #include <ranges>
+#include "exceptions.h"
+#include "logging.h"
 #include "rule/file_format.h"
 #include "utilities.h"
 
@@ -66,7 +68,11 @@ void HitObject::HitObjects::read(const std::vector<std::string>& contents)
 	for (const auto& line : contents)
 	{
 		const auto content = Utilities::String::split(line, AND);
-		if (content.size() < HitObject::MINIMUM_NUM_CONTENT) continue; // TODO: Warning
+		if (content.size() < HitObject::MINIMUM_NUM_CONTENT)
+		{
+			LOG_WARNNING(FormatExceptions::HitObjects::Format_HitObjects_NotEnoughtContent(line));
+			continue;
+		}
 
 		const auto back_itr = (empty()) ? end() : std::prev(end());
 		switch (std::stoi(content[3]))
@@ -81,13 +87,17 @@ void HitObject::HitObjects::read(const std::vector<std::string>& contents)
 		case static_cast<int32_t>(HitObjectType::SLIDER):
 		{
 			Slider slider;
-			if (content.size() < Slider::MINIMUM_NUM_CONTENT) continue; //TODO: Warning
+			if (content.size() < Slider::MINIMUM_NUM_CONTENT)
+			{
+				LOG_WARNNING(FormatExceptions::HitObjects::Format_HitObjects_NotEnoughtContent(line));
+				continue;
+			}
 			slider.read(content);
 			this->emplace_hint(back_itr, slider.time, std::make_unique<Slider>(std::move(slider)));
 			break;
 		}
 		default:
-			//TODO: Warning
+			LOG_WARNNING(FormatExceptions::HitObjects::Format_HitObjects_InvalidContent(line));
 			break;
 		}
 	}

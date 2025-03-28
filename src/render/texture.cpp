@@ -9,11 +9,11 @@ SDL_Texture* Texture::TextureMemory::load(const char* file_path, const std::stri
 {
 	SDL_Texture* texture = IMG_LoadTexture(this->renderer, file_path);
 	if (!texture)
-		THROW_ERROR(SDL_Exceptions::Texture::SDL_LoadTexture_Failed(file_path));
+		THROW_ERROR(SDLExceptions::Texture::SDL_Texture_Load_Failed(file_path));
 
 	// Nếu dùng STB_Image
 	/*if (!texture)
-		THROW_ERROR(SDL_Exceptions::Texture::IMG_LoadTexture_Failed(file_path));
+		THROW_ERROR(SDLExceptions::Texture::IMG_LoadTexture_Failed(file_path));
 
 	int32_t w, h, channels;
 	unsigned char* image = stbi_load(file_path, &w, &h, &channels, desired_channels);
@@ -24,7 +24,7 @@ SDL_Texture* Texture::TextureMemory::load(const char* file_path, const std::stri
 	if (!SDL_UpdateTexture(texture, nullptr, image, w * desired_channels))
 	{
 		stbi_image_free(image);
-		THROW_ERROR(SDL_Exceptions::Texture::SDL_UpdateTexture_Failed(file_path));
+		THROW_ERROR(SDLExceptions::Texture::SDL_UpdateTexture_Failed(file_path));
 	}
 	stbi_image_free(image);*/
 
@@ -70,6 +70,5 @@ void Texture::TextureMemory::free_all()
 void RenderObjects::RenderObject::render(const Texture::TextureMemory& memory) const
 {
 	if (!memory.render(*name, config))
-		LOG_ERROR(SDL_Exceptions::Texture::SDL_RenderTexture_Failed(*name));
-
+		LOG_ERROR(SDLExceptions::Texture::SDL_Texture_Render_Failed(*name));
 }

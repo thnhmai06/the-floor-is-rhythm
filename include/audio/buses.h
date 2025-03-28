@@ -21,7 +21,7 @@ struct AudioBus<Music>
 	int32_t volume;
 
 	int32_t set_volume(int32_t value = -1);
-	bool play(const std::string& name) const;
+	void play(const std::string& name) const;
 	static bool has_song_playing();
 	static bool is_playing();
 	static void pause();

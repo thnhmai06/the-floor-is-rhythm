@@ -4,8 +4,8 @@
 
 namespace Init
 {
-	SDL_Window* window();
-	SDL_Renderer* renderer(SDL_Window* window);
+	void window(SDL_Window*& window);
+	void renderer(SDL_Window* window, SDL_Renderer*& renderer);
 }
 
 namespace CleanUp

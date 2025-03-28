@@ -15,10 +15,11 @@ int32_t main(int32_t argc, char* argv[])
 	int32_t result = EXIT_SUCCESS;
 	Logging::init("root", DEBUG_MODE ? spdlog::level::debug : spdlog::level::info);
 	if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO))
-		THROW_CRITICAL(SDL_Exceptions::Init::SDL_InitSDL_Failed());
+		THROW_CRITICAL(SDLExceptions::Video::SDL_Video_InitSDL_Failed());
 
-	// Window
-	SDL_Window* window = Init::window();
+	// Window & Renderer
+	SDL_Window* window = nullptr;
+	Init::window(window);
 
 	// Render
 	result = render(window);

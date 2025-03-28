@@ -6,9 +6,9 @@
 void RenderObjects::Cursor::Cursor::render(const Texture::TextureMemory& memory) const
 {
 	if (memory.render(*tail, config))
-		LOG_ERROR(SDL_Exceptions::Texture::SDL_RenderTexture_Failed(*tail));
+		LOG_ERROR(SDLExceptions::Texture::SDL_Texture_Render_Failed(*tail));
 	if (!memory.render(*name, config))
-		LOG_ERROR(SDL_Exceptions::Texture::SDL_RenderTexture_Failed(*name));
+		LOG_ERROR(SDLExceptions::Texture::SDL_Texture_Render_Failed(*name));
 }
 //! CursorDirection
 void RenderObjects::Cursor::CursorDirection::change_direction(const Direction new_direction)

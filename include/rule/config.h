@@ -32,7 +32,7 @@ namespace ImmutableConfig
 	{
 		constexpr int32_t MAX_CHANNELS = 8;                // Số kênh phát hiệu ứng tối đa
 		constexpr int32_t SAMPLE_FREQUENCY = 48000;        // Tần số mẫu âm thanh
-		constexpr SDL_AudioFormat AUDIO_FORMAT = SDL_AUDIO_F32LE;        // Format âm thanh
+		constexpr SDL_AudioFormat AUDIO_FORMAT = SDL_AUDIO_F32LE;        // FormatExceptions âm thanh
 		constexpr int32_t MONO = 1, STEREO = 2;             // Số kênh âm thanh: 1 hay 2
 		constexpr int32_t BUFFER_SIZE = 256;               // Kích cỡ buffer
 	}

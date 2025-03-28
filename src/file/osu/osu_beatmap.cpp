@@ -127,7 +127,7 @@ void convert_beatmap(const char* file_name, const char* output)
 	Parser::Beatmap beatmap(file_name);
 	std::ofstream writer(output);
 	if (!writer)
-		THROW_ERROR(File_Exceptions::File_Open_Failed(output));
+		THROW_ERROR(FileExceptions::File_Open_Failed(output));
 	// Version
 	writer << FileFormat::Beatmap::FORMAT_VERSION << '\n';
 	writer << FileFormat::Beatmap::CONVERT::osu::VERSION << beatmap.Version << '\n';

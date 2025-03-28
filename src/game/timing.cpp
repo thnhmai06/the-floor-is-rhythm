@@ -1,6 +1,8 @@
 #include "game/timing.h" // Header
 #include <fstream>
 #include <ranges>
+#include "logging.h"
+#include "exceptions.h"
 #include "rule/file_format.h"
 #include "utilities.h"
 
@@ -47,7 +49,11 @@ void Timing::TimingPoints::read(const std::vector<std::string>& contents)
 	for (const auto& line : contents)
 	{
 		const auto content = Utilities::String::split(line, AND);
-		if (content.size() < TimingPoint::MINIMUM_NUM_CONTENT) continue; // TODO: Warning
+		if (content.size() < TimingPoint::MINIMUM_NUM_CONTENT)
+		{
+			LOG_WARNNING(FormatExceptions::TimingPoints::Format_TimingPoints_NotEnoughtContent(line));
+			continue;
+		}
 
 		const auto back_itr = empty() ? end() : std::prev(end());
 		if (std::stod(content[1]) >= 0)

@@ -23,7 +23,7 @@ Music AudioMemory<Music>::load(const char* file_path, const std::string& name)
 {
 	Mix_Music* audio = Mix_LoadMUS(file_path);
 	if (!audio)
-		THROW_ERROR(SDL_Exceptions::Audio::SDL_Audio_LoadMusic_Failed(file_path));
+		THROW_ERROR(SDLExceptions::Audio::SDL_Audio_LoadMusic_Failed(file_path));
 
 	insert_or_assign(name, audio);
 	return audio;
@@ -48,7 +48,7 @@ Effect AudioMemory<Effect>::load(const char* file_path, const std::string& name)
 {
 	Mix_Chunk* audio = Mix_LoadWAV(file_path);
 	if (!audio)
-		THROW_ERROR(SDL_Exceptions::Audio::SDL_Audio_LoadEffect_Failed(file_path));
+		THROW_ERROR(SDLExceptions::Audio::SDL_Audio_LoadEffect_Failed(file_path));
 
 	insert_or_assign(name, audio);
 	return audio;

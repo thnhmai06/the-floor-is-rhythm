@@ -6,7 +6,8 @@
 int32_t render(SDL_Window* window)
 {
 	int32_t result = EXIT_SUCCESS;
-
+	SDL_Renderer* renderer = nullptr;
+	Init::renderer(window, renderer);
 
 	//// test
 	//WorkingLayers::background->memory.load(
@@ -22,10 +23,8 @@ int32_t render(SDL_Window* window)
 	//bg->second.alpha = 100;
 	//auto obj_dstrect = SDL_FRect{ 100, 100, 60, 40 };
 	//obj->second.dst_rect = &obj_dstrect;
-	
-	SDL_Renderer* renderer = Init::renderer(window);
-	WorkingLayers::init_all(renderer);
 
+	WorkingLayers::init_all(renderer);
 	/*WorkingLayers::background->memory.load(R"(D:\Development\Code\cpp\Repositories\the-floor-is-rhythm\assets\floor.png)", SkinFormat::HitObject::FLOOR);
 	SDL_FRect size = { 100, 100, , ImmutableConfig::HitObject::SIZE_HEIGHT };
 	TextureConfig config(&size);
