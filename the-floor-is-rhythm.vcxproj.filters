@@ -138,7 +138,4 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="dependencies\SDL_mixer-build\bin\SDL3_mixer.dll" />
-  </ItemGroup>
 </Project>

@@ -3,7 +3,6 @@
 #include <map>
 #include <vector>
 #include "game/hitsound.h"
-#include "logging.h"
 
 enum class Direction : uint8_t
 {
@@ -54,7 +53,7 @@ namespace HitObject
 		void write(std::ofstream& writer) const override;
 
 		Floor() { type = HitObjectType::FLOOR; }
-		explicit Floor(const std::vector<std::string>& content) { type = HitObjectType::FLOOR;  Floor::read(content); }
+		explicit Floor(const std::vector<std::string>& content): Floor() { Floor::read(content); }
 	};
 	struct Slider : HitObject
 	{
@@ -70,7 +69,7 @@ namespace HitObject
 		void read(const std::vector<std::string>& content) override;
 		void write(std::ofstream& writer) const override;
 		Slider() { type = HitObjectType::SLIDER; }
-		explicit Slider(const std::vector<std::string>& content) { type = HitObjectType::SLIDER; Slider::read(content); }
+		explicit Slider(const std::vector<std::string>& content): Slider() { Slider::read(content); }
 	};
 
 	struct HitObjects : std::multimap<int32_t, std::unique_ptr<HitObject>>

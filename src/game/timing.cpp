@@ -53,12 +53,12 @@ void Timing::TimingPoints::read(const std::vector<std::string>& contents)
 		if (std::stod(content[1]) >= 0)
 		{
 			UninheritedPoint point(content);
-			emplace_hint(back_itr, point.time, std::make_unique<UninheritedPoint>(point));
+			emplace_hint(back_itr, point.time, std::make_unique<UninheritedPoint>(std::move(point)));
 		}
 		else
 		{
 			InheritedPoint point(content);
-			emplace_hint(back_itr, point.time, std::make_unique<InheritedPoint>(point));
+			emplace_hint(back_itr, point.time, std::make_unique<InheritedPoint>(std::move(point)));
 		}
 	}
 }

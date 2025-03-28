@@ -5,8 +5,6 @@
 #include <iomanip>
 #include <SDL3_mixer/SDL_mixer.h>
 
-#include "game/hitobject.h"
-
 namespace Utilities
 {
 	namespace Math

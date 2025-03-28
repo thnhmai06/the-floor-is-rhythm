@@ -3,7 +3,9 @@
 #include "logging.h"
 #include "exceptions.h"
 
-SDL_Texture* TextureMemory::load(const char* file_path, const std::string& name)
+//! Texture
+// ::TextureMemory
+SDL_Texture* Texture::TextureMemory::load(const char* file_path, const std::string& name)
 {
 	SDL_Texture* texture = IMG_LoadTexture(this->renderer, file_path);
 	if (!texture)
@@ -28,27 +30,26 @@ SDL_Texture* TextureMemory::load(const char* file_path, const std::string& name)
 
 	return load(texture, name);
 }
-SDL_Texture* TextureMemory::load(SDL_Texture* texture, const std::string& name)
+SDL_Texture* Texture::TextureMemory::load(SDL_Texture* texture, const std::string& name)
 {
 	SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 	insert_or_assign(name, texture);
 	return texture;
 }
-
-bool TextureMemory::render(const std::string& name, const TextureRenderConfig& config) const
+bool Texture::TextureMemory::render(const std::string& name, const TextureConfig& config) const
 {
 	if (const auto it = find(name); it != end())
 	{
 		SDL_SetTextureAlphaMod(it->second, config.alpha);
-		if (config.rotation.has_value())
-			return SDL_RenderTextureRotated(renderer, it->second, config.src_rect, config.dst_rect,
-				config.rotation->angle, config.rotation->center, config.rotation->flip);
-		return SDL_RenderTexture(renderer, it->second, config.src_rect, config.dst_rect);
+
+		if (config.rotation)
+			return SDL_RenderTextureRotated(renderer, it->second, config.src_rect.get(), config.dst_rect.get(),
+				config.rotation->angle, config.rotation->center.get(), config.rotation->flip);
+		return SDL_RenderTexture(renderer, it->second, config.src_rect.get(), config.dst_rect.get());
 	}
 	return false;
 }
-
-void TextureMemory::free(const std::string& name)
+void Texture::TextureMemory::free(const std::string& name)
 {
 	const auto it = find(name);
 	if (it != end())
@@ -57,10 +58,18 @@ void TextureMemory::free(const std::string& name)
 		erase(it);
 	}
 }
-
-void TextureMemory::free_all()
+void Texture::TextureMemory::free_all()
 {
 	for (const auto& texture : *this | std::views::values)
 		SDL_DestroyTexture(texture);
 	std::unordered_map<std::string, SDL_Texture*>::clear();
+}
+
+//! RenderObjects
+// ::RenderObject
+void RenderObjects::RenderObject::render(const Texture::TextureMemory& memory) const
+{
+	if (!memory.render(*name, config))
+		LOG_ERROR(SDL_Exceptions::Texture::SDL_RenderTexture_Failed(*name));
+
 }

@@ -1,7 +1,7 @@
 ﻿#include "render/layer.h" // Header
 
 //! Camera
-void Layer::Camera::move_into_camera(TextureRenderConfig& object) const
+void Layers::Layer::Camera::move_into_camera(Texture::TextureConfig& object) const
 {
 	if (object.dst_rect)
 	{
@@ -19,7 +19,7 @@ void Layer::Camera::move_into_camera(TextureRenderConfig& object) const
 		object.dst_rect->y -= camera_pos_on_layer.y;
 	}
 }
-void Layer::Camera::move_out_camera(TextureRenderConfig& object) const
+void Layers::Layer::Camera::move_out_camera(Texture::TextureConfig& object) const
 {
 	if (object.dst_rect)
 	{
@@ -39,7 +39,7 @@ void Layer::Camera::move_out_camera(TextureRenderConfig& object) const
 }
 
 //! Layer
-void Layer::to_absolute_object(TextureRenderConfig& object) const
+void Layers::Layer::to_absolute_object(Texture::TextureConfig& object) const
 {
 	// dstrect
 	if (config.dst_rect && object.dst_rect)
@@ -55,7 +55,7 @@ void Layer::to_absolute_object(TextureRenderConfig& object) const
 	// alpha
 	object.alpha = (object.alpha * config.alpha) / 255;
 }
-void Layer::to_relative_object(TextureRenderConfig& object) const
+void Layers::Layer::to_relative_object(Texture::TextureConfig& object) const
 {
 	// dstrect
 	if (config.dst_rect && object.dst_rect)
@@ -70,38 +70,30 @@ void Layer::to_relative_object(TextureRenderConfig& object) const
 	// alpha
 	object.alpha = (object.alpha * 255) / config.alpha;
 }
-void Layer::render()
+void Layers::Layer::render()
 {
 	if (!visible) return;
-	for (auto& object : render_list)
+
+	const auto begin = render_range ? render_range->first : render_buffer.begin();
+	const auto end = render_range ? render_range->second : render_buffer.end();
+	for (auto object = begin; object != end; ++object)
 	{
 		// i hate this job
-		to_absolute_object(object.config);
-		camera.move_into_camera(object.config);
-		object.render(memory);
-		camera.move_out_camera(object.config);
-		to_relative_object(object.config);
-	}
-}
-Layer::Layer(SDL_Renderer* renderer) : renderer(renderer), memory(renderer) {}
-void Layer::clear(const bool to_initial_state)
-{
-	render_list.clear();
-	if (to_initial_state)
-	{
-		config = Config();
-		memory.free_all();
+		to_absolute_object(object->config);
+		camera.move_into_camera(object->config);
+		object->render(memory);
+		camera.move_out_camera(object->config);
+		to_relative_object(object->config);
 	}
 }
 
-//! PlaygroundLayer
-void PlaygroundLayer::render()
+Layers::Layer::Layer(SDL_Renderer* renderer) : renderer(renderer), memory(renderer) {}
+void Layers::Layer::clear(const bool to_initial_state)
 {
-	// For lùi để các object trước được vẽ trên cùng
-	for (auto i = render_range.second; i >= render_range.first; --i)
+	render_buffer.clear();
+	if (to_initial_state)
 	{
-		if (i < 0 || i >= static_cast<int32_t>(render_hitobjects.size()))
-			continue;
-		render_hitobjects[i].render(memory);
+		config = LayerConfig();
+		memory.free_all();
 	}
 }

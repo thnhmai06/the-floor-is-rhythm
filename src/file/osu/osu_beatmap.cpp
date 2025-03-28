@@ -76,9 +76,9 @@ static HitObject::HitObjects convert_hitobjects(const std::vector<Parser::HitObj
 		const auto back_itr = (result.empty()) ? (result.end()) : (std::prev(result.end()));
 		if (osu_object.Type.HitCircle)
 			result.emplace_hint(back_itr, osu_object.Time,
-				std::make_unique<HitObject::Floor>(convert_hitobject_floor(osu_object)));
+				std::make_unique<HitObject::Floor>(std::move(convert_hitobject_floor(osu_object))));
 		else result.emplace_hint(back_itr, osu_object.Time,
-			std::make_unique<HitObject::Slider>(convert_hitobject_slider(osu_object)));
+			std::make_unique<HitObject::Slider>(std::move(convert_hitobject_slider(osu_object))));
 	}
 	return result;
 }
@@ -115,9 +115,9 @@ static Timing::TimingPoints convert_timing_points(const std::vector<Parser::Timi
 		const auto back_itr = (result.empty()) ? (result.end()) : (std::prev(result.end()));
 		if (timing_point.Uninherited)
 			result.emplace_hint(back_itr, timing_point.Time,
-				std::make_unique<Timing::UninheritedPoint>(convert_uninherited_point(timing_point)));
+				std::make_unique<Timing::UninheritedPoint>(std::move(convert_uninherited_point(timing_point))));
 		else result.emplace_hint(back_itr, timing_point.Time,
-			std::make_unique<Timing::InheritedPoint>(convert_inherited_point(timing_point)));
+			std::make_unique<Timing::InheritedPoint>(std::move(convert_inherited_point(timing_point))));
 	}
 	return result;
 }

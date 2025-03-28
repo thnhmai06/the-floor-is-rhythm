@@ -1,73 +1,92 @@
 ﻿#include "render/playground/r_object.h" // Header
-#include "exceptions.h"
 #include "rule/skin.h"
 #include "rule/config.h"
-#include "utilities.h"
 
-//! RenderObject
-void RenderObject::RenderObject::render(const TextureMemory& memory) const
+static SDL_FRect* calculate_next_render_hitobject(
+	SDL_FRect* dst,
+	const HitObject::DirectionJump& direction_jump,
+	const float& velocity,
+	const float& duration,
+	const float& time_delta,
+	const RenderObjects::Playground::RenderHitobject* previous)
 {
-	if (!memory.render(*name, config))
-		LOG_ERROR(SDL_Exceptions::Texture::SDL_RenderTexture_Failed(*name));
-}
-
-//! Playground
-//::RenderFloor
-RenderObject::Playground::RenderFloor::RenderFloor(
-	const HitObject::Floor* floor,
-	const Metadata::CalculatedDifficulty* diff,
-	const Timing::InheritedPoint* current_inherited_point,
-	const RenderHitobject* previous)
-{
-	name = &Skin_Filename::HitObject::FLOOR;
-	hitobject = floor;
-
-	//! Tính toán
-	const float current_timing_velocity = current_inherited_point ? (current_inherited_point->velocity) : 1;
-	const float velocity = diff->velocity * current_timing_velocity;
-	// Tính pos trung tâm
+	// Tính vị trí đặt
 	if (!previous)
 	{
-		dst.x = ImmutableConfig::HitObject::DEFAULT_POS_X;
-		dst.y = ImmutableConfig::HitObject::DEFAULT_POS_Y;
-	} else
+		dst->x = ImmutableConfig::HitObject::DEFAULT_POS_X;
+		dst->y = ImmutableConfig::HitObject::DEFAULT_POS_Y;
+	}
+	else
 	{
-		dst.x = previous->config.dst_rect->x;
-		dst.y = previous->config.dst_rect->y;
-		const auto time_delta = static_cast<float>(floor->time - previous->hitobject->end_time);
+		if (!previous->tail)
+		{
+			dst->x = previous->config.dst_rect->x;
+			dst->y = previous->config.dst_rect->y;
+		}
+		else
+		{
+			dst->x = previous->tail->x;
+			dst->y = previous->tail->y;
+		}
 
-		switch (floor->direction_jump)
+		switch (direction_jump)
 		{
 		case HitObject::DirectionJump::NO_ROTATE:
-			dst.x += velocity * time_delta;
+			dst->x += velocity * time_delta;
 			break;
 
 		case HitObject::DirectionJump::ROTATE_90:
-			dst.y -= velocity * time_delta;
+			dst->y -= velocity * time_delta;
 			break;
 
 		case HitObject::DirectionJump::ROTATE_180:
-			dst.x -= velocity * time_delta;
+			dst->x -= velocity * time_delta;
 			break;
 
 		case HitObject::DirectionJump::ROTATE_270:
-			dst.y += velocity * time_delta;
+			dst->y += velocity * time_delta;
 			break;
 		}
 	}
 	// Tính kích cỡ (width)
-	dst.w = velocity * diff->od.bad * 2;
+	dst->w = velocity * duration;
+
+	return dst;
+}
+
+//! RenderObjects::Playground
+// ::RenderFloor
+RenderObjects::Playground::RenderFloor::RenderFloor(
+	const HitObject::Floor* floor,
+	const Metadata::CalculatedDifficulty* diff,
+	const RenderHitobject* previous,
+	const float& current_timing_velocity)
+{
+	name = &Skin_Filename::HitObject::FLOOR;
+	hitobject = floor;
+	tail = config.dst_rect.get();
+
+	const float velocity = diff->velocity * current_timing_velocity;
+	const auto time_delta = static_cast<float>(floor->time - previous->hitobject->end_time);
+	calculate_next_render_hitobject(config.dst_rect.get(), floor->direction_jump, velocity,
+		diff->od.bad * 2, time_delta, previous);
 }
 
 //::RenderSlider
-RenderObject::Playground::RenderSlider::RenderSlider(
-	const HitObject::Slider* slider, 
-	const Metadata::CalculatedDifficulty* diff, 
-	const Timing::UninheritedPoint* current_uninherited_point, 
-	const Timing::InheritedPoint* current_inherited_point, 
-	const RenderHitobject* previous) : slider(slider)
+RenderObjects::Playground::RenderSlider::RenderSlider(
+	const HitObject::Slider* slider,
+	const Metadata::CalculatedDifficulty* diff,
+	const float& current_beatlength,
+	const RenderHitobject* previous,
+	const float& current_timing_velocity)
 {
 	name = &Skin_Filename::HitObject::Slider::BEGIN;
 	hitobject = slider;
 
+	const float velocity = diff->velocity * current_timing_velocity;
+	const auto time_delta = static_cast<float>(slider->time - previous->hitobject->end_time);
+	calculate_next_render_hitobject(config.dst_rect.get(), slider->direction_jump, velocity,
+		diff->od.bad * 2, time_delta, previous);
+
+	//TODO: draw components
 }

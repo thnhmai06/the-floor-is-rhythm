@@ -198,14 +198,14 @@
     <ClInclude Include="include\main.h" />
   </ItemGroup>
   <!-- After Build -->
-   <ItemGroup>
+  <ItemGroup>
     <SDL3MixerDLL Include="dependencies\SDL_mixer-build\bin\SDL3_mixer.dll" />
     <Assets Include="assets\**\*" />
   </ItemGroup>
-    <Target Name="CopySDL3MixerDll" AfterTargets="Build">
-        <Copy SourceFiles="@(SDL3MixerDLL)" DestinationFolder="$(OutDir)" />
-    </Target>
-   <Target Name="CopyAssets" AfterTargets="Build">
+  <Target Name="CopySDL3MixerDll" AfterTargets="Build">
+    <Copy SourceFiles="@(SDL3MixerDLL)" DestinationFolder="$(OutDir)" />
+  </Target>
+  <Target Name="CopyAssets" AfterTargets="Build">
     <MakeDir Directories="$(OutDir)assets" />
     <Copy SourceFiles="@(Assets)" DestinationFolder="$(OutDir)assets\" />
   </Target>

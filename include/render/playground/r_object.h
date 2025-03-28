@@ -1,47 +1,36 @@
-#pragma once
+﻿#pragma once
+#include <SDL3/SDL_rect.h>
 #include "game/hitobject.h"
 #include "game/metadata.h"
-#include "game/timing.h"
 #include "render/texture.h"
 
-namespace RenderObject
+namespace RenderObjects::Playground
 {
-	struct RenderObject
+	struct RenderHitobject : RenderObject
 	{
-		const std::string* name = nullptr;
-		TextureRenderConfig config;
+		const HitObject::HitObject* hitobject = nullptr;
+		// Lưu vị trí cuối cùng của hitobject trước đó; dùng SDL_FRect* thay vì SDL_FPoint* để tránh phải tạo thêm SDL_FPoint
+		SDL_FRect* tail = nullptr;
 
-		virtual void render(const TextureMemory& memory) const;
-		virtual ~RenderObject() = default;
+		RenderHitobject() { config.dst_rect = std::make_unique<SDL_FRect>(); }
 	};
 
-	namespace Playground
+	struct RenderFloor final : RenderHitobject
 	{
-		struct RenderHitobject : RenderObject
-		{
-			const HitObject::HitObject* hitobject = nullptr;
-			SDL_FRect dst;
+		RenderFloor(const HitObject::Floor* floor,
+			const Metadata::CalculatedDifficulty* diff,
+			const RenderHitobject* previous = nullptr,
+			const float& current_timing_velocity = 1);
+	};
 
-			RenderHitobject() { config.dst_rect = &dst; }
-		};
+	struct RenderSlider final : RenderHitobject
+	{
+		std::vector<RenderHitobject> components;
 
-		struct RenderFloor final : RenderHitobject
-		{
-			RenderFloor(const HitObject::Floor* floor,
-				const Metadata::CalculatedDifficulty* diff,
-				const Timing::InheritedPoint* current_inherited_point = nullptr,
-				const RenderHitobject* previous = nullptr);
-		};
-
-		struct RenderSlider final : RenderHitobject
-		{
-			const HitObject::Slider* slider = nullptr;
-
-			RenderSlider(const HitObject::Slider* slider,
-				const Metadata::CalculatedDifficulty* diff,
-				const Timing::UninheritedPoint* current_uninherited_point,
-				const Timing::InheritedPoint* current_inherited_point = nullptr,
-				const RenderHitobject* previous = nullptr);
-		};
-	}
+		RenderSlider(const HitObject::Slider* slider,
+			const Metadata::CalculatedDifficulty* diff,
+			const float& current_beatlength,
+			const RenderHitobject* previous = nullptr,
+			const float& current_timing_velocity = 1);
+	};
 }

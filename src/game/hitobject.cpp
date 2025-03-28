@@ -75,7 +75,7 @@ void HitObject::HitObjects::read(const std::vector<std::string>& contents)
 		{
 			Floor floor;
 			floor.read(content);
-			this->emplace_hint(back_itr, floor.time, std::make_unique<Floor>(floor));
+			this->emplace_hint(back_itr, floor.time, std::make_unique<Floor>(std::move(floor)));
 			break;
 		}
 		case static_cast<int32_t>(HitObjectType::SLIDER):
@@ -83,7 +83,7 @@ void HitObject::HitObjects::read(const std::vector<std::string>& contents)
 			Slider slider;
 			if (content.size() < Slider::MINIMUM_NUM_CONTENT) continue; //TODO: Warning
 			slider.read(content);
-			this->emplace_hint(back_itr, slider.time, std::make_unique<Slider>(slider));
+			this->emplace_hint(back_itr, slider.time, std::make_unique<Slider>(std::move(slider)));
 			break;
 		}
 		default:
