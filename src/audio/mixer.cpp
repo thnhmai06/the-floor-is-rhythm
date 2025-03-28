@@ -1,4 +1,7 @@
 ﻿#include "audio/mixer.h" // Header
+#include <SDL3/SDL_init.h>
+#include "logging.h"
+#include "exceptions.h"
 #include "utilities.h"
 #include "rule/config.h"
 
@@ -21,9 +24,8 @@ Mixer::Mixer()
 	spec.format = AUDIO_FORMAT;
 	spec.freq = SAMPLE_FREQUENCY;
 
-	if (!Mix_OpenAudio(0, &spec)) {
-		// TODO: Xử lý lỗi không khởi tạo được Mixer
-	}
+	if (!Mix_OpenAudio(0, &spec))
+		THROW_CRITICAL(SDL_Exceptions::Audio::SDL_Audio_CreateMixer_Failed());
 
 	// Sau khi khởi tạo, đặt master volume
 	set_master_volume(master);

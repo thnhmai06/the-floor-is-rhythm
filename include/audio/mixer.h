@@ -2,26 +2,17 @@
 #include <cstdint>
 #include <SDL3/SDL_audio.h>
 #include "audio/buses.h"
+#include "template.h"
 
-/**
- * @class Mixer
- * @brief Bộ trộn Âm thanh.
- */
+using namespace Template::Audio;
+
 struct Mixer {
 	int32_t volume;
 	SDL_AudioSpec spec;
-	AudioBuses::Music music;
-	AudioBuses::Effects effect;
+	AudioBus<Music> music;
+	AudioBus<Effect> effect;
 
-	/**
-	 * @brief Set/Lấy giá trị Master Volume
-	 */
-	inline int32_t set_master_volume(const int32_t value = -1);
-
-	Mixer();
-
-	/**
-	 * @brief Giải phóng hết audio và thoát Mixer.
-	 */
+	int32_t set_master_volume(int32_t value = -1);
 	void quit();
+	Mixer();
 };

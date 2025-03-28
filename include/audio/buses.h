@@ -1,75 +1,45 @@
 ﻿#pragma once
+#include <SDL3_mixer/SDL_mixer.h>
+#include "template.h"
 #include "audio/memory.h"
 
-namespace AudioBuses
+using namespace Template::Audio;
+
+template <AudioPtrType AudioPtr>
+struct AudioBus
 {
-	/**
-	 * @class Music
-	 * @brief Lớp quản lý các bài nhạc (mp3).
-	 */
-	struct Music
-	{
-		AudioMemory::Music memory;
-		int32_t volume;
+	AudioMemory<AudioPtr> memory;
+	int32_t volume;
 
-		/**
-		 * @brief Set/Lấy giá trị Music Volume
-		 */
-		int32_t set_volume(int32_t value = -1);
+	explicit AudioBus(const int32_t value = MIX_MAX_VOLUME) : volume(value) {}
+};
 
-		/**
-		 * @brief Phát Music đã load trong bộ nhớ.
-		 */
-		bool play(const std::string& name) const;
+template<>
+struct AudioBus<Music>
+{
+	AudioMemory<Music> memory;
+	int32_t volume;
 
-		/**
-		 * @brief Kiểm tra xem có bài nhạc nào đang phát không.
-		 */
-		static bool has_song_playing();
+	int32_t set_volume(int32_t value = -1);
+	bool play(const std::string& name) const;
+	static bool has_song_playing();
+	static bool is_playing();
+	static void pause();
+	static void resume();
+	static void stop();
 
-		/**
-		 * @brief Kiểm tra xem bài đang phát có đang chạy không.
-		 */
-		static bool is_playing();
+	explicit AudioBus(const int32_t value = MIX_MAX_VOLUME) : volume(value) {}
+};
 
-		/**
-		 * @brief Tạm dừng Music.
-		 */
-		static void pause();
+template<>
+struct AudioBus<Effect>
+{
+	AudioMemory<Effect> memory;
+	int32_t volume;
 
-		/**
-		 * @brief Tiếp tục phát Music.
-		 */
-		static void resume();
+	int32_t set_volume(int32_t value = -1);
+	int32_t set_effect_volume(const std::string& name, int32_t value = -1) const;
+	int32_t play(const std::string& name) const;
 
-		/**
-		 * @brief Dừng Music.
-		 */
-		static void stop();
-
-		Music();
-	};
-	/**
-	 * @class Effects
-	 * @brief Lớp quản lý các hiệu ứng âm thanh (wav).
-	 */
-	struct Effects
-	{
-		AudioMemory::Effects memory;
-		int32_t volume;
-		/**
-		 * @brief Set/Lấy giá trị tổng thể của Effect Volume.
-		 */
-		int32_t set_volume(int32_t value = -1);
-		/**
-		 * @brief Set/Lấy giá trị volume của Effect cụ thể.
-		 */
-		int32_t set_effect_volume(const std::string& name, int32_t value = -1) const;
-		/**
-		 * @brief Phát hiệu ứng âm thanh đã load trong bộ nhớ.
-		 */
-		int32_t play(const std::string& name) const;
-
-		Effects();
-	};
-}
+	explicit AudioBus(const int32_t value = MIX_MAX_VOLUME) : volume(value) {}
+};
