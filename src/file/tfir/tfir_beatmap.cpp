@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include "rule/file_format.h"
 #include "exceptions.h"
+#include "logging.h"
 #include "utilities.h"
 
 static constexpr int32_t MINIMUM_LINE_CHARACTERS = 3;
@@ -33,11 +34,11 @@ static void parse_beatmap(BeatmapFile& beatmap, const std::unordered_map<std::st
 {
 	for (const auto& [header, contents] : sections)
 	{
-		if (header == tfir_file::Beatmap::General::HEADER) beatmap.general.read(contents);
-		else if (header == tfir_file::Beatmap::Metadata::HEADER)beatmap.metadata.read(contents);
-		else if (header == tfir_file::Beatmap::Difficulty::HEADER) beatmap.calculated_difficulty.apply(Metadata::Difficulty(contents));
-		else if (header == tfir_file::Beatmap::HitObjects::HEADER) beatmap.hit_objects.read(contents);
-		else if (header == tfir_file::Beatmap::TimingPoints::HEADER) beatmap.timing_points.read(contents);
+		if (header == FileFormat::Beatmap::General::HEADER) beatmap.general.read(contents);
+		else if (header == FileFormat::Beatmap::Metadata::HEADER)beatmap.metadata.read(contents);
+		else if (header == FileFormat::Beatmap::Difficulty::HEADER) beatmap.calculated_difficulty.apply(Metadata::Difficulty(contents));
+		else if (header == FileFormat::Beatmap::HitObjects::HEADER) beatmap.hit_objects.read(contents);
+		else if (header == FileFormat::Beatmap::TimingPoints::HEADER) beatmap.timing_points.read(contents);
 	}
 }
 

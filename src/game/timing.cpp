@@ -4,8 +4,8 @@
 #include "rule/file_format.h"
 #include "utilities.h"
 
-using namespace tfir_file::Beatmap::TimingPoints;
-using tfir_file::Beatmap::HitObjects::Slider::AND;
+using namespace FileFormat::Beatmap::TimingPoints;
+using FileFormat::Beatmap::HitObjects::Slider::AND;
 
 //! UninheritedPoint
 void Timing::UninheritedPoint::read(const std::vector<std::string>& content)

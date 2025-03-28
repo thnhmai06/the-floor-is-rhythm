@@ -62,7 +62,7 @@ RenderObjects::Playground::RenderFloor::RenderFloor(
 	const RenderHitobject* previous,
 	const float& current_timing_velocity)
 {
-	name = &Skin_Filename::HitObject::FLOOR;
+	name = &SkinFormat::HitObject::FLOOR;
 	hitobject = floor;
 	tail = config.dst_rect.get();
 
@@ -80,7 +80,7 @@ RenderObjects::Playground::RenderSlider::RenderSlider(
 	const RenderHitobject* previous,
 	const float& current_timing_velocity)
 {
-	name = &Skin_Filename::HitObject::Slider::BEGIN;
+	name = &SkinFormat::HitObject::Slider::BEGIN;
 	hitobject = slider;
 
 	const float velocity = diff->velocity * current_timing_velocity;

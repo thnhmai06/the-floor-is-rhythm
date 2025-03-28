@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-namespace tfir_file
+namespace FileFormat
 {
 	namespace Beatmap
 	{

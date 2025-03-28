@@ -3,30 +3,39 @@
 #include "game/hitobject.h"
 #include "rule/config.h"
 #include "utilities.h"
+#include "rule/skin.h"
 
 namespace RenderObjects
 {
-	struct Cursor : RenderObject::RenderObject
+	struct Cursor : RenderObject
 	{
-		std::string tail;
-		SDL_FRect dst_rect = {
-			Utilities::Math::centre(static_cast<float>(Config::Cursor::size),ImmutableConfig::Video::LOGICAL_WIDTH),
-			Utilities::Math::centre(static_cast<float>(Config::Cursor::size),ImmutableConfig::Video::LOGICAL_HEIGHT),
-			static_cast<float>(Config::Cursor::size), static_cast<float>(Config::Cursor::size)
-		};
+		const std::string* tail;
 
-		void render(const TextureMemory& memory) const override;
-		Cursor();
+		void render(const Texture::TextureMemory& memory) const override;
+		Cursor()
+		{
+			name = &SkinFormat::Cursor::NAME;
+			tail = &SkinFormat::Cursor::TAIL;
+			config.dst_rect = std::make_unique<SDL_FRect>(
+				Utilities::Math::centre(static_cast<float>(Config::Cursor::size), ImmutableConfig::Video::LOGICAL_WIDTH),
+				Utilities::Math::centre(static_cast<float>(Config::Cursor::size), ImmutableConfig::Video::LOGICAL_HEIGHT),
+				static_cast<float>(Config::Cursor::size), 
+				static_cast<float>(Config::Cursor::size)
+			);
+		}
 	};
-	struct CursorDirection : RenderObject::RenderObject
+	struct CursorDirection : RenderObject
 	{
-		SDL_FRect dst_rect = {
-			Utilities::Math::centre(static_cast<float>(Config::Cursor::direction_size),ImmutableConfig::Video::LOGICAL_WIDTH),
-			Utilities::Math::centre(static_cast<float>(Config::Cursor::direction_size),ImmutableConfig::Video::LOGICAL_HEIGHT),
-			static_cast<float>(Config::Cursor::direction_size), static_cast<float>(Config::Cursor::direction_size)
-		};
-
-		std::string change_direction(Direction new_direction);
-		CursorDirection();
+		void change_direction(Direction new_direction);
+		CursorDirection()
+		{
+			change_direction(Direction::RIGHT); // default
+			config.dst_rect = std::make_unique<SDL_FRect>(
+				Utilities::Math::centre(static_cast<float>(Config::Cursor::direction_size), ImmutableConfig::Video::LOGICAL_WIDTH),
+				Utilities::Math::centre(static_cast<float>(Config::Cursor::direction_size), ImmutableConfig::Video::LOGICAL_HEIGHT),
+				static_cast<float>(Config::Cursor::direction_size), 
+				static_cast<float>(Config::Cursor::direction_size)
+			);
+		}
 	};
 }

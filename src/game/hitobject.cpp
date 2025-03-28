@@ -4,8 +4,8 @@
 #include "rule/file_format.h"
 #include "utilities.h"
 
-using namespace tfir_file::Beatmap::HitObjects;
-using tfir_file::Beatmap::AND;
+using namespace FileFormat::Beatmap::HitObjects;
+using FileFormat::Beatmap::AND;
 
 Direction HitObject::get_next_direction(const Direction prev_direction, const uint8_t direction_jump)
 {
@@ -52,8 +52,8 @@ void HitObject::Slider::write(std::ofstream& writer) const
 	writer << time << AND << static_cast<int32_t>(direction_jump) << AND << static_cast<int32_t>(combo_jump) << AND <<
 		static_cast<bool>(type) << AND << end_time << AND;
 	for (auto ptr = curves.begin(); ptr != curves.end(); ++ptr) {
-		if (ptr != curves.begin()) writer << tfir_file::Beatmap::HitObjects::Slider::AND;
-		writer << ptr->padding_time << tfir_file::Beatmap::HitObjects::Slider::CURVE_AND << static_cast<int32_t>(ptr->direction_jump);
+		if (ptr != curves.begin()) writer << FileFormat::Beatmap::HitObjects::Slider::AND;
+		writer << ptr->padding_time << FileFormat::Beatmap::HitObjects::Slider::CURVE_AND << static_cast<int32_t>(ptr->direction_jump);
 	}
 	writer << AND;
 	writer << hitsound.to_int() << AND << hitsample.to_string();

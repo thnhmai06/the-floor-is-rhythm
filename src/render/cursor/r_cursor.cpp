@@ -1,34 +1,17 @@
 #include "render/cursor/r_cursor.h" // Header
 #include "exceptions.h"
-#include "rule/skin.h"
+#include "logging.h"
 
 //! Cursor
-void RenderObjects::Cursor::render(const TextureMemory& memory) const
+void RenderObjects::Cursor::render(const Texture::TextureMemory& memory) const
 {
-	if (memory.render(tail, config))
-		LOG_ERROR(SDL_Exceptions::Texture::SDL_RenderTexture_Failed(tail));
+	if (memory.render(*tail, config))
+		LOG_ERROR(SDL_Exceptions::Texture::SDL_RenderTexture_Failed(*tail));
 	if (!memory.render(*name, config))
 		LOG_ERROR(SDL_Exceptions::Texture::SDL_RenderTexture_Failed(*name));
 }
-RenderObjects::Cursor::Cursor()
-{
-	// file used
-	name = &Skin_Filename::Cursor::NAME;
-	tail = Skin_Filename::Cursor::TAIL;
-	// config
-	config.dst_rect = &dst_rect;
-}
-
 //! CursorDirection
-std::string RenderObjects::CursorDirection::change_direction(const Direction new_direction)
+void RenderObjects::CursorDirection::change_direction(const Direction new_direction)
 {
-	name = &Skin_Filename::Cursor::DIRECTION.find(new_direction)->second;
-	return *name;
-}
-RenderObjects::CursorDirection::CursorDirection()
-{
-	// file used
-	change_direction(Direction::RIGHT); // default
-	// config
-	config.dst_rect = &dst_rect;
+	name = &SkinFormat::Cursor::DIRECTION.find(new_direction)->second;
 }

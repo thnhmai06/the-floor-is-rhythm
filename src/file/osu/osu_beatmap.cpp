@@ -42,7 +42,7 @@ static Metadata::Metadata convert_metadata(const Parser::MetadataSection& metada
 	if (!metadata.Creator.empty()) result.creator = metadata.Creator;
 	if (!metadata.Version.empty()) result.difficulty_name = metadata.Version;
 	if (!metadata.Source.empty()) { result.source = metadata.Source; result.source.push_back(' '); }
-	result.source.append(tfir_file::Beatmap::CONVERT::osu::SOURCE);
+	result.source.append(FileFormat::Beatmap::CONVERT::osu::SOURCE);
 	result.tags = metadata.Tags;
 	return result;
 }
@@ -129,8 +129,8 @@ void convert_beatmap(const char* file_name, const char* output)
 	if (!writer)
 		THROW_ERROR(File_Exceptions::File_Open_Failed(output));
 	// Version
-	writer << tfir_file::Beatmap::FORMAT_VERSION << '\n';
-	writer << tfir_file::Beatmap::CONVERT::osu::VERSION << beatmap.Version << '\n';
+	writer << FileFormat::Beatmap::FORMAT_VERSION << '\n';
+	writer << FileFormat::Beatmap::CONVERT::osu::VERSION << beatmap.Version << '\n';
 	writer << '\n';
 	// Contents
 	convert_general(beatmap.General).write(writer);

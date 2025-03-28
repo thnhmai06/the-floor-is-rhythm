@@ -1,13 +1,15 @@
 #pragma once
 #include "game/hitobject.h"
 
-namespace Skin_Filename
+namespace SkinFormat
 {
+	using ConfigValue = const std::string;
+
 	namespace Cursor
 	{
-		const std::string NAME = "cursor";
-		const std::string TAIL = "cursortail";
-		const std::unordered_map<Direction, std::string> DIRECTION = {
+		ConfigValue NAME = "cursor";
+		ConfigValue TAIL = "cursortail";
+		inline std::unordered_map<Direction, ConfigValue> DIRECTION = {
 			{Direction::RIGHT, "right"},
 			{Direction::UP, "up"},
 			{Direction::DOWN, "down"},
@@ -16,15 +18,15 @@ namespace Skin_Filename
 	}
 	namespace HitObject
 	{
-		const std::string FLOOR = "floor";
+		ConfigValue FLOOR = "floor";
 		namespace Slider
 		{
-			const std::string BODY = "sliderb";
-			const std::string BEGIN = "sliderbegin";
-			const std::string LINE = "sliderline";
-			const std::string POINT = "sliderpoint";
-			const std::string CURVE = "slidercurve";
-			const std::string END = "sliderend";
+			ConfigValue BODY = "sliderb";
+			ConfigValue BEGIN = "sliderbegin";
+			ConfigValue LINE = "sliderline";
+			ConfigValue POINT = "sliderpoint";
+			ConfigValue CURVE = "slidercurve";
+			ConfigValue END = "sliderend";
 		}
 	}
 }

@@ -26,10 +26,10 @@ int32_t render(SDL_Window* window)
 	SDL_Renderer* renderer = Init::renderer(window);
 	WorkingLayers::init_all(renderer);
 
-	/*WorkingLayers::background->memory.load(R"(D:\Development\Code\cpp\Repositories\the-floor-is-rhythm\assets\floor.png)", Skin_Filename::HitObject::FLOOR);
+	/*WorkingLayers::background->memory.load(R"(D:\Development\Code\cpp\Repositories\the-floor-is-rhythm\assets\floor.png)", SkinFormat::HitObject::FLOOR);
 	SDL_FRect size = { 100, 100, , ImmutableConfig::HitObject::SIZE_HEIGHT };
 	TextureConfig config(&size);
-	const auto obj = RenderObjects::RenderObjects(&Skin_Filename::HitObject::FLOOR, config);
+	const auto obj = RenderObjects::RenderObjects(&SkinFormat::HitObject::FLOOR, config);
 	WorkingLayers::background->render_buffer.emplace_back(obj);*/
 
 	try

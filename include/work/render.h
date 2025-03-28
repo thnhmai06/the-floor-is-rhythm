@@ -6,14 +6,14 @@ int32_t render(SDL_Window* window);
 namespace WorkingLayers
 {
 	inline std::unique_ptr<Layers::Layer> background;
-	inline std::unique_ptr<Layers::PlaygroundLayer> playground;
+	inline std::unique_ptr<Layers::Layer> playground;
 	inline std::unique_ptr<Layers::Layer> cursor;
 	inline std::unique_ptr<Layers::Layer> hud;
 
 	static void init_all(SDL_Renderer* renderer)
 	{
 		if (!background) background = std::make_unique<Layers::Layer>(renderer);
-		if (!playground) playground = std::make_unique<Layers::PlaygroundLayer>(renderer);
+		if (!playground) playground = std::make_unique<Layers::Layer>(renderer);
 		if (!cursor) cursor = std::make_unique<Layers::Layer>(renderer);
 		if (!hud) hud = std::make_unique<Layers::Layer>(renderer);
 	}
