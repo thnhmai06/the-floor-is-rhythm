@@ -3,7 +3,6 @@
 #include "rule/config.h"
 #include "texture.h"
 #include "object.h"
-#include "template.h"
 #include "utilities.h"
 
 struct LayerCamera : private RenderConfig
@@ -30,7 +29,8 @@ public:
 	LayerCamera() : RenderConfig()
 	{
 		const auto [camera_width, camera_height] = get_camera_size(false);
-		origin_pos = Template::Video::TextureOrigin::CENTRE(camera_width, camera_height);
+		origin_pos.x = Utilities::Math::centre(0, camera_width);
+		origin_pos.y = Utilities::Math::centre(0, camera_height);
 	}
 };
 
@@ -49,7 +49,7 @@ namespace Layers
 	 */
 	struct Layer
 	{
-		using RenderBuffer = std::list<RenderObjects::RenderObject>;
+		using RenderBuffer = std::list<RenderObjects::RenderObjects>;
 		using RenderRange = std::pair<RenderBuffer::iterator, RenderBuffer::iterator>;
 
 		SDL_Renderer* renderer;

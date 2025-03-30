@@ -1,7 +1,6 @@
 #pragma once
 #include <concepts>
 #include <SDL3_mixer/SDL_mixer.h>
-#include "render/object.h"
 
 namespace Template
 {
@@ -13,20 +12,56 @@ namespace Template
 		template <typename T>
 		concept AudioPtrType = std::same_as<T, Music> || std::same_as<T, Effect>;
 	}
-
-	namespace Video
+	namespace Render
 	{
-		namespace TextureOrigin
+		enum class RenderOriginType : uint8_t
 		{
-			inline constexpr RenderConfig::RenderOriginPoint TOP_LEFT = { 0, 0 };
-			constexpr RenderConfig::RenderOriginPoint CENTRE(const float& w, const float& h) { return { w / 2, h / 2 }; }
-			constexpr RenderConfig::RenderOriginPoint TOP_RIGHT(const float& w) { return { w, 0 }; }
-			constexpr RenderConfig::RenderOriginPoint BOTTOM_LEFT(const float& h) { return { 0, h }; }
-			constexpr RenderConfig::RenderOriginPoint BOTTOM_RIGHT(const float& w, const float& h) { return { w, h }; }
-			constexpr RenderConfig::RenderOriginPoint TOP_CENTRE(const float& w) { return { w / 2, 0 }; }
-			constexpr RenderConfig::RenderOriginPoint BOTTOM_CENTRE(const float& w, const float& h) { return { w / 2, h }; }
-			constexpr RenderConfig::RenderOriginPoint CENTRE_LEFT(const float& h) { return { 0, h / 2 }; }
-			constexpr RenderConfig::RenderOriginPoint CENTRE_RIGHT(const float& w, const float& h) { return { w, h / 2 }; }
+			TOP_LEFT,
+			CENTRE,
+			BOTTOM_LEFT,
+			BOTTOM_RIGHT,
+			TOP_RIGHT,
+			TOP_CENTRE,
+			BOTTOM_CENTRE,
+			CENTRE_LEFT,
+			CENTRE_RIGHT
+		};
+	}
+	namespace Game
+	{
+		namespace Direction
+		{
+			enum class Direction : uint8_t
+			{
+				RIGHT = 0,
+				UP = 1,
+				DOWN = 2,
+				LEFT = 3
+			};
+			enum class Rotation : uint8_t
+			{
+				NO_ROTATE = 0,
+				ROTATE_90 = 1,
+				ROTATE_180 = 2,
+				ROTATE_270 = 3
+			};
+			constexpr Direction operator+(const Direction& direction, const Rotation& rotation)
+			{
+				return static_cast<Direction>((static_cast<uint8_t>(direction) + static_cast<uint8_t>(rotation)) % 4);
+			}
+			constexpr Direction operator+=(Direction& direction, const Rotation& rotation)
+			{
+				direction = direction + rotation;
+				return direction;
+			}
+		}
+		namespace HitObject
+		{
+			enum class HitObjectType : bool
+			{
+				FLOOR = 0,
+				SLIDER = 1
+			};
 		}
 	}
 }

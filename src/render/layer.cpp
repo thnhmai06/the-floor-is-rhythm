@@ -35,12 +35,15 @@ void Layers::Layer::render()
 	if (!visible) return;
 	const auto begin = render_range ? render_range->first : render_buffer.begin();
 	const auto end = render_range ? render_range->second : render_buffer.end();
-	for (auto object = begin; object != end; ++object)
+	for (auto objects = begin; objects != end; ++objects)
 	{
-		// i hate this job fk
-		camera.move_into_camera(*object);
-		object->render();
-		camera.move_out_camera(*object);
+		for (const auto& object: objects)
+		{
+			// i hate this job fk
+			camera.move_into_camera(*object);
+			object->render();
+			camera.move_out_camera(*object);
+		}
 	}
 }
 Layers::Layer::Layer(SDL_Renderer* renderer) : renderer(renderer), memory(renderer) {}

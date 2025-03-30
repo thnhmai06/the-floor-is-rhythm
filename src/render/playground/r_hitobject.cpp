@@ -2,54 +2,49 @@
 #include "rule/skin.h"
 #include "rule/config.h"
 #include "utilities.h"
+#include "template.h"
 
 RenderObjects::Playground::RenderHitobject::RenderHitobject(
-	const float& velocity,
-	const float& duration,
-	const float& time_distance,
-	const RenderObject* previous)
+	const std::string* name,
+	const TextureMemory* memory,
+	const HitObject::HitObject* current,
+	const float& velocity, 
+	const float& duration, 
+	const RenderHitobject* previous) : hit_object(current)
 {
-	//! Vị trí, kích cỡ
-	this->config.origin_dst = SDL_FRect();
-	// Tính Position
+	RenderObject render_hit_object(name, memory, Template::Render::RenderOriginType::CENTRE);
 	if (!previous)
-	{
-		this->config.origin_dst->x = ImmutableConfig::HitObject::DEFAULT_POS_X;
-		this->config.origin_dst->y = ImmutableConfig::HitObject::DEFAULT_POS_Y;
-	}
+		render_hit_object.config.render_pos = ImmutableConfig::HitObject::DEFAULT_POS;
 	else
 	{
-		const auto end_point = previous->config.get_center_point();
-		this->config.origin_dst->x = end_point.x;
-		this->config.origin_dst->y = end_point.y;
-		switch (hitobject->rotation)
+		const float time_distance = static_cast<float>(current->time - previous->hit_object->end_time);
+		render_hit_object.config.render_pos = previous->back().config.render_pos;
+		switch (hit_object->rotation)
 		{
-		case Direction::Rotation::NO_ROTATE:
-			this->config.origin_dst->x += velocity * time_distance;
+		case Template::Game::Direction::Rotation::NO_ROTATE:
+		default:
+			render_hit_object.config.render_pos.x += velocity * time_distance;
 			break;
 
-		case Direction::Rotation::ROTATE_90:
-			this->config.origin_dst->y -= velocity * time_distance;
+		case Template::Game::Direction::Rotation::ROTATE_90:
+			render_hit_object.config.render_pos.y -= velocity * time_distance;
 			break;
 
-		case Direction::Rotation::ROTATE_180:
-			this->config.origin_dst->x -= velocity * time_distance;
+		case Template::Game::Direction::Rotation::ROTATE_180:
+			render_hit_object.config.render_pos.x -= velocity * time_distance;
 			break;
 
-		case Direction::Rotation::ROTATE_270:
-			this->config.origin_dst->y += velocity * time_distance;
+		case Template::Game::Direction::Rotation::ROTATE_270:
+			render_hit_object.config.render_pos.y += velocity * time_distance;
 			break;
 		}
 	}
-	// Tính kích cỡ (width)
-	this->config.origin_dst->w = velocity * duration;
-	this->config.origin_dst->h = ImmutableConfig::HitObject::SIZE_HEIGHT;
+	render_hit_object.config.set_scale_fixed(
+		{ velocity * duration, ImmutableConfig::HitObject::SIZE_HEIGHT }, 
+		memory->get_texture_size(*name)
+	);
 
-	//! Đặt dst của obj cuối (nếu ko nói gì thêm thì là chính dst_rect của this luôn)
-	this->end_pos = SDL_FPoint {
-		this->config.origin_dst->x + this->config.origin_dst->w,
-		this->config.origin_dst->y
-	};
+	push_back(render_hit_object);
 }
 
 // RenderObjects::Playground
@@ -62,7 +57,7 @@ RenderObjects::Playground::RenderFloor::RenderFloor(
 	RenderHitobject(diff->velocity* current_timing_velocity, diff->od.bad * 2, previous)
 {
 	target_texture_name = &SkinFormat::HitObject::FLOOR;
-	hitobject = floor;
+	hit_object = floor;
 }
 
 //! ::RenderSlider

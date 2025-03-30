@@ -2,15 +2,19 @@
 #include <SDL3/SDL_rect.h>
 #include "game/hitobject.h"
 #include "game/metadata.h"
+#include "render/object.h"
 #include "render/texture.h"
 
 namespace RenderObjects::Playground
 {
-	struct RenderHitobject : RenderObject
+	struct RenderHitobject : RenderObjects
 	{
-		const HitObject::HitObject* hitobject = nullptr;
+		const HitObject::HitObject* hit_object = nullptr;
 
 		RenderHitobject(
+			const std::string* name,
+			const TextureMemory* memory,
+			const HitObject::HitObject* current,
 			const float& velocity,
 			const float& duration,
 			const RenderHitobject* previous);
@@ -41,12 +45,12 @@ namespace RenderObjects::Playground
 				const float& src_retain_percent,
 				bool retain_from_beginning = true,
 				const float& dst_width,
-				const Direction::Direction& current_direction) const;
+				const Template::Game::Direction::Direction::Direction& current_direction) const;
 			[[nodiscard]] RenderObject create_slider_point(
-				const Direction::Direction& current_direction) const;
+				const Template::Game::Direction::Direction::Direction& current_direction) const;
 			[[nodiscard]] RenderObject create_slider_curve(
-				const Direction::Direction& current_direction,
-				const Direction::Rotation& rotation) const;
+				const Template::Game::Direction::Direction::Direction& current_direction,
+				const Template::Game::Direction::Direction::Rotation& rotation) const;
 
 		public:
 			SliderComponents(

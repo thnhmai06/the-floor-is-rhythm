@@ -1,5 +1,6 @@
 #pragma once
 #include "render/texture.h"
+#include "template.h"
 
 struct RenderConfig
 {
@@ -45,9 +46,11 @@ namespace RenderObjects
 		void set_scale_fixed(const SDL_FPoint& dst_size);
 		virtual void render() const;
 
-		explicit RenderObject(const std::string* name, const TextureMemory* memory, const RenderConfig::RenderOriginPoint origin) :
-			name(name), memory(memory), config(origin) {
+		explicit RenderObject(const std::string* name, const TextureMemory* memory, const Template::Render::RenderOriginType& origin_type);
+		explicit RenderObject(const std::string* name, const TextureMemory* memory, const RenderConfig::RenderOriginPoint& custom_origin) :
+			name(name), memory(memory), config(custom_origin) {
 		}
 		virtual ~RenderObject() = default;
 	};
+	using RenderObjects = std::vector<RenderObject>;
 }

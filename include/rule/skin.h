@@ -1,4 +1,5 @@
 #pragma once
+#include "template.h"
 #include "game/hitobject.h"
 
 namespace SkinFormat
@@ -7,13 +8,13 @@ namespace SkinFormat
 
 	namespace Cursor
 	{
-		ConfigValue NAME = "cursor";
+		ConfigValue BODY = "cursor";
 		ConfigValue TAIL = "cursortail";
-		inline std::unordered_map<Direction::Direction, ConfigValue> DIRECTION = {
-			{Direction::Direction::RIGHT, "right"},
-			{Direction::Direction::UP, "up"},
-			{Direction::Direction::DOWN, "down"},
-			{Direction::Direction::LEFT, "left"}
+		inline std::unordered_map<Template::Game::Direction::Direction, ConfigValue> DIRECTION = {
+			{Template::Game::Direction::Direction::RIGHT, "right"},
+			{Template::Game::Direction::Direction::UP, "up"},
+			{Template::Game::Direction::Direction::DOWN, "down"},
+			{Template::Game::Direction::Direction::LEFT, "left"}
 		};
 	}
 	namespace HitObject

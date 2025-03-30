@@ -1,41 +1,31 @@
 #pragma once
 #include "render/layer.h"
-#include "game/hitobject.h"
-#include "rule/config.h"
-#include "utilities.h"
 #include "rule/skin.h"
+#include "template.h"
 
 namespace RenderObjects::Cursor
 {
-	struct Cursor : RenderObject
+	struct Cursor final : RenderObject
 	{
-		const std::string* tail;
-
-		void render(const Texture::TextureMemory& memory) const override;
-		Cursor()
+		explicit Cursor(const TextureMemory* skin) : RenderObject(
+			&SkinFormat::Cursor::BODY, skin, Template::Render::RenderOriginType::CENTRE)
 		{
-			target_texture_name = &SkinFormat::Cursor::NAME;
-			tail = &SkinFormat::Cursor::TAIL;
-			config.origin_dst = std::make_unique<SDL_FRect>(
-				Utilities::Math::centre(static_cast<float>(Config::Cursor::size), ImmutableConfig::Video::LOGICAL_WIDTH),
-				Utilities::Math::centre(static_cast<float>(Config::Cursor::size), ImmutableConfig::Video::LOGICAL_HEIGHT),
-				static_cast<float>(Config::Cursor::size), 
-				static_cast<float>(Config::Cursor::size)
-			);
 		}
 	};
-	struct CursorDirection : RenderObject
+	struct CursorTail final : RenderObject
 	{
-		void change_direction(Direction new_direction);
-		CursorDirection()
+		explicit CursorTail(const TextureMemory* skin) : RenderObject(
+			&SkinFormat::Cursor::TAIL, skin, Template::Render::RenderOriginType::CENTRE)
 		{
-			change_direction(Direction::RIGHT); // default
-			config.origin_dst = std::make_unique<SDL_FRect>(
-				Utilities::Math::centre(static_cast<float>(Config::Cursor::direction_size), ImmutableConfig::Video::LOGICAL_WIDTH),
-				Utilities::Math::centre(static_cast<float>(Config::Cursor::direction_size), ImmutableConfig::Video::LOGICAL_HEIGHT),
-				static_cast<float>(Config::Cursor::direction_size), 
-				static_cast<float>(Config::Cursor::direction_size)
-			);
+		}
+	};
+	struct CursorDirection final : RenderObject
+	{
+		void change_direction(const Template::Game::Direction::Direction& direction);
+
+		explicit CursorDirection(const TextureMemory* skin) : RenderObject(
+			&SkinFormat::Cursor::DIRECTION[Template::Game::Direction::Direction::Direction::RIGHT], skin, Template::Render::RenderOriginType::CENTRE)
+		{
 		}
 	};
 }

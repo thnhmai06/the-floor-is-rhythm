@@ -77,3 +77,40 @@ void RenderObjects::RenderObject::render() const
 	if (!SDL_RenderTexture(memory->renderer, texture, &src_rect, &dst_rect))
 		THROW_ERROR(SDLExceptions::Texture::SDL_Texture_Render_Failed(*name));
 }
+
+RenderObjects::RenderObject::RenderObject(const std::string* name,
+	const TextureMemory* memory, const Template::Render::RenderOriginType& origin_type) :
+	name(name), memory(memory)
+{
+	const auto [w, h] = memory->get_texture_size(*name);
+	switch (origin_type)
+	{
+	case Template::Render::RenderOriginType::TOP_LEFT:
+		config.origin_pos = { 0, 0 };
+		break;
+	case Template::Render::RenderOriginType::CENTRE:
+		config.origin_pos = { w / 2, h / 2 };
+		break;
+	case Template::Render::RenderOriginType::BOTTOM_LEFT:
+		config.origin_pos = { 0, h };
+		break;
+	case Template::Render::RenderOriginType::BOTTOM_RIGHT:
+		config.origin_pos = { w, h };
+		break;
+	case Template::Render::RenderOriginType::TOP_RIGHT:
+		config.origin_pos = { w, 0 };
+		break;
+	case Template::Render::RenderOriginType::TOP_CENTRE:
+		config.origin_pos = { w / 2, 0 };
+		break;
+	case Template::Render::RenderOriginType::BOTTOM_CENTRE:
+		config.origin_pos = { w / 2, h };
+		break;
+	case Template::Render::RenderOriginType::CENTRE_LEFT:
+		config.origin_pos = { 0, h / 2 };
+		break;
+	case Template::Render::RenderOriginType::CENTRE_RIGHT:
+		config.origin_pos = { w, h / 2 };
+		break;
+	}
+}
