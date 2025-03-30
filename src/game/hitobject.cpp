@@ -5,20 +5,21 @@
 #include "logging.h"
 #include "rule/file_format.h"
 #include "utilities.h"
+#include "game/direction.h"
 
 using namespace FileFormat::Beatmap::HitObjects;
 using FileFormat::Beatmap::AND;
 
-Direction HitObject::get_next_direction(const Direction prev_direction, const uint8_t direction_jump)
+Direction::Direction HitObject::get_next_direction(const Direction::Direction prev_direction, const uint8_t direction_jump)
 {
-	return static_cast<Direction>((static_cast<uint8_t>(prev_direction) + direction_jump) % NUM_DIRECTIONS);
+	return static_cast<Direction::Direction>((static_cast<uint8_t>(prev_direction) + direction_jump) % NUM_DIRECTIONS);
 }
 
 //! Floor
 void HitObject::Floor::read(const std::vector<std::string>& content)
 {
 	end_time = time = std::stoi(content[0]);
-	direction_jump = static_cast<DirectionJump>(std::stoi(content[1]));
+	direction_jump = static_cast<Direction::Rotation>(std::stoi(content[1]));
 	combo_jump = std::stoi(content[2]);
 	hitsound = Hitsound::Hitsound{ std::stoi(content[4]) };
 	hitsample = Hitsound::HitSample{ content[5] };
@@ -35,7 +36,7 @@ void HitObject::Floor::write(std::ofstream& writer) const
 void HitObject::Slider::read(const std::vector<std::string>& content)
 {
 	time = std::stoi(content[0]);
-	direction_jump = static_cast<DirectionJump>(std::stoi(content[1]));
+	direction_jump = static_cast<Direction::Rotation>(std::stoi(content[1]));
 	combo_jump = std::stoi(content[2]);
 	end_time = std::stoi(content[4]);
 
@@ -43,7 +44,7 @@ void HitObject::Slider::read(const std::vector<std::string>& content)
 	for (const auto curves_str = Utilities::String::split(content[5], ::Slider::AND); const auto & curves : curves_str)
 	{
 		const auto curve_str = Utilities::String::split(curves, ::Slider::CURVE_AND, true);
-		const SliderCurve curve = {std::stoi(curve_str[0]), static_cast<DirectionJump>(std::stoi(curve_str[1]))};
+		const SliderCurve curve = {std::stoi(curve_str[0]), static_cast<Direction::Rotation>(std::stoi(curve_str[1]))};
 		this->curves.push_back(curve);
 	}
 	hitsound = Hitsound::Hitsound{ std::stoi(content[6]) };

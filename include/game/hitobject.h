@@ -2,15 +2,9 @@
 #include <cstdint>
 #include <map>
 #include <vector>
-#include "game/hitsound.h"
 
-enum class Direction : uint8_t
-{
-	RIGHT = 0,
-	UP = 1,
-	DOWN = 2,
-	LEFT = 3
-};
+#include "direction.h"
+#include "game/hitsound.h"
 
 namespace HitObject
 {
@@ -21,15 +15,8 @@ namespace HitObject
 		FLOOR = 0,
 		SLIDER = 1
 	};
-	enum class DirectionJump : uint8_t
-	{
-		NO_ROTATE = 0,
-		ROTATE_90 = 1,
-		ROTATE_180 = 2,
-		ROTATE_270 = 3
-	};
 
-	inline Direction get_next_direction(Direction prev_direction, uint8_t direction_jump);
+	inline Direction::Direction get_next_direction(Direction::Direction prev_direction, uint8_t rotation);
 
 	struct HitObject
 	{
@@ -38,7 +25,7 @@ namespace HitObject
 		int32_t time = 0;
 		int32_t end_time = 0;
 		HitObjectType type;
-		DirectionJump direction_jump = DirectionJump::NO_ROTATE;
+		Direction::Rotation rotation = Direction::Rotation::NO_ROTATE;
 		uint8_t combo_jump = 0;
 		Hitsound::Hitsound hitsound;
 		Hitsound::HitSample hitsample;
@@ -62,7 +49,7 @@ namespace HitObject
 		struct SliderCurve
 		{
 			int32_t padding_time = 0; // CurveTime = time + padding_time
-			DirectionJump direction_jump = DirectionJump::NO_ROTATE;
+			Direction::Rotation rotation = Direction::Rotation::NO_ROTATE;
 		};
 		std::vector<SliderCurve> curves;
 

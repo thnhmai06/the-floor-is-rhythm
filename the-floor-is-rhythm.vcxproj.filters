@@ -140,5 +140,8 @@
     <ClInclude Include="include\template.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\game\direction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

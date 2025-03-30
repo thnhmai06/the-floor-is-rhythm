@@ -14,9 +14,9 @@ namespace RenderObjects::Cursor
 		void render(const Texture::TextureMemory& memory) const override;
 		Cursor()
 		{
-			name = &SkinFormat::Cursor::NAME;
+			target_texture_name = &SkinFormat::Cursor::NAME;
 			tail = &SkinFormat::Cursor::TAIL;
-			config.dst_rect = std::make_unique<SDL_FRect>(
+			config.origin_dst = std::make_unique<SDL_FRect>(
 				Utilities::Math::centre(static_cast<float>(Config::Cursor::size), ImmutableConfig::Video::LOGICAL_WIDTH),
 				Utilities::Math::centre(static_cast<float>(Config::Cursor::size), ImmutableConfig::Video::LOGICAL_HEIGHT),
 				static_cast<float>(Config::Cursor::size), 
@@ -30,7 +30,7 @@ namespace RenderObjects::Cursor
 		CursorDirection()
 		{
 			change_direction(Direction::RIGHT); // default
-			config.dst_rect = std::make_unique<SDL_FRect>(
+			config.origin_dst = std::make_unique<SDL_FRect>(
 				Utilities::Math::centre(static_cast<float>(Config::Cursor::direction_size), ImmutableConfig::Video::LOGICAL_WIDTH),
 				Utilities::Math::centre(static_cast<float>(Config::Cursor::direction_size), ImmutableConfig::Video::LOGICAL_HEIGHT),
 				static_cast<float>(Config::Cursor::direction_size), 

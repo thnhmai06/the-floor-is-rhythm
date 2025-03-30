@@ -2,6 +2,7 @@
 #include <ranges>
 #include "logging.h"
 #include "exceptions.h"
+#include "utilities.h"
 
 //! Texture
 // ::TextureMemory
@@ -36,23 +37,21 @@ SDL_Texture* Texture::TextureMemory::load(SDL_Texture* texture, const std::strin
 	insert_or_assign(name, texture);
 	return texture;
 }
-bool Texture::TextureMemory::render(const std::string& name, const TextureConfig& config) const
+SDL_FPoint Texture::TextureMemory::get_texture_size(const const_iterator& texture)
+{
+	float width, height;
+	SDL_GetTextureSize(texture->second, &width, &height);
+	return { width, height };
+}
+SDL_FPoint Texture::TextureMemory::get_texture_size(const std::string& name) const
 {
 	if (const auto it = find(name); it != end())
-	{
-		SDL_SetTextureAlphaMod(it->second, config.alpha);
-
-		if (config.rotation)
-			return SDL_RenderTextureRotated(renderer, it->second, config.src_rect.get(), config.dst_rect.get(),
-				config.rotation->angle, config.rotation->center.get(), config.rotation->flip);
-		return SDL_RenderTexture(renderer, it->second, config.src_rect.get(), config.dst_rect.get());
-	}
-	return false;
+		return get_texture_size(it);
+	return { 0, 0 };
 }
 void Texture::TextureMemory::free(const std::string& name)
 {
-	const auto it = find(name);
-	if (it != end())
+	if (const auto it = find(name); it != end())
 	{
 		SDL_DestroyTexture(it->second);
 		erase(it);
@@ -67,8 +66,48 @@ void Texture::TextureMemory::free_all()
 
 //! RenderObjects
 // ::RenderObject
-void RenderObjects::RenderObject::render(const Texture::TextureMemory& memory) const
+SDL_FPoint RenderObjects::RenderObject::RenderOrigin::to_sdl_pos(const SDL_FPoint& texture_pos) const
 {
-	if (!memory.render(*name, config))
+	return { texture_pos.x + x, texture_pos.y + y};
+}
+SDL_FPoint RenderObjects::RenderObject::RenderOrigin::from_sdl_pos(const SDL_FPoint& sdl_pos) const
+{
+	return { sdl_pos.x - x, sdl_pos.y - y };
+}
+SDL_FRect RenderObjects::RenderObject::to_sdl_dst() const
+{
+	const auto [src_w, src_h] = memory->get_texture_size(*name);
+	const auto [x, y] = render_origin.to_sdl_pos(render_pos);
+	return { x, y, src_w * scale.x, src_h * scale.y };
+}
+SDL_FRect RenderObjects::RenderObject::from_sdl_dst() const
+{
+	const auto [src_w, src_h] = memory->get_texture_size(*name);
+	const auto [x, y] = render_origin.from_sdl_pos(render_pos);
+	return { x, y, src_w / scale.x, src_h / scale.y };
+}
+void RenderObjects::RenderObject::set_scale_fixed(const SDL_FPoint& dst_size)
+{
+	scale.x = dst_size.x / memory->get_texture_size(*name).x;
+	scale.y = dst_size.y / memory->get_texture_size(*name).y;
+}
+
+//! RenderObjects
+SDL_FRect RenderObjects::RenderObject::get_src_rect_fixed() const
+{
+	const auto [src_x, src_y] = memory->get_texture_size(*name);
+	return { src_x * src_rect_percent.x, src_y * src_rect_percent.y, src_x * src_rect_percent.w, src_y * src_rect_percent.h };
+}
+void RenderObjects::RenderObject::render() const
+{
+	const auto item = memory->find(*name);
+	if (item == memory->end())
+		LOG_ERROR(SDLExceptions::Texture::SDL_Texture_Render_Failed(*name));
+
+	const auto texture = item->second;
+	const auto src_rect = get_src_rect_fixed();
+	const auto dst_rect = to_sdl_dst();
+	SDL_SetTextureAlphaMod(texture, alpha);
+	if (!SDL_RenderTexture(memory->renderer, texture, &src_rect, &dst_rect))
 		LOG_ERROR(SDLExceptions::Texture::SDL_Texture_Render_Failed(*name));
 }

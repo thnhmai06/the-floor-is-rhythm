@@ -38,8 +38,10 @@ namespace ImmutableConfig
 	}
 	namespace Video
 	{
-		constexpr int32_t LOGICAL_WIDTH = 1280;
-		constexpr int32_t LOGICAL_HEIGHT = 720;
+		constexpr int32_t LOGICAL_WIDTH = 640;
+		constexpr int32_t LOGICAL_HEIGHT = 480;
+		constexpr int32_t GAMEPLAY_WIDTH = 510;
+		constexpr int32_t GAMEPLAY_HEIGHT = 384;
 	}
 	namespace Difficulty
 	{
@@ -65,5 +67,6 @@ namespace ImmutableConfig
 		constexpr int32_t DEFAULT_POS_X = 0;
 		constexpr int32_t DEFAULT_POS_Y = 0;
 		constexpr int32_t SIZE_HEIGHT = 40;
+		constexpr int32_t SLIDER_POINT_SIZE_WIDTH = 10;
 	}
 }

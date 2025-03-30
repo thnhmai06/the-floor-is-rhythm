@@ -164,6 +164,7 @@
     <ClInclude Include="include\coremgr.h" />
     <ClInclude Include="include\file\tfir\tfir_beatmap.h" />
     <ClInclude Include="include\game\cursor.h" />
+    <ClInclude Include="include\game\direction.h" />
     <ClInclude Include="include\game\hitsound.h" />
     <ClInclude Include="include\game\hitobject.h" />
     <ClInclude Include="include\game\timing.h" />
