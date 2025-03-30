@@ -63,10 +63,13 @@
     <ClCompile Include="src\render\cursor\r_cursor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\render\playground\r_object.cpp">
+    <ClCompile Include="src\render\playground\r_hitobject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\game\timing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\render\object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -131,7 +134,7 @@
     <ClInclude Include="include\rule\skin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\render\playground\r_object.h">
+    <ClInclude Include="include\render\playground\r_hitobject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\game\timing.h">
@@ -141,6 +144,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\game\direction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\render\object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

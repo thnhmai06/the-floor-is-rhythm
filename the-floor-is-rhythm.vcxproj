@@ -159,7 +159,8 @@
     <ClCompile Include="src\game\timing.cpp" />
     <ClCompile Include="src\render\layer.cpp" />
     <ClCompile Include="src\render\cursor\r_cursor.cpp" />
-    <ClCompile Include="src\render\playground\r_object.cpp" />
+    <ClCompile Include="src\render\object.cpp" />
+    <ClCompile Include="src\render\playground\r_hitobject.cpp" />
     <ClCompile Include="src\work\render.cpp" />
     <ClInclude Include="include\coremgr.h" />
     <ClInclude Include="include\file\tfir\tfir_beatmap.h" />
@@ -182,7 +183,8 @@
     <ClCompile Include="src\render\texture.cpp" />
     <ClInclude Include="include\render\layer.h" />
     <ClInclude Include="include\render\cursor\r_cursor.h" />
-    <ClInclude Include="include\render\playground\r_object.h" />
+    <ClInclude Include="include\render\object.h" />
+    <ClInclude Include="include\render\playground\r_hitobject.h" />
     <ClInclude Include="include\rule\skin.h" />
     <ClInclude Include="include\template.h" />
     <ClInclude Include="include\work\render.h" />

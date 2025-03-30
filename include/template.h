@@ -1,7 +1,7 @@
 #pragma once
 #include <concepts>
 #include <SDL3_mixer/SDL_mixer.h>
-#include "render/texture.h"
+#include "render/object.h"
 
 namespace Template
 {
@@ -18,15 +18,15 @@ namespace Template
 	{
 		namespace TextureOrigin
 		{
-			inline constexpr Texture::TextureConfig::TextureOrigin TOP_LEFT = { 0, 0 };
-			constexpr Texture::TextureConfig::TextureOrigin CENTRE(const float& w, const float& h) { return { w / 2, h / 2 }; }
-			constexpr Texture::TextureConfig::TextureOrigin TOP_RIGHT(const float& w) { return { w, 0 }; }
-			constexpr Texture::TextureConfig::TextureOrigin BOTTOM_LEFT(const float& h) { return { 0, h }; }
-			constexpr Texture::TextureConfig::TextureOrigin BOTTOM_RIGHT(const float& w, const float& h) { return { w, h }; }
-			constexpr Texture::TextureConfig::TextureOrigin TOP_CENTRE(const float& w) { return { w / 2, 0 }; }
-			constexpr Texture::TextureConfig::TextureOrigin BOTTOM_CENTRE(const float& w, const float& h) { return { w / 2, h }; }
-			constexpr Texture::TextureConfig::TextureOrigin CENTRE_LEFT(const float& h) { return { 0, h / 2 }; }
-			constexpr Texture::TextureConfig::TextureOrigin CENTRE_RIGHT(const float& w, const float& h) { return { w, h / 2 }; }
+			inline constexpr RenderConfig::RenderOriginPoint TOP_LEFT = { 0, 0 };
+			constexpr RenderConfig::RenderOriginPoint CENTRE(const float& w, const float& h) { return { w / 2, h / 2 }; }
+			constexpr RenderConfig::RenderOriginPoint TOP_RIGHT(const float& w) { return { w, 0 }; }
+			constexpr RenderConfig::RenderOriginPoint BOTTOM_LEFT(const float& h) { return { 0, h }; }
+			constexpr RenderConfig::RenderOriginPoint BOTTOM_RIGHT(const float& w, const float& h) { return { w, h }; }
+			constexpr RenderConfig::RenderOriginPoint TOP_CENTRE(const float& w) { return { w / 2, 0 }; }
+			constexpr RenderConfig::RenderOriginPoint BOTTOM_CENTRE(const float& w, const float& h) { return { w / 2, h }; }
+			constexpr RenderConfig::RenderOriginPoint CENTRE_LEFT(const float& h) { return { 0, h / 2 }; }
+			constexpr RenderConfig::RenderOriginPoint CENTRE_RIGHT(const float& w, const float& h) { return { w, h / 2 }; }
 		}
 	}
 }

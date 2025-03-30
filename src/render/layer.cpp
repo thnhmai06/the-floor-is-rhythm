@@ -42,33 +42,33 @@ void Layers::Layer::Camera::move_out_camera(Texture::TextureConfig& object) cons
 void Layers::Layer::to_absolute_object(Texture::TextureConfig& object) const
 {
 	// dstrect
-	if (config.dst_rect && object.origin_dst)
+	if (render_setting.dst_rect && object.origin_dst)
 	{
 		// Position
-		object.origin_dst->x += config.dst_rect->x;
-		object.origin_dst->y += config.dst_rect->y;
+		object.origin_dst->x += render_setting.dst_rect->x;
+		object.origin_dst->y += render_setting.dst_rect->y;
 
 		// Scaling
-		object.origin_dst->w *= config.dst_rect->w / ImmutableConfig::Video::LOGICAL_WIDTH;
-		object.origin_dst->h *= config.dst_rect->h / ImmutableConfig::Video::LOGICAL_HEIGHT;
+		object.origin_dst->w *= render_setting.dst_rect->w / ImmutableConfig::Video::LOGICAL_WIDTH;
+		object.origin_dst->h *= render_setting.dst_rect->h / ImmutableConfig::Video::LOGICAL_HEIGHT;
 	}
 	// alpha
-	object.alpha = (object.alpha * config.alpha) / 255;
+	object.alpha = (object.alpha * render_setting.alpha) / 255;
 }
 void Layers::Layer::to_relative_object(Texture::TextureConfig& object) const
 {
 	// dstrect
-	if (config.dst_rect && object.origin_dst)
+	if (render_setting.dst_rect && object.origin_dst)
 	{
 		// Position
-		object.origin_dst->x -= config.dst_rect->x;
-		object.origin_dst->y -= config.dst_rect->y;
+		object.origin_dst->x -= render_setting.dst_rect->x;
+		object.origin_dst->y -= render_setting.dst_rect->y;
 		// Scaling
-		object.origin_dst->w *= static_cast<float>(ImmutableConfig::Video::LOGICAL_WIDTH) / config.dst_rect->w;
-		object.origin_dst->h *= static_cast<float>(ImmutableConfig::Video::LOGICAL_HEIGHT) / config.dst_rect->h;
+		object.origin_dst->w *= static_cast<float>(ImmutableConfig::Video::LOGICAL_WIDTH) / render_setting.dst_rect->w;
+		object.origin_dst->h *= static_cast<float>(ImmutableConfig::Video::LOGICAL_HEIGHT) / render_setting.dst_rect->h;
 	}
 	// alpha
-	object.alpha = (object.alpha * 255) / config.alpha;
+	object.alpha = (object.alpha * 255) / render_setting.alpha;
 }
 void Layers::Layer::render()
 {
@@ -93,7 +93,7 @@ void Layers::Layer::clear(const bool to_initial_state)
 	render_buffer.clear();
 	if (to_initial_state)
 	{
-		config = LayerConfig();
+		render_setting = LayerConfig();
 		memory.free_all();
 	}
 }
