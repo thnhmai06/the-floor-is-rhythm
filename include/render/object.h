@@ -22,6 +22,7 @@ struct RenderConfig
 	void set_scale_fixed(const float& value, const SDL_FPoint& texture_size);
 	[[nodiscard]] SDL_FRect to_sdl_dst(const SDL_FPoint& texture_size) const;
 
+	RenderConfig() = default;
 	explicit RenderConfig(const SDL_FPoint& render_pos,
 		const RenderOriginPoint& origin = { 0.0f, 0.0f }) :
 		render_pos(render_pos), origin_pos(origin)

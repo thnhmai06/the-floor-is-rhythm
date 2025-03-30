@@ -3,7 +3,36 @@
 #include "rule/config.h"
 #include "texture.h"
 #include "object.h"
+#include "template.h"
 #include "utilities.h"
+
+struct LayerCamera : private RenderConfig
+{
+protected:
+	constexpr SDL_FPoint CAMERA_SIZE = {
+		static_cast<float>(ImmutableConfig::Video::LOGICAL_WIDTH),
+		static_cast<float>(ImmutableConfig::Video::LOGICAL_HEIGHT)
+	};
+public:
+	void move_into_camera(RenderObjects::RenderObject& object) const;
+	void move_out_camera(RenderObjects::RenderObject& object) const;
+
+	[[nodiscard]] uint8_t get_alpha() const;
+	void set_alpha(const uint8_t& value);
+	[[nodiscard]] float get_zoom() const;
+	void set_zoom(const float& value);
+	[[nodiscard]] SDL_FPoint get_camera_pos() const;
+	[[nodiscard]] SDL_FPoint get_camera_size(bool after_scale = true) const;
+	void move_x(const float& dx);
+	void move_y(const float& dy);
+
+	LayerCamera& operator=(const LayerCamera& other) : RenderConfig(other) { return *this; }
+	LayerCamera() : RenderConfig()
+	{
+		const auto [camera_width, camera_height] = get_camera_size(false);
+		origin_pos = Template::Video::TextureOrigin::CENTRE(camera_width, camera_height);
+	}
+};
 
 namespace Layers
 {
@@ -20,31 +49,15 @@ namespace Layers
 	 */
 	struct Layer
 	{
-	private:
-		void to_absolute_object(Texture::TextureConfig& object) const;
-		void to_relative_object(Texture::TextureConfig& object) const;
-
-	public:
 		using RenderBuffer = std::list<RenderObjects::RenderObject>;
 		using RenderRange = std::pair<RenderBuffer::iterator, RenderBuffer::iterator>;
 
 		SDL_Renderer* renderer;
 		RenderBuffer render_buffer;
 		std::optional<RenderRange> render_range;
-		RenderConfig render_setting;
+		LayerCamera camera;
 		TextureMemory memory;
 		bool visible = true;
-		struct Camera
-		{
-			SDL_FPoint centre_pos = {
-				Utilities::Math::centre(0, ImmutableConfig::Video::LOGICAL_WIDTH),
-				Utilities::Math::centre(0, ImmutableConfig::Video::LOGICAL_HEIGHT)
-			};
-			float zoom = 1.0f;
-
-			void move_into_camera(Texture::TextureConfig& object) const;
-			void move_out_camera(Texture::TextureConfig& object) const;
-		} camera;
 
 		virtual ~Layer() = default;
 		explicit Layer(SDL_Renderer* renderer);
