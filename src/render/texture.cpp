@@ -77,13 +77,13 @@ SDL_FPoint RenderObjects::RenderObject::RenderOrigin::from_sdl_pos(const SDL_FPo
 SDL_FRect RenderObjects::RenderObject::to_sdl_dst() const
 {
 	const auto [src_w, src_h] = memory->get_texture_size(*name);
-	const auto [x, y] = render_origin.to_sdl_pos(render_pos);
+	const auto [x, y] = object_origin.to_sdl_pos(render_pos);
 	return { x, y, src_w * scale.x, src_h * scale.y };
 }
-SDL_FRect RenderObjects::RenderObject::from_sdl_dst() const
+SDL_FRect RenderObjects::RenderObject::from_sdl_dst(const SDL_FPoint& sdl_pos) const
 {
 	const auto [src_w, src_h] = memory->get_texture_size(*name);
-	const auto [x, y] = render_origin.from_sdl_pos(render_pos);
+	const auto [x, y] = object_origin.from_sdl_pos(sdl_pos);
 	return { x, y, src_w / scale.x, src_h / scale.y };
 }
 void RenderObjects::RenderObject::set_scale_fixed(const SDL_FPoint& dst_size)

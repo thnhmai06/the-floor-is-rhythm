@@ -38,7 +38,7 @@ namespace RenderObjects
 		const Texture::TextureMemory* memory;
 		SDL_FRect src_rect_percent = {0, 0, 1, 1};
 		//? Đích
-		RenderOrigin render_origin = Template::Video::TextureOrigin::TOP_LEFT;
+		RenderOrigin object_origin = Template::Video::TextureOrigin::TOP_LEFT;
 		SDL_FPoint render_pos = { 0, 0 };
 		SDL_FPoint scale = { 1.0f, 1.0f };
 		uint8_t alpha = 255;
@@ -48,9 +48,9 @@ namespace RenderObjects
 		void set_scale_fixed(const float& value) { set_scale_fixed({ value, value }); }
 		[[nodiscard]] SDL_FRect get_src_rect_fixed() const;
 		[[nodiscard]] SDL_FRect to_sdl_dst() const;
-		[[nodiscard]] SDL_FRect from_sdl_dst() const;
-
+		[[nodiscard]] SDL_FRect from_sdl_dst(const SDL_FPoint& sdl_pos) const;
 		virtual void render() const;
+
 		explicit RenderObject(const std::string* name, const Texture::TextureMemory* memory, const SDL_FPoint& pos) :
 			name(name), memory(memory), render_pos(pos) {
 		}
