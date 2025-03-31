@@ -11,60 +11,67 @@ namespace RenderObjects::Playground
 	{
 		const HitObject::HitObject* hit_object = nullptr;
 
-		RenderHitobject(
-			const std::string* name,
+		static RenderObject create_adjacent_object(
+			const std::string* skin_name,
+			const TextureMemory* memory,
+			const float& speed,
+			const float& duration,
+			const SDL_FPoint& spacing = { 0, 0 },
+			const HitObject::HitObject* previous = nullptr
+		);
+		static RenderObject create_hit_object(
+			const std::string* skin_name,
 			const TextureMemory* memory,
 			const HitObject::HitObject* current,
-			const float& velocity,
+			const float& speed,
 			const float& duration,
-			const RenderHitobject* previous);
+			const RenderHitobject* previous = nullptr);
+		RenderHitobject() = default;
+		RenderHitobject(
+			const std::string* skin_name,
+			const TextureMemory* memory,
+			const HitObject::HitObject* current,
+			const float& speed,
+			const float& duration,
+			const RenderHitobject* previous = nullptr);
 	};
-
 	struct RenderFloor final : RenderHitobject
 	{
 		RenderFloor(
 			const HitObject::Floor* floor,
+			const TextureMemory* memory,
 			const Metadata::CalculatedDifficulty* diff,
-			const RenderHitobject* previous = nullptr,
-			const float& current_timing_velocity = 1);
+			const float& current_timing_velocity = 1,
+			const RenderHitobject* previous = nullptr);
 	};
-
 	struct RenderSlider final : RenderHitobject
 	{
 	private:
-		[[nodiscard]] RenderHitobject create_slider_end() const;
-
+		static RenderObject create_hit_object(
+			const std::string* skin_name,
+			const TextureMemory* memory,
+			const HitObject::HitObject* current,
+			const float& speed,
+			const float& duration,
+			const RenderHitobject* previous = nullptr);
+		static RenderObject create_slider_line(
+			const SDL_FRect& previous_dst,
+			const float& src_retain_percent,
+			bool retain_from_beginning = true,
+			const float& dst_width,
+			const Template::Game::Direction::Direction& current_direction);
+		static RenderObject create_slider_point(
+			const Template::Game::Direction::Direction& current_direction);
+		static RenderObject create_slider_curve(
+			const Template::Game::Direction::Direction& current_direction,
+			const Template::Game::Direction::Rotation& rotation);
 	public:
-		RenderHitobject slider_end;
-
-		struct SliderComponents : std::vector<RenderObject>
-		{
-		private:
-			[[nodiscard]] RenderObject create_slider_line(
-				const SDL_FRect& previous_dst,
-				const float& src_retain_percent,
-				bool retain_from_beginning = true,
-				const float& dst_width,
-				const Template::Game::Direction::Direction::Direction& current_direction) const;
-			[[nodiscard]] RenderObject create_slider_point(
-				const Template::Game::Direction::Direction::Direction& current_direction) const;
-			[[nodiscard]] RenderObject create_slider_curve(
-				const Template::Game::Direction::Direction::Direction& current_direction,
-				const Template::Game::Direction::Direction::Rotation& rotation) const;
-
-		public:
-			SliderComponents(
-				const HitObject::Slider* slider,
-				const SDL_FRect* start_dst,
-				const float& current_beatlength,
-				const float& velocity);
-		} components;
-
 		RenderSlider(
 			const HitObject::Slider* slider,
+			const TextureMemory* memory,
 			const Metadata::CalculatedDifficulty* diff,
 			const float& current_beatlength,
-			const RenderHitobject* previous = nullptr,
-			const float& current_timing_velocity = 1);
+			const float& current_timing_velocity = 1,
+			const RenderHitobject* previous = nullptr);
 	};
 }

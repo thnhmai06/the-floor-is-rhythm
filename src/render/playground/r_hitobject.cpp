@@ -4,80 +4,129 @@
 #include "utilities.h"
 #include "template.h"
 
-RenderObjects::Playground::RenderHitobject::RenderHitobject(
-	const std::string* name,
-	const TextureMemory* memory,
-	const HitObject::HitObject* current,
-	const float& velocity, 
+static auto current_direction = Template::Game::Direction::Direction::RIGHT;
+
+// ::RenderHitObject
+RenderObjects::RenderObject RenderObjects::Playground::RenderHitobject::create_adjacent_object(
+	const std::string* skin_name, 
+	const TextureMemory* memory, 
+	const SDL_FPoint& spacing, 
+	const float& speed, 
 	const float& duration, 
-	const RenderHitobject* previous) : hit_object(current)
+	const RenderObject* previous)
 {
-	RenderObject render_hit_object(name, memory, Template::Render::RenderOriginType::CENTRE);
+	RenderObject render_object(skin_name, memory, Template::Render::RenderOriginType::CENTRE);
+	// Pos
 	if (!previous)
+	{
+		current_direction = Template::Game::Direction::Direction::RIGHT; // reset
+		render_object.config.render_pos = ImmutableConfig::HitObject::DEFAULT_POS;
+	}
+	else
+	{
+		render_object.config.render_pos = previous->config.render_pos;
+		switch (current_direction)
+		{
+		case Template::Game::Direction::Direction::RIGHT:
+		default:
+			render_object.config.render_pos.x += speed * spacing.x;
+			break;
+		case Template::Game::Direction::Direction::UP:
+			render_object.config.render_pos.y -= speed * spacing.y;
+			break;
+		case Template::Game::Direction::Direction::LEFT:
+			render_object.config.render_pos.x -= speed * spacing.x;
+			break;
+		case Template::Game::Direction::Direction::DOWN:
+			render_object.config.render_pos.y += speed * spacing.y;
+			break;
+		}
+	}
+}
+RenderObjects::RenderObject RenderObjects::Playground::RenderHitobject::create_hit_object(
+	const std::string* skin_name, 
+	const TextureMemory* memory, 
+	const HitObject::HitObject* current,
+	const float& speed, 
+	const float& duration, 
+	const RenderHitobject* previous)
+{
+	RenderObject render_hit_object(skin_name, memory, Template::Render::RenderOriginType::CENTRE);
+	// Pos
+	if (!previous || !previous->hit_object)
+	{
+		current_direction = Template::Game::Direction::Direction::RIGHT + current->rotation; // reset
 		render_hit_object.config.render_pos = ImmutableConfig::HitObject::DEFAULT_POS;
+	}
 	else
 	{
 		const float time_distance = static_cast<float>(current->time - previous->hit_object->end_time);
 		render_hit_object.config.render_pos = previous->back().config.render_pos;
-		switch (hit_object->rotation)
+		switch (current_direction)
 		{
-		case Template::Game::Direction::Rotation::NO_ROTATE:
+		case Template::Game::Direction::Direction::RIGHT:
 		default:
-			render_hit_object.config.render_pos.x += velocity * time_distance;
+			render_hit_object.config.render_pos.x += speed * time_distance;
 			break;
 
-		case Template::Game::Direction::Rotation::ROTATE_90:
-			render_hit_object.config.render_pos.y -= velocity * time_distance;
+		case Template::Game::Direction::Direction::UP:
+			render_hit_object.config.render_pos.y -= speed * time_distance;
 			break;
 
-		case Template::Game::Direction::Rotation::ROTATE_180:
-			render_hit_object.config.render_pos.x -= velocity * time_distance;
+		case Template::Game::Direction::Direction::LEFT:
+			render_hit_object.config.render_pos.x -= speed * time_distance;
 			break;
 
-		case Template::Game::Direction::Rotation::ROTATE_270:
-			render_hit_object.config.render_pos.y += velocity * time_distance;
+		case Template::Game::Direction::Direction::DOWN:
+			render_hit_object.config.render_pos.y += speed * time_distance;
 			break;
 		}
 	}
+	// Size
 	render_hit_object.config.set_scale_fixed(
-		{ velocity * duration, ImmutableConfig::HitObject::SIZE_HEIGHT }, 
-		memory->get_texture_size(*name)
+		{ speed * duration, ImmutableConfig::HitObject::SIZE_HEIGHT },
+		memory->get_texture_size(*skin_name)
 	);
-
-	push_back(render_hit_object);
+	return render_hit_object;
+}
+RenderObjects::Playground::RenderHitobject::RenderHitobject(
+	const std::string* skin_name,
+	const TextureMemory* memory,
+	const HitObject::HitObject* current,
+	const float& speed,
+	const float& duration,
+	const RenderHitobject* previous) : hit_object(current)
+{
+	push_back(create_hit_object(skin_name, memory, current, speed, duration, previous));
 }
 
-// RenderObjects::Playground
-//! ::RenderFloor
+// ::RenderFloor
 RenderObjects::Playground::RenderFloor::RenderFloor(
 	const HitObject::Floor* floor,
+	const TextureMemory* memory,
 	const Metadata::CalculatedDifficulty* diff,
-	const RenderHitobject* previous,
-	const float& current_timing_velocity) :
-	RenderHitobject(diff->velocity* current_timing_velocity, diff->od.bad * 2, previous)
-{
-	target_texture_name = &SkinFormat::HitObject::FLOOR;
-	hit_object = floor;
+	const float& current_timing_velocity,
+	const RenderHitobject* previous) :
+	RenderHitobject(&SkinFormat::HitObject.find(current_direction += floor->rotation)->second.FLOOR, memory,
+		floor, current_timing_velocity * diff->velocity.speed, diff->od.bad * 2, previous) {
 }
 
-//! ::RenderSlider
+// ::RenderSlider
 RenderObjects::Playground::RenderSlider::RenderSlider(
 	const HitObject::Slider* slider,
+	const TextureMemory* memory,
 	const Metadata::CalculatedDifficulty* diff,
 	const float& current_beatlength,
-	const RenderHitobject* previous,
-	const float& current_timing_velocity) :
-	// Đầu
-	RenderHitobject(diff->velocity* current_timing_velocity, diff->od.bad * 2, previous),
-	// Thân
-	components(slider, config.origin_dst ? &config.origin_dst.value() : nullptr,
-		current_beatlength, diff->velocity* current_timing_velocity),
-	// Cuối
-	slider_end(RenderHitobject(diff->velocity* current_timing_velocity, diff->od.bad * 2, &components.back()));
-
+	const float& current_timing_velocity,
+	const RenderHitobject* previous) :
+	RenderHitobject()
 {
-	name = &SkinFormat::HitObject::Slider::BEGIN;
-	hitobject = slider;
+	hit_object = slider;
+	const auto slider_skin = &SkinFormat::HitObject.find(current_direction += slider->rotation)->second.SLIDER;
+	// Đầu
+	push_back(create_hit_object(&slider_skin->BEGIN, memory, slider,
+		current_timing_velocity * diff->velocity.speed, diff->od.bad * 2, previous));
+	// Thân
 
 }
 

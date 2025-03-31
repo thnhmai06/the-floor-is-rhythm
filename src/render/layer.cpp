@@ -16,7 +16,7 @@ void LayerCamera::move_into_camera(RenderObjects::RenderObject& object) const
 {
 	object.config.scale.x *= scale.x;
 	object.config.scale.y *= scale.y;
-	const auto camera_pos_sdl = origin_pos.to_sdl_pos(get_camera_pos());
+	const auto camera_pos_sdl = origin_pos.convert_pos_from_origin(get_camera_pos());
 	object.config.render_pos.x -= camera_pos_sdl.x;
 	object.config.render_pos.y -= camera_pos_sdl.y;
 }
@@ -24,7 +24,7 @@ void LayerCamera::move_out_camera(RenderObjects::RenderObject& object) const
 {
 	object.config.scale.x /= scale.x;
 	object.config.scale.y /= scale.y;
-	const auto camera_pos_sdl = origin_pos.to_sdl_pos(get_camera_pos());
+	const auto camera_pos_sdl = origin_pos.convert_pos_from_origin(get_camera_pos());
 	object.config.render_pos.x += camera_pos_sdl.x;
 	object.config.render_pos.y += camera_pos_sdl.y;
 }
@@ -37,12 +37,12 @@ void Layers::Layer::render()
 	const auto end = render_range ? render_range->second : render_buffer.end();
 	for (auto objects = begin; objects != end; ++objects)
 	{
-		for (const auto& object: objects)
+		for (auto& object: *objects)
 		{
 			// i hate this job fk
-			camera.move_into_camera(*object);
-			object->render();
-			camera.move_out_camera(*object);
+			camera.move_into_camera(object);
+			object.render();
+			camera.move_out_camera(object);
 		}
 	}
 }

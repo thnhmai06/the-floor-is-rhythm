@@ -4,7 +4,7 @@
 #include <cmath>
 #include <iomanip>
 #include <SDL3_mixer/SDL_mixer.h>
-#include "game/direction.h"
+#include "template.h"
 
 namespace Utilities
 {
@@ -13,17 +13,17 @@ namespace Utilities
 		inline bool is_bit_enabled(const std::int32_t value, const std::int32_t bitmask) { return (value & bitmask) != 0; }
 		inline bool is_equal_float(const float& variable, const float value, const float epsilon = 0.01f) { return abs(variable - value) <= epsilon; }
 		inline float centre(const float size, const float window_size) { return (window_size - size) / 2; }
-		inline float get_rotation_angle(const Direction::Direction& rotation, const bool clockwise = true)
+		inline float get_rotation_angle(const Template::Game::Direction::Direction& rotation, const bool clockwise = true)
 		{
 			switch (rotation)
 			{
-			case Direction::Direction::RIGHT:
+			case Template::Game::Direction::Direction::RIGHT:
 				return 0.0f;
-			case Direction::Direction::LEFT:
+			case Template::Game::Direction::Direction::LEFT:
 				return 180.0f;
-			case Direction::Direction::UP:
+			case Template::Game::Direction::Direction::UP:
 				return clockwise ? -90.0f : 90.0f;
-			case Direction::Direction::DOWN:
+			case Template::Game::Direction::Direction::DOWN:
 				return clockwise ? 90.0f : -90.0f;
 			}
 			return 0.0f;
@@ -88,10 +88,10 @@ namespace Utilities
 			return result;
 		}
 	}
-	namespace Video
+	namespace Render
 	{
-		inline SDL_FRect quick_FRect(const SDL_FPoint pos, const SDL_FPoint size) { return SDL_FRect{ pos.x, pos.y, size.x, size.y }; }
-		inline SDL_FPoint get_pos(const SDL_FRect& rect) { return SDL_FPoint{ rect.x, rect.y }; }
-		inline SDL_FPoint get_size(const SDL_FRect& rect) { return SDL_FPoint{ rect.w, rect.h }; }
+		inline SDL_FRect merge_pos_size(const SDL_FPoint pos, const SDL_FPoint size) { return SDL_FRect{ pos.x, pos.y, size.x, size.y }; }
+		inline SDL_FPoint get_pos_from_rect(const SDL_FRect& rect) { return SDL_FPoint{ rect.x, rect.y }; }
+		inline SDL_FPoint get_size_from_rect(const SDL_FRect& rect) { return SDL_FPoint{ rect.w, rect.h }; }
 	}
 }

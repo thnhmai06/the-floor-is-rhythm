@@ -61,6 +61,10 @@ namespace ImmutableConfig
 				constexpr int32_t BAD = 10; // 50
 			}
 		}
+		namespace Velocity
+		{
+			constexpr float BASE_SPEED = 100; // pixel/s
+		}
 	}
 	namespace HitObject
 	{

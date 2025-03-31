@@ -1,88 +1,82 @@
 #include "render/object.h" // Header
 #include "exceptions.h"
 #include "logging.h"
+#include "utilities.h"
 
-// ::RenderConfig::RenderOrigin
-SDL_FPoint RenderConfig::RenderOriginPoint::to_sdl_pos(const SDL_FPoint& texture_pos) const
+// RenderConfig::RenderOrigin
+SDL_FPoint RenderConfig::RenderOriginPoint::convert_pos_from_origin(const SDL_FPoint& pos, const RenderOriginPoint& from_origin) const
 {
-	return { texture_pos.x + x, texture_pos.y + y };
+	return { pos.x - from_origin.x + x, pos.y - from_origin.y + y };
 }
-SDL_FPoint RenderConfig::RenderOriginPoint::from_sdl_pos(const SDL_FPoint& sdl_pos) const
+SDL_FPoint RenderConfig::RenderOriginPoint::convert_pos_to_origin(const SDL_FPoint& pos, const RenderOriginPoint& to_origin) const
 {
-	return { sdl_pos.x - x, sdl_pos.y - y };
+	return { pos.x + to_origin.x - x, pos.y + to_origin.y - y };
 }
-SDL_FRect RenderConfig::RenderOriginPoint::to_sdl_dst(const SDL_FPoint& render_pos, const SDL_FPoint& texture_size) const
+SDL_FRect RenderConfig::RenderOriginPoint::convert_rect_from_origin(const SDL_FRect& rect, const RenderOriginPoint& to_origin) const
 {
-	const auto [x, y] = to_sdl_pos(render_pos);
-	return { x, y, texture_size.x, texture_size.y };
+	const auto [new_x, new_h] = convert_pos_from_origin({ .x = rect.x, .y = rect.y }, to_origin);
+	return { new_x, new_h, rect.w, rect.h };
 }
-SDL_FRect RenderConfig::RenderOriginPoint::to_sdl_dst(const SDL_FRect& render_rect) const
+SDL_FRect RenderConfig::RenderOriginPoint::convert_rect_to_origin(const SDL_FRect& rect, const RenderOriginPoint& to_origin) const
 {
-	return to_sdl_dst({ .x = render_rect.x, .y = render_rect.y }, { .x = render_rect.w, .y = render_rect.h });
-}
-SDL_FRect RenderConfig::RenderOriginPoint::from_sdl_dst(const SDL_FPoint& sdl_pos, const SDL_FPoint& texture_size) const
-{
-	const auto [x, y] = from_sdl_pos(sdl_pos);
-	return { x, y, texture_size.x, texture_size.y };
-}
-SDL_FRect RenderConfig::RenderOriginPoint::from_sdl_dst(const SDL_FRect& dst_rect) const
-{
-	return from_sdl_dst({ .x = dst_rect.x, .y = dst_rect.y }, { .x = dst_rect.w, .y = dst_rect.h });
+	const auto [new_x, new_h] = convert_pos_to_origin({ .x = rect.x, .y = rect.y }, to_origin);
+	return { new_x, new_h, rect.w, rect.h };
 }
 
-// ::RenderConfig
-void RenderConfig::set_scale_fixed(const SDL_FPoint& dst_size, const SDL_FPoint& texture_size)
+// RenderConfig
+void RenderConfig::set_scale_fixed(const SDL_FPoint& size, const SDL_FPoint& src_size)
 {
-	scale.x = dst_size.x / texture_size.x;
-	scale.y = dst_size.y / texture_size.y;
+	scale.x = size.x / src_size.x;
+	scale.y = size.y / src_size.y;
 }
-void RenderConfig::set_scale_fixed(const float& value, const SDL_FPoint& texture_size)
+void RenderConfig::set_scale_fixed(const float& value, const SDL_FPoint& src_size)
 {
-	set_scale_fixed({ value, value }, texture_size);
+	set_scale_fixed({ value, value }, src_size);
 }
-SDL_FRect RenderConfig::to_sdl_dst(const SDL_FPoint& texture_size) const
+SDL_FRect RenderConfig::get_sdl_dst_rect(const SDL_FPoint& src_size) const
 {
-	return origin_pos.to_sdl_dst(render_pos, { .x = texture_size.x * scale.x, .y = texture_size.y * scale.y });
+	return origin_pos.convert_rect_to_origin(
+		{ .x = render_pos.x,
+			.y = render_pos.y,
+			.w = src_size.x,
+			.h = src_size.y});
 }
 
 //! RenderObjects
 // ::RenderObject
-void RenderObjects::RenderObject::set_scale_fixed(const SDL_FPoint& dst_size)
+SDL_FRect RenderObjects::RenderObject::get_sdl_src_rect() const
 {
-	config.set_scale_fixed(dst_size, memory->get_texture_size(*name));
+	const auto [src_w, src_h] = src->get_size();
+	return { src_w * src_rect_in_percent.x, src_h * src_rect_in_percent.y, src_w * src_rect_in_percent.w, src_h * src_rect_in_percent.h };
 }
-SDL_FRect RenderObjects::RenderObject::to_sdl_dst() const
+SDL_FRect RenderObjects::RenderObject::get_sdl_dst_rect() const
 {
-	return config.to_sdl_dst(memory->get_texture_size(*name));
+	return config.get_sdl_dst_rect(Utilities::Video::get_size_from_rect(get_sdl_src_rect()));
 }
-SDL_FRect RenderObjects::RenderObject::from_sdl_dst(const SDL_FPoint& sdl_pos) const
+void RenderObjects::RenderObject::set_scale_fixed(const SDL_FPoint& size)
 {
-	return config.origin_pos.from_sdl_dst(sdl_pos, memory->get_texture_size(*name));
+	config.set_scale_fixed(size, Utilities::Video::get_size_from_rect(get_sdl_src_rect()));
 }
-SDL_FRect RenderObjects::RenderObject::get_src_rect_fixed() const
+void RenderObjects::RenderObject::set_scale_fixed(const float& value)
 {
-	const auto [src_x, src_y] = memory->get_texture_size(*name);
-	return { src_x * src_rect_in_percent.x, src_y * src_rect_in_percent.y, src_x * src_rect_in_percent.w, src_y * src_rect_in_percent.h };
+	config.set_scale_fixed(value, Utilities::Video::get_size_from_rect(get_sdl_src_rect()));
 }
 void RenderObjects::RenderObject::render() const
 {
-	const auto item = memory->find(*name);
-	if (item == memory->end())
-		THROW_ERROR(SDLExceptions::Texture::SDL_Texture_Render_Failed(*name));
+	const auto item = src->memory->find(src->name);
+	if (item == src->memory->end())
+		THROW_ERROR(SDLExceptions::Texture::SDL_Texture_Render_Failed(src->name));
 
-	const auto texture = item->second;
-	const auto src_rect = get_src_rect_fixed();
-	const auto dst_rect = to_sdl_dst();
-	SDL_SetTextureAlphaMod(texture, config.alpha);
-	if (!SDL_RenderTexture(memory->renderer, texture, &src_rect, &dst_rect))
-		THROW_ERROR(SDLExceptions::Texture::SDL_Texture_Render_Failed(*name));
+	const auto sdl_texture = item->second;
+	const auto src_rect = get_sdl_src_rect();
+	const auto dst_rect = get_sdl_dst_rect();
+	SDL_SetTextureAlphaMod(sdl_texture, config.alpha);
+	if (!SDL_RenderTexture(src->memory->renderer, sdl_texture, &src_rect, &dst_rect))
+		THROW_ERROR(SDLExceptions::Texture::SDL_Texture_Render_Failed(src->name));
 }
-
-RenderObjects::RenderObject::RenderObject(const std::string* name,
-	const TextureMemory* memory, const Template::Render::RenderOriginType& origin_type) :
-	name(name), memory(memory)
+RenderObjects::RenderObject::RenderObject(const TextureManager* texture, const Template::Render::RenderOriginType& origin_type) : src(texture)
 {
-	const auto [w, h] = memory->get_texture_size(*name);
+	const auto [w, h] = Utilities::Video::get_size_from_rect(get_sdl_src_rect());
 	switch (origin_type)
 	{
 	case Template::Render::RenderOriginType::TOP_LEFT:
@@ -114,3 +108,4 @@ RenderObjects::RenderObject::RenderObject(const std::string* name,
 		break;
 	}
 }
+RenderObjects::RenderObject::RenderObject(const TextureManager* texture, const RenderConfig::RenderOriginPoint& custom_origin) : src(texture), config(custom_origin) {}

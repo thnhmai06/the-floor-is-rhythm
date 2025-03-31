@@ -78,14 +78,14 @@ void HitObject::HitObjects::read(const std::vector<std::string>& contents)
 		const auto back_itr = (empty()) ? end() : std::prev(end());
 		switch (std::stoi(content[3]))
 		{
-		case static_cast<int32_t>(HitObjectType::FLOOR):
+		case static_cast<int32_t>(Template::Game::HitObject::HitObjectType::FLOOR):
 		{
 			Floor floor;
 			floor.read(content);
 			this->emplace_hint(back_itr, floor.time, std::make_unique<Floor>(std::move(floor)));
 			break;
 		}
-		case static_cast<int32_t>(HitObjectType::SLIDER):
+		case static_cast<int32_t>(Template::Game::HitObject::HitObjectType::SLIDER):
 		{
 			Slider slider;
 			if (content.size() < Slider::MINIMUM_NUM_CONTENT)

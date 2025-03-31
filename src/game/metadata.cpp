@@ -130,6 +130,11 @@ void Metadata::CalculatedDifficulty::HPDrainRate::apply(const float& v)
 	// TODO: later, i have no idea with math
 	value = v;
 }
+void Metadata::CalculatedDifficulty::Velocity::apply(const float& v)
+{
+	value = v;
+	speed = v * ImmutableConfig::Difficulty::Velocity::BASE_SPEED;
+}
 // ::
 void Metadata::CalculatedDifficulty::write(std::ofstream& writer) const
 {
@@ -138,12 +143,12 @@ void Metadata::CalculatedDifficulty::write(std::ofstream& writer) const
 	writer << HEADER << '\n';
 	writer << HP << FileFormat::Beatmap::SEPARATOR << hp.value << '\n';
 	writer << OD << FileFormat::Beatmap::SEPARATOR << od.value << '\n';
-	writer << VELOCITY << FileFormat::Beatmap::SEPARATOR << velocity << '\n';
+	writer << VELOCITY << FileFormat::Beatmap::SEPARATOR << velocity.value << '\n';
 	writer << '\n';
 }
 void Metadata::CalculatedDifficulty::apply(const Difficulty& basic)
 {
 	od.apply(basic.od);
 	hp.apply(basic.hp);
-	velocity = basic.velocity;
+	velocity.apply(basic.velocity);
 }

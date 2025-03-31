@@ -49,7 +49,7 @@ SDL_FPoint TextureMemory::get_texture_size(const std::string& name) const
 		return get_texture_size(it);
 	return { 0, 0 };
 }
-void TextureMemory::free(const std::string& name)
+void TextureMemory::free_texture(const std::string& name)
 {
 	if (const auto it = find(name); it != end() && it->second)
 	{
@@ -62,4 +62,28 @@ void TextureMemory::free_all()
 	for (const auto& texture : *this | std::views::values)
 		SDL_DestroyTexture(texture);
 	std::unordered_map<std::string, SDL_Texture*>::clear();
+}
+
+// Texture
+void TextureManager::free() { memory->free_texture(name); name = ""; memory = nullptr; }
+SDL_FPoint TextureManager::get_size() const { return memory->get_texture_size(name); }
+void TextureManager::rename(const std::string& new_name) const
+{
+	if (const auto item = memory->find(name); item != memory->end())
+	{
+		memory->insert_or_assign(new_name, item->second);
+		memory->erase(item);
+	}
+}
+void TextureManager::move(TextureMemory* to_memory)
+{
+	auto current = memory->find(name);
+	to_memory[name] = std::move(current);
+	memory->erase(current);
+	memory = to_memory;
+}
+TextureManager::TextureManager(const TextureMemory::iterator& memory_item, TextureMemory* memory)
+{
+	name = memory_item->first;
+	this->memory = memory;
 }
