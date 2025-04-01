@@ -90,7 +90,7 @@ namespace Utilities
 	}
 	namespace Render
 	{
-		inline SDL_FRect merge_pos_size(const SDL_FPoint pos, const SDL_FPoint size) { return SDL_FRect{ pos.x, pos.y, size.x, size.y }; }
+		inline SDL_FRect merge_pos_size(const SDL_FPoint& pos, const SDL_FPoint& size) { return SDL_FRect{ pos.x, pos.y, size.x, size.y }; }
 		inline SDL_FPoint get_pos_from_rect(const SDL_FRect& rect) { return SDL_FPoint{ rect.x, rect.y }; }
 		inline SDL_FPoint get_size_from_rect(const SDL_FRect& rect) { return SDL_FPoint{ rect.w, rect.h }; }
 	}

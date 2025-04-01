@@ -70,6 +70,6 @@ namespace ImmutableConfig
 	{
 		constexpr SDL_FPoint DEFAULT_POS = { 0, 0 };
 		constexpr int32_t SIZE_HEIGHT = 40;
-		constexpr int32_t SLIDER_POINT_SIZE_WIDTH = 10;
+		constexpr int32_t SLIDER_POINT_SIZE_WIDTH = SIZE_HEIGHT / 4;
 	}
 }

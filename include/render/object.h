@@ -36,7 +36,7 @@ namespace RenderObjects
 		// Không còn cho tự render toàn màn hình nữa (dstrect = nullptr);
 		// nếu muốn thì set config.render_pos về {0, 0}, set config.origin_pos về góc trái, rồi chỉnh set_scale_fixed là logical size của màn hình
 
-		const TextureManager* src;
+		const Texture* src;
 		SDL_FRect src_rect_in_percent = { 0, 0, 1, 1 }; // cũng là sdl src_rect, nhưng ở % so với gốc
 		RenderConfig config;
 
@@ -45,12 +45,14 @@ namespace RenderObjects
 		[[nodiscard]] SDL_FRect get_sdl_dst_rect() const;
 
 	public:
+		[[nodiscard]] SDL_FPoint get_render_pos() const;
+		[[nodiscard]] SDL_FPoint get_render_size() const;
 		void set_scale_fixed(const SDL_FPoint& size); // chính là đang set dst_rect size (muốn set pos vào trong RenderConfig tìm render_pos)
 		void set_scale_fixed(const float& value);
 		virtual void render() const;
 
-		explicit RenderObject(const TextureManager* texture, const Template::Render::RenderOriginType& origin_type);
-		explicit RenderObject(const TextureManager* texture, const RenderConfig::RenderOriginPoint& custom_origin);
+		explicit RenderObject(const Texture& texture, const Template::Render::RenderOriginType& origin_type);
+		explicit RenderObject(const Texture& texture, const RenderConfig::RenderOriginPoint& custom_origin);
 		virtual ~RenderObject() = default;
 	};
 	using RenderObjects = std::vector<RenderObject>;

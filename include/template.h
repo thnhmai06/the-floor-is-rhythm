@@ -31,7 +31,10 @@ namespace Template
 	{
 		namespace Direction
 		{
-			enum class Direction : uint8_t
+			using DirectionBase = uint8_t;
+			constexpr uint8_t NUM_DIRECTIONS = 4;
+
+			enum class Direction : DirectionBase
 			{
 				RIGHT = 0,
 				UP = 1,

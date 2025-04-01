@@ -6,7 +6,7 @@
 #include "utilities.h"
 
 // TextureMemory
-SDL_Texture* TextureMemory::load(const char* file_path, const std::string& name)
+SDL_Texture* TextureMemory::load_texture(const char* file_path, const std::string& name)
 {
 	SDL_Texture* texture = IMG_LoadTexture(this->renderer, file_path);
 	if (!texture)
@@ -29,13 +29,19 @@ SDL_Texture* TextureMemory::load(const char* file_path, const std::string& name)
 	}
 	stbi_image_free(image);*/
 
-	return load(texture, name);
+	return load_texture(texture, name);
 }
-SDL_Texture* TextureMemory::load(SDL_Texture* texture, const std::string& name)
+SDL_Texture* TextureMemory::load_texture(SDL_Texture* texture, const std::string& name)
 {
 	SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 	insert_or_assign(name, texture);
 	return texture;
+}
+Texture TextureMemory::find(const std::string& name)
+{
+	if (const auto it = BASE::find(name); it != end())
+		return { it, this };
+	return {};
 }
 SDL_FPoint TextureMemory::get_texture_size(const const_iterator& texture)
 {
@@ -43,17 +49,37 @@ SDL_FPoint TextureMemory::get_texture_size(const const_iterator& texture)
 	SDL_GetTextureSize(texture->second, &width, &height);
 	return { width, height };
 }
-SDL_FPoint TextureMemory::get_texture_size(const std::string& name) const
+SDL_FPoint TextureMemory::get_texture_size(const std::string& name)
 {
-	if (const auto it = find(name); it != end())
+	if (const auto it = BASE::find(name); it != end())
 		return get_texture_size(it);
 	return { 0, 0 };
 }
+TextureMemory::iterator TextureMemory::rename_texture(const std::string& old_name, const std::string& new_name)
+{
+	if (const auto item = BASE::find(old_name); item != end())
+	{
+		auto new_location = insert_or_assign(new_name, item->second).first;
+		erase(item);
+		return new_location;
+	}
+	return end();
+}
+TextureMemory::iterator TextureMemory::move_texture(const std::string& name, TextureMemory* to_memory)
+{
+	if (const auto current = BASE::find(name); current != end())
+	{
+		auto new_location = to_memory->insert_or_assign(name, current->second).first;
+		erase(current);
+		return new_location;
+	}
+	return end();
+}
 void TextureMemory::free_texture(const std::string& name)
 {
-	if (const auto it = find(name); it != end() && it->second)
+	if (const auto it = BASE::find(name); it != end())
 	{
-		SDL_DestroyTexture(it->second);
+		if (it->second) SDL_DestroyTexture(it->second);
 		erase(it);
 	}
 }
@@ -61,29 +87,24 @@ void TextureMemory::free_all()
 {
 	for (const auto& texture : *this | std::views::values)
 		SDL_DestroyTexture(texture);
-	std::unordered_map<std::string, SDL_Texture*>::clear();
+	BASE::clear();
 }
+Texture TextureMemory::operator[](const std::string& name) { return find(name); }
 
 // Texture
-void TextureManager::free() { memory->free_texture(name); name = ""; memory = nullptr; }
-SDL_FPoint TextureManager::get_size() const { return memory->get_texture_size(name); }
-void TextureManager::rename(const std::string& new_name) const
+const std::string& Texture::get_name() const { return item->first; }
+SDL_FPoint Texture::get_size() const { return TextureMemory::get_texture_size(get_name()); }
+void Texture::rename(const std::string& new_name)
 {
-	if (const auto item = memory->find(name); item != memory->end())
-	{
-		memory->insert_or_assign(new_name, item->second);
-		memory->erase(item);
-	}
+	item = memory->rename_texture(get_name(), new_name);
 }
-void TextureManager::move(TextureMemory* to_memory)
+void Texture::move(TextureMemory* to_memory)
 {
-	auto current = memory->find(name);
-	to_memory[name] = std::move(current);
-	memory->erase(current);
+	item = memory->move_texture(get_name(), to_memory);
 	memory = to_memory;
 }
-TextureManager::TextureManager(const TextureMemory::iterator& memory_item, TextureMemory* memory)
-{
-	name = memory_item->first;
-	this->memory = memory;
+void Texture::free() { memory->free_texture(get_name()); item = memory->end(); memory = nullptr; }
+Texture::Texture(const std::string& name, TextureMemory* memory) : item(memory->find(name).item), memory(memory) {
+}
+Texture::Texture(TextureMemory::const_iterator item_in_memory, TextureMemory* memory) : item(std::move(item_in_memory)), memory(memory) {
 }

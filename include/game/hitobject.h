@@ -8,7 +8,6 @@
 namespace HitObject
 {
 	constexpr uint8_t NUM_COMBOS = 8;
-	constexpr uint8_t NUM_DIRECTIONS = 4;
 
 	inline Template::Game::Direction::Direction get_next_direction(Template::Game::Direction::Direction prev_direction, uint8_t rotation);
 
@@ -42,7 +41,7 @@ namespace HitObject
 
 		struct SliderCurve
 		{
-			int32_t padding_time = 0; // CurveTime = time + padding_time
+			uint32_t after = 0;
 			Template::Game::Direction::Rotation rotation = Template::Game::Direction::Rotation::NO_ROTATE;
 		};
 		std::vector<SliderCurve> curves;

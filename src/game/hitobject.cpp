@@ -12,7 +12,7 @@ using FileFormat::Beatmap::AND;
 
 Template::Game::Direction::Direction HitObject::get_next_direction(const Template::Game::Direction::Direction prev_direction, const uint8_t rotation)
 {
-	return static_cast<Template::Game::Direction::Direction>((static_cast<uint8_t>(prev_direction) + rotation) % NUM_DIRECTIONS);
+	return static_cast<Template::Game::Direction::Direction>((static_cast<uint8_t>(prev_direction) + rotation) % Template::Game::Direction::NUM_DIRECTIONS);
 }
 
 //! Floor
@@ -56,7 +56,7 @@ void HitObject::Slider::write(std::ofstream& writer) const
 		static_cast<bool>(type) << AND << end_time << AND;
 	for (auto ptr = curves.begin(); ptr != curves.end(); ++ptr) {
 		if (ptr != curves.begin()) writer << FileFormat::Beatmap::HitObjects::Slider::AND;
-		writer << ptr->padding_time << FileFormat::Beatmap::HitObjects::Slider::CURVE_AND << static_cast<int32_t>(ptr->rotation);
+		writer << ptr->after << FileFormat::Beatmap::HitObjects::Slider::CURVE_AND << static_cast<int32_t>(ptr->rotation);
 	}
 	writer << AND;
 	writer << hitsound.to_int() << AND << hitsample.to_string();
@@ -80,21 +80,22 @@ void HitObject::HitObjects::read(const std::vector<std::string>& contents)
 		{
 		case static_cast<int32_t>(Template::Game::HitObject::HitObjectType::FLOOR):
 		{
-			Floor floor;
-			floor.read(content);
-			this->emplace_hint(back_itr, floor.time, std::make_unique<Floor>(std::move(floor)));
+			Floor floor(content);
+			const auto time = floor.time;
+			this->emplace_hint(back_itr, time, std::make_unique<Floor>(std::move(floor)));
+
 			break;
 		}
 		case static_cast<int32_t>(Template::Game::HitObject::HitObjectType::SLIDER):
 		{
-			Slider slider;
 			if (content.size() < Slider::MINIMUM_NUM_CONTENT)
 			{
 				LOG_WARNNING(FormatExceptions::HitObjects::Format_HitObjects_NotEnoughtContent(line));
 				continue;
 			}
-			slider.read(content);
-			this->emplace_hint(back_itr, slider.time, std::make_unique<Slider>(std::move(slider)));
+			Slider slider(content);
+			const auto time = slider.time;
+			this->emplace_hint(back_itr, time, std::make_unique<Slider>(std::move(slider)));
 			break;
 		}
 		default:
