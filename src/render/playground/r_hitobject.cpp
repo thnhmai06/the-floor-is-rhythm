@@ -121,7 +121,7 @@ RenderObjects::Playground::RenderHitobject::RenderHitobject(
 // ::RenderFloor
 RenderObjects::Playground::RenderFloor::RenderFloor(
 	const HitObject::Floor* floor,
-	TextureMemory& memory,
+	const TextureMemory& memory,
 	const Metadata::CalculatedDifficulty* diff,
 	const float& current_timing_velocity,
 	const RenderHitobject* previous) :
@@ -163,7 +163,7 @@ RenderObjects::RenderObject RenderObjects::Playground::RenderSlider::create_slid
 }
 RenderObjects::Playground::RenderSlider::RenderSlider(
 	const HitObject::Slider* slider,
-	TextureMemory& memory,
+	const TextureMemory& memory,
 	const Metadata::CalculatedDifficulty* diff,
 	const float& current_beatlength,
 	const float& current_timing_velocity,

@@ -39,7 +39,7 @@ namespace RenderObjects::Playground
 	{
 		RenderFloor(
 			const HitObject::Floor* floor,
-			TextureMemory& memory,
+			const TextureMemory& memory,
 			const Metadata::CalculatedDifficulty* diff,
 			const float& current_timing_velocity = 1,
 			const RenderHitobject* previous = nullptr);
@@ -53,7 +53,7 @@ namespace RenderObjects::Playground
 	public:
 		RenderSlider(
 			const HitObject::Slider* slider,
-			TextureMemory& memory,
+			const TextureMemory& memory,
 			const Metadata::CalculatedDifficulty* diff,
 			const float& current_beatlength,
 			const float& current_timing_velocity = 1,
