@@ -13,7 +13,7 @@ void load_skin(const char* skin_path, TextureMemory& target_memory, const char* 
 		{
 			const auto path = entry.path();
 			const auto skin_name = path.lexically_relative(root_path).string();
-			if (entry.is_directory() && SkinFormat::FOLDER_STORAGE.contains(path.string()))
+			if (entry.is_directory() && SkinFormat::FOLDER_STORAGE.contains(skin_name))
 			{
 				try
 				{
