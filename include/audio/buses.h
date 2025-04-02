@@ -1,7 +1,8 @@
 ﻿#pragma once
 #include <SDL3_mixer/SDL_mixer.h>
-#include "template.h"
 #include "audio/memory.h"
+#include "utilities.h"
+#include "template.h"
 
 using namespace Template::Audio;
 
@@ -9,9 +10,6 @@ template <AudioPtrType AudioPtr>
 struct AudioBus
 {
 	AudioMemory<AudioPtr> memory;
-	int32_t volume;
-
-	explicit AudioBus(const int32_t value = MIX_MAX_VOLUME) : volume(value) {}
 };
 
 template<>
