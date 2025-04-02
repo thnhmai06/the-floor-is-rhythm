@@ -10,35 +10,22 @@ namespace GameObjects::Timing
 		static constexpr int32_t MINIMUM_NUM_CONTENT = 7;
 
 		int32_t time = 0;
+		float beat_length;
 		Hitsound::SampleSetType sample_set = Hitsound::SampleSetType::NO_CUSTOM;
 		int32_t sample_index = 0;
 		int32_t volume = 100;
+		bool inherited = false;
 		bool kiai = false;
+		void read(const std::vector<std::string>& content);
+		void write(std::ofstream& writer) const;
 
-		virtual void read(const std::vector<std::string>& content) = NULL;
-		virtual void write(std::ofstream& writer) const = NULL;
-		virtual ~TimingPoint() = default;
-	};
-	struct UninheritedPoint : TimingPoint
-	{
-		float beat_length;
-		void read(const std::vector<std::string>& content) override;
-		void write(std::ofstream& writer) const override;
+		float get_velocity() const;
 
-		UninheritedPoint() = default;
-		UninheritedPoint(const std::vector<std::string>& content) { UninheritedPoint::read(content); }
-	};
-	struct InheritedPoint : TimingPoint
-	{
-		float velocity;
-		void read(const std::vector<std::string>& content) override;
-		void write(std::ofstream& writer) const override;
-
-		InheritedPoint() = default;
-		InheritedPoint(const std::vector<std::string>& content) { InheritedPoint::read(content); }
+		TimingPoint() = default;
+		TimingPoint(const std::vector<std::string>& content) { read(content); }
 	};
 
-	struct TimingPoints : std::multimap<int32_t, std::unique_ptr<TimingPoint>>
+	struct TimingPoints : std::multimap<int32_t, TimingPoint>
 	{
 		void read(const std::vector<std::string>& contents);
 		void write(std::ofstream& writer) const;

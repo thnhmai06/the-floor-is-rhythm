@@ -10,10 +10,10 @@ namespace SkinFormat
 		const std::string BODY = "cursor";
 		const std::string TAIL = "cursortail";
 		inline std::unordered_map<Template::Game::Direction::Direction, const std::string> DIRECTION = {
-			{Template::Game::Direction::Direction::RIGHT, "right"},
-			{Template::Game::Direction::Direction::UP, "up"},
-			{Template::Game::Direction::Direction::DOWN, "down"},
-			{Template::Game::Direction::Direction::LEFT, "left"}
+			{Template::Game::Direction::Direction::RIGHT, "right/direction"},
+			{Template::Game::Direction::Direction::UP, "up/direction"},
+			{Template::Game::Direction::Direction::DOWN, "down/direction"},
+			{Template::Game::Direction::Direction::LEFT, "left/direction"}
 		};
 	}
 

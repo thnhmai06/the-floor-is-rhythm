@@ -1,16 +1,17 @@
 ﻿#include "render/playground/r_hitobject.h" // Header
+#include <ranges>
 #include "rule/skin.h"
 #include "rule/config.h"
-#include "utilities.h"
 #include "template.h"
 
 using SkinFormat::HitObject::HitObjectType, SkinFormat::HitObject::HitObjectSkin;
 static auto current_direction = Template::Game::Direction::Direction::RIGHT;
 
+//! GameObjects::HitObjects
 // ::RenderHitObject
 RenderObjects::RenderObject RenderObjects::Playground::RenderHitobject::create_object_on_pos(
 	const Texture& texture,
-	const SDL_FPoint& pos, 
+	const SDL_FPoint& pos,
 	const SDL_FPoint& size)
 {
 	RenderObject current(texture, Template::Render::RenderOriginType::CENTRE);
@@ -29,7 +30,7 @@ RenderObjects::RenderObject RenderObjects::Playground::RenderHitobject::create_a
 	RenderObject current(texture, Template::Render::RenderOriginType::CENTRE);
 	current.config.render_pos = previous->config.render_pos;
 	float src_x_in_percent = 0;
-	if (!src_from_beginning) 
+	if (!src_from_beginning)
 	{
 		src_x_in_percent = 1 - src_width_in_percent;
 		src_width_in_percent = 1 - src_width_in_percent;
@@ -66,7 +67,7 @@ RenderObjects::RenderObject RenderObjects::Playground::RenderHitobject::create_a
 }
 RenderObjects::RenderObject RenderObjects::Playground::RenderHitobject::create_spacing_object(
 	const Texture& texture,
-	const GameObjects::HitObjects::HitObject* current,
+	const GameObjects::HitObjects::HitObject& current,
 	const float& speed,
 	const float& duration,
 	const RenderHitobject* previous)
@@ -75,12 +76,12 @@ RenderObjects::RenderObject RenderObjects::Playground::RenderHitobject::create_s
 	// Pos
 	if (!previous || !previous->hit_object)
 	{
-		current_direction = Template::Game::Direction::Direction::RIGHT + current->rotation; // reset
+		current_direction = Template::Game::Direction::Direction::RIGHT + current.get_rotation(); // reset
 		render_hit_object.config.render_pos = SDL_FPoint{ GameConfig::HitObject::DEFAULT_POS_X, GameConfig::HitObject::DEFAULT_POS_X };
 	}
 	else
 	{
-		const float time_distance = static_cast<float>(current->time - previous->hit_object->end_time);
+		const float time_distance = static_cast<float>(current.get_time() - previous->hit_object->get_end_time());
 		render_hit_object.config.render_pos = previous->back().config.render_pos;
 		switch (current_direction)
 		{
@@ -110,26 +111,24 @@ RenderObjects::RenderObject RenderObjects::Playground::RenderHitobject::create_s
 }
 RenderObjects::Playground::RenderHitobject::RenderHitobject(
 	const Texture& texture,
-	const GameObjects::HitObjects::HitObject* current,
+	const GameObjects::HitObjects::HitObject& current,
 	const float& speed,
 	const float& duration,
-	const RenderHitobject* previous) : hit_object(current)
+	const RenderHitobject* previous) : hit_object(&current)
 {
 	push_back(create_spacing_object(texture, current, speed, duration, previous));
 }
-
 // ::RenderFloor
 RenderObjects::Playground::RenderFloor::RenderFloor(
-	const GameObjects::HitObjects::Floor* floor,
+	const GameObjects::HitObjects::HitObject& floor_object,
 	const TextureMemory& memory,
-	const GameObjects::Metadata::CalculatedDifficulty* diff,
+	const GameObjects::Metadata::CalculatedDifficulty& diff,
 	const float& current_timing_velocity,
 	const RenderHitobject* previous) :
-	RenderHitobject(memory.find(HitObjectSkin[current_direction += floor->rotation][HitObjectType::FLOOR]),
-			floor, current_timing_velocity* diff->velocity.speed, diff->od.bad * 2, previous)
+	RenderHitobject(memory.find(HitObjectSkin[current_direction += floor_object.get_rotation()][HitObjectType::FLOOR]),
+		floor_object, current_timing_velocity* diff.velocity.speed, diff.od.bad * 2, previous)
 {
 }
-
 // ::RenderSlider
 RenderObjects::RenderObject RenderObjects::Playground::RenderSlider::create_slider_point(
 	const Texture& texture,
@@ -162,43 +161,44 @@ RenderObjects::RenderObject RenderObjects::Playground::RenderSlider::create_slid
 	return create_object_on_pos(texture, pos, size);
 }
 RenderObjects::Playground::RenderSlider::RenderSlider(
-	const GameObjects::HitObjects::Slider* slider,
+	const GameObjects::HitObjects::HitObject& slider_object,
 	const TextureMemory& memory,
-	const GameObjects::Metadata::CalculatedDifficulty* diff,
+	const GameObjects::Metadata::CalculatedDifficulty& diff,
 	const float& current_beatlength,
 	const float& current_timing_velocity,
 	const RenderHitobject* previous) :
 	RenderHitobject()
 {
-	hit_object = slider;
-	const auto speed = current_timing_velocity * diff->velocity.speed;
-	const auto duration = diff->od.bad * 2;
+	hit_object = &slider_object;
+	const auto slider = *std::get_if<GameObjects::HitObjects::Slider>(&slider_object);
+	const auto speed = current_timing_velocity * diff.velocity.speed;
+	const auto duration = diff.od.bad * 2;
 	// Đầu
 	push_back(create_spacing_object(
-		memory.find(HitObjectSkin[current_direction += slider->rotation][HitObjectType::SLIDER_BEGIN]),
-		slider, speed, duration, previous));
+		memory.find(HitObjectSkin[current_direction += slider.rotation][HitObjectType::SLIDER_BEGIN]),
+		slider_object, speed, duration, previous));
 
-	const float slider_total_time = static_cast<float>(slider->end_time - slider->time);
+	const float slider_total_time = static_cast<float>(slider.end_time - slider.time);
 	float current_slider_time = 0;
 	int32_t current_curve = 0;
 	// Thân
 	while (current_slider_time < slider_total_time)
 	{
-		auto next_slider_time = current_slider_time + current_beatlength;
-		if (current_curve < static_cast<int32_t>(slider->curves.size())
-			&& next_slider_time > static_cast<float>(slider->curves[current_curve].after))
+		if (const auto next_slider_time = current_slider_time + current_beatlength;
+			current_curve < static_cast<int32_t>(slider.curves.size())
+			&& next_slider_time > static_cast<float>(slider.curves[current_curve].after))
 			// Phát hiện line mới đi qua curve tiếp theo (đã pass trường hợp ko có curve)
 		{
-			const float time_length_after_curve = next_slider_time - static_cast<float>(slider->curves[current_curve].after);
+			const float time_length_after_curve = next_slider_time - static_cast<float>(slider.curves[current_curve].after);
 			// before curve
 			const float time_length_before_curve = current_beatlength - time_length_after_curve;
-			push_back(create_adjacent_object(memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_LINE]), 
+			push_back(create_adjacent_object(memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_LINE]),
 				speed, time_length_before_curve, &back(), time_length_before_curve / current_beatlength));
 			current_slider_time += time_length_before_curve;
 
 			// curve
 			//TODO: Thêm curve
-			current_direction += slider->curves[current_curve].rotation;
+			current_direction += slider.curves[current_curve].rotation;
 			++current_curve;
 
 			// after curve
@@ -206,13 +206,13 @@ RenderObjects::Playground::RenderSlider::RenderSlider(
 			push_back(create_adjacent_object(memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_LINE]),
 				speed, time_length_after_curve, &back(), time_length_after_curve / current_beatlength, false));
 		}
-		// Tạo slider line (bình thường)
+		// Tạo slider_object line (bình thường)
 		else push_back(create_adjacent_object(
 			memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_LINE]),
 			speed, current_beatlength, &back()));
 		current_slider_time += current_beatlength;
 
-		// Tạo slider point
+		// Tạo slider_object point
 		if (current_slider_time < slider_total_time)
 			push_back(create_slider_point(memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_POINT]), back()));
 	}

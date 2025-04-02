@@ -1,4 +1,5 @@
 ﻿#include "render/layer.h" // Header
+#include <ranges>
 #include "rule/config.h"
 
 //! LayerCamera
@@ -59,6 +60,61 @@ void Layers::Layer::clear(const bool to_initial_state)
 		camera = LayerCamera();
 		memory.free_all();
 	}
+}
+
+//! PlaygroundLayer
+void Layers::PlaygoundLayer::run_beatmap(
+	const GameObjects::HitObjects::HitObjects& hit_objects,
+	const GameObjects::Metadata::CalculatedDifficulty& difficulty,
+	const GameObjects::Timing::TimingPoints& uninherited_points,
+	const GameObjects::Timing::TimingPoints& inherited_points)
+{
+	clear();
+
+	auto current_uninherited = uninherited_points.begin();
+	auto current_inherited = inherited_points.begin();
+	RenderObjects::Playground::RenderHitobject previous;
+	for (const auto& hit_object : hit_objects | std::views::values)
+	{
+		auto next_uninherited = std::next(current_uninherited, 1);
+		while (next_uninherited != uninherited_points.end() &&
+			hit_object.get_time() >= next_uninherited->first)
+		{
+			++current_uninherited; ++next_uninherited;
+		}
+		auto next_inherited = std::next(current_inherited, 1);
+		while (next_inherited != inherited_points.end() &&
+			hit_object.get_time() >= next_inherited->first)
+		{
+			++current_inherited; ++next_inherited;
+		}
+
+		switch (hit_object.get_type())
+		{
+		case Template::Game::HitObject::HitObjectType::FLOOR:
+			previous = RenderObjects::Playground::RenderFloor(
+				hit_object, memory, difficulty, current_inherited->second.get_velocity(), &previous);
+			render_buffer.push_back(previous);
+			break;
+		case Template::Game::HitObject::HitObjectType::SLIDER:
+			previous = RenderObjects::Playground::RenderSlider(
+				hit_object, memory, difficulty, current_uninherited->second.beat_length,
+				current_inherited->second.get_velocity(), &previous);
+			render_buffer.push_back(previous);
+			break;
+		}
+	}
+}
+
+Layers::PlaygoundLayer::PlaygoundLayer(SDL_Renderer* renderer): Layer(renderer) {}
+Layers::PlaygoundLayer::PlaygoundLayer(
+	SDL_Renderer* renderer, 
+	const GameObjects::HitObjects::HitObjects& hit_objects, 
+	const GameObjects::Metadata::CalculatedDifficulty& difficulty, 
+	const GameObjects::Timing::TimingPoints& uninherited_points, 
+	const GameObjects::Timing::TimingPoints& inherited_points) : Layer(renderer)
+{
+	run_beatmap(hit_objects, difficulty, uninherited_points, inherited_points);
 }
 
 //void Layers::Layer::to_absolute_object(Texture::TextureConfig& object) const

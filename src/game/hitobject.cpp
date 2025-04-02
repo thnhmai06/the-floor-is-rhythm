@@ -15,28 +15,26 @@ Template::Game::Direction::Direction GameObjects::HitObjects::get_next_direction
 	return static_cast<Template::Game::Direction::Direction>((static_cast<uint8_t>(prev_direction) + rotation) % Template::Game::Direction::NUM_DIRECTIONS);
 }
 
-
 //! Floor
 void Floor::read(const std::vector<std::string>& content)
 {
 	end_time = time = std::stoi(content[0]);
 	rotation = static_cast<Template::Game::Direction::Rotation>(std::stoi(content[1]));
 	combo_jump = std::stoi(content[2]);
-	hitsound = Hitsound::Hitsound{ std::stoi(content[4]) };
-	hitsample = Hitsound::HitSample{ content[5] };
+	hit_sound = Hitsound::Hitsound{ std::stoi(content[4]) };
+	hit_sample = Hitsound::HitSample{ content[5] };
 }
 void Floor::write(std::ofstream& writer) const
 {
 	writer << time << AND << static_cast<int32_t>(rotation) << AND << static_cast<int32_t>(combo_jump) << AND <<
 		static_cast<bool>(type);
-	writer << AND << hitsound.to_int() << AND << hitsample.to_string();
+	writer << AND << hit_sound.to_int() << AND << hit_sample.to_string();
 	writer << '\n';
 }
 
 //! Slider
 void Slider::read(const std::vector<std::string>& content)
 {
-
 	time = std::stoi(content[0]);
 	rotation = static_cast<Template::Game::Direction::Rotation>(std::stoi(content[1]));
 	combo_jump = std::stoi(content[2]);
@@ -53,8 +51,8 @@ void Slider::read(const std::vector<std::string>& content)
 		};
 		this->curves.push_back(curve);
 	}
-	hitsound = Hitsound::Hitsound{ std::stoi(content[6]) };
-	hitsample = Hitsound::HitSample{ content[7] };
+	hit_sound = Hitsound::Hitsound{ std::stoi(content[6]) };
+	hit_sample = Hitsound::HitSample{ content[7] };
 }
 void Slider::write(std::ofstream& writer) const
 {
@@ -65,9 +63,19 @@ void Slider::write(std::ofstream& writer) const
 		writer << ptr->after << FileFormat::Beatmap::HitObjects::Slider::CURVE_AND << static_cast<int32_t>(ptr->rotation);
 	}
 	writer << AND;
-	writer << hitsound.to_int() << AND << hitsample.to_string();
+	writer << hit_sound.to_int() << AND << hit_sample.to_string();
 	writer << '\n';
 }
+
+//! HitObject
+int32_t HitObject::get_time() const { return std::visit([](const auto& hit_object) { return hit_object.time; }, *this); }
+int32_t HitObject::get_end_time() const { return std::visit([](const auto& hit_object) { return hit_object.end_time; }, *this); }
+Template::Game::HitObject::HitObjectType HitObject::get_type() const { return std::visit([](const auto& hit_object) { return hit_object.type; }, *this); }
+Template::Game::Direction::Rotation HitObject::get_rotation() const { return std::visit([](const auto& hit_object) { return hit_object.rotation; }, *this); }
+uint8_t HitObject::get_combo_jump() const { return std::visit([](const auto& hit_object) { return hit_object.combo_jump; }, *this); }
+GameObjects::Hitsound::Hitsound HitObject::get_hitsound() const { return std::visit([](const auto& hit_object) { return hit_object.hit_sound; }, *this); }
+GameObjects::Hitsound::HitSample HitObject::get_hitsample() const { return std::visit([](const auto& hit_object) { return hit_object.hit_sample; }, *this); }
+void HitObject::write(std::ofstream& writer) const { std::visit([&writer](const auto& hit_object) { hit_object.write(writer); }, *this); }
 
 //! HitObjects
 void HitObjects::read(const std::vector<std::string>& contents)
@@ -88,7 +96,7 @@ void HitObjects::read(const std::vector<std::string>& contents)
 		{
 			Floor floor(content);
 			const auto time = floor.time;
-			this->emplace_hint(back_itr, time, std::make_unique<Floor>(std::move(floor)));
+			this->emplace_hint(back_itr, time, floor);
 
 			break;
 		}
@@ -101,7 +109,7 @@ void HitObjects::read(const std::vector<std::string>& contents)
 			}
 			Slider slider(content);
 			const auto time = slider.time;
-			this->emplace_hint(back_itr, time, std::make_unique<Slider>(std::move(slider)));
+			this->emplace_hint(back_itr, time, slider);
 			break;
 		}
 		default:
@@ -114,6 +122,6 @@ void HitObjects::write(std::ofstream& writer) const
 {
 	writer << FileFormat::Beatmap::HitObjects::HEADER << '\n';
 	for (const auto& hit_object : *this | std::views::values)
-		hit_object->write(writer);
+		hit_object.write(writer);
 	writer << '\n';
 }

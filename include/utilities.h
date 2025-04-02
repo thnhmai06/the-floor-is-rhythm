@@ -10,9 +10,9 @@ namespace Utilities
 {
 	namespace Math
 	{
-		inline bool is_bit_enabled(const std::int32_t value, const std::int32_t bitmask) { return (value & bitmask) != 0; }
-		inline bool is_equal_float(const float& variable, const float value, const float epsilon = 0.01f) { return abs(variable - value) <= epsilon; }
-		inline float centre(const float size, const float window_size) { return (window_size - size) / 2; }
+		inline bool is_bit_enabled(const std::int32_t& value, const std::int32_t& bitmask) { return (value & bitmask) != 0; }
+		inline bool is_equal_float(const float& variable, const float& value, const float& epsilon = 0.01f) { return abs(variable - value) <= epsilon; }
+		inline float centre(const float& size, const float& window_size) { return (window_size - size) / 2; }
 		inline float get_rotation_angle(const Template::Game::Direction::Direction& rotation, const bool clockwise = true)
 		{
 			switch (rotation)
@@ -28,7 +28,7 @@ namespace Utilities
 			}
 			return 0.0f;
 		}
-		inline float max_float(const float a, const float b) { return a > b ? a : b; }
+		inline float max_float(const float& a, const float& b) { return a > b ? a : b; }
 	}
 	namespace Audio
 	{

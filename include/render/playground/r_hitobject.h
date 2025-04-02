@@ -2,6 +2,8 @@
 #include <SDL3/SDL_rect.h>
 #include "game/hitobject.h"
 #include "game/metadata.h"
+#include "game/timing.h"
+#include "render/layer.h"
 #include "render/object.h"
 #include "render/texture.h"
 
@@ -9,7 +11,8 @@ namespace RenderObjects::Playground
 {
 	struct RenderHitobject : RenderObjects
 	{
-		const GameObjects::HitObjects::HitObject* hit_object = nullptr;
+		const GameObjects::HitObjects::HitObject* hit_object = nullptr; // note: không dùng tham chiếu &
+
 		static RenderObject create_object_on_pos(
 			const Texture& texture,
 			const SDL_FPoint& pos,
@@ -23,7 +26,7 @@ namespace RenderObjects::Playground
 			bool src_from_beginning = true);
 		static RenderObject create_spacing_object(
 			const Texture& texture,
-			const GameObjects::HitObjects::HitObject* current,
+			const GameObjects::HitObjects::HitObject& current,
 			const float& speed,
 			const float& duration,
 			const RenderHitobject* previous = nullptr);
@@ -31,7 +34,7 @@ namespace RenderObjects::Playground
 		RenderHitobject() = default;
 		RenderHitobject(
 			const Texture& texture,
-			const GameObjects::HitObjects::HitObject* current,
+			const GameObjects::HitObjects::HitObject& current,
 			const float& speed,
 			const float& duration,
 			const RenderHitobject* previous = nullptr);
@@ -39,9 +42,9 @@ namespace RenderObjects::Playground
 	struct RenderFloor final : RenderHitobject
 	{
 		RenderFloor(
-			const GameObjects::HitObjects::Floor* floor,
+			const GameObjects::HitObjects::HitObject& floor_object,
 			const TextureMemory& memory,
-			const GameObjects::Metadata::CalculatedDifficulty* diff,
+			const GameObjects::Metadata::CalculatedDifficulty& diff,
 			const float& current_timing_velocity = 1,
 			const RenderHitobject* previous = nullptr);
 	};
@@ -53,9 +56,9 @@ namespace RenderObjects::Playground
 			const RenderObject& previous);
 	public:
 		RenderSlider(
-			const GameObjects::HitObjects::Slider* slider,
+			const GameObjects::HitObjects::HitObject& slider_object,
 			const TextureMemory& memory,
-			const GameObjects::Metadata::CalculatedDifficulty* diff,
+			const GameObjects::Metadata::CalculatedDifficulty& diff,
 			const float& current_beatlength,
 			const float& current_timing_velocity = 1,
 			const RenderHitobject* previous = nullptr);

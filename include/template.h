@@ -32,7 +32,7 @@ namespace Template
 		namespace Direction
 		{
 			using DirectionBase = uint8_t;
-			constexpr uint8_t NUM_DIRECTIONS = 4;
+			inline constexpr uint8_t NUM_DIRECTIONS = 4;
 
 			enum class Direction : DirectionBase
 			{

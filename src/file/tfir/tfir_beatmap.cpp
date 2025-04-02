@@ -37,8 +37,14 @@ static void parse_beatmap(BeatmapFile& beatmap, const std::unordered_map<std::st
 		if (header == FileFormat::Beatmap::General::HEADER) beatmap.general.read(contents);
 		else if (header == FileFormat::Beatmap::Metadata::HEADER)beatmap.metadata.read(contents);
 		else if (header == FileFormat::Beatmap::Difficulty::HEADER) beatmap.calculated_difficulty.apply(Difficulty(contents));
-		else if (header == FileFormat::Beatmap::TimingPoints::HEADER) beatmap.timing_points.read(contents);
 		else if (header == FileFormat::Beatmap::HitObjects::HEADER) beatmap.hit_objects.read(contents);
+		else if (header == FileFormat::Beatmap::TimingPoints::HEADER)
+		{
+			for (const auto timing_points = TimingPoints(contents); 
+				const auto& [time, point] : timing_points)
+				if (point.inherited) beatmap.inherited_points.insert({ time, point });
+				else beatmap.uninherited_points.insert({ time, point });
+		}
 	}
 }
 

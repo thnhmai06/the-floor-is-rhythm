@@ -10,37 +10,23 @@ using namespace FileFormat::Beatmap::TimingPoints;
 using namespace GameObjects::Timing;
 using FileFormat::Beatmap::HitObjects::Slider::AND;
 
-//! UninheritedPoint
-void UninheritedPoint::read(const std::vector<std::string>& content)
+//! TimingPoint
+void TimingPoint::read(const std::vector<std::string>& content)
 {
 	time = std::stoi(content[0]);
 	beat_length = std::stof(content[1]);
 	sample_set = static_cast<Hitsound::SampleSetType>(std::stoi(content[3]));
 	sample_index = std::stoi(content[4]);
 	volume = std::stoi(content[5]);
+	inherited = (beat_length < 0);
 	kiai = std::stoi(content[6]);
 }
-void UninheritedPoint::write(std::ofstream& writer) const
+void TimingPoint::write(std::ofstream& writer) const
 {
 	writer << time << AND << beat_length << AND << AND << static_cast<int32_t>(sample_set) << AND <<
 		sample_index << AND << volume << AND << kiai << '\n';
 }
-
-//! InheritedPoint
-void InheritedPoint::read(const std::vector<std::string>& content)
-{
-	time = std::stoi(content[0]);
-	velocity = (-std::stof(content[1]));
-	sample_set = static_cast<Hitsound::SampleSetType>(std::stoi(content[3]));
-	sample_index = std::stoi(content[4]);
-	volume = std::stoi(content[5]);
-	kiai = std::stoi(content[6]);
-}
-void InheritedPoint::write(std::ofstream& writer) const
-{
-	writer << time << AND << (-velocity) << AND << AND << static_cast<int32_t>(sample_set) << AND <<
-		sample_index << AND << volume << AND << kiai << '\n';
-}
+float TimingPoint::get_velocity() const { return (inherited) ? 100 / (-beat_length) : 1; }
 
 //! TimingPoints
 void TimingPoints::read(const std::vector<std::string>& contents)
@@ -55,22 +41,14 @@ void TimingPoints::read(const std::vector<std::string>& contents)
 		}
 
 		const auto back_itr = empty() ? end() : std::prev(end());
-		if (std::stod(content[1]) >= 0)
-		{
-			UninheritedPoint point(content);
-			emplace_hint(back_itr, point.time, std::make_unique<UninheritedPoint>(std::move(point)));
-		}
-		else
-		{
-			InheritedPoint point(content);
-			emplace_hint(back_itr, point.time, std::make_unique<InheritedPoint>(std::move(point)));
-		}
+		TimingPoint point(content);
+		emplace_hint(back_itr, point.time, point);
 	}
 }
 void TimingPoints::write(std::ofstream& writer) const
 {
 	writer << HEADER << '\n';
 	for (const auto& point : *this | std::views::values)
-		point->write(writer);
+		point.write(writer);
 	writer << '\n';
 }

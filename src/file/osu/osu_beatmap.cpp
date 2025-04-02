@@ -57,8 +57,8 @@ static Slider convert_hitobject_slider(const Parser::HitObject& object)
 	slider.end_time = object.EndTime;
 	slider.rotation = get_rotation(object.Type.ColourHax);
 	slider.combo_jump = object.Type.ColourHax;
-	slider.hitsound = object.Hitsound;
-	slider.hitsample = object.Hitsample;
+	slider.hit_sound = object.Hitsound;
+	slider.hit_sample = object.Hitsample;
 	return slider;
 }
 static Floor convert_hitobject_floor(const Parser::HitObject& object)
@@ -67,8 +67,8 @@ static Floor convert_hitobject_floor(const Parser::HitObject& object)
 	floor.time = object.Time;
 	floor.rotation = get_rotation(object.Type.ColourHax);
 	floor.combo_jump = object.Type.ColourHax;
-	floor.hitsound = object.Hitsound;
-	floor.hitsample = object.Hitsample;
+	floor.hit_sound = object.Hitsound;
+	floor.hit_sample = object.Hitsample;
 	return floor;
 }
 static HitObjects convert_hitobjects(const std::vector<Parser::HitObject>& objects)
@@ -78,19 +78,17 @@ static HitObjects convert_hitobjects(const std::vector<Parser::HitObject>& objec
 	{
 		const auto back_itr = (result.empty()) ? (result.end()) : (std::prev(result.end()));
 		if (osu_object.Type.HitCircle)
-			result.emplace_hint(back_itr, osu_object.Time,
-				std::make_unique<Floor>(convert_hitobject_floor(osu_object)));
-		else result.emplace_hint(back_itr, osu_object.Time,
-			std::make_unique<Slider>(convert_hitobject_slider(osu_object)));
+			result.emplace_hint(back_itr, osu_object.Time, convert_hitobject_floor(osu_object));
+		else result.emplace_hint(back_itr, osu_object.Time, convert_hitobject_slider(osu_object));
 	}
 	return result;
 }
 //! TimingPoints
 using namespace GameObjects::Timing;
 using GameObjects::Hitsound::SampleSetType;
-static UninheritedPoint convert_uninherited_point(const Parser::TimingPoint& timing_point)
+static TimingPoint convert_timing_point(const Parser::TimingPoint& timing_point)
 {
-	UninheritedPoint result;
+	TimingPoint result;
 	result.time = timing_point.Time;
 	result.beat_length = static_cast<float>(timing_point.BeatLength);
 	result.sample_set = static_cast<SampleSetType>(timing_point.SampleSet);
@@ -99,30 +97,23 @@ static UninheritedPoint convert_uninherited_point(const Parser::TimingPoint& tim
 	result.kiai = timing_point.Effects.kiai;
 	return result;
 }
-static InheritedPoint convert_inherited_point(const Parser::TimingPoint& timing_point)
+static std::pair<TimingPoints, TimingPoints> convert_timing_points(const std::vector<Parser::TimingPoint>& timing_points)
 {
-	InheritedPoint result;
-	result.time = timing_point.Time;
-	result.velocity = (100.0f / static_cast<float>(-timing_point.BeatLength));
-	result.sample_set = static_cast<SampleSetType>(timing_point.SampleSet);
-	result.sample_index = timing_point.SampleIndex;
-	result.volume = timing_point.Volume;
-	result.kiai = timing_point.Effects.kiai;
-	return result;
-}
-static TimingPoints convert_timing_points(const std::vector<Parser::TimingPoint>& timing_points)
-{
-	TimingPoints result;
+	TimingPoints uninherited_points;
+	TimingPoints inherited_points;
 	for (const Parser::TimingPoint& timing_point : timing_points)
 	{
-		const auto back_itr = (result.empty()) ? (result.end()) : (std::prev(result.end()));
 		if (timing_point.Uninherited)
-			result.emplace_hint(back_itr, timing_point.Time,
-				std::make_unique<UninheritedPoint>(convert_uninherited_point(timing_point)));
-		else result.emplace_hint(back_itr, timing_point.Time,
-			std::make_unique<InheritedPoint>(convert_inherited_point(timing_point)));
+		{
+			const auto back_itr = (uninherited_points.empty()) ? (uninherited_points.end()) : (std::prev(uninherited_points.end()));
+			uninherited_points.emplace_hint(back_itr, timing_point.Time, convert_timing_point(timing_point));
+		} else
+		{
+			const auto back_itr = (inherited_points.empty()) ? (inherited_points.end()) : (std::prev(inherited_points.end()));
+			inherited_points.emplace_hint(back_itr, timing_point.Time, convert_timing_point(timing_point));
+		}
 	}
-	return result;
+	return { uninherited_points , inherited_points };
 }
 
 void convert_beatmap(const char* file_name, const char* output)
@@ -139,7 +130,9 @@ void convert_beatmap(const char* file_name, const char* output)
 	convert_general(beatmap.General).write(writer);
 	convert_difficulty(beatmap.Difficulty).write(writer);
 	convert_metadata(beatmap.Metadata).write(writer);
-	convert_timing_points(beatmap.TimingPoints).write(writer);
+	const auto [uninherited_points, inherited_points] = convert_timing_points(beatmap.TimingPoints);
+	uninherited_points.write(writer);
+	inherited_points.write(writer);
 	convert_hitobjects(beatmap.HitObjects).write(writer);
 
 	writer.close();

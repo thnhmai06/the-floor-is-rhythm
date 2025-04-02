@@ -2,6 +2,7 @@
 #include <SDL3/SDL_render.h>
 #include "texture.h"
 #include "object.h"
+#include "render/playground/r_hitobject.h"
 #include "utilities.h"
 
 struct LayerCamera : private RenderConfig
@@ -55,5 +56,22 @@ namespace Layers
 		explicit Layer(SDL_Renderer* renderer);
 		virtual void render();
 		void clear(bool to_initial_state = false);
+	};
+
+	struct PlaygoundLayer : Layer
+	{
+		void run_beatmap(
+			const GameObjects::HitObjects::HitObjects& hit_objects,
+			const GameObjects::Metadata::CalculatedDifficulty& difficulty,
+			const GameObjects::Timing::TimingPoints& uninherited_points,
+			const GameObjects::Timing::TimingPoints& inherited_points);
+
+		PlaygoundLayer(SDL_Renderer* renderer);
+		PlaygoundLayer(
+			SDL_Renderer* renderer,
+			const GameObjects::HitObjects::HitObjects& hit_objects,
+			const GameObjects::Metadata::CalculatedDifficulty& difficulty,
+			const GameObjects::Timing::TimingPoints& uninherited_points,
+			const GameObjects::Timing::TimingPoints& inherited_points);
 	};
 }
