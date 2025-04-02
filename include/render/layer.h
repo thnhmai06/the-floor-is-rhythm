@@ -1,18 +1,11 @@
 ﻿#pragma once
 #include <SDL3/SDL_render.h>
-#include "rule/config.h"
 #include "texture.h"
 #include "object.h"
 #include "utilities.h"
 
 struct LayerCamera : private RenderConfig
 {
-protected:
-	constexpr SDL_FPoint CAMERA_SIZE = {
-		static_cast<float>(ImmutableConfig::Video::LOGICAL_WIDTH),
-		static_cast<float>(ImmutableConfig::Video::LOGICAL_HEIGHT)
-	};
-public:
 	void move_into_camera(RenderObjects::RenderObject& object) const;
 	void move_out_camera(RenderObjects::RenderObject& object) const;
 
@@ -25,7 +18,6 @@ public:
 	void move_x(const float& dx);
 	void move_y(const float& dy);
 
-	LayerCamera& operator=(const LayerCamera& other) : RenderConfig(other) { return *this; }
 	LayerCamera() : RenderConfig()
 	{
 		const auto [camera_width, camera_height] = get_camera_size(false);

@@ -10,6 +10,7 @@
 #include "template.h"
 #include "utilities.h"
 
+using namespace GameObjects::Metadata;
 static Template::Game::Direction::Rotation get_rotation(const uint8_t colour_hax)
 {
 	// Loại bỏ hai hướng là cùng phương là hướng hiện tại và hướng ngược với nó
@@ -18,26 +19,26 @@ static Template::Game::Direction::Rotation get_rotation(const uint8_t colour_hax
 	if (colour_hax == 0) return Template::Game::Direction::Rotation::NO_ROTATE;
 	return Utilities::Math::is_bit_enabled(colour_hax, 1) ? Template::Game::Direction::Rotation::ROTATE_90 : Template::Game::Direction::Rotation::ROTATE_270;
 }
-static Metadata::General convert_general(const Parser::GeneralSection& general)
+static General convert_general(const Parser::GeneralSection& general)
 {
-	Metadata::General result;
+	General result;
 	if (!general.AudioFilename.empty()) result.audio_file = general.AudioFilename;
 	if (!general.AudioLeadIn.empty()) result.start_music_delay = std::stoi(general.AudioLeadIn);
 	if (!general.PreviewTime.empty()) result.preview_timestamp = std::stoi(general.PreviewTime);
 	if (!general.EpilepsyWarning.empty()) result.epilepsy_warning = (std::stoi(general.EpilepsyWarning) == 1);
 	return result;
 }
-static Metadata::Difficulty convert_difficulty(const Parser::DifficultySection& difficulty)
+static Difficulty convert_difficulty(const Parser::DifficultySection& difficulty)
 {
-	Metadata::Difficulty result;
+	Difficulty result;
 	if (!difficulty.OverallDifficulty.empty()) result.od = std::stof(difficulty.OverallDifficulty);
 	if (!difficulty.HPDrainRate.empty()) result.hp = std::stof(difficulty.HPDrainRate);
 	if (!difficulty.SliderMultiplier.empty()) result.velocity = std::stof(difficulty.SliderMultiplier);
 	return result;
 }
-static Metadata::Metadata convert_metadata(const Parser::MetadataSection& metadata)
+static Metadata convert_metadata(const Parser::MetadataSection& metadata)
 {
-	Metadata::Metadata result;
+	Metadata result;
 	if (!metadata.Title.empty()) result.title = metadata.Title;
 	if (!metadata.Artist.empty()) result.artist = metadata.Artist;
 	if (!metadata.Creator.empty()) result.creator = metadata.Creator;
@@ -48,9 +49,10 @@ static Metadata::Metadata convert_metadata(const Parser::MetadataSection& metada
 	return result;
 }
 //! HitObjects
-static HitObject::Slider convert_hitobject_slider(const Parser::HitObject& object)
+using namespace GameObjects::HitObjects;
+static Slider convert_hitobject_slider(const Parser::HitObject& object)
 {
-	HitObject::Slider slider;
+	Slider slider;
 	slider.time = object.Time;
 	slider.end_time = object.EndTime;
 	slider.rotation = get_rotation(object.Type.ColourHax);
@@ -59,9 +61,9 @@ static HitObject::Slider convert_hitobject_slider(const Parser::HitObject& objec
 	slider.hitsample = object.Hitsample;
 	return slider;
 }
-static HitObject::Floor convert_hitobject_floor(const Parser::HitObject& object)
+static Floor convert_hitobject_floor(const Parser::HitObject& object)
 {
-	HitObject::Floor floor;
+	Floor floor;
 	floor.time = object.Time;
 	floor.rotation = get_rotation(object.Type.ColourHax);
 	floor.combo_jump = object.Type.ColourHax;
@@ -69,56 +71,56 @@ static HitObject::Floor convert_hitobject_floor(const Parser::HitObject& object)
 	floor.hitsample = object.Hitsample;
 	return floor;
 }
-static HitObject::HitObjects convert_hitobjects(const std::vector<Parser::HitObject>& objects)
+static HitObjects convert_hitobjects(const std::vector<Parser::HitObject>& objects)
 {
-	HitObject::HitObjects result;
+	HitObjects result;
 	for (const Parser::HitObject& osu_object : objects)
 	{
 		const auto back_itr = (result.empty()) ? (result.end()) : (std::prev(result.end()));
 		if (osu_object.Type.HitCircle)
 			result.emplace_hint(back_itr, osu_object.Time,
-				std::make_unique<HitObject::Floor>(std::move(convert_hitobject_floor(osu_object))));
+				std::make_unique<Floor>(convert_hitobject_floor(osu_object)));
 		else result.emplace_hint(back_itr, osu_object.Time,
-			std::make_unique<HitObject::Slider>(std::move(convert_hitobject_slider(osu_object))));
+			std::make_unique<Slider>(convert_hitobject_slider(osu_object)));
 	}
 	return result;
 }
 //! TimingPoints
-static Timing::UninheritedPoint convert_uninherited_point(const Parser::TimingPoint& timing_point)
+using namespace GameObjects::Timing;
+using GameObjects::Hitsound::SampleSetType;
+static UninheritedPoint convert_uninherited_point(const Parser::TimingPoint& timing_point)
 {
-	Timing::UninheritedPoint result;
+	UninheritedPoint result;
 	result.time = timing_point.Time;
 	result.beat_length = static_cast<float>(timing_point.BeatLength);
-	result.meter = timing_point.Meter;
-	result.sample_set = static_cast<Hitsound::SampleSetType>(timing_point.SampleSet);
+	result.sample_set = static_cast<SampleSetType>(timing_point.SampleSet);
 	result.sample_index = timing_point.SampleIndex;
 	result.volume = timing_point.Volume;
 	result.kiai = timing_point.Effects.kiai;
 	return result;
 }
-static Timing::InheritedPoint convert_inherited_point(const Parser::TimingPoint& timing_point)
+static InheritedPoint convert_inherited_point(const Parser::TimingPoint& timing_point)
 {
-	Timing::InheritedPoint result;
+	InheritedPoint result;
 	result.time = timing_point.Time;
 	result.velocity = (100.0f / static_cast<float>(-timing_point.BeatLength));
-	result.meter = timing_point.Meter;
-	result.sample_set = static_cast<Hitsound::SampleSetType>(timing_point.SampleSet);
+	result.sample_set = static_cast<SampleSetType>(timing_point.SampleSet);
 	result.sample_index = timing_point.SampleIndex;
 	result.volume = timing_point.Volume;
 	result.kiai = timing_point.Effects.kiai;
 	return result;
 }
-static Timing::TimingPoints convert_timing_points(const std::vector<Parser::TimingPoint>& timing_points)
+static TimingPoints convert_timing_points(const std::vector<Parser::TimingPoint>& timing_points)
 {
-	Timing::TimingPoints result;
+	TimingPoints result;
 	for (const Parser::TimingPoint& timing_point : timing_points)
 	{
 		const auto back_itr = (result.empty()) ? (result.end()) : (std::prev(result.end()));
 		if (timing_point.Uninherited)
 			result.emplace_hint(back_itr, timing_point.Time,
-				std::make_unique<Timing::UninheritedPoint>(std::move(convert_uninherited_point(timing_point))));
+				std::make_unique<UninheritedPoint>(convert_uninherited_point(timing_point)));
 		else result.emplace_hint(back_itr, timing_point.Time,
-			std::make_unique<Timing::InheritedPoint>(std::move(convert_inherited_point(timing_point))));
+			std::make_unique<InheritedPoint>(convert_inherited_point(timing_point)));
 	}
 	return result;
 }

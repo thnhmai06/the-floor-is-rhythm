@@ -49,7 +49,7 @@ SDL_FPoint TextureMemory::get_texture_size(const const_iterator& texture)
 	SDL_GetTextureSize(texture->second, &width, &height);
 	return { width, height };
 }
-SDL_FPoint TextureMemory::get_texture_size(const std::string& name)
+SDL_FPoint TextureMemory::get_texture_size(const std::string& name) const
 {
 	if (const auto it = BASE::find(name); it != end())
 		return get_texture_size(it);
@@ -89,11 +89,10 @@ void TextureMemory::free_all()
 		SDL_DestroyTexture(texture);
 	BASE::clear();
 }
-Texture TextureMemory::operator[](const std::string& name) const { return find(name); }
 
 // Texture
 const std::string& Texture::get_name() const { return item->first; }
-SDL_FPoint Texture::get_size() const { return TextureMemory::get_texture_size(get_name()); }
+SDL_FPoint Texture::get_size() const { return memory->get_texture_size(get_name()); }
 Texture::Texture(const std::string& name, const TextureMemory* memory) : item(memory->find(name).item), memory(memory) {
 }
 Texture::Texture(TextureMemory::const_iterator item_in_memory, const TextureMemory* memory) : item(std::move(item_in_memory)), memory(memory) {

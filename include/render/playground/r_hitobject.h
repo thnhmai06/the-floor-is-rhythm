@@ -9,7 +9,7 @@ namespace RenderObjects::Playground
 {
 	struct RenderHitobject : RenderObjects
 	{
-		const HitObject::HitObject* hit_object = nullptr;
+		const GameObjects::HitObjects::HitObject* hit_object = nullptr;
 		static RenderObject create_object_on_pos(
 			const Texture& texture,
 			const SDL_FPoint& pos,
@@ -23,14 +23,15 @@ namespace RenderObjects::Playground
 			bool src_from_beginning = true);
 		static RenderObject create_spacing_object(
 			const Texture& texture,
-			const HitObject::HitObject* current,
+			const GameObjects::HitObjects::HitObject* current,
 			const float& speed,
 			const float& duration,
 			const RenderHitobject* previous = nullptr);
+
 		RenderHitobject() = default;
 		RenderHitobject(
 			const Texture& texture,
-			const HitObject::HitObject* current,
+			const GameObjects::HitObjects::HitObject* current,
 			const float& speed,
 			const float& duration,
 			const RenderHitobject* previous = nullptr);
@@ -38,9 +39,9 @@ namespace RenderObjects::Playground
 	struct RenderFloor final : RenderHitobject
 	{
 		RenderFloor(
-			const HitObject::Floor* floor,
+			const GameObjects::HitObjects::Floor* floor,
 			const TextureMemory& memory,
-			const Metadata::CalculatedDifficulty* diff,
+			const GameObjects::Metadata::CalculatedDifficulty* diff,
 			const float& current_timing_velocity = 1,
 			const RenderHitobject* previous = nullptr);
 	};
@@ -52,9 +53,9 @@ namespace RenderObjects::Playground
 			const RenderObject& previous);
 	public:
 		RenderSlider(
-			const HitObject::Slider* slider,
+			const GameObjects::HitObjects::Slider* slider,
 			const TextureMemory& memory,
-			const Metadata::CalculatedDifficulty* diff,
+			const GameObjects::Metadata::CalculatedDifficulty* diff,
 			const float& current_beatlength,
 			const float& current_timing_velocity = 1,
 			const RenderHitobject* previous = nullptr);

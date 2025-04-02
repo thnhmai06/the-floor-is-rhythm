@@ -6,8 +6,8 @@
 #include "rule/config.h"
 
 using namespace Utilities::Audio;
-using namespace ImmutableConfig::Audio;
-using Config::Volume::master;
+using namespace GameConfig::Audio;
+using UserConfig::Volume::master;
 
 int32_t Mixer::set_master_volume(const int32_t value)
 {

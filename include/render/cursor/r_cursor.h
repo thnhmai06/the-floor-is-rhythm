@@ -7,24 +7,26 @@ namespace RenderObjects::Cursor
 {
 	struct Cursor final : RenderObject
 	{
-		explicit Cursor(const TextureMemory* skin) : RenderObject(
-			&SkinFormat::Cursor::BODY, skin, Template::Render::RenderOriginType::CENTRE)
+		explicit Cursor(const TextureMemory* memory) : RenderObject {
+			memory->find(SkinFormat::Cursor::BODY), Template::Render::RenderOriginType::CENTRE }
 		{
 		}
 	};
 	struct CursorTail final : RenderObject
 	{
-		explicit CursorTail(const TextureMemory* skin) : RenderObject(
-			&SkinFormat::Cursor::TAIL, skin, Template::Render::RenderOriginType::CENTRE)
+		explicit CursorTail(const TextureMemory* memory) : RenderObject {
+			memory->find(SkinFormat::Cursor::TAIL), Template::Render::RenderOriginType::CENTRE }
 		{
 		}
 	};
 	struct CursorDirection final : RenderObject
 	{
-		void change_direction(const Template::Game::Direction::Direction& direction);
+		Template::Game::Direction::Direction current_direction = Template::Game::Direction::Direction::RIGHT;
 
-		explicit CursorDirection(const TextureMemory* skin) : RenderObject(
-			&SkinFormat::Cursor::DIRECTION[Template::Game::Direction::Direction::Direction::RIGHT], skin, Template::Render::RenderOriginType::CENTRE)
+		void update_direction(const Template::Game::Direction::Direction& direction);
+
+		explicit CursorDirection(const TextureMemory* memory) : RenderObject{
+			memory->find(SkinFormat::Cursor::DIRECTION[current_direction]), Template::Render::RenderOriginType::CENTRE }
 		{
 		}
 	};

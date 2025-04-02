@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <SDL3/SDL_audio.h>
 
-namespace Config
+namespace UserConfig
 {
 	namespace Video
 	{
@@ -22,7 +22,7 @@ namespace Config
 	}
 }
 
-namespace ImmutableConfig
+namespace GameConfig
 {
 	namespace General
 	{
@@ -42,6 +42,8 @@ namespace ImmutableConfig
 		constexpr int32_t LOGICAL_HEIGHT = 480;
 		constexpr int32_t GAMEPLAY_WIDTH = 510;
 		constexpr int32_t GAMEPLAY_HEIGHT = 384;
+		constexpr int32_t DEFAULT_CAMERA_SIZE_WIDTH = LOGICAL_WIDTH;
+		constexpr int32_t DEFAULT_CAMERA_SIZE_HEIGHT = LOGICAL_HEIGHT;
 	}
 	namespace Difficulty
 	{
@@ -68,7 +70,8 @@ namespace ImmutableConfig
 	}
 	namespace HitObject
 	{
-		constexpr SDL_FPoint DEFAULT_POS = { 0, 0 };
+		constexpr int32_t DEFAULT_POS_X = 0;
+		constexpr int32_t DEFAULT_POS_Y = 0;
 		constexpr int32_t SIZE_HEIGHT = 40;
 		constexpr int32_t SLIDER_POINT_SIZE_WIDTH = SIZE_HEIGHT / 4;
 	}

@@ -6,7 +6,7 @@
 #include "utilities.h"
 
 using namespace Utilities::Audio;
-using namespace Config::Volume;
+using namespace UserConfig::Volume;
 
 //! Music
 int32_t AudioBus<Music>::set_volume(const int32_t value)

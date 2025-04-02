@@ -7,16 +7,17 @@
 #include "template.h"
 #include "utilities.h"
 
-using namespace FileFormat::Beatmap::HitObjects;
+using namespace GameObjects::HitObjects;
 using FileFormat::Beatmap::AND;
 
-Template::Game::Direction::Direction HitObject::get_next_direction(const Template::Game::Direction::Direction prev_direction, const uint8_t rotation)
+Template::Game::Direction::Direction GameObjects::HitObjects::get_next_direction(const Template::Game::Direction::Direction& prev_direction, uint8_t rotation)
 {
 	return static_cast<Template::Game::Direction::Direction>((static_cast<uint8_t>(prev_direction) + rotation) % Template::Game::Direction::NUM_DIRECTIONS);
 }
 
+
 //! Floor
-void HitObject::Floor::read(const std::vector<std::string>& content)
+void Floor::read(const std::vector<std::string>& content)
 {
 	end_time = time = std::stoi(content[0]);
 	rotation = static_cast<Template::Game::Direction::Rotation>(std::stoi(content[1]));
@@ -24,7 +25,7 @@ void HitObject::Floor::read(const std::vector<std::string>& content)
 	hitsound = Hitsound::Hitsound{ std::stoi(content[4]) };
 	hitsample = Hitsound::HitSample{ content[5] };
 }
-void HitObject::Floor::write(std::ofstream& writer) const
+void Floor::write(std::ofstream& writer) const
 {
 	writer << time << AND << static_cast<int32_t>(rotation) << AND << static_cast<int32_t>(combo_jump) << AND <<
 		static_cast<bool>(type);
@@ -33,24 +34,29 @@ void HitObject::Floor::write(std::ofstream& writer) const
 }
 
 //! Slider
-void HitObject::Slider::read(const std::vector<std::string>& content)
+void Slider::read(const std::vector<std::string>& content)
 {
+
 	time = std::stoi(content[0]);
 	rotation = static_cast<Template::Game::Direction::Rotation>(std::stoi(content[1]));
 	combo_jump = std::stoi(content[2]);
 	end_time = std::stoi(content[4]);
 
 	// Curves
-	for (const auto curves_str = Utilities::String::split(content[5], ::Slider::AND); const auto & curves : curves_str)
+	for (const auto curves_str = Utilities::String::split(content[5], FileFormat::Beatmap::HitObjects::Slider::AND);
+	     const auto& curves : curves_str)
 	{
-		const auto curve_str = Utilities::String::split(curves, ::Slider::CURVE_AND, true);
-		const SliderCurve curve = {std::stoi(curve_str[0]), static_cast<Template::Game::Direction::Rotation>(std::stoi(curve_str[1]))};
+		const auto curve_str = Utilities::String::split(curves, FileFormat::Beatmap::HitObjects::Slider::CURVE_AND, true);
+		const SliderCurve curve = {
+			.after = std::stoi(curve_str[0]),
+			.rotation = static_cast<Template::Game::Direction::Rotation>(std::stoi(curve_str[1]))
+		};
 		this->curves.push_back(curve);
 	}
 	hitsound = Hitsound::Hitsound{ std::stoi(content[6]) };
 	hitsample = Hitsound::HitSample{ content[7] };
 }
-void HitObject::Slider::write(std::ofstream& writer) const
+void Slider::write(std::ofstream& writer) const
 {
 	writer << time << AND << static_cast<int32_t>(rotation) << AND << static_cast<int32_t>(combo_jump) << AND <<
 		static_cast<bool>(type) << AND << end_time << AND;
@@ -64,7 +70,7 @@ void HitObject::Slider::write(std::ofstream& writer) const
 }
 
 //! HitObjects
-void HitObject::HitObjects::read(const std::vector<std::string>& contents)
+void HitObjects::read(const std::vector<std::string>& contents)
 {
 	for (const auto& line : contents)
 	{
@@ -104,10 +110,10 @@ void HitObject::HitObjects::read(const std::vector<std::string>& contents)
 		}
 	}
 }
-void HitObject::HitObjects::write(std::ofstream& writer) const
+void HitObjects::write(std::ofstream& writer) const
 {
-	writer << HEADER << '\n';
-	for (const auto& hitobject : *this | std::views::values)
-		hitobject->write(writer);
+	writer << FileFormat::Beatmap::HitObjects::HEADER << '\n';
+	for (const auto& hit_object : *this | std::views::values)
+		hit_object->write(writer);
 	writer << '\n';
 }

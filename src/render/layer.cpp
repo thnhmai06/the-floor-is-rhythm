@@ -1,4 +1,5 @@
 ﻿#include "render/layer.h" // Header
+#include "rule/config.h"
 
 //! LayerCamera
 uint8_t LayerCamera::get_alpha() const { return alpha; }
@@ -10,7 +11,9 @@ void LayerCamera::move_y(const float& dy) { render_pos.y += dy; }
 SDL_FPoint LayerCamera::get_camera_pos() const { return render_pos; }
 SDL_FPoint LayerCamera::get_camera_size(const bool after_scale) const
 {
-	return after_scale ? SDL_FPoint{ CAMERA_SIZE.x * scale.x, CAMERA_SIZE.y * scale.y } : CAMERA_SIZE;
+	return after_scale
+	? SDL_FPoint{ GameConfig::Video::DEFAULT_CAMERA_SIZE_WIDTH * scale.x, GameConfig::Video::DEFAULT_CAMERA_SIZE_HEIGHT * scale.y }
+	: SDL_FPoint{ GameConfig::Video::DEFAULT_CAMERA_SIZE_WIDTH, GameConfig::Video::DEFAULT_CAMERA_SIZE_HEIGHT };
 }
 void LayerCamera::move_into_camera(RenderObjects::RenderObject& object) const
 {
@@ -68,8 +71,8 @@ void Layers::Layer::clear(const bool to_initial_state)
 //		object.origin_dst->y += render_setting.dst_rect->y;
 //
 //		// Scaling
-//		object.origin_dst->w *= render_setting.dst_rect->w / ImmutableConfig::Video::LOGICAL_WIDTH;
-//		object.origin_dst->h *= render_setting.dst_rect->h / ImmutableConfig::Video::LOGICAL_HEIGHT;
+//		object.origin_dst->w *= render_setting.dst_rect->w / GameConfig::Video::LOGICAL_WIDTH;
+//		object.origin_dst->h *= render_setting.dst_rect->h / GameConfig::Video::LOGICAL_HEIGHT;
 //	}
 //	// alpha
 //	object.alpha = (object.alpha * render_setting.alpha) / 255;
@@ -83,8 +86,8 @@ void Layers::Layer::clear(const bool to_initial_state)
 //		object.origin_dst->x -= render_setting.dst_rect->x;
 //		object.origin_dst->y -= render_setting.dst_rect->y;
 //		// Scaling
-//		object.origin_dst->w *= static_cast<float>(ImmutableConfig::Video::LOGICAL_WIDTH) / render_setting.dst_rect->w;
-//		object.origin_dst->h *= static_cast<float>(ImmutableConfig::Video::LOGICAL_HEIGHT) / render_setting.dst_rect->h;
+//		object.origin_dst->w *= static_cast<float>(GameConfig::Video::LOGICAL_WIDTH) / render_setting.dst_rect->w;
+//		object.origin_dst->h *= static_cast<float>(GameConfig::Video::LOGICAL_HEIGHT) / render_setting.dst_rect->h;
 //	}
 //	// alpha
 //	object.alpha = (object.alpha * 255) / render_setting.alpha;

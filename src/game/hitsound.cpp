@@ -2,15 +2,23 @@
 #include "rule/file_format.h"
 #include "utilities.h"
 
+using namespace GameObjects::Hitsound;
+
+//! HitsoundBitmap
+bool GameObjects::Hitsound::operator&(const HitsoundBitmap& left, const HitsoundBitmap& right)
+{
+	return static_cast<uint8_t>(left) & static_cast<uint8_t>(right);
+}
+
 //! Hitsound
-void Hitsound::Hitsound::read(const std::int32_t HitSound)
+void Hitsound::read(const std::int32_t HitSound)
 {
 	normal = Utilities::Math::is_bit_enabled(HitSound, static_cast<std::int32_t>(HitsoundBitmap::NORMAL));
 	whistle = Utilities::Math::is_bit_enabled(HitSound, static_cast<std::int32_t>(HitsoundBitmap::WHISTLE));
 	finish = Utilities::Math::is_bit_enabled(HitSound, static_cast<std::int32_t>(HitsoundBitmap::FINISH));
 	clap = Utilities::Math::is_bit_enabled(HitSound, static_cast<std::int32_t>(HitsoundBitmap::CLAP));
 }
-std::int32_t Hitsound::Hitsound::to_int() const
+std::int32_t Hitsound::to_int() const
 {
 	std::int32_t hitsound = 0;
 	if (normal)
@@ -23,7 +31,7 @@ std::int32_t Hitsound::Hitsound::to_int() const
 		hitsound |= static_cast<std::int32_t>(HitsoundBitmap::CLAP);
 	return hitsound;
 }
-Hitsound::Hitsound& Hitsound::Hitsound::operator= (const Parser::Hitsound& hs)
+Hitsound& Hitsound::operator= (const Parser::Hitsound& hs)
 {
 	whistle = hs.Whistle;
 	finish = hs.Finish;
@@ -32,7 +40,7 @@ Hitsound::Hitsound& Hitsound::Hitsound::operator= (const Parser::Hitsound& hs)
 }
 
 //! Hitsample
-Hitsound::HitSample& Hitsound::HitSample::operator= (const Parser::HitObject::HitSample& hs)
+HitSample& HitSample::operator= (const Parser::HitObject::HitSample& hs)
 {
 	normal_set = static_cast<SampleSetType>(static_cast<int32_t>(hs.NormalSet));
 	addition_set = static_cast<SampleSetType>(static_cast<int32_t>(hs.AdditionSet));
@@ -41,7 +49,7 @@ Hitsound::HitSample& Hitsound::HitSample::operator= (const Parser::HitObject::Hi
 	file_name = hs.Filename;
 	return *this;
 }
-Hitsound::HitSample::HitSample(const std::string& hitsample_str)
+HitSample::HitSample(const std::string& hitsample_str)
 {
 	if (hitsample_str.empty())
 		return; // not written
@@ -52,7 +60,7 @@ Hitsound::HitSample::HitSample(const std::string& hitsample_str)
 	volume = std::stoi(list[3]);
 	if (list.size() > 4) file_name = list[4];
 }
-std::string Hitsound::HitSample::to_string() const
+std::string HitSample::to_string() const
 {
 	std::string result;
 	result.append(std::to_string(static_cast<int32_t>(normal_set)));
@@ -66,18 +74,18 @@ std::string Hitsound::HitSample::to_string() const
 	if (!file_name.empty()) result.append(file_name);
 	return result;
 }
-std::string Hitsound::HitSample::get_hitsound_filename(const HitsoundBitmap& HitsoundType)
+std::string HitSample::get_hitsound_filename(const HitsoundBitmap& HitsoundType)
 {
 	if (!file_name.empty())
 	{
 		// Only provide Normal hitsound
-		if (HitsoundType == HitsoundBitmap::NORMAL)
+		if (HitsoundType & HitsoundBitmap::NORMAL)
 			return file_name;
 		return "";
 	}
 
 	// sampleSet
-	SampleSetType SampleSet = (HitsoundType == HitsoundBitmap::NORMAL) ? normal_set : addition_set;
+	SampleSetType SampleSet = (HitsoundType & HitsoundBitmap::NORMAL) ? normal_set : addition_set;
 	std::string SampleSetStr;
 	switch (SampleSet)
 	{
@@ -90,7 +98,7 @@ std::string Hitsound::HitSample::get_hitsound_filename(const HitsoundBitmap& Hit
 	case SampleSetType::DRUM:
 		SampleSetStr = "drum";
 		break;
-	default:
+	case SampleSetType::NO_CUSTOM:
 		return ""; // No custom sampleSet, use skin hitsound instand
 	}
 
@@ -107,7 +115,7 @@ std::string Hitsound::HitSample::get_hitsound_filename(const HitsoundBitmap& Hit
 	case HitsoundBitmap::CLAP:
 		HitsoundTypeStr = "clap";
 		break;
-	default:
+	case HitsoundBitmap::NORMAL:
 		HitsoundTypeStr = "normal";
 		break;
 	}

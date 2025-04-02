@@ -1,13 +1,14 @@
 ﻿#include "game/metadata.h" // Header
-
+#include <fstream>
 #include "rule/config.h"
 #include "utilities.h"
 #include "rule/file_format.h"
 
+using namespace GameObjects::Metadata;
 static constexpr int32_t MINIMUM_LINE_CHARACTERS = 3;
 
 //! Metadata::General
-void Metadata::General::read(const std::vector<std::string>& contents)
+void General::read(const std::vector<std::string>& contents)
 {
 	for (const auto& line : contents)
 	{
@@ -27,7 +28,7 @@ void Metadata::General::read(const std::vector<std::string>& contents)
 			epilepsy_warning = std::stoi(content[1]);
 	}
 }
-void Metadata::General::write(std::ofstream& writer) const
+void General::write(std::ofstream& writer) const
 {
 	using namespace FileFormat::Beatmap::General;
 
@@ -40,7 +41,7 @@ void Metadata::General::write(std::ofstream& writer) const
 }
 
 //! Metadata::Metadata
-void Metadata::Metadata::read(const std::vector<std::string>& contents)
+void Metadata::read(const std::vector<std::string>& contents)
 {
 	for (const auto& line : contents)
 	{
@@ -63,7 +64,7 @@ void Metadata::Metadata::read(const std::vector<std::string>& contents)
 			tags = Utilities::String::split(content[1], ' ');
 	}
 }
-void Metadata::Metadata::write(std::ofstream& writer) const
+void Metadata::write(std::ofstream& writer) const
 {
 	using namespace FileFormat::Beatmap::Metadata;
 
@@ -86,7 +87,7 @@ void Metadata::Metadata::write(std::ofstream& writer) const
 }
 
 //! Metadata::Difficulty
-void Metadata::Difficulty::read(const std::vector<std::string>& contents)
+void Difficulty::read(const std::vector<std::string>& contents)
 {
 	for (const auto& line : contents)
 	{
@@ -103,7 +104,7 @@ void Metadata::Difficulty::read(const std::vector<std::string>& contents)
 			velocity = std::stof(content[1]);
 	}
 }
-void Metadata::Difficulty::write(std::ofstream& writer) const
+void Difficulty::write(std::ofstream& writer) const
 {
 	using namespace FileFormat::Beatmap::Difficulty;
 
@@ -116,27 +117,27 @@ void Metadata::Difficulty::write(std::ofstream& writer) const
 
 //! Metadata::CalculatedDifficulty
 // ::OverallDifficulty
-void Metadata::CalculatedDifficulty::OverallDifficulty::apply(const float& v)
+void CalculatedDifficulty::OverallDifficulty::apply(const float& v)
 {
 	value = v;
-	perfect = ImmutableConfig::Difficulty::OD::Base::PERFECT - v * ImmutableConfig::Difficulty::OD::Multiply::PERFECT;
-	good = ImmutableConfig::Difficulty::OD::Base::GOOD - v * ImmutableConfig::Difficulty::OD::Multiply::GOOD;
-	bad = ImmutableConfig::Difficulty::OD::Base::BAD - v * ImmutableConfig::Difficulty::OD::Multiply::BAD;
+	perfect = GameConfig::Difficulty::OD::Base::PERFECT - v * GameConfig::Difficulty::OD::Multiply::PERFECT;
+	good = GameConfig::Difficulty::OD::Base::GOOD - v * GameConfig::Difficulty::OD::Multiply::GOOD;
+	bad = GameConfig::Difficulty::OD::Base::BAD - v * GameConfig::Difficulty::OD::Multiply::BAD;
 }
 // ::HPDrainRate
-void Metadata::CalculatedDifficulty::HPDrainRate::apply(const float& v)
+void CalculatedDifficulty::HPDrainRate::apply(const float& v)
 {
 	// Follow Rules: https://osu.ppy.sh/wiki/en/Gameplay/Health#osu!taiko
 	// TODO: later, i have no idea with math
 	value = v;
 }
-void Metadata::CalculatedDifficulty::Velocity::apply(const float& v)
+void CalculatedDifficulty::Velocity::apply(const float& v)
 {
 	value = v;
-	speed = v * ImmutableConfig::Difficulty::Velocity::BASE_SPEED;
+	speed = v * GameConfig::Difficulty::Velocity::BASE_SPEED;
 }
 // ::
-void Metadata::CalculatedDifficulty::write(std::ofstream& writer) const
+void CalculatedDifficulty::write(std::ofstream& writer) const
 {
 	using namespace  FileFormat::Beatmap::Difficulty;
 
@@ -146,7 +147,7 @@ void Metadata::CalculatedDifficulty::write(std::ofstream& writer) const
 	writer << VELOCITY << FileFormat::Beatmap::SEPARATOR << velocity.value << '\n';
 	writer << '\n';
 }
-void Metadata::CalculatedDifficulty::apply(const Difficulty& basic)
+void CalculatedDifficulty::apply(const Difficulty& basic)
 {
 	od.apply(basic.od);
 	hp.apply(basic.hp);

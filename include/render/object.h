@@ -36,7 +36,7 @@ namespace RenderObjects
 		// Không còn cho tự render toàn màn hình nữa (dstrect = nullptr);
 		// nếu muốn thì set config.render_pos về {0, 0}, set config.origin_pos về góc trái, rồi chỉnh set_scale_fixed là logical size của màn hình
 
-		const Texture* src;
+		Texture src;
 		SDL_FRect src_rect_in_percent = { 0, 0, 1, 1 }; // cũng là sdl src_rect, nhưng ở % so với gốc
 		RenderConfig config;
 

@@ -5,11 +5,11 @@
 #include "template.h"
 #include "game/hitsound.h"
 
-namespace HitObject
+namespace GameObjects::HitObjects
 {
 	constexpr uint8_t NUM_COMBOS = 8;
 
-	inline Template::Game::Direction::Direction get_next_direction(Template::Game::Direction::Direction prev_direction, uint8_t rotation);
+	inline Template::Game::Direction::Direction get_next_direction(const Template::Game::Direction::Direction& prev_direction, uint8_t rotation);
 
 	struct HitObject
 	{
@@ -17,7 +17,7 @@ namespace HitObject
 
 		int32_t time = 0;
 		int32_t end_time = 0;
-		Template::Game::HitObject::HitObjectType type;
+		Template::Game::HitObject::HitObjectType type = Template::Game::HitObject::HitObjectType::FLOOR;
 		Template::Game::Direction::Rotation rotation = Template::Game::Direction::Rotation::NO_ROTATE;
 		uint8_t combo_jump = 0;
 		Hitsound::Hitsound hitsound;
@@ -41,7 +41,7 @@ namespace HitObject
 
 		struct SliderCurve
 		{
-			uint32_t after = 0;
+			int32_t after = 0;
 			Template::Game::Direction::Rotation rotation = Template::Game::Direction::Rotation::NO_ROTATE;
 		};
 		std::vector<SliderCurve> curves;

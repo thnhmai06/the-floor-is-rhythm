@@ -5,10 +5,9 @@
  */
 #pragma once
 #include <string>
-#include <fstream>
 #include <unordered_set>
 
-namespace Metadata
+namespace GameObjects::Metadata
 {
 	//! Raw
 	struct General
@@ -90,7 +89,7 @@ namespace Metadata
 			void apply(const float& v);
 			void apply() { apply(value); }
 
-			Velocity() = default;
+			Velocity() { apply(1.4f); }
 			Velocity(const float value) { apply(value); }
 		} velocity;
 

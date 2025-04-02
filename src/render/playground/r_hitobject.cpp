@@ -39,25 +39,25 @@ RenderObjects::RenderObject RenderObjects::Playground::RenderHitobject::create_a
 	case Template::Game::Direction::Direction::RIGHT:
 		current.src_rect_in_percent.x = src_x_in_percent;
 		current.src_rect_in_percent.w = src_width_in_percent;
-		current.set_scale_fixed({ speed * duration, ImmutableConfig::HitObject::SIZE_HEIGHT });
+		current.set_scale_fixed({ speed * duration, GameConfig::HitObject::SIZE_HEIGHT });
 		current.config.render_pos.x += previous->get_render_size().x;
 		break;
 	case Template::Game::Direction::Direction::UP:
 		current.src_rect_in_percent.y = src_x_in_percent;
 		current.src_rect_in_percent.h = src_width_in_percent;
-		current.set_scale_fixed({ ImmutableConfig::HitObject::SIZE_HEIGHT, speed * duration });
+		current.set_scale_fixed({ GameConfig::HitObject::SIZE_HEIGHT, speed * duration });
 		current.config.render_pos.y -= previous->get_render_size().y;
 		break;
 	case Template::Game::Direction::Direction::LEFT:
 		current.src_rect_in_percent.x = src_x_in_percent;
 		current.src_rect_in_percent.w = src_width_in_percent;
-		current.set_scale_fixed({ speed * duration, ImmutableConfig::HitObject::SIZE_HEIGHT });
+		current.set_scale_fixed({ speed * duration, GameConfig::HitObject::SIZE_HEIGHT });
 		current.config.render_pos.x -= current.get_render_size().x;
 		break;
 	case Template::Game::Direction::Direction::DOWN:
 		current.src_rect_in_percent.y = src_x_in_percent;
 		current.src_rect_in_percent.h = src_width_in_percent;
-		current.set_scale_fixed({ ImmutableConfig::HitObject::SIZE_HEIGHT, speed * duration });
+		current.set_scale_fixed({ GameConfig::HitObject::SIZE_HEIGHT, speed * duration });
 		current.config.render_pos.y += current.get_render_size().y;
 		break;
 	}
@@ -66,7 +66,7 @@ RenderObjects::RenderObject RenderObjects::Playground::RenderHitobject::create_a
 }
 RenderObjects::RenderObject RenderObjects::Playground::RenderHitobject::create_spacing_object(
 	const Texture& texture,
-	const HitObject::HitObject* current,
+	const GameObjects::HitObjects::HitObject* current,
 	const float& speed,
 	const float& duration,
 	const RenderHitobject* previous)
@@ -76,7 +76,7 @@ RenderObjects::RenderObject RenderObjects::Playground::RenderHitobject::create_s
 	if (!previous || !previous->hit_object)
 	{
 		current_direction = Template::Game::Direction::Direction::RIGHT + current->rotation; // reset
-		render_hit_object.config.render_pos = ImmutableConfig::HitObject::DEFAULT_POS;
+		render_hit_object.config.render_pos = SDL_FPoint{ GameConfig::HitObject::DEFAULT_POS_X, GameConfig::HitObject::DEFAULT_POS_X };
 	}
 	else
 	{
@@ -85,22 +85,22 @@ RenderObjects::RenderObject RenderObjects::Playground::RenderHitobject::create_s
 		switch (current_direction)
 		{
 		case Template::Game::Direction::Direction::RIGHT:
-			render_hit_object.set_scale_fixed({ speed * duration, ImmutableConfig::HitObject::SIZE_HEIGHT });
+			render_hit_object.set_scale_fixed({ speed * duration, GameConfig::HitObject::SIZE_HEIGHT });
 			render_hit_object.config.render_pos.x += speed * time_distance;
 			break;
 
 		case Template::Game::Direction::Direction::UP:
-			render_hit_object.set_scale_fixed({ ImmutableConfig::HitObject::SIZE_HEIGHT, speed * duration });
+			render_hit_object.set_scale_fixed({ GameConfig::HitObject::SIZE_HEIGHT, speed * duration });
 			render_hit_object.config.render_pos.y -= speed * time_distance;
 			break;
 
 		case Template::Game::Direction::Direction::LEFT:
-			render_hit_object.set_scale_fixed({ speed * duration, ImmutableConfig::HitObject::SIZE_HEIGHT });
+			render_hit_object.set_scale_fixed({ speed * duration, GameConfig::HitObject::SIZE_HEIGHT });
 			render_hit_object.config.render_pos.x -= speed * time_distance;
 			break;
 
 		case Template::Game::Direction::Direction::DOWN:
-			render_hit_object.set_scale_fixed({ ImmutableConfig::HitObject::SIZE_HEIGHT, speed * duration });
+			render_hit_object.set_scale_fixed({ GameConfig::HitObject::SIZE_HEIGHT, speed * duration });
 			render_hit_object.config.render_pos.y += speed * time_distance;
 			break;
 		}
@@ -110,7 +110,7 @@ RenderObjects::RenderObject RenderObjects::Playground::RenderHitobject::create_s
 }
 RenderObjects::Playground::RenderHitobject::RenderHitobject(
 	const Texture& texture,
-	const HitObject::HitObject* current,
+	const GameObjects::HitObjects::HitObject* current,
 	const float& speed,
 	const float& duration,
 	const RenderHitobject* previous) : hit_object(current)
@@ -120,12 +120,12 @@ RenderObjects::Playground::RenderHitobject::RenderHitobject(
 
 // ::RenderFloor
 RenderObjects::Playground::RenderFloor::RenderFloor(
-	const HitObject::Floor* floor,
+	const GameObjects::HitObjects::Floor* floor,
 	const TextureMemory& memory,
-	const Metadata::CalculatedDifficulty* diff,
+	const GameObjects::Metadata::CalculatedDifficulty* diff,
 	const float& current_timing_velocity,
 	const RenderHitobject* previous) :
-	RenderHitobject(memory[HitObjectSkin[current_direction += floor->rotation][HitObjectType::FLOOR]],
+	RenderHitobject(memory.find(HitObjectSkin[current_direction += floor->rotation][HitObjectType::FLOOR]),
 			floor, current_timing_velocity* diff->velocity.speed, diff->od.bad * 2, previous)
 {
 }
@@ -136,35 +136,35 @@ RenderObjects::RenderObject RenderObjects::Playground::RenderSlider::create_slid
 	const RenderObject& previous)
 {
 	SDL_FPoint pos = previous.config.origin_pos; // vị trí centre
-	SDL_FPoint size = { ImmutableConfig::HitObject::SIZE_HEIGHT, ImmutableConfig::HitObject::SIZE_HEIGHT };
+	SDL_FPoint size = { GameConfig::HitObject::SIZE_HEIGHT, GameConfig::HitObject::SIZE_HEIGHT };
 	switch (current_direction) // Chuyển về end centre
 	{
 	case Template::Game::Direction::Direction::RIGHT:
 		pos.x += previous.get_render_size().x / 2;
-		size.x = ImmutableConfig::HitObject::SLIDER_POINT_SIZE_WIDTH;
+		size.x = GameConfig::HitObject::SLIDER_POINT_SIZE_WIDTH;
 		break;
 
 	case Template::Game::Direction::Direction::LEFT:
 		pos.x -= previous.get_render_size().x / 2;
-		size.x = ImmutableConfig::HitObject::SLIDER_POINT_SIZE_WIDTH;
+		size.x = GameConfig::HitObject::SLIDER_POINT_SIZE_WIDTH;
 		break;
 
 	case Template::Game::Direction::Direction::UP:
 		pos.y -= previous.get_render_size().y / 2;
-		size.y = ImmutableConfig::HitObject::SLIDER_POINT_SIZE_WIDTH;
+		size.y = GameConfig::HitObject::SLIDER_POINT_SIZE_WIDTH;
 		break;
 
 	case Template::Game::Direction::Direction::DOWN:
 		pos.y += previous.get_render_size().y / 2;
-		size.y = ImmutableConfig::HitObject::SLIDER_POINT_SIZE_WIDTH;
+		size.y = GameConfig::HitObject::SLIDER_POINT_SIZE_WIDTH;
 		break;
 	}
 	return create_object_on_pos(texture, pos, size);
 }
 RenderObjects::Playground::RenderSlider::RenderSlider(
-	const HitObject::Slider* slider,
+	const GameObjects::HitObjects::Slider* slider,
 	const TextureMemory& memory,
-	const Metadata::CalculatedDifficulty* diff,
+	const GameObjects::Metadata::CalculatedDifficulty* diff,
 	const float& current_beatlength,
 	const float& current_timing_velocity,
 	const RenderHitobject* previous) :
@@ -175,7 +175,7 @@ RenderObjects::Playground::RenderSlider::RenderSlider(
 	const auto duration = diff->od.bad * 2;
 	// Đầu
 	push_back(create_spacing_object(
-		memory[HitObjectSkin[current_direction += slider->rotation][HitObjectType::SLIDER_BEGIN]], 
+		memory.find(HitObjectSkin[current_direction += slider->rotation][HitObjectType::SLIDER_BEGIN]),
 		slider, speed, duration, previous));
 
 	const float slider_total_time = static_cast<float>(slider->end_time - slider->time);
@@ -192,7 +192,7 @@ RenderObjects::Playground::RenderSlider::RenderSlider(
 			const float time_length_after_curve = next_slider_time - static_cast<float>(slider->curves[current_curve].after);
 			// before curve
 			const float time_length_before_curve = current_beatlength - time_length_after_curve;
-			push_back(create_adjacent_object(memory[HitObjectSkin[current_direction][HitObjectType::SLIDER_LINE]], 
+			push_back(create_adjacent_object(memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_LINE]), 
 				speed, time_length_before_curve, &back(), time_length_before_curve / current_beatlength));
 			current_slider_time += time_length_before_curve;
 
@@ -203,21 +203,21 @@ RenderObjects::Playground::RenderSlider::RenderSlider(
 
 			// after curve
 			// (giống khi không bị dính curve, nhưng retain từ cuối)
-			push_back(create_adjacent_object(memory[HitObjectSkin[current_direction][HitObjectType::SLIDER_LINE]],
+			push_back(create_adjacent_object(memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_LINE]),
 				speed, time_length_after_curve, &back(), time_length_after_curve / current_beatlength, false));
 		}
 		// Tạo slider line (bình thường)
 		else push_back(create_adjacent_object(
-			memory[HitObjectSkin[current_direction][HitObjectType::SLIDER_LINE]], 
+			memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_LINE]),
 			speed, current_beatlength, &back()));
 		current_slider_time += current_beatlength;
 
 		// Tạo slider point
 		if (current_slider_time < slider_total_time)
-			push_back(create_slider_point(memory[HitObjectSkin[current_direction][HitObjectType::SLIDER_POINT]], back()));
+			push_back(create_slider_point(memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_POINT]), back()));
 	}
 
 	// Cuối
-	push_back(create_adjacent_object(memory[HitObjectSkin[current_direction][HitObjectType::SLIDER_END]], 
+	push_back(create_adjacent_object(memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_END]),
 		speed, duration, &back()));
 }

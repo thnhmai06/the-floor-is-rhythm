@@ -20,7 +20,7 @@ namespace SkinFormat
 	namespace HitObject
 	{
 		using HitObjectTypeBase = uint8_t;
-		constexpr HitObjectTypeBase NUM_SKIN_TYPE = 6;
+		constexpr HitObjectTypeBase NUM_SKIN_TYPE = 7;
 		
 		enum class HitObjectType : HitObjectTypeBase
 		{
@@ -39,6 +39,7 @@ namespace SkinFormat
 			using BASE = std::array<VALUE, NUM_SKIN_TYPE>;
 
 		private:
+			VALUE direction_folder;
 			static std::string get_direction_folder(const Template::Game::Direction::Direction& direction) {
 				switch (direction)
 				{
@@ -63,18 +64,17 @@ namespace SkinFormat
 			{
 				return BASE::operator[](static_cast<HitObjectTypeBase>(type));
 			}
-			explicit HitObjectDirectionSkinType(const Template::Game::Direction::Direction& direction) : BASE()
-			{
-				// hehe xd
-				const auto direction_folder = get_direction_folder(direction);
-				(*this)[HitObjectType::FLOOR] = direction_folder + "floor";
-				(*this)[HitObjectType::SLIDER_FOCUS] = direction_folder + "sliderfocus";
-				(*this)[HitObjectType::SLIDER_BEGIN] = direction_folder + "sliderbegin";
-				(*this)[HitObjectType::SLIDER_LINE] = direction_folder + "sliderline";
-				(*this)[HitObjectType::SLIDER_POINT] = direction_folder + "sliderpoint";
-				(*this)[HitObjectType::SLIDER_CURVE] = direction_folder + "slidercurve";
-				(*this)[HitObjectType::SLIDER_END] = direction_folder + "sliderend";
-			}
+			explicit HitObjectDirectionSkinType(const Template::Game::Direction::Direction& direction) :
+			direction_folder(get_direction_folder(direction)),
+			BASE {
+				direction_folder + "floor",
+				direction_folder + "sliderfocus",
+				direction_folder + "sliderbegin",
+				direction_folder + "sliderline",
+				direction_folder + "sliderpoint",
+				direction_folder + "slidercurve",
+				direction_folder + "sliderend"
+			} {}
 		};
 		class HitObjectSkinType : std::array<HitObjectDirectionSkinType, Template::Game::Direction::NUM_DIRECTIONS>
 		{
@@ -91,13 +91,12 @@ namespace SkinFormat
 			{
 				return BASE::operator[](static_cast<Template::Game::Direction::DirectionBase>(direction));
 			}
-			explicit HitObjectSkinType() : BASE()
-			{
-				(*this)[Template::Game::Direction::Direction::RIGHT] = HitObjectDirectionSkinType(Template::Game::Direction::Direction::RIGHT);
-				(*this)[Template::Game::Direction::Direction::UP] = HitObjectDirectionSkinType(Template::Game::Direction::Direction::UP);
-				(*this)[Template::Game::Direction::Direction::DOWN] = HitObjectDirectionSkinType(Template::Game::Direction::Direction::DOWN);
-				(*this)[Template::Game::Direction::Direction::LEFT] = HitObjectDirectionSkinType(Template::Game::Direction::Direction::LEFT);
-			}
+			explicit HitObjectSkinType() : BASE {
+				HitObjectDirectionSkinType(Template::Game::Direction::Direction::RIGHT),
+				HitObjectDirectionSkinType(Template::Game::Direction::Direction::UP),
+				HitObjectDirectionSkinType(Template::Game::Direction::Direction::DOWN),
+				HitObjectDirectionSkinType(Template::Game::Direction::Direction::LEFT)
+			} {}
 		};
 		inline const HitObjectSkinType HitObjectSkin;
 	}

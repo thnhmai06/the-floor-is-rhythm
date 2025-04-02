@@ -71,18 +71,18 @@ void RenderObjects::RenderObject::set_scale_fixed(const float& value)
 }
 void RenderObjects::RenderObject::render() const
 {
-	const auto item = src->item;
-	if (item == src->memory->end())
-		THROW_ERROR(SDLExceptions::Texture::SDL_Texture_Render_Failed(src->get_name()));
+	const auto item = src.item;
+	if (item == src.memory->end())
+		THROW_ERROR(SDLExceptions::Texture::SDL_Texture_Render_Failed(src.get_name()));
 
 	const auto sdl_texture = item->second;
 	const auto src_rect = get_sdl_src_rect();
 	const auto dst_rect = get_sdl_dst_rect();
 	SDL_SetTextureAlphaMod(sdl_texture, config.alpha);
-	if (!SDL_RenderTexture(src->memory->renderer, sdl_texture, &src_rect, &dst_rect))
-		THROW_ERROR(SDLExceptions::Texture::SDL_Texture_Render_Failed(src->get_name()));
+	if (!SDL_RenderTexture(src.memory->renderer, sdl_texture, &src_rect, &dst_rect))
+		THROW_ERROR(SDLExceptions::Texture::SDL_Texture_Render_Failed(src.get_name()));
 }
-RenderObjects::RenderObject::RenderObject(const Texture& texture, const Template::Render::RenderOriginType& origin_type) : src(&texture)
+RenderObjects::RenderObject::RenderObject(const Texture& texture, const Template::Render::RenderOriginType& origin_type) : src(texture)
 {
 	const auto [w, h] = Utilities::Render::get_size_from_rect(get_sdl_src_rect());
 	switch (origin_type)
@@ -116,4 +116,4 @@ RenderObjects::RenderObject::RenderObject(const Texture& texture, const Template
 		break;
 	}
 }
-RenderObjects::RenderObject::RenderObject(const Texture& texture, const RenderConfig::RenderOriginPoint& custom_origin) : src(&texture), config(custom_origin) {}
+RenderObjects::RenderObject::RenderObject(const Texture& texture, const RenderConfig::RenderOriginPoint& custom_origin) : src(texture), config(custom_origin) {}

@@ -1,11 +1,11 @@
 #pragma once
-#include "game/hitobject.h"
+#include "template.h"
 
-namespace GameObjects
+namespace GameObjects::Cursor
 {
 	struct Cursor
 	{
-		Direction direction = Direction::RIGHT;
+		Template::Game::Direction::Direction direction = Template::Game::Direction::Direction::RIGHT;
 		//using timing point variable
 	};
 }

@@ -3,14 +3,13 @@
 #include <map>
 #include "hitsound.h"
 
-namespace Timing
+namespace GameObjects::Timing
 {
 	struct TimingPoint
 	{
 		static constexpr int32_t MINIMUM_NUM_CONTENT = 7;
 
-		int32_t time;
-		int32_t meter;
+		int32_t time = 0;
 		Hitsound::SampleSetType sample_set = Hitsound::SampleSetType::NO_CUSTOM;
 		int32_t sample_index = 0;
 		int32_t volume = 100;

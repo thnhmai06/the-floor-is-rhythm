@@ -3,13 +3,17 @@
 #include "game/hitobject.h"
 #include "game/timing.h"
 
+using namespace GameObjects::Metadata;
+using namespace GameObjects::HitObjects;
+using namespace GameObjects::Timing;
+
 struct BeatmapFile
 {
-	Metadata::General general;
-	Metadata::Metadata metadata;
-	Metadata::CalculatedDifficulty calculated_difficulty;
-	HitObject::HitObjects hit_objects;
-	Timing::TimingPoints timing_points;
+	General general;
+	Metadata metadata;
+	CalculatedDifficulty calculated_difficulty;
+	HitObjects hit_objects;
+	TimingPoints timing_points;
 
 	BeatmapFile(const char* file_path);
 };
