@@ -7,7 +7,7 @@ namespace GameObjects::Timing
 {
 	struct TimingPoint
 	{
-		static constexpr int32_t MINIMUM_NUM_CONTENT = 7;
+		static constexpr int32_t MINIMUM_NUM_CONTENT = 6;
 
 		int32_t time = 0;
 		float beat_length;
@@ -28,9 +28,9 @@ namespace GameObjects::Timing
 	struct TimingPoints : std::multimap<int32_t, TimingPoint>
 	{
 		void read(const std::vector<std::string>& contents);
-		void write(std::ofstream& writer) const;
+		void write(std::ofstream& writer, bool write_header = true, bool write_new_line = true) const;
 
 		TimingPoints() = default;
-		TimingPoints(const std::vector<std::string>& contents) { read(contents); }
+		explicit TimingPoints(const std::vector<std::string>& contents) { read(contents); }
 	};
 }

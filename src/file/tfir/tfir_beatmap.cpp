@@ -40,10 +40,18 @@ static void parse_beatmap(BeatmapFile& beatmap, const std::unordered_map<std::st
 		else if (header == FileFormat::Beatmap::HitObjects::HEADER) beatmap.hit_objects.read(contents);
 		else if (header == FileFormat::Beatmap::TimingPoints::HEADER)
 		{
-			for (const auto timing_points = TimingPoints(contents); 
+			for (const auto timing_points = TimingPoints(contents);
 				const auto& [time, point] : timing_points)
-				if (point.inherited) beatmap.inherited_points.insert({ time, point });
-				else beatmap.uninherited_points.insert({ time, point });
+				if (point.inherited)
+				{
+					const auto back_itr = beatmap.inherited_points.empty() ? beatmap.inherited_points.end() : std::prev(beatmap.inherited_points.end());
+					beatmap.inherited_points.emplace_hint(back_itr, time, point );
+				}
+				else
+				{
+					const auto back_itr = beatmap.uninherited_points.empty() ? beatmap.uninherited_points.end() : std::prev(beatmap.uninherited_points.end());
+					beatmap.uninherited_points.emplace_hint(back_itr, time, point );
+				}
 		}
 	}
 }

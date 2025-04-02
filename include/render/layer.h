@@ -60,6 +60,8 @@ namespace Layers
 
 	struct PlaygoundLayer : Layer
 	{
+		//TODO: Làm tương thích với beatmap skin
+
 		void run_beatmap(
 			const GameObjects::HitObjects::HitObjects& hit_objects,
 			const GameObjects::Metadata::CalculatedDifficulty& difficulty,

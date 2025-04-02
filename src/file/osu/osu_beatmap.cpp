@@ -50,13 +50,28 @@ static Metadata convert_metadata(const Parser::MetadataSection& metadata)
 }
 //! HitObjects
 using namespace GameObjects::HitObjects;
-static Slider convert_hitobject_slider(const Parser::HitObject& object)
+static Slider convert_hitobject_slider(const Parser::HitObject& object, bool current_curve_rotation = 0)
 {
 	Slider slider;
 	slider.time = object.Time;
 	slider.end_time = object.EndTime;
 	slider.rotation = get_rotation(object.Type.ColourHax);
 	slider.combo_jump = object.Type.ColourHax;
+	if (object.SliderParameters.has_value())
+	{
+		const float add_time_unit = static_cast<float>(slider.end_time - slider.time) / object.SliderParameters.value().Slides;
+		for (auto i = 1; i < object.SliderParameters.value().Slides - 1; ++i)
+		{
+			Slider::SliderCurve curve;
+			curve.after = static_cast<int32_t>(add_time_unit * static_cast<float>(i));
+			curve.rotation = (current_curve_rotation ? 
+				Template::Game::Direction::Rotation::ROTATE_270 : 
+				Template::Game::Direction::Rotation::ROTATE_90);
+			current_curve_rotation = !current_curve_rotation;
+			slider.curves.push_back(curve);
+		}
+	}
+
 	slider.hit_sound = object.Hitsound;
 	slider.hit_sample = object.Hitsample;
 	return slider;
@@ -74,12 +89,13 @@ static Floor convert_hitobject_floor(const Parser::HitObject& object)
 static HitObjects convert_hitobjects(const std::vector<Parser::HitObject>& objects)
 {
 	HitObjects result;
+	bool current_curve_rotation = 0;
 	for (const Parser::HitObject& osu_object : objects)
 	{
 		const auto back_itr = (result.empty()) ? (result.end()) : (std::prev(result.end()));
 		if (osu_object.Type.HitCircle)
 			result.emplace_hint(back_itr, osu_object.Time, convert_hitobject_floor(osu_object));
-		else result.emplace_hint(back_itr, osu_object.Time, convert_hitobject_slider(osu_object));
+		else result.emplace_hint(back_itr, osu_object.Time, convert_hitobject_slider(osu_object, current_curve_rotation));
 	}
 	return result;
 }
@@ -131,8 +147,8 @@ void convert_beatmap(const char* file_name, const char* output)
 	convert_difficulty(beatmap.Difficulty).write(writer);
 	convert_metadata(beatmap.Metadata).write(writer);
 	const auto [uninherited_points, inherited_points] = convert_timing_points(beatmap.TimingPoints);
-	uninherited_points.write(writer);
-	inherited_points.write(writer);
+	uninherited_points.write(writer, true, false);
+	inherited_points.write(writer, false, true);
 	convert_hitobjects(beatmap.HitObjects).write(writer);
 
 	writer.close();

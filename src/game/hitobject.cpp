@@ -62,8 +62,7 @@ void Slider::write(std::ofstream& writer) const
 		if (ptr != curves.begin()) writer << FileFormat::Beatmap::HitObjects::Slider::AND;
 		writer << ptr->after << FileFormat::Beatmap::HitObjects::Slider::CURVE_AND << static_cast<int32_t>(ptr->rotation);
 	}
-	writer << AND;
-	writer << hit_sound.to_int() << AND << hit_sample.to_string();
+	writer << AND << hit_sound.to_int() << AND << hit_sample.to_string();
 	writer << '\n';
 }
 
