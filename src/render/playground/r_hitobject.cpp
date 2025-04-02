@@ -1,6 +1,6 @@
 ﻿#include "render/playground/r_hitobject.h" // Header
 #include <ranges>
-#include "rule/skin.h"
+#include "rule/skin_format.h"
 #include "rule/config.h"
 #include "template.h"
 

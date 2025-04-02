@@ -30,7 +30,7 @@
     <ClCompile Include="src\audio\mixer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\logging.cpp">
+    <ClCompile Include="src\logger\logging.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\game\metadata.cpp">
@@ -72,6 +72,12 @@
     <ClCompile Include="src\render\object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\skin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rule\skin_format.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\game\metadata.h">
@@ -80,7 +86,7 @@
     <ClInclude Include="include\rule\file_format.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\exceptions.h">
+    <ClInclude Include="include\logger\exceptions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\audio\mixer.h">
@@ -101,7 +107,7 @@
     <ClInclude Include="include\game\hitobject.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\logging.h">
+    <ClInclude Include="include\logger\logging.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="include\main.h">
@@ -131,7 +137,7 @@
     <ClInclude Include="include\game\cursor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rule\skin.h">
+    <ClInclude Include="include\rule\skin_format.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\render\playground\r_hitobject.h">
@@ -144,6 +150,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\render\object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\skin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\logger\info.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

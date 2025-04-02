@@ -1,7 +1,7 @@
 ﻿#include "main.h" // Header
 #include <SDL3/SDL_init.h>
-#include "logging.h"
-#include "exceptions.h"
+#include "logger/logging.h"
+#include "logger/exceptions.h"
 #include "work/render.h"
 #include "coremgr.h"
 

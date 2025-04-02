@@ -1,6 +1,6 @@
 #pragma once
 #include "render/layer.h"
-#include "rule/skin.h"
+#include "rule/skin_format.h"
 #include "template.h"
 
 namespace RenderObjects::Cursor

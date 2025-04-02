@@ -1,10 +1,14 @@
 ﻿#pragma once
 #include <array>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
 #include "template.h"
-#include "game/hitobject.h"
 
 namespace SkinFormat
 {
+	const std::unordered_set<std::string_view> SUPPORT_IMAGE_EXTENSIONS = { ".png", ".jpg" };
+
 	namespace Cursor
 	{
 		const std::string BODY = "cursor";
@@ -21,7 +25,7 @@ namespace SkinFormat
 	{
 		using HitObjectTypeBase = uint8_t;
 		constexpr HitObjectTypeBase NUM_SKIN_TYPE = 7;
-		
+
 		enum class HitObjectType : HitObjectTypeBase
 		{
 			FLOOR,
@@ -32,7 +36,7 @@ namespace SkinFormat
 			SLIDER_CURVE,
 			SLIDER_END
 		};
-		class HitObjectDirectionSkinType : std::array<std::string, NUM_SKIN_TYPE>
+		struct HitObjectDirectionSkinType : std::array<std::string, NUM_SKIN_TYPE>
 		{
 		protected:
 			using VALUE = std::string;
@@ -65,18 +69,19 @@ namespace SkinFormat
 				return BASE::operator[](static_cast<HitObjectTypeBase>(type));
 			}
 			explicit HitObjectDirectionSkinType(const Template::Game::Direction::Direction& direction) :
-			direction_folder(get_direction_folder(direction)),
-			BASE {
-				direction_folder + "floor",
-				direction_folder + "sliderfocus",
-				direction_folder + "sliderbegin",
-				direction_folder + "sliderline",
-				direction_folder + "sliderpoint",
-				direction_folder + "slidercurve",
-				direction_folder + "sliderend"
-			} {}
+				direction_folder(get_direction_folder(direction)),
+				BASE{
+					direction_folder + "floor",
+					direction_folder + "sliderfocus",
+					direction_folder + "sliderbegin",
+					direction_folder + "sliderline",
+					direction_folder + "sliderpoint",
+					direction_folder + "slidercurve",
+					direction_folder + "sliderend"
+				} {
+			}
 		};
-		class HitObjectSkinType : std::array<HitObjectDirectionSkinType, Template::Game::Direction::NUM_DIRECTIONS>
+		struct HitObjectSkinType : std::array<HitObjectDirectionSkinType, Template::Game::Direction::NUM_DIRECTIONS>
 		{
 		protected:
 			using VALUE = HitObjectDirectionSkinType;
@@ -91,13 +96,18 @@ namespace SkinFormat
 			{
 				return BASE::operator[](static_cast<Template::Game::Direction::DirectionBase>(direction));
 			}
-			explicit HitObjectSkinType() : BASE {
+			explicit HitObjectSkinType() : BASE{
 				HitObjectDirectionSkinType(Template::Game::Direction::Direction::RIGHT),
 				HitObjectDirectionSkinType(Template::Game::Direction::Direction::UP),
 				HitObjectDirectionSkinType(Template::Game::Direction::Direction::DOWN),
 				HitObjectDirectionSkinType(Template::Game::Direction::Direction::LEFT)
-			} {}
+			} {
+			}
 		};
 		inline const HitObjectSkinType HitObjectSkin;
 	}
+
+	// Dùng string do khi convert string_view -> string insert thì kí tự đầu trở thành null char
+	struct ImageStorage : std::unordered_set<std::string> { ImageStorage(); } const IMAGE_STORAGE;
+	struct FolderStorage : std::unordered_set<std::string> { FolderStorage(); } const FOLDER_STORAGE;
 }

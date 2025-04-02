@@ -1,8 +1,8 @@
 ﻿#include "render/texture.h" // Header
 #include <ranges>
 #include <SDL3_image/SDL_image.h>
-#include "logging.h"
-#include "exceptions.h"
+#include "logger/logging.h"
+#include "logger/exceptions.h"
 #include "utilities.h"
 
 // TextureMemory

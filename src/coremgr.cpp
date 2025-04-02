@@ -2,8 +2,8 @@
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_video.h>
 #include "rule/config.h"
-#include "exceptions.h"
-#include "logging.h"
+#include "logger/exceptions.h"
+#include "logger/logging.h"
 
 //! Video
 void Init::window(SDL_Window*& window)

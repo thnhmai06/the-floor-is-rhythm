@@ -2,8 +2,8 @@
 #include <fstream>
 #include <unordered_map>
 #include "rule/file_format.h"
-#include "exceptions.h"
-#include "logging.h"
+#include "logger/exceptions.h"
+#include "logger/logging.h"
 #include "utilities.h"
 
 static constexpr int32_t MINIMUM_LINE_CHARACTERS = 3;

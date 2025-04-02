@@ -154,6 +154,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\rule\skin_format.cpp" />
+    <ClCompile Include="src\skin.cpp" />
     <ClCompile Include="src\coremgr.cpp" />
     <ClCompile Include="src\file\tfir\tfir_beatmap.cpp" />
     <ClCompile Include="src\game\timing.cpp" />
@@ -168,7 +170,8 @@
     <ClInclude Include="include\game\hitsound.h" />
     <ClInclude Include="include\game\hitobject.h" />
     <ClInclude Include="include\game\timing.h" />
-    <ClInclude Include="include\logging.h" />
+    <ClInclude Include="include\logger\info.h" />
+    <ClInclude Include="include\logger\logging.h" />
     <ClCompile Include="src\audio\buses.cpp" />
     <ClCompile Include="src\audio\memory.cpp" />
     <ClCompile Include="src\audio\mixer.cpp" />
@@ -176,7 +179,7 @@
     <ClCompile Include="src\game\hitsound.cpp" />
     <ClCompile Include="src\game\metadata.cpp" />
     <ClCompile Include="src\game\hitobject.cpp" />
-    <ClCompile Include="src\logging.cpp" />
+    <ClCompile Include="src\logger\logging.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="include\utilities.h" />
     <ClCompile Include="src\render\texture.cpp" />
@@ -184,7 +187,8 @@
     <ClInclude Include="include\render\cursor\r_cursor.h" />
     <ClInclude Include="include\render\object.h" />
     <ClInclude Include="include\render\playground\r_hitobject.h" />
-    <ClInclude Include="include\rule\skin.h" />
+    <ClInclude Include="include\rule\skin_format.h" />
+    <ClInclude Include="include\skin.h" />
     <ClInclude Include="include\template.h" />
     <ClInclude Include="include\work\render.h" />
   </ItemGroup>
@@ -193,7 +197,7 @@
     <ClInclude Include="include\audio\buses.h" />
     <ClInclude Include="include\audio\memory.h" />
     <ClInclude Include="include\rule\config.h" />
-    <ClInclude Include="include\exceptions.h" />
+    <ClInclude Include="include\logger\exceptions.h" />
     <ClInclude Include="include\render\texture.h" />
     <ClInclude Include="include\rule\file_format.h" />
     <ClInclude Include="include\game\metadata.h" />

@@ -1,7 +1,7 @@
 #include "work/render.h" // Header
 #include "coremgr.h"
 #include "main.h"
-#include "rule/skin.h"
+#include "rule/skin_format.h"
 
 int32_t render(SDL_Window* window)
 {

@@ -5,8 +5,8 @@
 #include "game/metadata.h"
 #include "game/hitobject.h"
 #include "game/timing.h"
-#include "exceptions.h"
-#include "logging.h"
+#include "logger/exceptions.h"
+#include "logger/logging.h"
 #include "template.h"
 #include "utilities.h"
 

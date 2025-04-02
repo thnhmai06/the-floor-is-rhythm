@@ -1,8 +1,8 @@
 #include "game/timing.h" // Header
 #include <fstream>
 #include <ranges>
-#include "logging.h"
-#include "exceptions.h"
+#include "logger/logging.h"
+#include "logger/exceptions.h"
 #include "rule/file_format.h"
 #include "utilities.h"
 

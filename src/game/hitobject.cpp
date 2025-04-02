@@ -1,8 +1,8 @@
 #include "game/hitobject.h" // Header
 #include <fstream>
 #include <ranges>
-#include "exceptions.h"
-#include "logging.h"
+#include "logger/exceptions.h"
+#include "logger/logging.h"
 #include "rule/file_format.h"
 #include "template.h"
 #include "utilities.h"

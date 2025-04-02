@@ -1,8 +1,8 @@
 ﻿#include "audio/memory.h" // Header
 #include <SDL3_mixer/SDL_mixer.h>
 #include <ranges>
-#include "exceptions.h"
-#include "logging.h"
+#include "logger/exceptions.h"
+#include "logger/logging.h"
 
 //! AudioMemory<Music>
 void AudioMemory<Music>::free(const std::string& name)

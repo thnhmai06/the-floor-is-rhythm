@@ -1,6 +1,6 @@
 #include "render/object.h" // Header
-#include "exceptions.h"
-#include "logging.h"
+#include "logger/exceptions.h"
+#include "logger/logging.h"
 #include "utilities.h"
 
 // RenderConfig::RenderOrigin
