@@ -28,7 +28,7 @@ namespace GameObjects::Timing
 	struct TimingPoints : std::multimap<int32_t, TimingPoint>
 	{
 		void read(const std::vector<std::string>& contents);
-		void write(std::ofstream& writer, bool write_header = true, bool write_new_line = true) const;
+		void write(std::ofstream& writer) const;
 
 		TimingPoints() = default;
 		explicit TimingPoints(const std::vector<std::string>& contents) { read(contents); }

@@ -113,23 +113,15 @@ static TimingPoint convert_timing_point(const Parser::TimingPoint& timing_point)
 	result.kiai = timing_point.Effects.kiai;
 	return result;
 }
-static std::pair<TimingPoints, TimingPoints> convert_timing_points(const std::vector<Parser::TimingPoint>& timing_points)
+static TimingPoints convert_timing_points(const std::vector<Parser::TimingPoint>& timing_points)
 {
-	TimingPoints uninherited_points;
-	TimingPoints inherited_points;
+	TimingPoints result;
 	for (const Parser::TimingPoint& timing_point : timing_points)
 	{
-		if (timing_point.Uninherited)
-		{
-			const auto back_itr = (uninherited_points.empty()) ? (uninherited_points.end()) : (std::prev(uninherited_points.end()));
-			uninherited_points.emplace_hint(back_itr, timing_point.Time, convert_timing_point(timing_point));
-		} else
-		{
-			const auto back_itr = (inherited_points.empty()) ? (inherited_points.end()) : (std::prev(inherited_points.end()));
-			inherited_points.emplace_hint(back_itr, timing_point.Time, convert_timing_point(timing_point));
-		}
+		const auto back_itr = (result.empty()) ? (result.end()) : (std::prev(result.end()));
+		result.emplace_hint(back_itr, timing_point.Time, convert_timing_point(timing_point));
 	}
-	return { uninherited_points , inherited_points };
+	return result;
 }
 
 void convert_beatmap(const char* file_name, const char* output)
@@ -146,9 +138,7 @@ void convert_beatmap(const char* file_name, const char* output)
 	convert_general(beatmap.General).write(writer);
 	convert_difficulty(beatmap.Difficulty).write(writer);
 	convert_metadata(beatmap.Metadata).write(writer);
-	const auto [uninherited_points, inherited_points] = convert_timing_points(beatmap.TimingPoints);
-	uninherited_points.write(writer, true, false);
-	inherited_points.write(writer, false, true);
+	convert_timing_points(beatmap.TimingPoints).write(writer);
 	convert_hitobjects(beatmap.HitObjects).write(writer);
 
 	writer.close();

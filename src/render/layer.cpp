@@ -66,27 +66,25 @@ void Layers::Layer::clear(const bool to_initial_state)
 void Layers::PlaygoundLayer::run_beatmap(
 	const GameObjects::HitObjects::HitObjects& hit_objects,
 	const GameObjects::Metadata::CalculatedDifficulty& difficulty,
-	const GameObjects::Timing::TimingPoints& uninherited_points,
-	const GameObjects::Timing::TimingPoints& inherited_points)
+	const GameObjects::Timing::TimingPoints& timing_points)
 {
 	clear();
 
-	auto current_uninherited = uninherited_points.begin();
-	auto current_inherited = inherited_points.begin();
+	auto current_uninherited = timing_points.begin();
+	auto current_inherited = timing_points.begin();
 	RenderObjects::Playground::RenderHitobject previous;
 	for (const auto& hit_object : hit_objects | std::views::values)
 	{
-		auto next_uninherited = std::next(current_uninherited, 1);
-		while (next_uninherited != uninherited_points.end() &&
-			hit_object.get_time() >= next_uninherited->first)
+		auto next_timing_point = std::next(current_uninherited, 1);
+		while (next_timing_point != timing_points.end() &&
+			hit_object.get_time() >= next_timing_point->first)
 		{
-			++current_uninherited; ++next_uninherited;
-		}
-		auto next_inherited = std::next(current_inherited, 1);
-		while (next_inherited != inherited_points.end() &&
-			hit_object.get_time() >= next_inherited->first)
-		{
-			++current_inherited; ++next_inherited;
+			if (next_timing_point->second.beat_length < 0) // inherited
+				current_inherited = next_timing_point;
+			else // uninherited
+				current_uninherited = next_timing_point;
+
+			++next_timing_point;
 		}
 
 		switch (hit_object.get_type())
@@ -111,10 +109,9 @@ Layers::PlaygoundLayer::PlaygoundLayer(
 	SDL_Renderer* renderer, 
 	const GameObjects::HitObjects::HitObjects& hit_objects, 
 	const GameObjects::Metadata::CalculatedDifficulty& difficulty, 
-	const GameObjects::Timing::TimingPoints& uninherited_points, 
-	const GameObjects::Timing::TimingPoints& inherited_points) : Layer(renderer)
+	const GameObjects::Timing::TimingPoints& timing_points) : Layer(renderer)
 {
-	run_beatmap(hit_objects, difficulty, uninherited_points, inherited_points);
+	run_beatmap(hit_objects, difficulty, timing_points);
 }
 
 //void Layers::Layer::to_absolute_object(Texture::TextureConfig& object) const

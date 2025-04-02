@@ -45,10 +45,10 @@ void TimingPoints::read(const std::vector<std::string>& contents)
 		emplace_hint(back_itr, point.time, point);
 	}
 }
-void TimingPoints::write(std::ofstream& writer,const bool write_header,const bool write_new_line) const
+void TimingPoints::write(std::ofstream& writer) const
 {
-	if (write_header) writer << HEADER << '\n';
+	writer << HEADER << '\n';
 	for (const auto& point : *this | std::views::values)
 		point.write(writer);
-	if (write_new_line) writer << '\n';
+	writer << '\n';
 }

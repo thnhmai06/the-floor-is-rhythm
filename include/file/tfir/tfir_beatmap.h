@@ -13,8 +13,7 @@ struct BeatmapFile
 	Metadata metadata;
 	CalculatedDifficulty calculated_difficulty;
 	HitObjects hit_objects;
-	TimingPoints uninherited_points;
-	TimingPoints inherited_points;
+	TimingPoints timing_points;
 
 	BeatmapFile(const char* file_path);
 };

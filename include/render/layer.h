@@ -65,15 +65,13 @@ namespace Layers
 		void run_beatmap(
 			const GameObjects::HitObjects::HitObjects& hit_objects,
 			const GameObjects::Metadata::CalculatedDifficulty& difficulty,
-			const GameObjects::Timing::TimingPoints& uninherited_points,
-			const GameObjects::Timing::TimingPoints& inherited_points);
+			const GameObjects::Timing::TimingPoints& timing_points);
 
 		PlaygoundLayer(SDL_Renderer* renderer);
 		PlaygoundLayer(
 			SDL_Renderer* renderer,
 			const GameObjects::HitObjects::HitObjects& hit_objects,
 			const GameObjects::Metadata::CalculatedDifficulty& difficulty,
-			const GameObjects::Timing::TimingPoints& uninherited_points,
-			const GameObjects::Timing::TimingPoints& inherited_points);
+			const GameObjects::Timing::TimingPoints& timing_points);
 	};
 }
