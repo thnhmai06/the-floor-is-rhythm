@@ -16,14 +16,14 @@ public:
 	SDL_Texture* load_texture(SDL_Texture* texture, const std::string& name);
 	[[nodiscard]] static SDL_FPoint get_texture_size(const const_iterator& texture);
 	[[nodiscard]] static SDL_FPoint get_texture_size(const std::string& name);
-	Texture find(const std::string& name);
+	[[nodiscard]] Texture find(const std::string& name) const;
 	iterator rename_texture(const std::string& old_name, const std::string& new_name);
 	iterator move_texture(const std::string& name, TextureMemory* to_memory);
 	void free_texture(const std::string& name);
 	void free_all();
 	void clear() { free_all(); } // Tránh gọi nhầm hàm clear() của std::unordered_map
 
-	Texture operator[](const std::string& name);
+	Texture operator[](const std::string& name) const;
 	explicit TextureMemory(SDL_Renderer* renderer) : renderer(renderer) {}
 	~TextureMemory() { free_all(); }
 };
@@ -31,15 +31,12 @@ public:
 struct Texture
 {
 	TextureMemory::const_iterator item;
-	TextureMemory* memory = nullptr;
+	const TextureMemory* memory = nullptr;
 
 	[[nodiscard]] const std::string& get_name() const;
 	[[nodiscard]] SDL_FPoint get_size() const;
-	void rename(const std::string& new_name);
-	void move(TextureMemory* to_memory);
-	void free();
 
 	Texture() = default;
-	Texture(const std::string& name, TextureMemory* memory);
-	Texture(TextureMemory::const_iterator item_in_memory, TextureMemory* memory);
+	Texture(const std::string& name, const TextureMemory* memory);
+	Texture(TextureMemory::const_iterator item_in_memory, const TextureMemory* memory);
 };
