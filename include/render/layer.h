@@ -2,7 +2,7 @@
 #include <SDL3/SDL_render.h>
 #include "texture.h"
 #include "object.h"
-#include "render/playground/r_hitobject.h"
+#include "render/playground/hitobject.h"
 #include "utilities.h"
 
 struct LayerCamera : private RenderConfig

@@ -1,4 +1,4 @@
-#include "render/cursor/r_cursor.h" // Header
+#include "render/cursor/cursor.h" // Header
 
 void RenderObjects::Cursor::CursorDirection::update_direction(const Template::Game::Direction::Direction& direction)
 {

@@ -3,7 +3,7 @@
 #include <ranges>
 #include "logger/logging.h"
 #include "logger/exceptions.h"
-#include "rule/file_format.h"
+#include "format/file.h"
 #include "utilities.h"
 
 using namespace FileFormat::Beatmap::TimingPoints;

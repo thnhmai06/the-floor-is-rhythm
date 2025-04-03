@@ -1,6 +1,6 @@
 ﻿#include "render/layer.h" // Header
 #include <ranges>
-#include "rule/config.h"
+#include "config.h"
 
 //! LayerCamera
 uint8_t LayerCamera::get_alpha() const { return alpha; }

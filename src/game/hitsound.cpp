@@ -1,5 +1,5 @@
 #include "game/hitsound.h" // Header
-#include "rule/file_format.h"
+#include "format/file.h"
 #include "utilities.h"
 
 using namespace GameObjects::Hitsound;

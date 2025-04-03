@@ -1,7 +1,7 @@
 #include "coremgr.h" // Header
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_video.h>
-#include "rule/config.h"
+#include "config.h"
 #include "logger/exceptions.h"
 #include "logger/logging.h"
 

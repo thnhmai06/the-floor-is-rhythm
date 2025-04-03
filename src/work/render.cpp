@@ -1,7 +1,8 @@
 #include "work/render.h" // Header
 #include "coremgr.h"
 #include "main.h"
-#include "rule/skin_format.h"
+#include "format/skin.h"
+#include "skin.h"
 
 int32_t render(SDL_Window* window)
 {
@@ -10,6 +11,8 @@ int32_t render(SDL_Window* window)
 	Init::renderer(window, renderer);
 
 	WorkingLayers::init_all(renderer);
+	const char* skin_path = "./assets";
+	load_skin(skin_path, WorkingLayers::playground->memory);
 
 	try
 	{

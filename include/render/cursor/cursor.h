@@ -1,6 +1,6 @@
 #pragma once
 #include "render/layer.h"
-#include "rule/skin_format.h"
+#include "format/skin.h"
 #include "template.h"
 
 namespace RenderObjects::Cursor
@@ -12,10 +12,10 @@ namespace RenderObjects::Cursor
 		{
 		}
 	};
-	struct CursorTail final : RenderObject
+	struct CursorTrail final : RenderObject
 	{
-		explicit CursorTail(const TextureMemory* memory) : RenderObject {
-			memory->find(SkinFormat::Cursor::TAIL), Template::Render::RenderOriginType::CENTRE }
+		explicit CursorTrail(const TextureMemory* memory) : RenderObject {
+			memory->find(SkinFormat::Cursor::TRAIL), Template::Render::RenderOriginType::CENTRE }
 		{
 		}
 	};

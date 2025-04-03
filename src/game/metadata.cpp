@@ -1,8 +1,8 @@
 ﻿#include "game/metadata.h" // Header
 #include <fstream>
-#include "rule/config.h"
+#include "config.h"
 #include "utilities.h"
-#include "rule/file_format.h"
+#include "format/file.h"
 
 using namespace GameObjects::Metadata;
 static constexpr int32_t MINIMUM_LINE_CHARACTERS = 3;

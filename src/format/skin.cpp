@@ -1,11 +1,11 @@
-﻿#include "rule/skin_format.h" // Header
+﻿#include "format/skin.h" // Header
 #include <ranges>
 
 SkinFormat::ImageStorage::ImageStorage()
 {
 	// Của Cursor
     insert(Cursor::BODY);
-	insert(Cursor::TAIL);
+	insert(Cursor::TRAIL);
     for (const auto& val : Cursor::DIRECTION | std::views::values) {
         insert(val);
     }

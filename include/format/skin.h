@@ -12,7 +12,7 @@ namespace SkinFormat
 	namespace Cursor
 	{
 		const std::string BODY = "cursor";
-		const std::string TAIL = "cursortail";
+		const std::string TRAIL = "cursortrail";
 		inline std::unordered_map<Template::Game::Direction::Direction, const std::string> DIRECTION = {
 			{Template::Game::Direction::Direction::RIGHT, "right/direction"},
 			{Template::Game::Direction::Direction::UP, "up/direction"},
@@ -28,13 +28,13 @@ namespace SkinFormat
 
 		enum class HitObjectType : HitObjectTypeBase
 		{
-			FLOOR,
-			SLIDER_FOCUS,
-			SLIDER_BEGIN,
-			SLIDER_LINE,
-			SLIDER_POINT,
-			SLIDER_CURVE,
-			SLIDER_END
+			FLOOR = 0,
+			SLIDER_FOCUS = 1,
+			SLIDER_BEGIN = 2,
+			SLIDER_LINE = 3,
+			SLIDER_POINT = 4,
+			SLIDER_CURVE = 5,
+			SLIDER_END = 6
 		};
 		struct HitObjectDirectionSkinType : std::array<std::string, NUM_SKIN_TYPE>
 		{
@@ -69,16 +69,16 @@ namespace SkinFormat
 				return BASE::operator[](static_cast<HitObjectTypeBase>(type));
 			}
 			explicit HitObjectDirectionSkinType(const Template::Game::Direction::Direction& direction) :
-				direction_folder(get_direction_folder(direction)),
-				BASE{
-					direction_folder + "floor",
-					direction_folder + "sliderfocus",
-					direction_folder + "sliderbegin",
-					direction_folder + "sliderline",
-					direction_folder + "sliderpoint",
-					direction_folder + "slidercurve",
-					direction_folder + "sliderend"
-				} {
+				BASE{},
+				direction_folder(get_direction_folder(direction))
+			{
+				(*this)[HitObjectType::FLOOR] = direction_folder + "floor";
+				(*this)[HitObjectType::SLIDER_FOCUS] = direction_folder + "sliderfocus";
+				(*this)[HitObjectType::SLIDER_BEGIN] = direction_folder + "sliderbegin";
+				(*this)[HitObjectType::SLIDER_LINE] = direction_folder + "sliderline";
+				(*this)[HitObjectType::SLIDER_POINT] = direction_folder + "sliderpoint";
+				(*this)[HitObjectType::SLIDER_CURVE] = direction_folder + "slidercurve";
+				(*this)[HitObjectType::SLIDER_END] = direction_folder + "sliderend";
 			}
 		};
 		struct HitObjectSkinType : std::array<HitObjectDirectionSkinType, Template::Game::Direction::NUM_DIRECTIONS>

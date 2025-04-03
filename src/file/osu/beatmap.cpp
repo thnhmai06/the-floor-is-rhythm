@@ -1,7 +1,7 @@
-﻿#include "file/osu/osu_beatmap.h" // Header
+﻿#include "file/osu/beatmap.h" // Header
 #include <osu!parser/Parser.hpp>
 #include <fstream>
-#include "rule/file_format.h"
+#include "format/file.h"
 #include "game/metadata.h"
 #include "game/hitobject.h"
 #include "game/timing.h"

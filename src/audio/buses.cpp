@@ -1,5 +1,5 @@
 ﻿#include "audio/buses.h" // Header
-#include "rule/config.h"
+#include "config.h"
 #include "template.h"
 #include "logger/logging.h"
 #include "logger/exceptions.h"

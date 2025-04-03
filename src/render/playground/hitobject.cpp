@@ -1,7 +1,7 @@
-﻿#include "render/playground/r_hitobject.h" // Header
+﻿#include "render/playground/hitobject.h" // Header
 #include <ranges>
-#include "rule/skin_format.h"
-#include "rule/config.h"
+#include "format/skin.h"
+#include "config.h"
 #include "template.h"
 
 using SkinFormat::HitObject::HitObjectType, SkinFormat::HitObject::HitObjectSkin;

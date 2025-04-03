@@ -1,6 +1,6 @@
 ﻿#include "skin.h" // Header
 #include <filesystem>
-#include "rule/skin_format.h"
+#include "format/skin.h"
 #include "logger/logging.h"
 
 std::unordered_set<std::string> load_skin(
@@ -18,7 +18,7 @@ std::unordered_set<std::string> load_skin(
 		for (const auto& entry : std::filesystem::directory_iterator(skin_path))
 		{
 			const auto& path = entry.path();
-			if (const auto name = path.lexically_relative(root_path).string(); 
+			if (const auto name = path.lexically_relative(root_path).replace_extension().generic_string();
 				entry.is_directory() && SkinFormat::FOLDER_STORAGE.contains(name))
 			{
 				try

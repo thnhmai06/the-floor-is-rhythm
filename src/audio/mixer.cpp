@@ -3,7 +3,7 @@
 #include "logger/logging.h"
 #include "logger/exceptions.h"
 #include "utilities.h"
-#include "rule/config.h"
+#include "config.h"
 
 using namespace Utilities::Audio;
 using namespace GameConfig::Audio;

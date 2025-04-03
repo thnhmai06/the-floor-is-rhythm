@@ -1,7 +1,7 @@
-﻿#include "file/tfir/tfir_beatmap.h" // Header
+﻿#include "file/tfir/beatmap.h" // Header
 #include <fstream>
 #include <unordered_map>
-#include "rule/file_format.h"
+#include "format/file.h"
 #include "logger/exceptions.h"
 #include "logger/logging.h"
 #include "utilities.h"
