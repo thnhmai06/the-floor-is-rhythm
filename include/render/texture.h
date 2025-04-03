@@ -12,8 +12,8 @@ protected:
 
 public:
 	SDL_Renderer* renderer;
-	SDL_Texture* load_texture(const char* file_path, const std::string& name);
-	SDL_Texture* load_texture(SDL_Texture* texture, const std::string& name);
+	Texture load_texture(const char* file_path, const std::string& name, bool override = true);
+	Texture load_texture(SDL_Texture* texture, const std::string& name, bool override = true);
 	[[nodiscard]] static SDL_FPoint get_texture_size(const const_iterator& texture);
 	[[nodiscard]] SDL_FPoint get_texture_size(const std::string& name) const;
 	[[nodiscard]] Texture find(const std::string& name) const;

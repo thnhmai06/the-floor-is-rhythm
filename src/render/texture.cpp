@@ -6,8 +6,9 @@
 #include "utilities.h"
 
 // TextureMemory
-SDL_Texture* TextureMemory::load_texture(const char* file_path, const std::string& name)
+Texture TextureMemory::load_texture(const char* file_path, const std::string& name, const bool override)
 {
+	if (!override && contains(name)) return {};
 	SDL_Texture* texture = IMG_LoadTexture(this->renderer, file_path);
 	if (!texture)
 		THROW_ERROR(SDLExceptions::Texture::SDL_Texture_Load_Failed(file_path));
@@ -29,13 +30,15 @@ SDL_Texture* TextureMemory::load_texture(const char* file_path, const std::strin
 	}
 	stbi_image_free(image);*/
 
-	return load_texture(texture, name);
+	return load_texture(texture, name, override);
 }
-SDL_Texture* TextureMemory::load_texture(SDL_Texture* texture, const std::string& name)
+Texture TextureMemory::load_texture(SDL_Texture* texture, const std::string& name, const bool override)
 {
+	if (!override && contains(name)) return {};
 	SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-	insert_or_assign(name, texture);
-	return texture;
+	free_texture(name); // Nếu không có sẽ không làm gì
+	const auto item = insert_or_assign(name, texture).first;
+	return { item, this };
 }
 Texture TextureMemory::find(const std::string& name) const
 {
