@@ -3,6 +3,7 @@
 #include "main.h"
 #include "format/skin.h"
 #include "skin.h"
+#include "file/tfir/beatmap.h"
 
 int32_t render(SDL_Window* window)
 {
@@ -12,10 +13,14 @@ int32_t render(SDL_Window* window)
 
 	WorkingLayers::init_all(renderer);
 	const char* skin_path = "./assets";
-	load_skin(skin_path, WorkingLayers::playground->memory);
 
 	try
 	{
+		load_skin(skin_path, WorkingLayers::playground->memory);
+		BeatmapFile beatmap(R"(D:\output.tfd)");
+		WorkingLayers::playground->run_beatmap(beatmap.hit_objects, beatmap.calculated_difficulty, beatmap.timing_points);
+		WorkingLayers::playground->render_range = {0, 0};
+
 		SDL_Event quit_event;
 		while (running) {
 			// quit event
@@ -24,6 +29,7 @@ int32_t render(SDL_Window* window)
 			// render
 			SDL_RenderClear(renderer);
 			WorkingLayers::render_all();
+			WorkingLayers::playground->camera.move_x(0.1f);
 			SDL_RenderPresent(renderer);
 		}
 	} catch (...) {

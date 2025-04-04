@@ -6,8 +6,8 @@ namespace UserConfig
 {
 	namespace Video
 	{
-		inline int32_t width = 1366;
-		inline int32_t height = 768;
+		inline int32_t width = 640;
+		inline int32_t height = 480;
 	}
 	namespace Volume
 	{
@@ -40,10 +40,21 @@ namespace GameConfig
 	{
 		constexpr int32_t LOGICAL_WIDTH = 640;
 		constexpr int32_t LOGICAL_HEIGHT = 480;
-		constexpr int32_t GAMEPLAY_WIDTH = 510;
-		constexpr int32_t GAMEPLAY_HEIGHT = 384;
-		constexpr int32_t DEFAULT_CAMERA_SIZE_WIDTH = LOGICAL_WIDTH;
-		constexpr int32_t DEFAULT_CAMERA_SIZE_HEIGHT = LOGICAL_HEIGHT;
+
+		namespace Camera
+		{
+			constexpr int32_t DEFAULT_POS_X = 0;
+			constexpr int32_t DEFAULT_POS_Y = 0;
+			constexpr int32_t DEFAULT_SIZE_WIDTH = LOGICAL_WIDTH;
+			constexpr int32_t DEFAULT_SIZE_HEIGHT = LOGICAL_HEIGHT;
+		}
+	}
+	namespace HitObject
+	{
+		constexpr int32_t DEFAULT_POS_X = Video::Camera::DEFAULT_POS_X;
+		constexpr int32_t DEFAULT_POS_Y = Video::Camera::DEFAULT_POS_Y;
+		constexpr int32_t SIZE_HEIGHT = 40; // pixel
+		constexpr int32_t SLIDER_POINT_SIZE_WIDTH = SIZE_HEIGHT / 4; // pixel
 	}
 	namespace Difficulty
 	{
@@ -65,14 +76,7 @@ namespace GameConfig
 		}
 		namespace Velocity
 		{
-			constexpr float BASE_SPEED = 100; // pixel/s
+			constexpr float BASE_SPEED = static_cast<float>(HitObject::SIZE_HEIGHT) * 3 / 1000; // pixel/ms
 		}
-	}
-	namespace HitObject
-	{
-		constexpr int32_t DEFAULT_POS_X = 0;
-		constexpr int32_t DEFAULT_POS_Y = 0;
-		constexpr int32_t SIZE_HEIGHT = 40;
-		constexpr int32_t SLIDER_POINT_SIZE_WIDTH = SIZE_HEIGHT / 4;
 	}
 }

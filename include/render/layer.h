@@ -1,8 +1,8 @@
 ﻿#pragma once
 #include <SDL3/SDL_render.h>
-#include "texture.h"
-#include "object.h"
+#include "config.h"
 #include "render/playground/hitobject.h"
+#include "game/timing.h"
 #include "utilities.h"
 
 struct LayerCamera : private RenderConfig
@@ -21,9 +21,11 @@ struct LayerCamera : private RenderConfig
 
 	LayerCamera() : RenderConfig()
 	{
-		const auto [camera_width, camera_height] = get_camera_size(false);
-		origin_pos.x = Utilities::Math::centre(0, camera_width);
-		origin_pos.y = Utilities::Math::centre(0, camera_height);
+		origin_pos = {
+			Utilities::Math::centre(0, GameConfig::Video::LOGICAL_WIDTH),
+			Utilities::Math::centre(0, GameConfig::Video::LOGICAL_HEIGHT)
+		};
+		render_pos = { .x= GameConfig::Video::Camera::DEFAULT_POS_X, .y= GameConfig::Video::Camera::DEFAULT_POS_Y };
 	}
 };
 
@@ -43,7 +45,7 @@ namespace Layers
 	struct Layer
 	{
 		using RenderBuffer = std::list<RenderObjects::RenderObjects>;
-		using RenderRange = std::pair<RenderBuffer::iterator, RenderBuffer::iterator>;
+		using RenderRange = std::pair<int32_t, int32_t>;
 
 		SDL_Renderer* renderer;
 		RenderBuffer render_buffer;

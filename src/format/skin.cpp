@@ -6,16 +6,13 @@ SkinFormat::ImageStorage::ImageStorage()
 	// Của Cursor
     insert(Cursor::BODY);
 	insert(Cursor::TRAIL);
-    for (const auto& val : Cursor::DIRECTION | std::views::values) {
+    for (const auto& val : Cursor::DIRECTION | std::views::values) 
         insert(val);
-    }
 
 	// Của HitObjects
-    for (const auto& direction_skin : HitObject::HitObjectSkin) {
-		for (const auto& skin : direction_skin) {
+    for (const auto& direction_skin : HitObject::HitObjectSkin)
+		for (const auto& skin : direction_skin)
 			insert(skin);
-		}
-    }
 }
 
 SkinFormat::FolderStorage::FolderStorage()

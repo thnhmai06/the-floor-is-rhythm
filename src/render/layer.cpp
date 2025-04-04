@@ -13,32 +13,42 @@ SDL_FPoint LayerCamera::get_camera_pos() const { return render_pos; }
 SDL_FPoint LayerCamera::get_camera_size(const bool after_scale) const
 {
 	return after_scale
-	? SDL_FPoint{ GameConfig::Video::DEFAULT_CAMERA_SIZE_WIDTH * scale.x, GameConfig::Video::DEFAULT_CAMERA_SIZE_HEIGHT * scale.y }
-	: SDL_FPoint{ GameConfig::Video::DEFAULT_CAMERA_SIZE_WIDTH, GameConfig::Video::DEFAULT_CAMERA_SIZE_HEIGHT };
+	? SDL_FPoint{ GameConfig::Video::Camera::DEFAULT_SIZE_WIDTH * scale.x, GameConfig::Video::Camera::DEFAULT_SIZE_HEIGHT * scale.y }
+	: SDL_FPoint{ GameConfig::Video::Camera::DEFAULT_SIZE_WIDTH, GameConfig::Video::Camera::DEFAULT_SIZE_HEIGHT };
 }
 void LayerCamera::move_into_camera(RenderObjects::RenderObject& object) const
 {
-	object.config.scale.x *= scale.x;
-	object.config.scale.y *= scale.y;
-	const auto camera_pos_sdl = origin_pos.convert_pos_from_origin(get_camera_pos());
-	object.config.render_pos.x -= camera_pos_sdl.x;
-	object.config.render_pos.y -= camera_pos_sdl.y;
+	if (scale.x > 0) object.config.scale.x *= scale.x;
+	if (scale.y > 0) object.config.scale.y *= scale.y;
+	const auto render_pos_sdl = origin_pos.convert_pos_to_origin(render_pos, {0, 0});
+	object.config.render_pos.x -= render_pos_sdl.x;
+	object.config.render_pos.y -= render_pos_sdl.y;
 }
 void LayerCamera::move_out_camera(RenderObjects::RenderObject& object) const
 {
-	object.config.scale.x /= scale.x;
-	object.config.scale.y /= scale.y;
-	const auto camera_pos_sdl = origin_pos.convert_pos_from_origin(get_camera_pos());
-	object.config.render_pos.x += camera_pos_sdl.x;
-	object.config.render_pos.y += camera_pos_sdl.y;
+	const auto render_pos_sdl = origin_pos.convert_pos_to_origin(render_pos, {0, 0});
+	object.config.render_pos.x += render_pos_sdl.x;
+	object.config.render_pos.y += render_pos_sdl.y;
+	if (scale.x > 0) object.config.scale.x /= scale.x;
+	if (scale.y > 0) object.config.scale.y /= scale.y;
 }
 
 //! Layer
 void Layers::Layer::render()
 {
-	if (!visible) return;
-	const auto begin = render_range ? render_range->first : render_buffer.begin();
-	const auto end = render_range ? render_range->second : render_buffer.end();
+	if (!visible || render_buffer.empty()) return;
+	const auto size = static_cast<int32_t>(render_buffer.size());
+	auto begin = render_buffer.begin();
+	auto end = render_buffer.end();
+	if (render_range.has_value())
+	{
+		if (render_range.value().first > render_range.value().second)
+			std::swap(render_range.value().first, render_range.value().second);
+		if (0 <= render_range.value().first && render_range.value().first < size)
+			begin = std::next(render_buffer.begin(), render_range.value().first);
+		if (0 <= render_range.value().second && render_range.value().second < size)
+			end = std::next(render_buffer.begin(), render_range.value().second + 1);
+	}
 	for (auto objects = begin; objects != end; ++objects)
 	{
 		for (auto& object: *objects)
@@ -113,35 +123,3 @@ Layers::PlaygoundLayer::PlaygoundLayer(
 {
 	run_beatmap(hit_objects, difficulty, timing_points);
 }
-
-//void Layers::Layer::to_absolute_object(Texture::TextureConfig& object) const
-//{
-//	// dstrect
-//	if (render_setting.dst_rect && object.origin_dst)
-//	{
-//		// Position
-//		object.origin_dst->x += render_setting.dst_rect->x;
-//		object.origin_dst->y += render_setting.dst_rect->y;
-//
-//		// Scaling
-//		object.origin_dst->w *= render_setting.dst_rect->w / GameConfig::Video::LOGICAL_WIDTH;
-//		object.origin_dst->h *= render_setting.dst_rect->h / GameConfig::Video::LOGICAL_HEIGHT;
-//	}
-//	// alpha
-//	object.alpha = (object.alpha * render_setting.alpha) / 255;
-//}
-//void Layers::Layer::to_relative_object(Texture::TextureConfig& object) const
-//{
-//	// dstrect
-//	if (render_setting.dst_rect && object.origin_dst)
-//	{
-//		// Position
-//		object.origin_dst->x -= render_setting.dst_rect->x;
-//		object.origin_dst->y -= render_setting.dst_rect->y;
-//		// Scaling
-//		object.origin_dst->w *= static_cast<float>(GameConfig::Video::LOGICAL_WIDTH) / render_setting.dst_rect->w;
-//		object.origin_dst->h *= static_cast<float>(GameConfig::Video::LOGICAL_HEIGHT) / render_setting.dst_rect->h;
-//	}
-//	// alpha
-//	object.alpha = (object.alpha * 255) / render_setting.alpha;
-//}

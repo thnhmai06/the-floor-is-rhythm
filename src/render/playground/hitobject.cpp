@@ -1,11 +1,26 @@
 ﻿#include "render/playground/hitobject.h" // Header
-#include <ranges>
 #include "format/skin.h"
 #include "config.h"
 #include "template.h"
 
 using SkinFormat::HitObject::HitObjectType, SkinFormat::HitObject::HitObjectSkin;
 static auto current_direction = Template::Game::Direction::Direction::RIGHT;
+
+static void set_hit_object_size(RenderObjects::RenderObject& object, const float& width)
+{
+	switch (current_direction)
+	{
+	case Template::Game::Direction::Direction::RIGHT:
+	case Template::Game::Direction::Direction::LEFT:
+		object.set_scale_fixed({ width, GameConfig::HitObject::SIZE_HEIGHT });
+		break;
+
+	case Template::Game::Direction::Direction::UP:
+	case Template::Game::Direction::Direction::DOWN:
+		object.set_scale_fixed({ GameConfig::HitObject::SIZE_HEIGHT, width });
+		break;
+	}
+}
 
 //! GameObjects::HitObjects
 // ::RenderHitObject
@@ -40,28 +55,25 @@ RenderObjects::RenderObject RenderObjects::Playground::RenderHitobject::create_a
 	case Template::Game::Direction::Direction::RIGHT:
 		current.src_rect_in_percent.x = src_x_in_percent;
 		current.src_rect_in_percent.w = src_width_in_percent;
-		current.set_scale_fixed({ speed * duration, GameConfig::HitObject::SIZE_HEIGHT });
 		current.config.render_pos.x += previous->get_render_size().x;
 		break;
 	case Template::Game::Direction::Direction::UP:
 		current.src_rect_in_percent.y = src_x_in_percent;
 		current.src_rect_in_percent.h = src_width_in_percent;
-		current.set_scale_fixed({ GameConfig::HitObject::SIZE_HEIGHT, speed * duration });
 		current.config.render_pos.y -= previous->get_render_size().y;
 		break;
 	case Template::Game::Direction::Direction::LEFT:
 		current.src_rect_in_percent.x = src_x_in_percent;
 		current.src_rect_in_percent.w = src_width_in_percent;
-		current.set_scale_fixed({ speed * duration, GameConfig::HitObject::SIZE_HEIGHT });
 		current.config.render_pos.x -= current.get_render_size().x;
 		break;
 	case Template::Game::Direction::Direction::DOWN:
 		current.src_rect_in_percent.y = src_x_in_percent;
 		current.src_rect_in_percent.h = src_width_in_percent;
-		current.set_scale_fixed({ GameConfig::HitObject::SIZE_HEIGHT, speed * duration });
 		current.config.render_pos.y += current.get_render_size().y;
 		break;
 	}
+	set_hit_object_size(current, speed * duration);
 
 	return current;
 }
@@ -77,7 +89,11 @@ RenderObjects::RenderObject RenderObjects::Playground::RenderHitobject::create_s
 	if (!previous || !previous->hit_object)
 	{
 		current_direction = Template::Game::Direction::Direction::RIGHT + current.get_rotation(); // reset
-		render_hit_object.config.render_pos = SDL_FPoint{ GameConfig::HitObject::DEFAULT_POS_X, GameConfig::HitObject::DEFAULT_POS_X };
+		render_hit_object.config.render_pos = 
+			SDL_FPoint{
+				GameConfig::HitObject::DEFAULT_POS_X,
+				GameConfig::HitObject::DEFAULT_POS_Y
+			};
 	}
 	else
 	{
@@ -86,29 +102,27 @@ RenderObjects::RenderObject RenderObjects::Playground::RenderHitobject::create_s
 		switch (current_direction)
 		{
 		case Template::Game::Direction::Direction::RIGHT:
-			render_hit_object.set_scale_fixed({ speed * duration, GameConfig::HitObject::SIZE_HEIGHT });
 			render_hit_object.config.render_pos.x += speed * time_distance;
 			break;
 
 		case Template::Game::Direction::Direction::UP:
-			render_hit_object.set_scale_fixed({ GameConfig::HitObject::SIZE_HEIGHT, speed * duration });
 			render_hit_object.config.render_pos.y -= speed * time_distance;
 			break;
 
 		case Template::Game::Direction::Direction::LEFT:
-			render_hit_object.set_scale_fixed({ speed * duration, GameConfig::HitObject::SIZE_HEIGHT });
 			render_hit_object.config.render_pos.x -= speed * time_distance;
 			break;
 
 		case Template::Game::Direction::Direction::DOWN:
-			render_hit_object.set_scale_fixed({ GameConfig::HitObject::SIZE_HEIGHT, speed * duration });
 			render_hit_object.config.render_pos.y += speed * time_distance;
 			break;
 		}
 	}
+	set_hit_object_size(render_hit_object, speed * duration);
 
 	return render_hit_object;
 }
+
 RenderObjects::Playground::RenderHitobject::RenderHitobject(
 	const Texture& texture,
 	const GameObjects::HitObjects::HitObject& current,
@@ -126,7 +140,7 @@ RenderObjects::Playground::RenderFloor::RenderFloor(
 	const float& current_timing_velocity,
 	const RenderHitobject* previous) :
 	RenderHitobject(memory.find(HitObjectSkin[current_direction += floor_object.get_rotation()][HitObjectType::FLOOR]),
-		floor_object, current_timing_velocity* diff.velocity.speed, diff.od.bad * 2, previous)
+		floor_object, current_timing_velocity * diff.velocity.speed, diff.od.bad * 2, previous)
 {
 }
 // ::RenderSlider
@@ -134,7 +148,7 @@ RenderObjects::RenderObject RenderObjects::Playground::RenderSlider::create_slid
 	const Texture& texture,
 	const RenderObject& previous)
 {
-	SDL_FPoint pos = previous.config.origin_pos; // vị trí centre
+	SDL_FPoint pos = previous.config.render_pos; // vị trí centre
 	SDL_FPoint size = { GameConfig::HitObject::SIZE_HEIGHT, GameConfig::HitObject::SIZE_HEIGHT };
 	switch (current_direction) // Chuyển về end centre
 	{

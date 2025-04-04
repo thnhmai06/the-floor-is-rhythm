@@ -2,8 +2,6 @@
 #include <SDL3/SDL_rect.h>
 #include "game/hitobject.h"
 #include "game/metadata.h"
-#include "game/timing.h"
-#include "render/layer.h"
 #include "render/object.h"
 #include "render/texture.h"
 
