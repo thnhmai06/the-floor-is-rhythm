@@ -45,10 +45,12 @@ namespace RenderObjects
 		[[nodiscard]] SDL_FRect get_sdl_dst_rect() const;
 
 	public:
-		[[nodiscard]] SDL_FPoint get_render_pos() const;
+		[[nodiscard]] SDL_FPoint get_render_sdl_pos() const;
 		[[nodiscard]] SDL_FPoint get_render_size() const;
 		void set_scale_fixed(const SDL_FPoint& size); // chính là đang set dst_rect size (muốn set pos vào trong RenderConfig tìm render_pos)
 		void set_scale_fixed(const float& value);
+		void set_origin_pos(const Template::Render::RenderOriginType& origin_type);
+		void set_origin_pos(const RenderConfig::RenderOriginPoint& custom_origin);
 		void render() const;
 
 		explicit RenderObject(Texture texture, const Template::Render::RenderOriginType& origin_type);

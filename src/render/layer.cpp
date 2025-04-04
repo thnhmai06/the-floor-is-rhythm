@@ -7,6 +7,7 @@ uint8_t LayerCamera::get_alpha() const { return alpha; }
 void LayerCamera::set_alpha(const uint8_t& value) { alpha = value; }
 float LayerCamera::get_zoom() const { return scale.x; }
 void LayerCamera::set_zoom(const float& value) { scale = { .x= value, .y= value }; }
+void LayerCamera::move_zoom(const float& dv) { set_zoom(scale.x + dv); }
 void LayerCamera::move_x(const float& dx) { render_pos.x += dx; }
 void LayerCamera::move_y(const float& dy) { render_pos.y += dy; }
 SDL_FPoint LayerCamera::get_camera_pos() const { return render_pos; }

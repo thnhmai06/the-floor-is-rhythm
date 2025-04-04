@@ -6,8 +6,8 @@ namespace UserConfig
 {
 	namespace Video
 	{
-		inline int32_t width = 640;
-		inline int32_t height = 480;
+		inline int32_t width = 1366;
+		inline int32_t height = 768;
 	}
 	namespace Volume
 	{
@@ -38,8 +38,8 @@ namespace GameConfig
 	}
 	namespace Video
 	{
-		constexpr int32_t LOGICAL_WIDTH = 640;
-		constexpr int32_t LOGICAL_HEIGHT = 480;
+		constexpr int32_t LOGICAL_WIDTH = 1280;
+		constexpr int32_t LOGICAL_HEIGHT = 720;
 
 		namespace Camera
 		{

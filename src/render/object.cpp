@@ -10,7 +10,7 @@ SDL_FPoint RenderConfig::RenderOriginPoint::convert_pos_from_origin(const SDL_FP
 }
 SDL_FPoint RenderConfig::RenderOriginPoint::convert_pos_to_origin(const SDL_FPoint& pos, const RenderOriginPoint& to_origin) const
 {
-	return { pos.x - x  + to_origin.x, pos.y - y + to_origin.y };
+	return { pos.x - x + to_origin.x, pos.y - y + to_origin.y };
 }
 SDL_FRect RenderConfig::RenderOriginPoint::convert_rect_from_origin(const SDL_FRect& rect, const RenderOriginPoint& to_origin) const
 {
@@ -54,7 +54,7 @@ SDL_FRect RenderObjects::RenderObject::get_sdl_dst_rect() const
 {
 	return config.get_sdl_dst_rect(Utilities::Render::get_size_from_rect(get_sdl_src_rect()));
 }
-SDL_FPoint RenderObjects::RenderObject::get_render_pos() const
+SDL_FPoint RenderObjects::RenderObject::get_render_sdl_pos() const
 {
 	return Utilities::Render::get_pos_from_rect(get_sdl_dst_rect());
 }
@@ -70,16 +70,7 @@ void RenderObjects::RenderObject::set_scale_fixed(const float& value)
 {
 	config.set_scale_fixed(value, Utilities::Render::get_size_from_rect(get_sdl_src_rect()));
 }
-void RenderObjects::RenderObject::render() const
-{
-	const auto sdl_texture = src.item->second;
-	const auto src_rect = get_sdl_src_rect();
-	const auto dst_rect = get_sdl_dst_rect();
-	SDL_SetTextureAlphaMod(sdl_texture, config.alpha);
-	if (!SDL_RenderTexture(src.memory->renderer, sdl_texture, &src_rect, &dst_rect))
-		THROW_ERROR(SDLExceptions::Texture::SDL_Texture_Render_Failed(src.get_name()));
-}
-RenderObjects::RenderObject::RenderObject(Texture texture, const Template::Render::RenderOriginType& origin_type) : src(std::move(texture))
+void RenderObjects::RenderObject::set_origin_pos(const Template::Render::RenderOriginType& origin_type)
 {
 	const auto [w, h] = Utilities::Render::get_size_from_rect(get_sdl_src_rect());
 	switch (origin_type)
@@ -113,4 +104,24 @@ RenderObjects::RenderObject::RenderObject(Texture texture, const Template::Rende
 		break;
 	}
 }
-RenderObjects::RenderObject::RenderObject(Texture texture, const RenderConfig::RenderOriginPoint& custom_origin) : src(std::move(texture)), config(custom_origin) {}
+void RenderObjects::RenderObject::set_origin_pos(const RenderConfig::RenderOriginPoint& custom_origin)
+{
+	config.origin_pos = custom_origin;
+}
+void RenderObjects::RenderObject::render() const
+{
+	const auto sdl_texture = src.item->second;
+	const auto src_rect = get_sdl_src_rect();
+	const auto dst_rect = get_sdl_dst_rect();
+	SDL_SetTextureAlphaMod(sdl_texture, config.alpha);
+	if (!SDL_RenderTexture(src.memory->renderer, sdl_texture, &src_rect, &dst_rect))
+		THROW_ERROR(SDLExceptions::Texture::SDL_Texture_Render_Failed(src.get_name()));
+}
+RenderObjects::RenderObject::RenderObject(Texture texture, const Template::Render::RenderOriginType& origin_type) :
+	src(std::move(texture))
+{
+	set_origin_pos(origin_type);
+}
+RenderObjects::RenderObject::RenderObject(Texture texture, const RenderConfig::RenderOriginPoint& custom_origin) :
+	src(std::move(texture)), config(custom_origin) {
+}

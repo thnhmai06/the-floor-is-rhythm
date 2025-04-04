@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include <SDL3/SDL_rect.h>
 #include "game/hitobject.h"
 #include "game/metadata.h"
 #include "render/object.h"
@@ -11,10 +10,6 @@ namespace RenderObjects::Playground
 	{
 		const GameObjects::HitObjects::HitObject* hit_object = nullptr; // note: không dùng tham chiếu &
 
-		static RenderObject create_object_on_pos(
-			const Texture& texture,
-			const SDL_FPoint& pos,
-			const SDL_FPoint& size);
 		static RenderObject create_adjacent_object(
 			const Texture& texture,
 			const float& speed,
@@ -49,9 +44,10 @@ namespace RenderObjects::Playground
 	struct RenderSlider final : RenderHitobject
 	{
 	private:
+		vector slider_points;
 		static RenderObject create_slider_point(
 			const Texture& texture,
-			const RenderObject& previous);
+			const RenderObject* previous);
 	public:
 		RenderSlider(
 			const GameObjects::HitObjects::HitObject& slider_object,

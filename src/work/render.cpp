@@ -19,7 +19,7 @@ int32_t render(SDL_Window* window)
 		load_skin(skin_path, WorkingLayers::playground->memory);
 		BeatmapFile beatmap(R"(D:\output.tfd)");
 		WorkingLayers::playground->run_beatmap(beatmap.hit_objects, beatmap.calculated_difficulty, beatmap.timing_points);
-		WorkingLayers::playground->render_range = {0, 0};
+		WorkingLayers::playground->render_range = {0, 19};
 
 		SDL_Event quit_event;
 		while (running) {
@@ -30,6 +30,7 @@ int32_t render(SDL_Window* window)
 			SDL_RenderClear(renderer);
 			WorkingLayers::render_all();
 			WorkingLayers::playground->camera.move_x(0.1f);
+			WorkingLayers::playground->camera.move_zoom(-0.0001f);
 			SDL_RenderPresent(renderer);
 		}
 	} catch (...) {
