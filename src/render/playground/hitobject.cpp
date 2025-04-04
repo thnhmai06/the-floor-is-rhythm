@@ -28,12 +28,12 @@ RenderObjects::RenderObject RenderObjects::Playground::RenderHitobject::create_a
 	const Texture& texture,
 	const float& speed,
 	const float& duration,
-	const RenderObject* previous,
+	const RenderObject& previous,
 	float src_width_in_percent,
 	const bool src_from_beginning)
 {
 	RenderObject current(texture, Template::Render::RenderOriginType::CENTRE);
-	current.config.render_pos = previous->config.render_pos;
+	current.config.render_pos = previous.config.render_pos;
 	float src_x_in_percent = 0;
 	// size
 	set_hit_object_size(current, speed * duration);
@@ -49,7 +49,7 @@ RenderObjects::RenderObject RenderObjects::Playground::RenderHitobject::create_a
 	case Template::Game::Direction::Direction::RIGHT:
 		current.src_rect_in_percent.x = src_x_in_percent;
 		current.src_rect_in_percent.w = src_width_in_percent;
-		current.config.render_pos.x += previous->get_render_size().x / 2 + current.get_render_size().x / 2;
+		current.config.render_pos.x += previous.get_render_size().x / 2 + current.get_render_size().x / 2;
 		//current.config.render_pos.y += 10; // for debugging
 		break;
 	case Template::Game::Direction::Direction::UP:
@@ -65,7 +65,7 @@ RenderObjects::RenderObject RenderObjects::Playground::RenderHitobject::create_a
 	case Template::Game::Direction::Direction::DOWN:
 		current.src_rect_in_percent.y = src_x_in_percent;
 		current.src_rect_in_percent.h = src_width_in_percent;
-		current.config.render_pos.y += previous->get_render_size().y / 2 + current.get_render_size().y / 2;
+		current.config.render_pos.y += previous.get_render_size().y / 2 + current.get_render_size().y / 2;
 		break;
 	}
 
@@ -204,7 +204,7 @@ RenderObjects::Playground::RenderSlider::RenderSlider(
 			// before curve
 			const float time_length_before_curve = current_beatlength - time_length_after_curve;
 			push_back(create_adjacent_object(memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_LINE]),
-				speed, time_length_before_curve, &back(), time_length_before_curve / current_beatlength));
+				speed, time_length_before_curve, back(), time_length_before_curve / current_beatlength));
 			current_slider_time += time_length_before_curve;
 
 			// curve
@@ -215,13 +215,13 @@ RenderObjects::Playground::RenderSlider::RenderSlider(
 			// after curve
 			// (giống khi không bị dính curve, nhưng retain từ cuối)
 			push_back(create_adjacent_object(memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_LINE]),
-				speed, time_length_after_curve, &back(), time_length_after_curve / current_beatlength, false));
+				speed, time_length_after_curve, back(), time_length_after_curve / current_beatlength, false));
 		}
 		// Tạo slider_object line (bình thường)
 		else {
 			push_back(create_adjacent_object(
 				memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_LINE]),
-				speed, current_beatlength, &back()));
+				speed, current_beatlength, back()));
 		}
 		current_slider_time += current_beatlength;
 
@@ -231,10 +231,12 @@ RenderObjects::Playground::RenderSlider::RenderSlider(
 		// không đặt previous là slider point, vì sliderpoint có thể có khoảng trống trong src
 	}
 
-	// Cuối
-	push_back(create_adjacent_object(memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_END]),
-		speed, duration, &back()));
+	const auto last_component_pos = size() - 1;
 
 	// Thêm Slider Points trở lại phần render
 	insert(end(), std::make_move_iterator(slider_points.begin()), std::make_move_iterator(slider_points.end()));
+
+	// Cuối
+	push_back(create_adjacent_object(memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_END]),
+		speed, duration, at(last_component_pos)));
 }

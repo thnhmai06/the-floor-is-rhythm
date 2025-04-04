@@ -14,7 +14,7 @@ namespace RenderObjects::Playground
 			const Texture& texture,
 			const float& speed,
 			const float& duration,
-			const RenderObject* previous,
+			const RenderObject& previous,
 			float src_width_in_percent = 1,
 			bool src_from_beginning = true);
 		static RenderObject create_spacing_object(
