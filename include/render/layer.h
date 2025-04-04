@@ -12,9 +12,6 @@ struct LayerCamera : private RenderConfig
 
 	[[nodiscard]] uint8_t get_alpha() const;
 	void set_alpha(const uint8_t& value);
-	[[nodiscard]] float get_zoom() const;
-	void set_zoom(const float& value);
-	void move_zoom(const float& dv);
 	[[nodiscard]] SDL_FPoint get_camera_pos() const;
 	[[nodiscard]] SDL_FPoint get_camera_size(bool after_scale = true) const;
 	void move_x(const float& dx);

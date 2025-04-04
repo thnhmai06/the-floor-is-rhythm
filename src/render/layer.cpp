@@ -5,9 +5,6 @@
 //! LayerCamera
 uint8_t LayerCamera::get_alpha() const { return alpha; }
 void LayerCamera::set_alpha(const uint8_t& value) { alpha = value; }
-float LayerCamera::get_zoom() const { return scale.x; }
-void LayerCamera::set_zoom(const float& value) { scale = { .x= value, .y= value }; }
-void LayerCamera::move_zoom(const float& dv) { set_zoom(scale.x + dv); }
 void LayerCamera::move_x(const float& dx) { render_pos.x += dx; }
 void LayerCamera::move_y(const float& dy) { render_pos.y += dy; }
 SDL_FPoint LayerCamera::get_camera_pos() const { return render_pos; }
@@ -19,8 +16,6 @@ SDL_FPoint LayerCamera::get_camera_size(const bool after_scale) const
 }
 void LayerCamera::move_into_camera(RenderObjects::RenderObject& object) const
 {
-	if (scale.x > 0) object.config.scale.x *= scale.x;
-	if (scale.y > 0) object.config.scale.y *= scale.y;
 	const auto render_pos_sdl = origin_pos.convert_pos_to_origin(render_pos, {0, 0});
 	object.config.render_pos.x -= render_pos_sdl.x;
 	object.config.render_pos.y -= render_pos_sdl.y;
@@ -30,8 +25,6 @@ void LayerCamera::move_out_camera(RenderObjects::RenderObject& object) const
 	const auto render_pos_sdl = origin_pos.convert_pos_to_origin(render_pos, {0, 0});
 	object.config.render_pos.x += render_pos_sdl.x;
 	object.config.render_pos.y += render_pos_sdl.y;
-	if (scale.x > 0) object.config.scale.x /= scale.x;
-	if (scale.y > 0) object.config.scale.y /= scale.y;
 }
 
 //! Layer
@@ -106,9 +99,9 @@ void Layers::PlaygoundLayer::run_beatmap(
 			render_buffer.push_back(previous);
 			break;
 		case Template::Game::HitObject::HitObjectType::SLIDER:
-			previous = RenderObjects::Playground::RenderSlider(
+			previous = static_cast<RenderObjects::Playground::RenderHitobject>(RenderObjects::Playground::RenderSlider(
 				hit_object, memory, difficulty, current_uninherited->second.beat_length,
-				current_inherited->second.get_velocity(), &previous);
+				current_inherited->second.get_velocity(), &previous));
 			render_buffer.push_back(previous);
 			break;
 		}
