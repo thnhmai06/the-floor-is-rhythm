@@ -76,7 +76,7 @@ void Layers::PlaygoundLayer::run_beatmap(
 
 	auto current_uninherited = timing_points.begin();
 	auto current_inherited = timing_points.begin();
-	RenderObjects::Playground::RenderHitobject previous;
+	RenderObjects::Playground::RenderHitObject previous;
 	for (const auto& hit_object : hit_objects | std::views::values)
 	{
 		auto next_timing_point = std::next(current_uninherited, 1);
@@ -99,9 +99,9 @@ void Layers::PlaygoundLayer::run_beatmap(
 			render_buffer.push_back(previous);
 			break;
 		case Template::Game::HitObject::HitObjectType::SLIDER:
-			previous = static_cast<RenderObjects::Playground::RenderHitobject>(RenderObjects::Playground::RenderSlider(
+			previous = RenderObjects::Playground::RenderSlider(
 				hit_object, memory, difficulty, current_uninherited->second.beat_length,
-				current_inherited->second.get_velocity(), &previous));
+				current_inherited->second.get_velocity(), &previous);
 			render_buffer.push_back(previous);
 			break;
 		}

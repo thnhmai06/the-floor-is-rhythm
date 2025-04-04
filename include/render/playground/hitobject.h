@@ -6,14 +6,13 @@
 
 namespace RenderObjects::Playground
 {
-	struct RenderHitobject : RenderObjects
+	struct RenderHitObject : RenderObjects
 	{
 		const GameObjects::HitObjects::HitObject* hit_object = nullptr; // note: không dùng tham chiếu &
 
 		static RenderObject create_adjacent_object(
 			const Texture& texture,
-			const float& speed,
-			const float& duration,
+			const SDL_FPoint& size,
 			const RenderObject& previous,
 			float src_width_in_percent = 1,
 			bool src_from_beginning = true);
@@ -21,33 +20,30 @@ namespace RenderObjects::Playground
 			const Texture& texture,
 			const GameObjects::HitObjects::HitObject& current,
 			const float& speed,
-			const float& duration,
-			const RenderHitobject* previous = nullptr);
+			const RenderHitObject* previous = nullptr);
 
-		RenderHitobject() = default;
-		RenderHitobject(
+		RenderHitObject() = default;
+		RenderHitObject(
 			const Texture& texture,
 			const GameObjects::HitObjects::HitObject& current,
 			const float& speed,
-			const float& duration,
-			const RenderHitobject* previous = nullptr);
+			const RenderHitObject* previous = nullptr);
 	};
-	struct RenderFloor final : RenderHitobject
+	struct RenderFloor final : RenderHitObject
 	{
 		RenderFloor(
-			const GameObjects::HitObjects::HitObject& floor_object,
+			const GameObjects::HitObjects::HitObject& floor_hit_object,
 			const TextureMemory& memory,
 			const GameObjects::Metadata::CalculatedDifficulty& diff,
 			const float& current_timing_velocity = 1,
-			const RenderHitobject* previous = nullptr);
+			const RenderHitObject* previous = nullptr);
 	};
-	struct RenderSlider final : RenderHitobject
+	struct RenderSlider final : RenderHitObject
 	{
 	private:
-		vector slider_points;
 		static RenderObject create_slider_point(
 			const Texture& texture,
-			const RenderObject* previous);
+			const RenderObject& previous);
 	public:
 		RenderSlider(
 			const GameObjects::HitObjects::HitObject& slider_object,
@@ -55,6 +51,6 @@ namespace RenderObjects::Playground
 			const GameObjects::Metadata::CalculatedDifficulty& diff,
 			const float& current_beatlength,
 			const float& current_timing_velocity = 1,
-			const RenderHitobject* previous = nullptr);
+			const RenderHitObject* previous = nullptr);
 	};
 }
