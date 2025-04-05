@@ -5,7 +5,7 @@
 
 std::unordered_set<std::string> load_skin(
 	const char* skin_path, 
-	TextureMemory& target_memory, 
+	Structures::Render::Textures::TextureMemory& target_memory,
 	const char* root_path, 
 	const std::unordered_set<std::string>& only_in)
 {

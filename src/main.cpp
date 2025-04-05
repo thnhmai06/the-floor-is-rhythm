@@ -3,10 +3,10 @@
 #include "logger/logging.h"
 #include "logger/exceptions.h"
 #include "work/render.h"
-#include "coremgr.h"
+#include "core.h"
 
-#include "file/tfir/beatmap.h"
-#include "file/osu/beatmap.h"
+#include "parser/tfir/beatmap.h"
+#include "parser/osu/beatmap.h"
 
 constexpr bool DEBUG_MODE = true;
 
@@ -19,7 +19,7 @@ int32_t main(int32_t argc, char* argv[])
 
 	// Window & Renderer
 	SDL_Window* window = nullptr;
-	Init::window(window);
+	Core::Init::window(window);
 
 	// Render
 	result = render(window);
@@ -28,6 +28,6 @@ int32_t main(int32_t argc, char* argv[])
 		R"(D:\output.tfd)");
 	BeatmapFile beatmap(R"(D:\output.tfd)");*/
 
-	CleanUp::window(window);
+	Core::CleanUp::window(window);
 	return result;
 }

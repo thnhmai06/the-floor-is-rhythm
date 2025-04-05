@@ -18,93 +18,84 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\utilities.h">
+    <ClCompile Include="src\structures\audio\buses.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\audio\buses.cpp">
+    <ClCompile Include="src\structures\audio\memory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\audio\memory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\audio\mixer.cpp">
+    <ClCompile Include="src\structures\audio\mixer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\logger\logging.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\game\metadata.cpp">
+    <ClCompile Include="src\structures\game\metadata.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\game\hitsound.cpp">
+    <ClCompile Include="src\structures\game\hitsound.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\game\hitobject.cpp">
+    <ClCompile Include="src\structures\game\hitobject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\render\texture.cpp">
+    <ClCompile Include="src\structures\render\texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\work\render.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\render\layer.cpp">
+    <ClCompile Include="src\structures\render\layer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\coremgr.cpp">
+    <ClCompile Include="src\core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\file\tfir\tfir_beatmap.cpp">
+    <ClCompile Include="src\structures\game\timing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\file\osu\osu_beatmap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\render\cursor\r_cursor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\render\playground\r_hitobject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\game\timing.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\render\object.cpp">
+    <ClCompile Include="src\structures\render\object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\skin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\rule\skin_format.cpp">
+    <ClCompile Include="src\parser\osu\beatmap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\parser\tfir\beatmap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\format\skin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\structures\render\cursor\cursor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\structures\render\playground\hitobject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\game\metadata.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rule\file_format.h">
+    <ClInclude Include="include\structures\game\metadata.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\logger\exceptions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\audio\mixer.h">
+    <ClInclude Include="include\structures\audio\mixer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\audio\buses.h">
+    <ClInclude Include="include\structures\audio\buses.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\audio\memory.h">
+    <ClInclude Include="include\structures\audio\memory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\rule\config.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\game\hitsound.h">
+    <ClInclude Include="include\structures\game\hitsound.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\game\hitobject.h">
+    <ClInclude Include="include\structures\game\hitobject.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="include\logger\logging.h">
@@ -113,49 +104,58 @@
     <ClInclude Include="include\main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\render\texture.h">
+    <ClInclude Include="include\structures\render\texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\work\render.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\render\layer.h">
+    <ClInclude Include="include\structures\render\layer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\coremgr.h">
+    <ClInclude Include="include\core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\file\tfir\tfir_beatmap.h">
+    <ClInclude Include="include\structures\game\cursor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\file\osu\osu_beatmap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\render\cursor\r_cursor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\game\cursor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\rule\skin_format.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\render\playground\r_hitobject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\game\timing.h">
+    <ClInclude Include="include\structures\game\timing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\template.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\render\object.h">
+    <ClInclude Include="include\structures\render\object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\skin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\logger\info.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\parser\osu\beatmap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\parser\tfir\beatmap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\format\file.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\format\skin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structures\render\cursor\cursor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structures\render\playground\hitobject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\utilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

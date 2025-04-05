@@ -53,7 +53,7 @@ namespace GameConfig
 	{
 		constexpr int32_t DEFAULT_POS_X = Video::Camera::DEFAULT_POS_X;
 		constexpr int32_t DEFAULT_POS_Y = Video::Camera::DEFAULT_POS_Y;
-		constexpr int32_t SIZE = 48; // pixel
+		constexpr int32_t SIZE = 64; // pixel
 		constexpr int32_t SLIDER_POINT_SIZE_WIDTH = SIZE / 4; // pixel
 	}
 	namespace Difficulty
@@ -76,7 +76,7 @@ namespace GameConfig
 		}
 		namespace Velocity
 		{
-			constexpr float BASE_SPEED = static_cast<float>(HitObject::SIZE) * 3 / 1000; // pixel/ms
+			constexpr float BASE_SPEED = static_cast<float>(HitObject::SIZE) * 10 / 1000; // pixel/ms
 		}
 	}
 }

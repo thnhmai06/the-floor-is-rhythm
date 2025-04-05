@@ -159,37 +159,37 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\audio\buses.cpp">
+    <ClCompile Include="src\structures\audio\buses.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\audio\memory.cpp">
+    <ClCompile Include="src\structures\audio\memory.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\audio\mixer.cpp">
+    <ClCompile Include="src\structures\audio\mixer.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\coremgr.cpp">
+    <ClCompile Include="src\core.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\file\osu\beatmap.cpp">
+    <ClCompile Include="src\parser\osu\beatmap.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\file\tfir\beatmap.cpp">
+    <ClCompile Include="src\parser\tfir\beatmap.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\format\skin.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\game\hitobject.cpp">
+    <ClCompile Include="src\structures\game\hitobject.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\game\hitsound.cpp">
+    <ClCompile Include="src\structures\game\hitsound.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\game\metadata.cpp">
+    <ClCompile Include="src\structures\game\metadata.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\game\timing.cpp">
+    <ClCompile Include="src\structures\game\timing.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\logger\logging.cpp">
@@ -198,19 +198,19 @@
     <ClCompile Include="src\main.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\render\cursor\cursor.cpp">
+    <ClCompile Include="src\structures\render\cursor\cursor.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\render\layer.cpp">
+    <ClCompile Include="src\structures\render\layer.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\render\object.cpp">
+    <ClCompile Include="src\structures\render\object.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\render\playground\hitobject.cpp">
+    <ClCompile Include="src\structures\render\playground\hitobject.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\render\texture.cpp">
+    <ClCompile Include="src\structures\render\texture.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\skin.cpp">
@@ -219,33 +219,33 @@
     <ClCompile Include="src\work\render.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClInclude Include="include\audio\buses.h">
+    <ClInclude Include="include\structures\audio\buses.h">
     </ClInclude>
-    <ClInclude Include="include\audio\memory.h">
+    <ClInclude Include="include\structures\audio\memory.h">
     </ClInclude>
-    <ClInclude Include="include\audio\mixer.h">
+    <ClInclude Include="include\structures\audio\mixer.h">
     </ClInclude>
     <ClInclude Include="include\config.h">
     </ClInclude>
-    <ClInclude Include="include\coremgr.h">
+    <ClInclude Include="include\core.h">
     </ClInclude>
-    <ClInclude Include="include\file\osu\beatmap.h">
+    <ClInclude Include="include\parser\osu\beatmap.h">
     </ClInclude>
-    <ClInclude Include="include\file\tfir\beatmap.h">
+    <ClInclude Include="include\parser\tfir\beatmap.h">
     </ClInclude>
     <ClInclude Include="include\format\file.h">
     </ClInclude>
     <ClInclude Include="include\format\skin.h">
     </ClInclude>
-    <ClInclude Include="include\game\cursor.h">
+    <ClInclude Include="include\structures\game\cursor.h">
     </ClInclude>
-    <ClInclude Include="include\game\hitobject.h">
+    <ClInclude Include="include\structures\game\hitobject.h">
     </ClInclude>
-    <ClInclude Include="include\game\hitsound.h">
+    <ClInclude Include="include\structures\game\hitsound.h">
     </ClInclude>
-    <ClInclude Include="include\game\metadata.h">
+    <ClInclude Include="include\structures\game\metadata.h">
     </ClInclude>
-    <ClInclude Include="include\game\timing.h">
+    <ClInclude Include="include\structures\game\timing.h">
     </ClInclude>
     <ClInclude Include="include\logger\exceptions.h">
     </ClInclude>
@@ -255,15 +255,15 @@
     </ClInclude>
     <ClInclude Include="include\main.h">
     </ClInclude>
-    <ClInclude Include="include\render\cursor\cursor.h">
+    <ClInclude Include="include\structures\render\cursor\cursor.h">
     </ClInclude>
-    <ClInclude Include="include\render\layer.h">
+    <ClInclude Include="include\structures\render\layer.h">
     </ClInclude>
-    <ClInclude Include="include\render\object.h">
+    <ClInclude Include="include\structures\render\object.h">
     </ClInclude>
-    <ClInclude Include="include\render\playground\hitobject.h">
+    <ClInclude Include="include\structures\render\playground\hitobject.h">
     </ClInclude>
-    <ClInclude Include="include\render\texture.h">
+    <ClInclude Include="include\structures\render\texture.h">
     </ClInclude>
     <ClInclude Include="include\skin.h">
     </ClInclude>
