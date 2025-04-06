@@ -6,7 +6,7 @@
 
 namespace Structures::Render::RenderObjects::Playground
 {
-	using namespace Structures::Render::RenderObjects;
+	using Render::RenderObjects::RenderObject;
 
 	struct RenderHitObject : RenderObjects
 	{

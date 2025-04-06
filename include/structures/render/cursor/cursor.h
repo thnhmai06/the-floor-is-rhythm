@@ -1,36 +1,26 @@
-#pragma once
-#include "structures/render/layer.h"
-#include "format/skin.h"
+﻿#pragma once
+#include "structures/render/playground/hitobject.h"
 #include "template.h"
 
-namespace RenderObjects::Cursor
+namespace Structures::Render::RenderObjects::Cursor
 {
-	using namespace Structures::Render::RenderObjects;
-
-	struct Cursor final : RenderObject
+	struct RenderCursorBody final : RenderObjects
 	{
-		explicit Cursor(const TextureMemory& memory) : RenderObject {
-			memory.find(SkinFormat::Cursor::BODY), Template::Render::RenderOriginType::CENTRE }
-		{
-		}
+		explicit RenderCursorBody(const TextureMemory& memory);
 	};
-	struct CursorTrail final : RenderObject
+	struct RenderCursorTrail final : RenderObjects
 	{
-		explicit CursorTrail(const TextureMemory& memory) : RenderObject {
-			memory.find(SkinFormat::Cursor::TRAIL), Template::Render::RenderOriginType::CENTRE }
-		{
-		}
+		//TODO: Thêm trail theo hướng di chuyển
+		explicit RenderCursorTrail(const TextureMemory& memory);
 	};
-	struct CursorDirection final : RenderObject
+	struct RenderCursorDirection final : RenderObjects
 	{
-		Template::Game::Direction::Direction current_direction = Template::Game::Direction::Direction::RIGHT;
+	private:
+		const Template::Game::Direction::Direction* current_direction;
 
-		void update_direction(const Template::Game::Direction::Direction& direction);
-
-		explicit CursorDirection(const TextureMemory& memory) : RenderObject{
-			memory.find(SkinFormat::Cursor::DIRECTION[Template::Game::Direction::Direction::RIGHT]),
-			Template::Render::RenderOriginType::CENTRE }
-		{
-		}
+	public:
+		void update_src();
+		void change_current_direction_target(const Template::Game::Direction::Direction* new_target);
+		RenderCursorDirection(const TextureMemory& memory, const Template::Game::Direction::Direction* current_direction);
 	};
 }

@@ -13,7 +13,10 @@ SDL_FPoint Layer::LayerCamera::LayerCamera::get_camera_pos() const { return rend
 SDL_FPoint Layer::LayerCamera::LayerCamera::get_camera_size(const bool after_scale) const
 {
 	return after_scale
-		? SDL_FPoint{ GameConfig::Video::Camera::DEFAULT_SIZE_WIDTH * scale.x, GameConfig::Video::Camera::DEFAULT_SIZE_HEIGHT * scale.y }
+		? SDL_FPoint{
+			GameConfig::Video::Camera::DEFAULT_SIZE_WIDTH * scale.x,
+			GameConfig::Video::Camera::DEFAULT_SIZE_HEIGHT * scale.y
+		}
 	: SDL_FPoint{ GameConfig::Video::Camera::DEFAULT_SIZE_WIDTH, GameConfig::Video::Camera::DEFAULT_SIZE_HEIGHT };
 }
 void Layer::LayerCamera::LayerCamera::move_into_camera(RenderObjects::RenderObject& object) const
@@ -30,24 +33,11 @@ void Layer::LayerCamera::LayerCamera::move_out_camera(RenderObjects::RenderObjec
 }
 
 // ::Layer
-void Layer::render()
+void Layer::render_in_range(const RenderObjectsBuffer::iterator& begin, const RenderObjectsBuffer::iterator& end)
 {
-	if (!memory || !visible || render_buffer.empty()) return;
-	const auto size = static_cast<int32_t>(render_buffer.size());
-	auto begin = render_buffer.begin();
-	auto end = render_buffer.end();
-	if (render_range.has_value())
-	{
-		if (render_range.value().first > render_range.value().second)
-			std::swap(render_range.value().first, render_range.value().second);
-		if (0 <= render_range.value().first && render_range.value().first < size)
-			begin = std::next(render_buffer.begin(), render_range.value().first);
-		if (0 <= render_range.value().second && render_range.value().second < size)
-			end = std::next(render_buffer.begin(), render_range.value().second + 1);
-	}
 	for (auto objects = begin; objects != end; ++objects)
 	{
-		for (auto& object : *objects)
+		for (auto& object : *objects->get())
 		{
 			// i hate this job fk
 			camera.move_into_camera(object);
@@ -56,11 +46,30 @@ void Layer::render()
 		}
 	}
 }
+void Layer::render()
+{
+	if (!memory || !visible || render_buffer.empty()) return;
+	auto begin = render_buffer.begin();
+	auto end = render_buffer.end();
+	if (!render_range.empty())
+	{
+		for (const auto& [from, to]: render_range)
+		{
+			if (from > to) continue;
+			if (from < render_buffer.size())
+				begin = std::next(render_buffer.begin(), from);
+			if (to < render_buffer.size())
+				end = std::next(render_buffer.begin(), to + 1);
+			render_in_range(begin, end);
+		}
+	}
+	else render_in_range(begin, end);
+}
 Layer::Layer(const TextureMemory* memory) : memory(memory) {}
 void Layer::reset(const bool to_initial_state)
 {
 	render_buffer.clear();
-	render_range.reset();
+	render_range.clear();
 	if (to_initial_state)
 	{
 		camera = LayerCamera();
@@ -68,7 +77,7 @@ void Layer::reset(const bool to_initial_state)
 }
 
 // ::PlaygroundLayer
-void PlaygoundLayer::run_beatmap(
+void PlaygoundLayer::load_beatmap(
 	const GameObjects::HitObjects::HitObjects& hit_objects,
 	const GameObjects::Metadata::CalculatedDifficulty& difficulty,
 	const GameObjects::Timing::TimingPoints& timing_points)
@@ -84,9 +93,11 @@ void PlaygoundLayer::run_beatmap(
 		while (next_timing_point != timing_points.end() &&
 			hit_object.get_time() >= next_timing_point->first)
 		{
-			if (next_timing_point->second.beat_length < 0) // inherited
+			if (next_timing_point->second.beat_length < 0) 
+				// inherited
 				current_inherited = next_timing_point;
-			else // uninherited
+			else 
+				// uninherited
 				current_uninherited = next_timing_point;
 
 			++next_timing_point;
@@ -97,23 +108,35 @@ void PlaygoundLayer::run_beatmap(
 		case Template::Game::HitObject::HitObjectType::FLOOR:
 			previous = RenderObjects::Playground::RenderFloor(
 				hit_object, *memory, difficulty, current_inherited->second.get_velocity(), &previous);
-			render_buffer.push_back(previous);
+			render_buffer.push_back(std::make_shared<RenderObjects::Playground::RenderHitObject>(previous));
 			break;
 		case Template::Game::HitObject::HitObjectType::SLIDER:
 			previous = RenderObjects::Playground::RenderSlider(
 				hit_object, *memory, difficulty, current_uninherited->second.beat_length,
 				current_inherited->second.get_velocity(), &previous);
-			render_buffer.push_back(previous);
+			render_buffer.push_back(std::make_shared<RenderObjects::Playground::RenderHitObject>(previous));
 			break;
 		}
 	}
 }
 PlaygoundLayer::PlaygoundLayer(const TextureMemory* target_memory): Layer(target_memory) {}
-PlaygoundLayer::PlaygoundLayer(
-	const TextureMemory* target_memory,
-	const GameObjects::HitObjects::HitObjects& hit_objects, 
-	const GameObjects::Metadata::CalculatedDifficulty& difficulty, 
-	const GameObjects::Timing::TimingPoints& timing_points) : Layer(target_memory)
+
+// ::CursorLayer
+CursorLayer::CursorLayer(const TextureMemory* target_memory) : Layer(target_memory) {}
+
+void CursorLayer::load_cursor(const Template::Game::Direction::Direction* current_direction)
 {
-	run_beatmap(hit_objects, difficulty, timing_points);
+	// Thứ tự render: body -> trail -> direction
+
+	const auto cursor_body = std::make_shared<RenderObjects::Cursor::RenderCursorBody>(*memory);
+	render_buffer.push_back(cursor_body);
+	components.body = cursor_body;
+
+	const auto cursor_trail = std::make_shared<RenderObjects::Cursor::RenderCursorTrail>(*memory);
+	render_buffer.push_back(cursor_trail);
+	components.trail = cursor_trail;
+
+	const auto cursor_direction = std::make_shared<RenderObjects::Cursor::RenderCursorDirection>(*memory, current_direction);
+	render_buffer.push_back(cursor_direction);
+	components.direction = cursor_direction;
 }

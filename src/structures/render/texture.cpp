@@ -98,6 +98,12 @@ void TextureMemory::free_all()
 // ::Texture
 const std::string& Texture::get_name() const { return item->first; }
 SDL_FPoint Texture::get_size() const { return memory->get_texture_size(get_name()); }
+void Texture::change_target(const std::string& new_target, const TextureMemory* new_memory)
+{
+	if (new_memory) memory = new_memory;
+	if (!new_target.empty())
+		item = memory->find(new_target).item;
+}
 Texture::Texture(const std::string& name, const TextureMemory* memory) : item(memory->find(name).item), memory(memory) {
 }
 Texture::Texture(TextureMemory::const_iterator item_in_memory, const TextureMemory* memory) : item(std::move(item_in_memory)), memory(memory) {

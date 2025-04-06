@@ -2,6 +2,7 @@
 #include <SDL3/SDL_render.h>
 #include "config.h"
 #include "structures/render/playground/hitobject.h"
+#include "structures/render/cursor/cursor.h"
 #include "structures/game/timing.h"
 #include "utilities.h"
 
@@ -22,12 +23,12 @@ namespace Structures::Render::Layers
 	 */
 	struct Layer
 	{
-		using RenderBuffer = std::list<RenderObjects::RenderObjects>;
-		using RenderRange = std::pair<int32_t, int32_t>;
+		using RenderObjectsBuffer = std::list<RenderObjects::RenderObjectsShared>;
+		using RenderRange = std::list<std::pair<uint32_t, uint32_t>>;
 
 		const TextureMemory* memory = nullptr;
-		RenderBuffer render_buffer;
-		std::optional<RenderRange> render_range;
+		RenderObjectsBuffer render_buffer;
+		RenderRange render_range;
 		struct LayerCamera : private RenderConfig
 		{
 			void move_into_camera(RenderObjects::RenderObject& object) const;
@@ -53,23 +54,42 @@ namespace Structures::Render::Layers
 
 		virtual ~Layer() = default;
 		explicit Layer(const TextureMemory* memory);
-		virtual void render();
+		void render();
 		void reset(bool to_initial_state = false);
+
+	private:
+		virtual void render_in_range(const RenderObjectsBuffer::iterator& begin, const RenderObjectsBuffer::iterator& end);
 	};
 	struct PlaygoundLayer : Layer
 	{
 		//TODO: Làm tương thích với beatmap skin
 
-		void run_beatmap(
+		void load_beatmap(
 			const GameObjects::HitObjects::HitObjects& hit_objects,
 			const GameObjects::Metadata::CalculatedDifficulty& difficulty,
 			const GameObjects::Timing::TimingPoints& timing_points);
 
 		PlaygoundLayer(const TextureMemory* memory);
-		PlaygoundLayer(
-			const TextureMemory* memory,
-			const GameObjects::HitObjects::HitObjects& hit_objects,
-			const GameObjects::Metadata::CalculatedDifficulty& difficulty,
-			const GameObjects::Timing::TimingPoints& timing_points);
+	};
+	struct CursorLayer : Layer
+	{
+	protected:
+		using BASE = Layer;
+
+	private:
+		using BASE::render_buffer;
+		using BASE::render_range;
+
+	public:
+		struct
+		{
+			std::shared_ptr<RenderObjects::Cursor::RenderCursorBody> body;
+			std::shared_ptr<RenderObjects::Cursor::RenderCursorTrail> trail;
+			std::shared_ptr<RenderObjects::Cursor::RenderCursorDirection> direction;
+		} components;
+
+		void load_cursor(const Template::Game::Direction::Direction* current_direction);
+
+		explicit CursorLayer(const TextureMemory* target_memory);
 	};
 }

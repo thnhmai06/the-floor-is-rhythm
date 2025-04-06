@@ -1,4 +1,6 @@
 ﻿#pragma once
+#include <memory>
+
 #include "structures/render/texture.h"
 #include "template.h"
 
@@ -54,12 +56,13 @@ namespace Structures::Render
 			void set_scale_fixed(const float& value);
 			void set_origin_pos(const Template::Render::RenderOriginType& origin_type);
 			void set_origin_pos(const RenderConfig::RenderOriginPoint& custom_origin);
-			void render() const;
+			virtual void render() const;
 
 			explicit RenderObject(Texture texture, const Template::Render::RenderOriginType& origin_type);
 			explicit RenderObject(Texture texture, const RenderConfig::RenderOriginPoint& custom_origin);
-			~RenderObject() = default;
+			virtual ~RenderObject() = default;
 		};
 		using RenderObjects = std::vector<RenderObject>;
+		using RenderObjectsShared = std::shared_ptr<RenderObjects>;
 	}
 }

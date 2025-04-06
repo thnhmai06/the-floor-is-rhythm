@@ -6,6 +6,7 @@
 #include "logger/logging.h"
 #include "utilities.h"
 
+using GameObjects::Metadata::Difficulty;
 static constexpr int32_t MINIMUM_LINE_CHARACTERS = 3;
 
 static std::unordered_map<std::string, std::vector<std::string>> read_content(std::ifstream& reader)
@@ -35,7 +36,7 @@ static void parse_beatmap(BeatmapFile& beatmap, const std::unordered_map<std::st
 	for (const auto& [header, contents] : sections)
 	{
 		if (header == FileFormat::Beatmap::General::HEADER) beatmap.general.read(contents);
-		else if (header == FileFormat::Beatmap::Metadata::HEADER)beatmap.metadata.read(contents);
+		else if (header == FileFormat::Beatmap::Metadata::HEADER) beatmap.metadata.read(contents);
 		else if (header == FileFormat::Beatmap::Difficulty::HEADER) beatmap.calculated_difficulty.apply(Difficulty(contents));
 		else if (header == FileFormat::Beatmap::HitObjects::HEADER) beatmap.hit_objects.read(contents);
 		else if (header == FileFormat::Beatmap::TimingPoints::HEADER) beatmap.timing_points.read(contents);

@@ -36,6 +36,7 @@ namespace Structures::Render::Textures
 
 		[[nodiscard]] const std::string& get_name() const;
 		[[nodiscard]] SDL_FPoint get_size() const;
+		void change_target(const std::string& new_target = {}, const TextureMemory* new_memory = nullptr);
 
 		Texture() = default;
 		Texture(const std::string& name, const TextureMemory* memory);

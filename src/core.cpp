@@ -25,7 +25,7 @@ void Init::renderer(SDL_Window* window, SDL_Renderer*& renderer)
 		THROW_CRITICAL(SDLExceptions::Video::SDL_Video_CreateRenderer_Failed());
 
 	SPDLOG_INFO("GPU Driver: {}", SDL_GetCurrentVideoDriver());
-	SPDLOG_INFO("structures/render/er: {}", SDL_GetRendererName(renderer));
+	SPDLOG_INFO("Renderer: {}", SDL_GetRendererName(renderer));
 
 	SDL_SetRenderLogicalPresentation(
 		renderer,	

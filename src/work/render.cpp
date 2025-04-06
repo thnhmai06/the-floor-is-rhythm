@@ -19,10 +19,15 @@ int32_t render(SDL_Window* window)
 
 	try
 	{
+		auto current_direction = Template::Game::Direction::Direction::UP;
 		load_skin(skin_path, *TextureMemory::skin);
 		BeatmapFile beatmap(R"(D:\output.tfd)");
-		Layers::playground->run_beatmap(beatmap.hit_objects, beatmap.calculated_difficulty, beatmap.timing_points);
-		Layers::playground->render_range = {0, 2};
+		Layers::playground->load_beatmap(beatmap.hit_objects, beatmap.calculated_difficulty, beatmap.timing_points);
+		//Layers::playground->render_range.emplace_back(0, 200);
+
+		Layers::cursor->load_cursor(&current_direction);
+		current_direction = Template::Game::Direction::Direction::DOWN;
+		Layers::cursor->components.direction->update_src();
 
 		SDL_Event quit_event;
 		while (running) {
@@ -32,7 +37,7 @@ int32_t render(SDL_Window* window)
 			// render
 			SDL_RenderClear(renderer);
 			Layers::render_all();
-			Layers::playground->camera.move_x(0.1f);
+			Layers::playground->camera.move_x(10);
 			SDL_RenderPresent(renderer);
 		}
 	} catch (...) {
