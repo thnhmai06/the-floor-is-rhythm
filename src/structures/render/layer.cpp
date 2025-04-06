@@ -51,15 +51,19 @@ void Layer::render()
 	if (!memory || !visible || render_buffer.empty()) return;
 	auto begin = render_buffer.begin();
 	auto end = render_buffer.end();
+	const auto size = render_buffer.size();
 	if (!render_range.empty())
 	{
 		for (const auto& [from, to]: render_range)
 		{
+			const auto r_to = size - from - 1;
+			const auto r_from = size - to - 1;
+
 			if (from > to) continue;
 			if (from < render_buffer.size())
-				begin = std::next(render_buffer.begin(), from);
+				begin = std::next(render_buffer.begin(), r_from);
 			if (to < render_buffer.size())
-				end = std::next(render_buffer.begin(), to + 1);
+				end = std::next(render_buffer.begin(), r_to + 1);
 			render_in_range(begin, end);
 		}
 	}
@@ -118,6 +122,7 @@ void PlaygoundLayer::load_beatmap(
 			break;
 		}
 	}
+	render_buffer.reverse(); // Object trước cần đè lên object sau
 }
 PlaygoundLayer::PlaygoundLayer(const TextureMemory* target_memory): Layer(target_memory) {}
 

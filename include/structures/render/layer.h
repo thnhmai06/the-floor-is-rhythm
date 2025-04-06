@@ -24,7 +24,7 @@ namespace Structures::Render::Layers
 	struct Layer
 	{
 		using RenderObjectsBuffer = std::list<RenderObjects::RenderObjectsShared>;
-		using RenderRange = std::list<std::pair<uint32_t, uint32_t>>;
+		using RenderRange = std::list<std::pair<size_t, size_t>>;
 
 		const TextureMemory* memory = nullptr;
 		RenderObjectsBuffer render_buffer;

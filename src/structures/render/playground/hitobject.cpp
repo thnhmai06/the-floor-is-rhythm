@@ -58,12 +58,12 @@ RenderObject RenderHitObject::create_adjacent_object(
 	case Template::Game::Direction::Direction::UP:
 		object.src_rect_in_percent.y = src_x_in_percent;
 		object.src_rect_in_percent.h = src_width_in_percent;
-		object.config.render_pos.y -= object.get_render_size().y / 2;
+		object.config.render_pos.y -= previous.get_render_size().y / 2 + object.get_render_size().y / 2;
 		break;
 	case Template::Game::Direction::Direction::LEFT:
 		object.src_rect_in_percent.x = src_x_in_percent;
 		object.src_rect_in_percent.w = src_width_in_percent;
-		object.config.render_pos.x -= object.get_render_size().x / 2;
+		object.config.render_pos.x -= previous.get_render_size().x / 2 + object.get_render_size().x / 2;
 		break;
 	case Template::Game::Direction::Direction::DOWN:
 		object.src_rect_in_percent.y = src_x_in_percent;
@@ -153,22 +153,22 @@ RenderObject RenderSlider::create_slider_point(
 	{
 	case Template::Game::Direction::Direction::RIGHT:
 		size.x = GameConfig::HitObject::SLIDER_POINT_SIZE_WIDTH;
-		current.config.render_pos.x = previous.get_render_sdl_pos().x + previous.get_render_size().x;
+		current.config.render_pos.x = previous.get_render_sdl_pos().x + previous.get_render_size().x + size.x / 2;
 		break;
 
 	case Template::Game::Direction::Direction::LEFT:
 		size.x = GameConfig::HitObject::SLIDER_POINT_SIZE_WIDTH;
-		current.config.render_pos.x = previous.get_render_sdl_pos().x - size.x;
+		current.config.render_pos.x = previous.get_render_sdl_pos().x - size.x / 2;
 		break;
 
 	case Template::Game::Direction::Direction::UP:
 		size.y = GameConfig::HitObject::SLIDER_POINT_SIZE_WIDTH;
-		current.config.render_pos.y = previous.get_render_sdl_pos().y - size.y;
+		current.config.render_pos.y = previous.get_render_sdl_pos().y - size.y / 2;
 		break;
 
 	case Template::Game::Direction::Direction::DOWN:
 		size.y = GameConfig::HitObject::SLIDER_POINT_SIZE_WIDTH;
-		current.config.render_pos.y = previous.get_render_sdl_pos().y + previous.get_render_size().y;
+		current.config.render_pos.y = previous.get_render_sdl_pos().y + previous.get_render_size().y + size.y / 2;
 		break;
 	}
 	current.set_scale_fixed(size);
