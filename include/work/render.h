@@ -25,16 +25,16 @@ namespace WorkingComponents::Render
 		using namespace Structures::Render::Layers;
 
 		inline std::unique_ptr<Layer> background;
-		inline std::unique_ptr<PlaygoundLayer> playground;
-		inline std::unique_ptr<CursorLayer> cursor;
+		inline std::unique_ptr<Layer> playground;
+		inline std::unique_ptr<Layer> cursor;
 		inline std::unique_ptr<Layer> hud;
 
 		static void init_all()
 		{
-			background = std::make_unique<Layer>(TextureMemory::skin.get());
-			playground = std::make_unique<PlaygoundLayer>(TextureMemory::skin.get());
-			cursor = std::make_unique<CursorLayer>(TextureMemory::skin.get());
-			hud = std::make_unique<Layer>(TextureMemory::skin.get());
+			background = std::make_unique<Layer>();
+			playground = std::make_unique<Layer>();
+			cursor = std::make_unique<Layer>();
+			hud = std::make_unique<Layer>();
 		}
 		static void render_all()
 		{

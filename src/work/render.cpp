@@ -22,7 +22,7 @@ int32_t render(SDL_Window* window)
 		auto current_direction = Template::Game::Direction::Direction::UP;
 		load_skin(skin_path, *TextureMemory::skin);
 		BeatmapFile beatmap(R"(D:\output.tfd)");
-		Layers::playground->load_beatmap(beatmap.hit_objects, beatmap.calculated_difficulty, beatmap.timing_points);
+		Layers::playground->load_mapset(beatmap.hit_objects, beatmap.calculated_difficulty, beatmap.timing_points);
 		//Layers::playground->render_range.emplace_back(0, 200);
 
 		Layers::cursor->load_cursor(&current_direction);

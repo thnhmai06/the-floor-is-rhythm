@@ -72,7 +72,13 @@
     <ClCompile Include="src\structures\render\cursor\cursor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\render\playground\hitobject.cpp">
+    <ClCompile Include="src\structures\render\playground\mapset.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\structures\render\collection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\structures\screens\screen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -152,10 +158,16 @@
     <ClInclude Include="include\structures\render\cursor\cursor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\render\playground\hitobject.h">
+    <ClInclude Include="include\structures\render\playground\mapset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\utilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structures\screens\screen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structures\render\collection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

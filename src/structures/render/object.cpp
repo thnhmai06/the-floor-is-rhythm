@@ -110,21 +110,44 @@ void RenderObject::set_origin_pos(const RenderConfig::RenderOriginPoint& custom_
 {
 	config.origin_pos = custom_origin;
 }
-void RenderObject::render() const
+void RenderObject::render(const SDL_FPoint& offset) const
 {
+	if (!visible) return;
+
 	const auto sdl_texture = src.item->second;
 	const auto src_rect = get_sdl_src_rect();
-	const auto dst_rect = get_sdl_dst_rect();
+	auto dst_rect = get_sdl_dst_rect();
+	dst_rect.x += offset.x;
+	dst_rect.y += offset.y;
 	SDL_SetTextureAlphaMod(sdl_texture, config.alpha);
 	if (!SDL_RenderTexture(src.memory->renderer, sdl_texture, &src_rect, &dst_rect))
 		THROW_ERROR(SDLExceptions::Texture::SDL_Texture_Render_Failed(src.get_name()));
 }
-using Structures::Render::Textures::Texture;
-RenderObject::RenderObject(Texture texture, const Template::Render::RenderOriginType& origin_type) :
+using Structures::Render::Textures::TexturePtr;
+RenderObject::RenderObject(TexturePtr texture, const Template::Render::RenderOriginType& origin_type) :
 	src(std::move(texture))
 {
 	set_origin_pos(origin_type);
 }
-RenderObject::RenderObject(Texture texture, const RenderConfig::RenderOriginPoint& custom_origin) :
+RenderObject::RenderObject(TexturePtr texture, const RenderConfig::RenderOriginPoint& custom_origin) :
 	src(std::move(texture)), config(custom_origin) {
+}
+
+// ::PolyRenderObject
+auto PolyRenderObject::operator+=(const CONTAINER& other)
+{
+	for (const auto& object : other)
+		push_back(object);
+	return *this;
+}
+auto PolyRenderObject::operator+=(const RenderObject& obj)
+{
+	push_back(obj);
+	return *this;
+}
+void PolyRenderObject::render(const SDL_FPoint& offset) const
+{
+	if (!visible) return;
+	for (const auto& object : *this)
+		object.render(offset);
 }

@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include <memory>
-
 #include "structures/render/texture.h"
 #include "template.h"
 
@@ -41,9 +40,10 @@ namespace Structures::Render
 			// Không còn cho tự render toàn màn hình nữa (dstrect = nullptr);
 			// nếu muốn thì set config.render_pos về {0, 0}, set config.origin_pos về góc trái, rồi chỉnh set_scale_fixed là logical size của màn hình
 
-			Texture src;
+			TexturePtr src;
 			SDL_FRect src_rect_in_percent = { 0, 0, 1, 1 }; // cũng là sdl src_rect, nhưng ở % so với gốc
 			RenderConfig config;
+			bool visible = true;
 
 		protected:
 			[[nodiscard]] SDL_FRect get_sdl_src_rect() const;
@@ -56,13 +56,26 @@ namespace Structures::Render
 			void set_scale_fixed(const float& value);
 			void set_origin_pos(const Template::Render::RenderOriginType& origin_type);
 			void set_origin_pos(const RenderConfig::RenderOriginPoint& custom_origin);
-			virtual void render() const;
+			void render(const SDL_FPoint& offset = {0, 0}) const;
 
-			explicit RenderObject(Texture texture, const Template::Render::RenderOriginType& origin_type);
-			explicit RenderObject(Texture texture, const RenderConfig::RenderOriginPoint& custom_origin);
-			virtual ~RenderObject() = default;
+			RenderObject() = default;
+			explicit RenderObject(TexturePtr texture, const Template::Render::RenderOriginType& origin_type);
+			explicit RenderObject(TexturePtr texture, const RenderConfig::RenderOriginPoint& custom_origin);
 		};
-		using RenderObjects = std::vector<RenderObject>;
-		using RenderObjectsShared = std::shared_ptr<RenderObjects>;
+
+		struct PolyRenderObject : std::vector<RenderObject>
+		{
+		protected:
+			using CONTAINER = std::vector<RenderObject>;
+			using BASE = std::shared_ptr<CONTAINER>;
+
+		public:
+			bool visible = true;
+			void render(const SDL_FPoint& offset = {0, 0}) const;
+
+			auto operator+=(const CONTAINER& other);
+			auto operator+=(const RenderObject& obj);
+			PolyRenderObject() = default;
+		};
 	}
 }

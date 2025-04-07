@@ -1,9 +1,7 @@
-﻿#pragma once
-#include <SDL3/SDL_render.h>
+﻿// ReSharper disable CppClangTidyCppcoreguidelinesAvoidConstOrRefDataMembers
+#pragma once
 #include "config.h"
-#include "structures/render/playground/hitobject.h"
-#include "structures/render/cursor/cursor.h"
-#include "structures/game/timing.h"
+#include "structures/render/collection.h"
 #include "utilities.h"
 
 namespace Structures::Render::Layers
@@ -23,21 +21,46 @@ namespace Structures::Render::Layers
 	 */
 	struct Layer
 	{
-		using RenderObjectsBuffer = std::list<RenderObjects::RenderObjectsShared>;
-		using RenderRange = std::list<std::pair<size_t, size_t>>;
+		// buffer
+		struct RenderBufferItem;
+		struct RenderBuffer : std::list<RenderObjects::RenderObjectCollection*>
+		{
+		protected:
+			using BASE = std::list<RenderObjects::RenderObjectCollection*>;
 
-		const TextureMemory* memory = nullptr;
-		RenderObjectsBuffer render_buffer;
-		RenderRange render_range;
+		public:
+			const Layer* parent;
+
+			RenderBufferItem add_collection(RenderObjects::RenderObjectCollection* collection);
+			static void remove_collection(RenderBufferItem& item);
+
+			RenderBuffer(const Layer* layer) : parent(layer) {}
+		};
+		struct RenderBufferItem
+		{
+			RenderBuffer* render_buffer;
+			RenderBuffer::iterator item;
+
+			void remove();
+
+			RenderBufferItem(RenderBuffer* render_buffer, RenderBuffer::iterator item) :
+				render_buffer(render_buffer), item(std::move(item))
+			{
+			}
+		};
+
+		// attributes
+		RenderBuffer render_buffer;
 		struct LayerCamera : private RenderConfig
 		{
-			void move_into_camera(RenderObjects::RenderObject& object) const;
-			void move_out_camera(RenderObjects::RenderObject& object) const;
+			using RenderObjects::RenderObject;
+
+			SDL_FPoint get_object_offset() const;
 
 			[[nodiscard]] uint8_t get_alpha() const;
-			void set_alpha(const uint8_t& value);
 			[[nodiscard]] SDL_FPoint get_camera_pos() const;
 			[[nodiscard]] SDL_FPoint get_camera_size(bool after_scale = true) const;
+			void set_alpha(const uint8_t& value);
 			void move_x(const float& dx);
 			void move_y(const float& dy);
 
@@ -53,43 +76,8 @@ namespace Structures::Render::Layers
 		bool visible = true;
 
 		virtual ~Layer() = default;
-		explicit Layer(const TextureMemory* memory);
-		void render();
+		explicit Layer();
+		void render() const;
 		void reset(bool to_initial_state = false);
-
-	private:
-		virtual void render_in_range(const RenderObjectsBuffer::iterator& begin, const RenderObjectsBuffer::iterator& end);
-	};
-	struct PlaygoundLayer : Layer
-	{
-		//TODO: Làm tương thích với beatmap skin
-
-		void load_beatmap(
-			const GameObjects::HitObjects::HitObjects& hit_objects,
-			const GameObjects::Metadata::CalculatedDifficulty& difficulty,
-			const GameObjects::Timing::TimingPoints& timing_points);
-
-		PlaygoundLayer(const TextureMemory* memory);
-	};
-	struct CursorLayer : Layer
-	{
-	protected:
-		using BASE = Layer;
-
-	private:
-		using BASE::render_buffer;
-		using BASE::render_range;
-
-	public:
-		struct
-		{
-			std::shared_ptr<RenderObjects::Cursor::RenderCursorBody> body;
-			std::shared_ptr<RenderObjects::Cursor::RenderCursorTrail> trail;
-			std::shared_ptr<RenderObjects::Cursor::RenderCursorDirection> direction;
-		} components;
-
-		void load_cursor(const Template::Game::Direction::Direction* current_direction);
-
-		explicit CursorLayer(const TextureMemory* target_memory);
 	};
 }

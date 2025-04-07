@@ -1,4 +1,5 @@
-﻿#include "structures/render/playground/hitobject.h" // Header
+﻿#include "structures/render/playground/mapset.h" // Header
+#include <ranges>
 #include "format/skin.h"
 #include "config.h"
 #include "template.h"
@@ -23,13 +24,82 @@ static SDL_FPoint get_size_follow_speed(const float& width)
 	return size;
 }
 
-//! Structures::Render::RenderObjects::Playground
-using namespace Structures::Render::RenderObjects::Playground;
+//! Structures::Render::PolyRenderObject::Playground
+//! ::Components
+using namespace Structures::Render::RenderObjects::Playground::Components;
 using SkinFormat::HitObject::HitObjectType, SkinFormat::HitObject::HitObjectSkin;
 // ::RenderHitObject
 //? static
-RenderObject RenderHitObject::create_adjacent_object(
-	const Texture& texture,
+RenderObject RenderHitObject::create_spacing_object(
+	const TexturePtr& texture,
+	const GameObjects::HitObjects::HitObject& current,
+	const float& speed,
+	const RenderHitObject* previous)
+{
+	RenderObject object(texture, Template::Render::RenderOriginType::CENTRE);
+	// Pos
+	if (!previous || !previous->hit_object)
+	{
+		current_direction = Template::Game::Direction::Direction::RIGHT + current.get_rotation(); // reset
+		object.config.render_pos =
+			SDL_FPoint{
+				GameConfig::HitObject::DEFAULT_POS_X,
+				GameConfig::HitObject::DEFAULT_POS_Y
+		};
+	}
+	else
+	{
+		const float time_distance = static_cast<float>(current.get_time() - previous->hit_object->get_end_time());
+		object.config.render_pos = previous->back().config.render_pos;
+		switch (current_direction)
+		{
+		case Template::Game::Direction::Direction::RIGHT:
+			object.config.render_pos.x += speed * time_distance;
+			break;
+
+		case Template::Game::Direction::Direction::UP:
+			object.config.render_pos.y -= speed * time_distance;
+			break;
+
+		case Template::Game::Direction::Direction::LEFT:
+			object.config.render_pos.x -= speed * time_distance;
+			break;
+
+		case Template::Game::Direction::Direction::DOWN:
+			object.config.render_pos.y += speed * time_distance;
+			break;
+		}
+	}
+	object.set_scale_fixed(GameConfig::HitObject::SIZE);
+
+	return object;
+}
+//? public
+RenderHitObject::RenderHitObject(
+	const TexturePtr& texture,
+	const GameObjects::HitObjects::HitObject& current,
+	const float& speed,
+	const RenderHitObject* previous) : hit_object(&current)
+{
+	push_back(create_spacing_object(texture, current, speed, previous));
+}
+
+// ::RenderFloor
+RenderFloor::RenderFloor(
+	const GameObjects::HitObjects::HitObject& floor_hit_object,
+	const TextureMemory& memory,
+	const GameObjects::Metadata::CalculatedDifficulty& diff,
+	const float& current_timing_velocity,
+	const RenderHitObject* previous) :
+	RenderHitObject(memory.find(HitObjectSkin[current_direction += floor_hit_object.get_rotation()][HitObjectType::FLOOR]),
+		floor_hit_object, current_timing_velocity* diff.velocity.speed, previous)
+{
+}
+
+// ::RenderSlider
+//? Static
+RenderObject RenderSlider::create_adjacent_object(
+	const TexturePtr& texture,
 	const SDL_FPoint& size,
 	const RenderObject& previous,
 	float src_width_in_percent,
@@ -74,75 +144,8 @@ RenderObject RenderHitObject::create_adjacent_object(
 
 	return object;
 }
-RenderObject RenderHitObject::create_spacing_object(
-	const Texture& texture,
-	const GameObjects::HitObjects::HitObject& current,
-	const float& speed,
-	const RenderHitObject* previous)
-{
-	RenderObject object(texture, Template::Render::RenderOriginType::CENTRE);
-	// Pos
-	if (!previous || !previous->hit_object)
-	{
-		current_direction = Template::Game::Direction::Direction::RIGHT + current.get_rotation(); // reset
-		object.config.render_pos = 
-			SDL_FPoint{
-				GameConfig::HitObject::DEFAULT_POS_X,
-				GameConfig::HitObject::DEFAULT_POS_Y
-			};
-	}
-	else
-	{
-		const float time_distance = static_cast<float>(current.get_time() - previous->hit_object->get_end_time());
-		object.config.render_pos = previous->back().config.render_pos;
-		switch (current_direction)
-		{
-		case Template::Game::Direction::Direction::RIGHT:
-			object.config.render_pos.x += speed * time_distance;
-			break;
-
-		case Template::Game::Direction::Direction::UP:
-			object.config.render_pos.y -= speed * time_distance;
-			break;
-
-		case Template::Game::Direction::Direction::LEFT:
-			object.config.render_pos.x -= speed * time_distance;
-			break;
-
-		case Template::Game::Direction::Direction::DOWN:
-			object.config.render_pos.y += speed * time_distance;
-			break;
-		}
-	}
-	object.set_scale_fixed(GameConfig::HitObject::SIZE);
-
-	return object;
-}
-//? public
-RenderHitObject::RenderHitObject(
-	const Texture& texture,
-	const GameObjects::HitObjects::HitObject& current,
-	const float& speed,
-	const RenderHitObject* previous) : hit_object(&current)
-{
-	push_back(create_spacing_object(texture, current, speed, previous));
-}
-
-// ::RenderFloor
-RenderFloor::RenderFloor(
-	const GameObjects::HitObjects::HitObject& floor_hit_object,
-	const TextureMemory& memory,
-	const GameObjects::Metadata::CalculatedDifficulty& diff,
-	const float& current_timing_velocity,
-	const RenderHitObject* previous) :
-	RenderHitObject(memory.find(HitObjectSkin[current_direction += floor_hit_object.get_rotation()][HitObjectType::FLOOR]),
-		floor_hit_object, current_timing_velocity * diff.velocity.speed, previous)
-{
-}
-
-// ::RenderSlider
 RenderObject RenderSlider::create_slider_point(
-	const Texture& texture,
+	const TexturePtr& texture,
 	const RenderObject& previous)
 {
 	RenderObject current(texture, Template::Render::RenderOriginType::CENTRE);
@@ -174,6 +177,7 @@ RenderObject RenderSlider::create_slider_point(
 	current.set_scale_fixed(size);
 	return current;
 }
+//? Public
 RenderSlider::RenderSlider(
 	const GameObjects::HitObjects::HitObject& slider_object,
 	const TextureMemory& memory,
@@ -207,7 +211,7 @@ RenderSlider::RenderSlider(
 			//! before curve
 			const float time_length_before_curve = current_beatlength - time_length_after_curve;
 			push_back(create_adjacent_object(memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_LINE]),
-				get_size_follow_speed(speed * time_length_before_curve), 
+				get_size_follow_speed(speed * time_length_before_curve),
 				at(previous_pos), time_length_before_curve / current_beatlength));
 			current_slider_time += time_length_before_curve;
 			previous_pos = size() - 1;
@@ -224,7 +228,7 @@ RenderSlider::RenderSlider(
 			previous_pos = size() - 1;
 		}
 		// Tạo slider_object line (bình thường)
-		else 
+		else
 		{
 			push_back(create_adjacent_object(
 				memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_LINE]),
@@ -241,5 +245,48 @@ RenderSlider::RenderSlider(
 
 	// Cuối
 	push_back(create_adjacent_object(memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_END]),
-		{GameConfig::HitObject::SIZE, GameConfig::HitObject::SIZE}, at(previous_pos)));
+		{ GameConfig::HitObject::SIZE, GameConfig::HitObject::SIZE }, at(previous_pos)));
+}
+
+//! ::Collection
+// ::MapsetCollection
+using namespace Structures::Render::RenderObjects::Playground::Collection;
+MapsetCollection::MapsetCollection(
+	const TextureMemory& memory,
+	const GameObjects::HitObjects::HitObjects& hit_objects,
+	const GameObjects::Metadata::CalculatedDifficulty& difficulty,
+	const GameObjects::Timing::TimingPoints& timing_points)
+{
+	auto current_uninherited = timing_points.begin();
+	auto current_inherited = timing_points.begin();
+
+	const std::weak_ptr<RenderHitObject> previous;
+	for (const auto& hit_object : hit_objects | std::views::values)
+	{
+		auto next_timing_point = std::next(current_uninherited, 1);
+		while (next_timing_point != timing_points.end() &&
+			hit_object.get_time() >= next_timing_point->first)
+		{
+			if (next_timing_point->second.beat_length < 0)
+				// inherited
+				current_inherited = next_timing_point;
+			else
+				// uninherited
+				current_uninherited = next_timing_point;
+
+			++next_timing_point;
+		}
+
+		switch (hit_object.get_type())
+		{
+		case Template::Game::HitObject::HitObjectType::FLOOR:
+			push_back(std::make_shared<RenderFloor>(
+				hit_object, memory, difficulty, current_inherited->second.get_velocity(), (!previous.lock() ? nullptr : previous.lock().get())));
+			break;
+		case Template::Game::HitObject::HitObjectType::SLIDER:
+			push_back(std::make_shared<RenderSlider>(hit_object, memory, difficulty, current_uninherited->second.beat_length,
+				current_inherited->second.get_velocity(), (!previous.lock() ? nullptr : previous.lock().get())));
+			break;
+		}
+	}
 }

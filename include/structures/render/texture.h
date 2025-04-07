@@ -5,7 +5,7 @@
 
 namespace Structures::Render::Textures
 {
-	struct Texture;
+	struct TexturePtr;
 
 	struct TextureMemory : std::unordered_map<std::string, SDL_Texture*>
 	{
@@ -14,11 +14,11 @@ namespace Structures::Render::Textures
 
 	public:
 		SDL_Renderer* renderer;
-		Texture load_texture(const char* file_path, const std::string& name, bool override = true);
-		Texture load_texture(SDL_Texture* texture, const std::string& name, bool override = true);
+		TexturePtr load_texture(const char* file_path, const std::string& name, bool override = true);
+		TexturePtr load_texture(SDL_Texture* texture, const std::string& name, bool override = true);
 		[[nodiscard]] static SDL_FPoint get_texture_size(const const_iterator& texture);
 		[[nodiscard]] SDL_FPoint get_texture_size(const std::string& name) const;
-		[[nodiscard]] Texture find(const std::string& name) const;
+		[[nodiscard]] TexturePtr find(const std::string& name) const;
 		iterator rename_texture(const std::string& old_name, const std::string& new_name);
 		iterator move_texture(const std::string& name, TextureMemory* to_memory);
 		void free_texture(const std::string& name);
@@ -29,7 +29,7 @@ namespace Structures::Render::Textures
 		~TextureMemory() { free_all(); }
 	};
 
-	struct Texture
+	struct TexturePtr
 	{
 		TextureMemory::const_iterator item;
 		const TextureMemory* memory = nullptr;
@@ -38,8 +38,8 @@ namespace Structures::Render::Textures
 		[[nodiscard]] SDL_FPoint get_size() const;
 		void change_target(const std::string& new_target = {}, const TextureMemory* new_memory = nullptr);
 
-		Texture() = default;
-		Texture(const std::string& name, const TextureMemory* memory);
-		Texture(TextureMemory::const_iterator item_in_memory, const TextureMemory* memory);
+		TexturePtr() = default;
+		TexturePtr(const std::string& name, const TextureMemory* memory);
+		TexturePtr(TextureMemory::const_iterator item_in_memory, const TextureMemory* memory);
 	};
 }

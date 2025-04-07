@@ -5,10 +5,10 @@
 #include "logger/exceptions.h"
 #include "utilities.h"
 
-//! Texture::
+//! TexturePtr::
 using namespace Structures::Render::Textures;
 // ::TextureMemory
-Texture TextureMemory::load_texture(const char* file_path, const std::string& name, const bool override)
+TexturePtr TextureMemory::load_texture(const char* file_path, const std::string& name, const bool override)
 {
 	if (!override && contains(name)) return {};
 	SDL_Texture* texture = IMG_LoadTexture(this->renderer, file_path);
@@ -17,7 +17,7 @@ Texture TextureMemory::load_texture(const char* file_path, const std::string& na
 
 	// Nếu dùng STB_Image
 	/*if (!texture)
-		THROW_ERROR(SDLExceptions::Texture::IMG_LoadTexture_Failed(file_path));
+		THROW_ERROR(SDLExceptions::TexturePtr::IMG_LoadTexture_Failed(file_path));
 
 	int32_t w, h, channels;
 	unsigned char* image = stbi_load(file_path, &w, &h, &channels, desired_channels);
@@ -28,13 +28,13 @@ Texture TextureMemory::load_texture(const char* file_path, const std::string& na
 	if (!SDL_UpdateTexture(texture, nullptr, image, w * desired_channels))
 	{
 		stbi_image_free(image);
-		THROW_ERROR(SDLExceptions::Texture::SDL_UpdateTexture_Failed(file_path));
+		THROW_ERROR(SDLExceptions::TexturePtr::SDL_UpdateTexture_Failed(file_path));
 	}
 	stbi_image_free(image);*/
 
 	return load_texture(texture, name, override);
 }
-Texture TextureMemory::load_texture(SDL_Texture* texture, const std::string& name, const bool override)
+TexturePtr TextureMemory::load_texture(SDL_Texture* texture, const std::string& name, const bool override)
 {
 	if (!override && contains(name)) return {};
 	SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
@@ -42,7 +42,7 @@ Texture TextureMemory::load_texture(SDL_Texture* texture, const std::string& nam
 	const auto item = insert_or_assign(name, texture).first;
 	return { item, this };
 }
-Texture TextureMemory::find(const std::string& name) const
+TexturePtr TextureMemory::find(const std::string& name) const
 {
 	if (const auto it = BASE::find(name); it != end())
 		return {it, this};
@@ -95,16 +95,16 @@ void TextureMemory::free_all()
 	BASE::clear();
 }
 
-// ::Texture
-const std::string& Texture::get_name() const { return item->first; }
-SDL_FPoint Texture::get_size() const { return memory->get_texture_size(get_name()); }
-void Texture::change_target(const std::string& new_target, const TextureMemory* new_memory)
+// ::TexturePtr
+const std::string& TexturePtr::get_name() const { return item->first; }
+SDL_FPoint TexturePtr::get_size() const { return memory->get_texture_size(get_name()); }
+void TexturePtr::change_target(const std::string& new_target, const TextureMemory* new_memory)
 {
 	if (new_memory) memory = new_memory;
 	if (!new_target.empty())
 		item = memory->find(new_target).item;
 }
-Texture::Texture(const std::string& name, const TextureMemory* memory) : item(memory->find(name).item), memory(memory) {
+TexturePtr::TexturePtr(const std::string& name, const TextureMemory* memory) : item(memory->find(name).item), memory(memory) {
 }
-Texture::Texture(TextureMemory::const_iterator item_in_memory, const TextureMemory* memory) : item(std::move(item_in_memory)), memory(memory) {
+TexturePtr::TexturePtr(TextureMemory::const_iterator item_in_memory, const TextureMemory* memory) : item(std::move(item_in_memory)), memory(memory) {
 }

@@ -29,6 +29,15 @@ namespace Utilities
 			return 0.0f;
 		}
 		inline float max_float(const float& a, const float& b) { return a > b ? a : b; }
+
+		namespace FPoint
+		{
+			inline SDL_FPoint operator+(const SDL_FPoint& a, const SDL_FPoint& b) { return SDL_FPoint{ a.x + b.x, a.y + b.y }; }
+			inline SDL_FPoint operator-(const SDL_FPoint& a, const SDL_FPoint& b) { return SDL_FPoint{ a.x - b.x, a.y - b.y }; }
+			inline SDL_FPoint& operator+=(SDL_FPoint& a, const SDL_FPoint& b) { a.x += b.x; a.y += b.y; return a; }
+			inline SDL_FPoint& operator-=(SDL_FPoint& a, const SDL_FPoint& b) { a.x -= b.x; a.y -= b.y; return a; }
+			inline SDL_FPoint operator-(const SDL_FPoint& a) { return SDL_FPoint{ -a.x, -a.y }; }
+		}
 	}
 	namespace Audio
 	{
@@ -59,7 +68,7 @@ namespace Utilities
 		inline std::string trim(std::string str)
 		{
 			unsigned long long start = 0;
-			for (const auto &c: str)
+			for (const auto& c : str)
 			{
 				if (c == ' ' || c == '\t' || c == '\n' || c == '\r') start++;
 				else break;
