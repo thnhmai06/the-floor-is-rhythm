@@ -1,4 +1,4 @@
-#include "core.h" // Header
+#include "work/core.h" // Header
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_video.h>
 #include "config.h"
@@ -6,7 +6,7 @@
 #include "logger/logging.h"
 
 //! Core
-using namespace Core;
+using namespace Work::Core;
 // ::Init
 void Init::window(SDL_Window*& window)
 {

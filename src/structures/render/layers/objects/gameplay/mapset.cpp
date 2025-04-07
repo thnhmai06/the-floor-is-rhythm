@@ -1,4 +1,4 @@
-﻿#include "structures/render/playground/mapset.h" // Header
+﻿#include "structures/render/layers/objects/gameplay/mapset.h" // Header
 #include <ranges>
 #include "format/skin.h"
 #include "config.h"
@@ -24,14 +24,14 @@ static SDL_FPoint get_size_follow_speed(const float& width)
 	return size;
 }
 
-//! Structures::Render::PolyRenderObject::Playground
+//! Structures::Render::PolyRenderObject::Gameplay
 //! ::Components
-using namespace Structures::Render::RenderObjects::Playground::Components;
+using namespace Structures::Render::RenderObjects::Gameplay::Components;
 using SkinFormat::HitObject::HitObjectType, SkinFormat::HitObject::HitObjectSkin;
 // ::RenderHitObject
 //? static
 RenderObject RenderHitObject::create_spacing_object(
-	const TexturePtr& texture,
+	const TextureMemory::Item& texture,
 	const GameObjects::HitObjects::HitObject& current,
 	const float& speed,
 	const RenderHitObject* previous)
@@ -76,7 +76,7 @@ RenderObject RenderHitObject::create_spacing_object(
 }
 //? public
 RenderHitObject::RenderHitObject(
-	const TexturePtr& texture,
+	const TextureMemory::Item& texture,
 	const GameObjects::HitObjects::HitObject& current,
 	const float& speed,
 	const RenderHitObject* previous) : hit_object(&current)
@@ -99,7 +99,7 @@ RenderFloor::RenderFloor(
 // ::RenderSlider
 //? Static
 RenderObject RenderSlider::create_adjacent_object(
-	const TexturePtr& texture,
+	const TextureMemory::Item& texture,
 	const SDL_FPoint& size,
 	const RenderObject& previous,
 	float src_width_in_percent,
@@ -145,7 +145,7 @@ RenderObject RenderSlider::create_adjacent_object(
 	return object;
 }
 RenderObject RenderSlider::create_slider_point(
-	const TexturePtr& texture,
+	const TextureMemory::Item& texture,
 	const RenderObject& previous)
 {
 	RenderObject current(texture, Template::Render::RenderOriginType::CENTRE);
@@ -250,7 +250,7 @@ RenderSlider::RenderSlider(
 
 //! ::Collection
 // ::MapsetCollection
-using namespace Structures::Render::RenderObjects::Playground::Collection;
+using namespace Structures::Render::RenderObjects::Gameplay::Collection;
 MapsetCollection::MapsetCollection(
 	const TextureMemory& memory,
 	const GameObjects::HitObjects::HitObjects& hit_objects,
@@ -283,6 +283,7 @@ MapsetCollection::MapsetCollection(
 			push_back(std::make_shared<RenderFloor>(
 				hit_object, memory, difficulty, current_inherited->second.get_velocity(), (!previous.lock() ? nullptr : previous.lock().get())));
 			break;
+
 		case Template::Game::HitObject::HitObjectType::SLIDER:
 			push_back(std::make_shared<RenderSlider>(hit_object, memory, difficulty, current_uninherited->second.beat_length,
 				current_inherited->second.get_velocity(), (!previous.lock() ? nullptr : previous.lock().get())));

@@ -1,4 +1,4 @@
-﻿#include "structures/render/cursor/cursor.h" // Header
+﻿#include "structures/render/layers/objects/gameplay/cursor.h" // Header
 #include "format/skin.h"
 
 //! Structures::Render::PolyRenderObject::Cursor
@@ -45,16 +45,21 @@ RenderCursorDirection::RenderCursorDirection(
 //! ::Collection
 using namespace Structures::Render::RenderObjects::Cursor::Collection;
 CursorCollection::CursorCollection(const TextureMemory& memory, const Template::Game::Direction::Direction* current_direction)
-: RenderObjectCollection()
+	: RenderObjectCollection()
 {
+	//! Chú ý thứ tự: Body -> Trail -> Direction
+
+	// body
 	auto c_body = std::make_shared<RenderCursorBody>(memory);
 	push_back(c_body);
 	body = c_body;
 
+	// trail
 	auto c_trail = std::make_shared<RenderCursorTrail>(memory);
 	push_back(c_trail);
 	trail = c_trail;
 
+	// direction
 	auto c_direction = std::make_shared<RenderCursorDirection>(memory, current_direction);
 	push_back(c_direction);
 	direction = c_direction;

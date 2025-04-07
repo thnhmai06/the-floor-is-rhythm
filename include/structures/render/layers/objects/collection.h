@@ -1,6 +1,6 @@
 #pragma once
 #include <variant>
-#include "structures/render/object.h"
+#include "structures/render/layers/objects/object.h"
 
 namespace Structures::Render::RenderObjects
 {
@@ -25,12 +25,13 @@ namespace Structures::Render::RenderObjects
 		vector<std::pair<size_t, size_t>> render_range;
 		SDL_FPoint offset = { 0, 0 };
 		bool visible = true;
-		void render(const SDL_FPoint& camera_offset);
+		void render(const SDL_FPoint& camera_offset) const;
 
 		RenderObjectCollection() = default;
 		~RenderObjectCollection();
 	};
+	using RenderObjectCollectionUnique = std::unique_ptr<RenderObjectCollection>;
 
 	// Storage
-	using RenderObjectStorage = std::list<RenderObjectCollection>;
+	using RenderObjectStorage = std::list<RenderObjectCollectionUnique>;
 }

@@ -1,12 +1,12 @@
-﻿#include "structures/render/layer.h" // Header
+﻿#include "structures/render/layers/layer.h" // Header
 #include "config.h"
 #include "utilities.h"
 
 using namespace Utilities::Math::FPoint;
 
-//! Layers
-using namespace Structures::Render::Layers;
-// ::Layer::LayerCamera
+// Structures::Render::Layers::Layer
+using Structures::Render::Layers::Layer;
+// ::LayerCamera
 uint8_t Layer::LayerCamera::LayerCamera::get_alpha() const { return alpha; }
 void Layer::LayerCamera::LayerCamera::set_alpha(const uint8_t& value) { alpha = value; }
 void Layer::LayerCamera::LayerCamera::move_x(const float& dx) { render_pos.x += dx; }
@@ -25,18 +25,33 @@ SDL_FPoint Layer::LayerCamera::get_object_offset() const
 {
 	return -origin_pos.convert_pos_to_origin(render_pos, { 0, 0 });
 }
-
-// ::Layer
-// ::RenderBufferItem
-Layer::RenderBufferItem Layer::RenderBuffer::add_collection(RenderObjects::RenderObjectCollection* collection)
+// ::RenderBuffer
+Layer::RenderBuffer::Item Layer::RenderBuffer::add_collection(const RenderObjects::RenderObjectCollection* collection)
 {
-	return {this, insert(end(), collection)};
+	return { this, insert(end(), collection) };
 }
-void Layer::RenderBuffer::remove_collection(RenderBufferItem& item)
+void Layer::RenderBuffer::remove_collection(Item& item)
 {
 	item.remove();
 }
-
+// ::RenderBuffer::Item
+void Layer::RenderBuffer::Item::remove()
+{
+	if (render_buffer && item != render_buffer->end())
+	{
+		render_buffer->erase(item);
+		item = render_buffer->end();
+	}
+}
+Layer::RenderBuffer::Item::Item(RenderBuffer* render_buffer) :
+	render_buffer(render_buffer), item(render_buffer->end())
+{
+}
+Layer::RenderBuffer::Item::Item(RenderBuffer* render_buffer, iterator item) :
+	render_buffer(render_buffer), item(std::move(item))
+{
+}
+// ::
 void Layer::render() const
 {
 	if (!visible || render_buffer.empty()) return;
@@ -50,13 +65,5 @@ void Layer::reset(const bool to_initial_state)
 	if (to_initial_state)
 	{
 		camera = LayerCamera();
-	}
-}
-void Layer::RenderBufferItem::remove()
-{
-	if (render_buffer && item != render_buffer->end())
-	{
-		render_buffer->erase(item);
-		item = render_buffer->end();
 	}
 }

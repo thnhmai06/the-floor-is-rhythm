@@ -1,11 +1,11 @@
 ﻿#pragma once
 #include "structures/game/hitobject.h"
 #include "structures/game/metadata.h"
-#include "structures/render/collection.h"
-#include "structures/render/texture.h"
+#include "structures/render/layers/objects/collection.h"
+#include "structures/render/textures/texture.h"
 #include "structures/game/timing.h"
 
-namespace Structures::Render::RenderObjects::Playground
+namespace Structures::Render::RenderObjects::Gameplay
 {
 	namespace Components
 	{
@@ -16,14 +16,14 @@ namespace Structures::Render::RenderObjects::Playground
 			const GameObjects::HitObjects::HitObject* hit_object = nullptr; // note: không dùng tham chiếu &
 
 			static RenderObject create_spacing_object(
-				const TexturePtr& texture,
+				const TextureMemory::Item& texture,
 				const GameObjects::HitObjects::HitObject& current,
 				const float& speed,
 				const RenderHitObject* previous = nullptr);
 
 			RenderHitObject() = default;
 			RenderHitObject(
-				const TexturePtr& texture,
+				const TextureMemory::Item& texture,
 				const GameObjects::HitObjects::HitObject& current,
 				const float& speed,
 				const RenderHitObject* previous = nullptr);
@@ -41,13 +41,13 @@ namespace Structures::Render::RenderObjects::Playground
 		{
 		private:
 			static RenderObject create_adjacent_object(
-				const TexturePtr& texture,
+				const TextureMemory::Item& texture,
 				const SDL_FPoint& size,
 				const RenderObject& previous,
 				float src_width_in_percent = 1,
 				bool src_from_beginning = true);
 			static RenderObject create_slider_point(
-				const TexturePtr& texture,
+				const TextureMemory::Item& texture,
 				const RenderObject& previous);
 		public:
 			RenderSlider(

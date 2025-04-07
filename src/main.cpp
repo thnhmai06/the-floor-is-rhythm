@@ -3,7 +3,7 @@
 #include "logger/logging.h"
 #include "logger/exceptions.h"
 #include "work/render.h"
-#include "core.h"
+#include "work/core.h"
 
 #include "parser/tfir/beatmap.h"
 #include "parser/osu/beatmap.h"
@@ -19,15 +19,15 @@ int32_t main(int32_t argc, char* argv[])
 
 	// Window & Renderer
 	SDL_Window* window = nullptr;
-	Core::Init::window(window);
+	Work::Core::Init::window(window);
 
 	// Render
-	result = render(window);
+	result = Work::Render::render(window);
 	/*convert_beatmap(
 		R"(D:\PROGRAM\osu!\Songs\2287992 Camellia - Operation_ Zenithfall\Camellia - Operation Zenithfall (Mir) [Final Mission].osu)",
 		R"(D:\output.tfd)");
 	BeatmapFile beatmap(R"(D:\output.tfd)");*/
 
-	Core::CleanUp::window(window);
+	Work::Core::CleanUp::window(window);
 	return result;
 }

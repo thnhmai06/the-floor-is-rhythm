@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <memory>
-#include "structures/render/texture.h"
+#include "structures/render/textures/texture.h"
 #include "template.h"
 
 namespace Structures::Render
@@ -40,7 +40,7 @@ namespace Structures::Render
 			// Không còn cho tự render toàn màn hình nữa (dstrect = nullptr);
 			// nếu muốn thì set config.render_pos về {0, 0}, set config.origin_pos về góc trái, rồi chỉnh set_scale_fixed là logical size của màn hình
 
-			TexturePtr src;
+			TextureMemory::Item src;
 			SDL_FRect src_rect_in_percent = { 0, 0, 1, 1 }; // cũng là sdl src_rect, nhưng ở % so với gốc
 			RenderConfig config;
 			bool visible = true;
@@ -59,8 +59,8 @@ namespace Structures::Render
 			void render(const SDL_FPoint& offset = {0, 0}) const;
 
 			RenderObject() = default;
-			explicit RenderObject(TexturePtr texture, const Template::Render::RenderOriginType& origin_type);
-			explicit RenderObject(TexturePtr texture, const RenderConfig::RenderOriginPoint& custom_origin);
+			explicit RenderObject(TextureMemory::Item texture, const Template::Render::RenderOriginType& origin_type);
+			explicit RenderObject(TextureMemory::Item texture, const RenderConfig::RenderOriginPoint& custom_origin);
 		};
 
 		struct PolyRenderObject : std::vector<RenderObject>

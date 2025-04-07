@@ -2,7 +2,7 @@
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_video.h>
 
-namespace Core
+namespace Work::Core
 {
 	namespace Init
 	{

@@ -1,7 +1,7 @@
 ﻿#pragma once
-#include "structures/render/playground/mapset.h"
+#include "structures/render/layers/objects/gameplay/mapset.h"
+#include "structures/render/layers/objects/collection.h"
 #include "template.h"
-#include "structures/render/collection.h"
 
 namespace Structures::Render::RenderObjects::Cursor
 {
@@ -30,7 +30,7 @@ namespace Structures::Render::RenderObjects::Cursor
 
 	namespace Collection
 	{
-		struct CursorCollection final : private RenderObjectCollection
+		struct CursorCollection final : RenderObjectCollection
 		{
 		protected:
 			using BASE = RenderObjectCollection;

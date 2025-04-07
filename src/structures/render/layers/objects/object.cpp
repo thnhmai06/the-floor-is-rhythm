@@ -1,4 +1,4 @@
-﻿#include "structures/render/object.h" // Header
+﻿#include "structures/render/layers/objects/object.h" // Header
 #include "logger/exceptions.h"
 #include "logger/logging.h"
 #include "utilities.h"
@@ -123,13 +123,12 @@ void RenderObject::render(const SDL_FPoint& offset) const
 	if (!SDL_RenderTexture(src.memory->renderer, sdl_texture, &src_rect, &dst_rect))
 		THROW_ERROR(SDLExceptions::Texture::SDL_Texture_Render_Failed(src.get_name()));
 }
-using Structures::Render::Textures::TexturePtr;
-RenderObject::RenderObject(TexturePtr texture, const Template::Render::RenderOriginType& origin_type) :
+RenderObject::RenderObject(TextureMemory::Item texture, const Template::Render::RenderOriginType& origin_type) :
 	src(std::move(texture))
 {
 	set_origin_pos(origin_type);
 }
-RenderObject::RenderObject(TexturePtr texture, const RenderConfig::RenderOriginPoint& custom_origin) :
+RenderObject::RenderObject(TextureMemory::Item texture, const RenderConfig::RenderOriginPoint& custom_origin) :
 	src(std::move(texture)), config(custom_origin) {
 }
 

@@ -39,22 +39,22 @@
     <ClCompile Include="src\structures\game\hitobject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\render\texture.cpp">
+    <ClCompile Include="src\structures\render\textures\texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\work\render.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\render\layer.cpp">
+    <ClCompile Include="src\structures\render\layers\layer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\core.cpp">
+    <ClCompile Include="src\work\core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\structures\game\timing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\render\object.cpp">
+    <ClCompile Include="src\structures\render\layers\objects\object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\skin.cpp">
@@ -69,16 +69,19 @@
     <ClCompile Include="src\format\skin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\render\cursor\cursor.cpp">
+    <ClCompile Include="src\structures\render\layers\objects\gameplay\cursor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\render\playground\mapset.cpp">
+    <ClCompile Include="src\structures\render\layers\objects\gameplay\mapset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\render\collection.cpp">
+    <ClCompile Include="src\structures\render\layers\objects\collection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\screens\screen.cpp">
+    <ClCompile Include="src\structures\render\screens\gameplay\playing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\structures\render\screens\screen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -110,16 +113,16 @@
     <ClInclude Include="include\main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\render\texture.h">
+    <ClInclude Include="include\structures\render\textures\texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\work\render.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\render\layer.h">
+    <ClInclude Include="include\structures\render\layers\layer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\core.h">
+    <ClInclude Include="include\work\core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\structures\game\cursor.h">
@@ -131,7 +134,7 @@
     <ClInclude Include="include\template.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\render\object.h">
+    <ClInclude Include="include\structures\render\layers\objects\object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\skin.h">
@@ -155,19 +158,31 @@
     <ClInclude Include="include\format\skin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\render\cursor\cursor.h">
+    <ClInclude Include="include\structures\render\layers\objects\gameplay\cursor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\render\playground\mapset.h">
+    <ClInclude Include="include\structures\render\layers\objects\gameplay\mapset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\utilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\screens\screen.h">
+    <ClInclude Include="include\structures\render\screens\screen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\render\collection.h">
+    <ClInclude Include="include\structures\render\layers\objects\collection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structures\render\screens\gameplay\playing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\work\render\textures.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\work\render\screens.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\work\render\layers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

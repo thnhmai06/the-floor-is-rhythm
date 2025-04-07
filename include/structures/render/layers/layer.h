@@ -1,7 +1,7 @@
 ﻿// ReSharper disable CppClangTidyCppcoreguidelinesAvoidConstOrRefDataMembers
 #pragma once
 #include "config.h"
-#include "structures/render/collection.h"
+#include "structures/render/layers/objects/collection.h"
 #include "utilities.h"
 
 namespace Structures::Render::Layers
@@ -23,38 +23,35 @@ namespace Structures::Render::Layers
 	{
 		// buffer
 		struct RenderBufferItem;
-		struct RenderBuffer : std::list<RenderObjects::RenderObjectCollection*>
+		struct RenderBuffer : std::list<const RenderObjects::RenderObjectCollection*>
 		{
 		protected:
 			using BASE = std::list<RenderObjects::RenderObjectCollection*>;
 
 		public:
+			struct Item
+			{
+				RenderBuffer* render_buffer;
+				iterator item;
+
+				void remove();
+
+				explicit Item(RenderBuffer* render_buffer);
+				Item(RenderBuffer* render_buffer, iterator item);
+			};
+
 			const Layer* parent;
 
-			RenderBufferItem add_collection(RenderObjects::RenderObjectCollection* collection);
-			static void remove_collection(RenderBufferItem& item);
+			Item add_collection(const RenderObjects::RenderObjectCollection* collection);
+			static void remove_collection(Item& item);
 
 			RenderBuffer(const Layer* layer) : parent(layer) {}
-		};
-		struct RenderBufferItem
-		{
-			RenderBuffer* render_buffer;
-			RenderBuffer::iterator item;
-
-			void remove();
-
-			RenderBufferItem(RenderBuffer* render_buffer, RenderBuffer::iterator item) :
-				render_buffer(render_buffer), item(std::move(item))
-			{
-			}
 		};
 
 		// attributes
 		RenderBuffer render_buffer;
 		struct LayerCamera : private RenderConfig
 		{
-			using RenderObjects::RenderObject;
-
 			SDL_FPoint get_object_offset() const;
 
 			[[nodiscard]] uint8_t get_alpha() const;

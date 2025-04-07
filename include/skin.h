@@ -1,6 +1,6 @@
 #pragma once
 #include <unordered_set>
-#include "structures/render/texture.h"
+#include "structures/render/textures/texture.h"
 
 std::unordered_set<std::string> load_skin(
 	const char* skin_path,

@@ -1,4 +1,4 @@
-#include "structures/render/collection.h" // Header
+#include "structures/render/layers/objects/collection.h" // Header
 #include "utilities.h"
 
 // Structures::Render::RenderObjects::RenderObjectCollection
@@ -12,7 +12,7 @@ void RenderObjectCollection::render_in_range(const size_t& from, const size_t& t
 				object->render(total_offset);
 			}, (*this)[i]);
 }
-void RenderObjectCollection::render(const SDL_FPoint& camera_offset)
+void RenderObjectCollection::render(const SDL_FPoint& camera_offset) const
 {
 	using Utilities::Math::FPoint::operator+;
 
