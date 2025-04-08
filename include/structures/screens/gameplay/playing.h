@@ -1,5 +1,5 @@
 #pragma once
-#include "structures/render/screens/screen.h"
+#include "structures/screens/screen.h"
 #include "parser/tfir/beatmap.h"
 
 namespace Structures::Render::Screen::Gameplay

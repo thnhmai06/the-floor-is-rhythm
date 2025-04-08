@@ -1,4 +1,4 @@
-#include "structures/render/screens/gameplay/playing.h" // Header
+#include "structures/screens/gameplay/playing.h" // Header
 #include "structures/render/layers/objects/gameplay/mapset.h"
 #include "structures/render/layers/objects/gameplay/cursor.h"
 
