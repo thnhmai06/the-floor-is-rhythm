@@ -246,10 +246,10 @@
     <ClCompile Include="src\structures\render\layers\objects\object.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\render\screens\gameplay\playing.cpp">
+    <ClCompile Include="src\structures\screens\gameplay\playing.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\render\screens\screen.cpp">
+    <ClCompile Include="src\structures\screens\screen.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\structures\render\textures\texture.cpp">

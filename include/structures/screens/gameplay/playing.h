@@ -6,20 +6,24 @@ namespace Structures::Render::Screen::Gameplay
 {
 	struct PlayingScreen : private Screens::Screen
 	{
-		struct Components
+		struct Render : Screen::Render
 		{
-			Item map_set;
-			Item cursor;
+			struct Components
+			{
+				Screen::Render::Item map_set;
+				Screen::Render::Item cursor;
 
-			Components(RenderObjects::RenderObjectStorage* storage,
-				Layers::Layer* playground_layer, Layers::Layer* cursor_layer);
-		} components;
-		Template::Game::Direction::Direction current_direction = Template::Game::Direction::Direction::RIGHT;
+				Components(RenderObjects::RenderObjectStorage* storage,
+					Layers::Layer* playground_layer, Layers::Layer* cursor_layer);
+			} components;
+			Template::Game::Direction::Direction current_direction = Template::Game::Direction::Direction::RIGHT;
 
-		PlayingScreen(
-			Layers::Layer& playground_layer,
-			Layers::Layer& cursor_layer,
-			const Textures::TextureMemory& skin,
-			const BeatmapFile& beatmap);
+			Render(Layers::Layer& playground_layer,
+				Layers::Layer& cursor_layer,
+				const Textures::TextureMemory& skin,
+				const BeatmapFile& beatmap);
+		} render;
+
+		explicit PlayingScreen(const BeatmapFile& beatmap);
 	};
 }

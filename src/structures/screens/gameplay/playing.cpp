@@ -1,19 +1,21 @@
 #include "structures/screens/gameplay/playing.h" // Header
 #include "structures/render/layers/objects/gameplay/mapset.h"
 #include "structures/render/layers/objects/gameplay/cursor.h"
+#include "work/render/layers.h"
+#include "work/render/textures.h"
 
 using namespace Structures::Render::Screen::Gameplay;
 
-// ::PlayingScreen
-// :: Components
-PlayingScreen::Components::Components(
+//! PLayingScreen
+// Render
+PlayingScreen::Render::Components::Components(
 	RenderObjects::RenderObjectStorage* storage,
 	Layers::Layer* playground_layer, Layers::Layer* cursor_layer) :
 	map_set(storage, &playground_layer->render_buffer),
 	cursor(storage, &cursor_layer->render_buffer) {
 }
-// ::
-PlayingScreen::PlayingScreen(
+PlayingScreen::Render::Render
+(
 	Layers::Layer& playground_layer,
 	Layers::Layer& cursor_layer,
 	const Textures::TextureMemory& skin,
@@ -35,4 +37,10 @@ PlayingScreen::PlayingScreen(
 		std::make_unique<CursorCollection>(skin, &current_direction)
 	);
 	components.cursor.render_item = cursor_layer.render_buffer.add_collection(components.cursor.storage_item->get());
+}
+
+// Total
+PlayingScreen::PlayingScreen(const BeatmapFile& beatmap) :
+	render(*Work::Render::Layers::playground, *Work::Render::Layers::cursor, *Work::Render::Textures::skin, beatmap)
+{
 }

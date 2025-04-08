@@ -2,23 +2,27 @@
 #include "structures/render/layers/objects/collection.h"
 #include "structures/render/layers/layer.h"
 
-namespace Structures::Render::Screens
+namespace Structures::Screens
 {
-	using RenderObjects::RenderObjectStorage;
+	using Render::RenderObjects::RenderObjectStorage;
+	using Render::Layers::Layer;
 
 	struct Screen
 	{
-		RenderObjectStorage storage;
-
-		struct Item
+		struct Render
 		{
-			RenderObjectStorage* storage;
-			RenderObjectStorage::iterator storage_item;
-			Layers::Layer::RenderBuffer::Item render_item;
+			RenderObjectStorage storage;
 
-			void remove();
+			struct Item
+			{
+				RenderObjectStorage* storage;
+				RenderObjectStorage::iterator storage_item;
+				Layer::RenderBuffer::Item render_item;
 
-			Item(RenderObjectStorage* storage, Layers::Layer::RenderBuffer* render_buffer);
+				void remove();
+
+				Item(RenderObjectStorage* storage, Layer::RenderBuffer* render_buffer);
+			};
 		};
 	};
 }

@@ -1,8 +1,8 @@
 #include "structures/screens/screen.h" // Header
 
-using Structures::Render::Screens::Screen;
+using Structures::Screens::Screen;
 // :: Item
-void Screen::Item::remove()
+void Screen::Render::Item::remove()
 {
 	// render
 	render_item.remove();
@@ -14,7 +14,7 @@ void Screen::Item::remove()
 		storage_item = storage->end();
 	}
 }
-Screen::Item::Item(RenderObjectStorage* storage, Layers::Layer::RenderBuffer* render_buffer) :
+Screen::Render::Item::Item(RenderObjectStorage* storage, Layer::RenderBuffer* render_buffer) :
 	storage(storage), storage_item(storage->end()), render_item(render_buffer)
 {
 }
