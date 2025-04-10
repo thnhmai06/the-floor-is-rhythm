@@ -78,10 +78,13 @@
     <ClCompile Include="src\structures\render\layers\objects\collection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\render\screens\gameplay\playing.cpp">
+    <ClCompile Include="src\structures\screens\gameplay\playing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\render\screens\screen.cpp">
+    <ClCompile Include="src\structures\screens\screen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\structures\timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -167,22 +170,25 @@
     <ClInclude Include="include\utilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\render\screens\screen.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\structures\render\layers\objects\collection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\structures\render\screens\gameplay\playing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\work\render\textures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\work\render\screens.h">
+    <ClInclude Include="include\work\render\layers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\work\render\layers.h">
+    <ClInclude Include="include\structures\screens\gameplay\playing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structures\screens\screen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\work\screens.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structures\timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

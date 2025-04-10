@@ -30,7 +30,7 @@ PlayingScreen::Render::Components::Components(
 }
 PlayingScreen::Render::Render
 (
-	const Game& game,
+	const Template::Game::Direction::Direction* current_direction,
 	Layers::Layer& playground_layer,
 	Layers::Layer& cursor_layer,
 	const Textures::TextureMemory& skin,
@@ -49,7 +49,7 @@ PlayingScreen::Render::Render
 	using RenderObjects::Cursor::Collection::CursorCollection;
 	components.cursor.storage_item = storage.insert(
 		std::prev(storage.end(), 1),
-		std::make_unique<CursorCollection>(skin, &game.current_direction)
+		std::make_unique<CursorCollection>(skin, current_direction)
 	);
 	components.cursor.render_item = cursor_layer.render_buffer.add_collection(components.cursor.storage_item->get());
 }
@@ -57,7 +57,8 @@ PlayingScreen::Render::Render
 // Total
 PlayingScreen::PlayingScreen(const char* beatmap_path) :
 	beatmap(std::make_unique<const BeatmapFile>(beatmap_path)),
-	render(game, *Work::Render::Layers::playground,
+	game(),
+	render(&game.current_direction, *Work::Render::Layers::playground,
 		*Work::Render::Layers::cursor, *Work::Render::Textures::skin, *this->beatmap)
 {
 }

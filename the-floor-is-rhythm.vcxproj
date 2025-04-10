@@ -185,6 +185,7 @@
     <ClInclude Include="include\structures\render\textures\texture.h" />
     <ClInclude Include="include\structures\screens\gameplay\playing.h" />
     <ClInclude Include="include\structures\screens\screen.h" />
+    <ClInclude Include="include\structures\timer.h" />
     <ClInclude Include="include\template.h" />
     <ClInclude Include="include\utilities.h" />
     <ClInclude Include="include\work\core.h" />
@@ -255,6 +256,7 @@
     <ClCompile Include="src\structures\render\textures\texture.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
+    <ClCompile Include="src\structures\timer.cpp" />
     <ClCompile Include="src\work\core.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>

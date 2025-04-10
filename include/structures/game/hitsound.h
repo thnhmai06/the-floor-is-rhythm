@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include <osu!parser/Parser/Structures/Beatmap/HitObject.hpp>
+#include <osu!parser/Parser/Structures/Beatmap/Objects/HitObject.hpp>
 
 // lưu trữ Hitsound và Hitsample giống như osu!
 // p/s: code trong osu!parser/Parser/Structures/Beatmap/HitObjects.hpp

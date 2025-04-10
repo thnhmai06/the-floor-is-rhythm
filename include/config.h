@@ -20,6 +20,21 @@ namespace UserConfig
 		inline int32_t size = 48;
 		inline int32_t direction_size = 32;
 	}
+	namespace KeyBinding
+	{
+		namespace Direction
+		{
+			inline int32_t up = SDL_SCANCODE_UP;
+			inline int32_t down = SDL_SCANCODE_DOWN;
+			inline int32_t left = SDL_SCANCODE_LEFT;
+			inline int32_t right = SDL_SCANCODE_RIGHT;
+		}
+		namespace Click
+		{
+			inline int32_t k1 = SDL_SCANCODE_Z;
+			inline int32_t k2 = SDL_SCANCODE_X;
+		}
+	}
 }
 
 namespace GameConfig

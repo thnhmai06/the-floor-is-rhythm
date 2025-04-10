@@ -1,5 +1,6 @@
 #pragma once
 #include "structures/screens/screen.h"
+#include "structures/timer.h"
 #include "parser/tfir/beatmap.h"
 
 namespace Structures::Render::Screen::Gameplay
@@ -7,11 +8,37 @@ namespace Structures::Render::Screen::Gameplay
 	struct PlayingScreen : private Screens::Screen
 	{
 		std::unique_ptr<const BeatmapFile> beatmap;
-
-		struct Game
+		
+		struct Render : Screen::Render
 		{
+			struct Components
+			{
+				Screen::Render::Item map_set;
+				Screen::Render::Item cursor;
+
+				Components(
+					RenderObjects::RenderObjectStorage* storage,
+					Layers::Layer* playground_layer, 
+					Layers::Layer* cursor_layer);
+			} components;
+
+			Render(
+				const Template::Game::Direction::Direction* current_direction,
+				Layers::Layer& playground_layer,
+				Layers::Layer& cursor_layer,
+				const Textures::TextureMemory& skin,
+				const BeatmapFile& beatmap);
+		} render;
+		struct Game final
+		{
+		private:
+			Template::Game::Direction::Direction require_direction = Template::Game::Direction::Direction::RIGHT;
+			GameObjects::HitObjects::HitObjects::iterator current_hit_object;
+			Timer timer;
+
+		public:
 			uint8_t health = 200;
-			int32_t time = -2000; // ms
+			int64_t current_time = -2000; // ms
 			struct Count
 			{
 				unsigned long count_300 = 0;
@@ -21,13 +48,6 @@ namespace Structures::Render::Screen::Gameplay
 
 				[[nodiscard]] float get_accuracy() const;
 			} count;
-			unsigned long long score = 0;
-			unsigned long combo = 0;
-			unsigned long max_combo = 0;
-			auto current_direction = Template::Game::Direction::Direction::RIGHT;
-			auto require_direction = Template::Game::Direction::Direction::RIGHT;
-
-			// optional
 			struct Keystroke
 			{
 				struct
@@ -43,26 +63,22 @@ namespace Structures::Render::Screen::Gameplay
 					unsigned long k2 = 0;
 				} click;
 			} key_stoke;
-		} game;
+			unsigned long long score = 0;
+			unsigned long combo = 0;
+			unsigned long max_combo = 0;
+			Template::Game::Direction::Direction current_direction = Template::Game::Direction::Direction::RIGHT;
 
-		struct Render : Screen::Render
-		{
-			struct Components
+			[[nodiscard]] bool is_paused() const { return timer.is_paused(); }
+			void pause() { timer.pause(); }
+			void resume() { timer.resume(); }
+
+			void make_time_step()
 			{
-				Screen::Render::Item map_set;
-				Screen::Render::Item cursor;
+				current_time = timer.get_time();
+			}
 
-				Components(RenderObjects::RenderObjectStorage* storage,
-					Layers::Layer* playground_layer, 
-					Layers::Layer* cursor_layer);
-			} components;
-
-			Render(const Game& game,
-				Layers::Layer& playground_layer,
-				Layers::Layer& cursor_layer,
-				const Textures::TextureMemory& skin,
-				const BeatmapFile& beatmap);
-		} render;
+			Game() = default;
+		} game;
 
 		explicit PlayingScreen(const char* beatmap_path);
 	};
