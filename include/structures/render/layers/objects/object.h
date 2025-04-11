@@ -14,7 +14,7 @@ namespace Structures::Render
 			[[nodiscard]] SDL_FRect convert_rect_from_origin(const SDL_FRect& rect, const RenderOriginPoint& to_origin = { 0, 0 }) const;
 			[[nodiscard]] SDL_FRect convert_rect_to_origin(const SDL_FRect& rect, const RenderOriginPoint& to_origin = { 0, 0 }) const;
 		};
-		SDL_FPoint render_pos = { 0, 0 }; // chính là dst_rect với size nguyên gốc (muốn đổi size hãy ra ngoài RenderObject tìm set_scale_fixed())
+		SDL_FPoint render_pos = { 0, 0 }; // chính là dst_rect với size nguyên gốc (muốn đổi size hãy ra ngoài RenderObject tìm set_render_size())
 		RenderOriginPoint origin_pos = { 0, 0 };
 		SDL_FPoint scale = { 1.0f, 1.0f };
 		uint8_t alpha = 255;
@@ -38,7 +38,7 @@ namespace Structures::Render
 		struct RenderObject
 		{
 			// Không còn cho tự render toàn màn hình nữa (dstrect = nullptr);
-			// nếu muốn thì set config.render_pos về {0, 0}, set config.origin_pos về góc trái, rồi chỉnh set_scale_fixed là logical size của màn hình
+			// nếu muốn thì set config.render_pos về {0, 0}, set config.origin_pos về góc trái, rồi chỉnh set_render_size là logical size của màn hình
 
 			TextureMemory::Item src;
 			SDL_FRect src_rect_in_percent = { 0, 0, 1, 1 }; // cũng là sdl src_rect, nhưng ở % so với gốc
@@ -52,8 +52,9 @@ namespace Structures::Render
 		public:
 			[[nodiscard]] SDL_FPoint get_render_sdl_pos() const;
 			[[nodiscard]] SDL_FPoint get_render_size() const;
-			void set_scale_fixed(const SDL_FPoint& size); // chính là đang set dst_rect size (muốn set pos vào trong RenderConfig tìm render_pos)
-			void set_scale_fixed(const float& value);
+			void set_render_size(const SDL_FPoint& size); // chính là đang set dst_rect size (muốn set pos vào trong RenderConfig tìm render_pos)
+			void set_render_size(const float& value);
+			void set_render_size_based_on_src(const SDL_FPoint& src_percent);
 			void set_origin_pos(const Template::Render::RenderOriginType& origin_type);
 			void set_origin_pos(const RenderConfig::RenderOriginPoint& custom_origin);
 			void render(const SDL_FPoint& offset = {0, 0}) const;

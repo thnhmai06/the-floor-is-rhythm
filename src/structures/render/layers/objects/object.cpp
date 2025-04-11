@@ -64,13 +64,18 @@ SDL_FPoint RenderObject::get_render_size() const
 {
 	return Utilities::Render::get_size_from_rect(get_sdl_dst_rect());
 }
-void RenderObject::set_scale_fixed(const SDL_FPoint& size)
+void RenderObject::set_render_size(const SDL_FPoint& size)
 {
 	config.set_scale_fixed(size, Utilities::Render::get_size_from_rect(get_sdl_src_rect()));
 }
-void RenderObject::set_scale_fixed(const float& value)
+void RenderObject::set_render_size(const float& value)
 {
 	config.set_scale_fixed(value, Utilities::Render::get_size_from_rect(get_sdl_src_rect()));
+}
+void RenderObject::set_render_size_based_on_src(const SDL_FPoint& src_percent)
+{
+	const auto [src_w, src_h] = src.get_size();
+	set_render_size({ src_w * src_percent.x, src_h * src_percent.y });
 }
 void RenderObject::set_origin_pos(const Template::Render::RenderOriginType& origin_type)
 {

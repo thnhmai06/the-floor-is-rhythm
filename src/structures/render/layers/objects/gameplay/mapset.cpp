@@ -3,11 +3,12 @@
 #include "format/skin.h"
 #include "config.h"
 #include "template.h"
+#include "utilities.h"
 
 static auto current_direction = Template::Game::Direction::Direction::RIGHT;
-static SDL_FPoint get_size_follow_speed(const float& width)
+static SDL_FPoint translate_width_based_on_direction(const float& width, const float& default_size = GameConfig::HitObject::SIZE)
 {
-	SDL_FPoint size = { GameConfig::HitObject::SIZE, GameConfig::HitObject::SIZE };
+	SDL_FPoint size = { default_size, default_size };
 	switch (current_direction)
 	{
 	case Template::Game::Direction::Direction::RIGHT:
@@ -71,7 +72,7 @@ RenderObject RenderHitObject::create_spacing_object(
 			break;
 		}
 	}
-	object.set_scale_fixed(GameConfig::HitObject::SIZE);
+	object.set_render_size(GameConfig::HitObject::SIZE);
 
 	return object;
 }
@@ -93,7 +94,7 @@ RenderFloor::RenderFloor(
 	const float& current_timing_velocity,
 	const RenderHitObject* previous) :
 	RenderHitObject(memory.find(HitObjectSkin[current_direction += floor_hit_object.get_rotation()][HitObjectType::FLOOR]),
-		floor_hit_object, current_timing_velocity * diff.velocity.speed, previous)
+		floor_hit_object, current_timing_velocity* diff.velocity.speed, previous)
 {
 }
 
@@ -110,7 +111,7 @@ RenderObject RenderSlider::create_adjacent_object(
 	object.config.render_pos = previous.config.render_pos;
 	float src_x_in_percent = 0;
 	// size
-	object.set_scale_fixed(size);
+	object.set_render_size(size);
 	// pos
 	if (!src_from_beginning)
 	{
@@ -175,7 +176,7 @@ RenderObject RenderSlider::create_slider_point(
 		current.config.render_pos.y = previous.get_render_sdl_pos().y + previous.get_render_size().y + size.y / 2;
 		break;
 	}
-	current.set_scale_fixed(size);
+	current.set_render_size(size);
 	return current;
 }
 //? Public
@@ -199,11 +200,12 @@ RenderSlider::RenderSlider(
 
 	const float slider_total_time = static_cast<float>(slider.end_time - slider.time);
 	float current_slider_time = 0;
-	int32_t current_curve = 0;
+	//int32_t current_curve = 0;
 	auto previous_pos = size() - 1;
 	// Thân
 	while (current_slider_time < slider_total_time)
 	{
+		/*
 		// Tạo slider_object line (curve trong line)
 		if (const auto next_slider_time = current_slider_time + slider_tick_distance;
 			current_curve < static_cast<int32_t>(slider.curves.size())
@@ -214,31 +216,36 @@ RenderSlider::RenderSlider(
 			//! before curve
 			const float time_length_before_curve = slider_tick_distance - time_length_after_curve;
 			push_back(create_adjacent_object(memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_LINE]),
-				get_size_follow_speed(speed * time_length_before_curve),
+				translate_width_based_on_direction(speed * time_length_before_curve),
 				at(previous_pos), time_length_before_curve / slider_tick_distance));
 			current_slider_time += time_length_before_curve;
 			previous_pos = size() - 1;
 			//! curve
-			//TODO: Thêm curve
+			// Thêm curve (chưa viết code)
 			current_direction += slider.curves[current_curve].rotation;
 			++current_curve;
 
 			//! after curve
 			// (giống khi không bị dính curve, nhưng retain từ cuối)
 			push_back(create_adjacent_object(memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_LINE]),
-				get_size_follow_speed(speed * time_length_after_curve), at(previous_pos),
+				translate_width_based_on_direction(speed * time_length_after_curve), at(previous_pos),
 				time_length_after_curve / slider_tick_distance, false));
 			previous_pos = size() - 1;
 		}
-		// Tạo slider_object line (bình thường)
 		else
 		{
-			push_back(create_adjacent_object(
-				memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_LINE]),
-				get_size_follow_speed(speed * slider_tick_distance), at(previous_pos)));
-			previous_pos = size() - 1;
-		}
-		current_slider_time += slider_tick_distance;
+		*/
+		// Tạo slider_object line (bình thường)
+		const float current_tick_distance = 
+			Utilities::Math::min_float(slider_tick_distance, slider_total_time - current_slider_time);
+		const float current_tick_distance_in_percent = current_tick_distance / slider_tick_distance;
+		RenderObject slider_line = create_adjacent_object(
+			memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_LINE]),
+			translate_width_based_on_direction(speed * current_tick_distance), at(previous_pos), 
+			current_tick_distance_in_percent);
+		push_back(std::move(slider_line));
+		previous_pos = size() - 1;
+		current_slider_time += current_tick_distance;
 
 		// Tạo slider_object point
 		if (current_slider_time < slider_total_time)
@@ -267,7 +274,6 @@ MapsetCollection::MapsetCollection(
 	std::weak_ptr<RenderHitObject> previous;
 	for (const auto& hit_object : hit_objects | std::views::values)
 	{
-		++next_timing_point;
 		while (next_timing_point != timing_points.end() &&
 			hit_object.get_time() >= next_timing_point->first)
 		{
@@ -277,6 +283,7 @@ MapsetCollection::MapsetCollection(
 			else
 				// uninherited
 				current_uninherited = next_timing_point;
+			++next_timing_point;
 		}
 
 		switch (hit_object.get_type())
@@ -294,7 +301,7 @@ MapsetCollection::MapsetCollection(
 		case Template::Game::HitObject::HitObjectType::SLIDER:
 		{
 			const auto current = std::make_shared<RenderSlider>(hit_object, memory, difficulty,
-				current_uninherited->second.beat_length, current_inherited->second.get_velocity(), 
+				current_uninherited->second.beat_length, current_inherited->second.get_velocity(),
 				(!previous.lock() ? nullptr : previous.lock().get()));
 			push_back(current);
 			previous = current;

@@ -25,6 +25,7 @@ namespace Structures::Screen::Gameplay
 		public:
 			uint8_t health = 200;
 			int64_t current_time = -2000; // ms
+			Template::Game::Direction::Direction current_direction = Template::Game::Direction::Direction::RIGHT;
 			struct Keystroke
 			{
 				struct
@@ -76,8 +77,6 @@ namespace Structures::Screen::Gameplay
 					click.reset();
 				}
 			} key_stoke;
-			Template::Game::Direction::Direction current_direction = Template::Game::Direction::Direction::RIGHT;
-
 			struct Score
 			{
 			private:
@@ -109,7 +108,6 @@ namespace Structures::Screen::Gameplay
 			[[nodiscard]] bool is_paused() const { return timer.is_paused(); }
 			void pause() { timer.pause(); }
 			void resume() { timer.resume(); }
-
 			void make_time_step()
 			{
 				current_time = timer.get_time();

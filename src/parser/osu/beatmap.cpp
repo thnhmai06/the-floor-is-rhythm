@@ -17,7 +17,9 @@ static Template::Game::Direction::Rotation get_rotation(const uint8_t colour_hax
 	// Ta còn lại hai hướng phương vuông góc, colour_hax sẽ quyết định là hướng nào (vì còn 2 hướng nên quyết định bằng tính chẵn lẻ)
 	// colour_hax: 1 -> 7 (3 cùng tính chẵn lẻ, 4 không cùng) nên xác suất là như nhau khi đầy đủ (trừ khi bên beatmap osu lẻ combo color)
 	if (colour_hax == 0) return Template::Game::Direction::Rotation::NO_ROTATE;
-	return Utilities::Math::is_bit_enabled(colour_hax, 1) ? Template::Game::Direction::Rotation::ROTATE_90 : Template::Game::Direction::Rotation::ROTATE_270;
+	return Utilities::Math::is_bit_enabled(colour_hax, 1)
+		? Template::Game::Direction::Rotation::ROTATE_90
+		: Template::Game::Direction::Rotation::ROTATE_270;
 }
 static General convert_general(const Parser::GeneralSection& general)
 {
@@ -50,28 +52,36 @@ static Metadata convert_metadata(const Parser::MetadataSection& metadata)
 }
 //! HitObjects
 using namespace GameObjects::HitObjects;
-static Slider convert_hit_object_slider(const Parser::HitObject& object, bool& current_curve_rotation)
+static Slider convert_hit_object_slider(const Parser::HitObject& object)
 {
 	Slider slider;
 	slider.time = object.Time;
-	slider.end_time = object.EndTime.value();
-	slider.rotation = get_rotation(object.Type.ColourHax);
-	slider.combo_jump = object.Type.ColourHax;
+	slider.end_time = slider.time;
+	if (object.EndTime.has_value())
+		slider.end_time = object.EndTime.value();
+	slider.rotation = get_rotation(static_cast<uint8_t>(object.Type.ColourHax));
+	slider.combo_jump = static_cast<uint8_t>(object.Type.ColourHax);
+
+	// Bên dưới là thêm slider curve dựa trên số lần lặp.
+	// Nah slides trong osu! nhiều khi nó lặp nhanh quá, nên mình không muốn thêm curve
+	// dựa trên nó. So... bỏ slider curve nhé :D
+	/*
 	if (object.SliderParameters.has_value())
 	{
-		const float add_time_unit = 
+		const float add_time_unit =
 			static_cast<float>(slider.end_time - slider.time) / object.SliderParameters.value().Slides;
 		for (auto i = 1; i < object.SliderParameters.value().Slides - 1; ++i)
 		{
 			Slider::SliderCurve curve;
 			curve.after = static_cast<int32_t>(add_time_unit * static_cast<float>(i));
-			curve.rotation = (current_curve_rotation ? 
-				Template::Game::Direction::Rotation::ROTATE_270 : 
+			curve.rotation = (current_curve_rotation ?
+				Template::Game::Direction::Rotation::ROTATE_270 :
 				Template::Game::Direction::Rotation::ROTATE_90);
 			current_curve_rotation = !current_curve_rotation;
 			slider.curves.push_back(curve);
 		}
 	}
+	*/
 
 	slider.hit_sound = object.Hitsound;
 	slider.hit_sample = object.Hitsample;
@@ -80,9 +90,9 @@ static Slider convert_hit_object_slider(const Parser::HitObject& object, bool& c
 static Floor convert_hit_object_floor(const Parser::HitObject& object)
 {
 	Floor floor;
-	floor.time = object.Time;
-	floor.rotation = get_rotation(object.Type.ColourHax);
-	floor.combo_jump = object.Type.ColourHax;
+	floor.end_time = floor.time = object.Time;
+	floor.rotation = get_rotation(static_cast<uint8_t>(object.Type.ColourHax));
+	floor.combo_jump = static_cast<uint8_t>(object.Type.ColourHax);
 	floor.hit_sound = object.Hitsound;
 	floor.hit_sample = object.Hitsample;
 	return floor;
@@ -90,13 +100,12 @@ static Floor convert_hit_object_floor(const Parser::HitObject& object)
 static HitObjects convert_hit_objects(const std::vector<Parser::HitObject>& objects)
 {
 	HitObjects result;
-	bool current_curve_rotation = 0;
 	for (const Parser::HitObject& osu_object : objects)
 	{
 		const auto back_itr = (result.empty()) ? (result.end()) : (std::prev(result.end()));
 		if (osu_object.Type.HitCircle)
 			result.emplace_hint(back_itr, osu_object.Time, convert_hit_object_floor(osu_object));
-		else result.emplace_hint(back_itr, osu_object.Time, convert_hit_object_slider(osu_object, current_curve_rotation));
+		else result.emplace_hint(back_itr, osu_object.Time, convert_hit_object_slider(osu_object)); // slider, spinner...
 	}
 	return result;
 }

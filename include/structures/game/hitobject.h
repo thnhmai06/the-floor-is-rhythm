@@ -31,19 +31,19 @@ namespace GameObjects::HitObjects
 	};
 	struct Slider
 	{
-		static constexpr int32_t MINIMUM_NUM_CONTENT = 8;
-		struct SliderCurve
+		static constexpr int32_t MINIMUM_NUM_CONTENT = 7;
+		/*struct SliderCurve
 		{
 			int32_t after = 0;
 			Template::Game::Direction::Rotation rotation = Template::Game::Direction::Rotation::NO_ROTATE;
-		};
+		};*/
 
 		int32_t time = 0;
 		int32_t end_time = 0;
 		Template::Game::HitObject::HitObjectType type = Template::Game::HitObject::HitObjectType::FLOOR;
 		Template::Game::Direction::Rotation rotation = Template::Game::Direction::Rotation::NO_ROTATE;
 		uint8_t combo_jump = 0;
-		std::vector<SliderCurve> curves;
+		//std::vector<SliderCurve> curves;
 		Hitsound::Hitsound hit_sound;
 		Hitsound::HitSample hit_sample;
 

@@ -21,5 +21,5 @@ void HealthBar::set_health(const uint8_t& health) const
 	const float health_in_percent = Utilities::Math::min_float(
 		static_cast<float>(health) / static_cast<float>(MAX_HEALTH), 1);
 	this->colour_object->src_rect_in_percent = { .x = 0, .y = 0, .w = health_in_percent, .h = 1 };
-	this->colour_object->set_scale_fixed({ HEALTH_BAR_FULL_WIDTH * health_in_percent, HEALTH_BAR_HEIGHT });
+	this->colour_object->set_render_size({ HEALTH_BAR_FULL_WIDTH * health_in_percent, HEALTH_BAR_HEIGHT });
 }

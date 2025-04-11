@@ -22,11 +22,11 @@ int32_t main(int32_t argc, char* argv[])
 	Work::Core::Init::window(window);
 
 	// Render
-	result = Work::Render::render(window);
-	/*convert_beatmap(
+	//result = Work::Render::render(window);
+	convert_beatmap(
 		R"(D:\PROGRAM\osu!\Songs\2287992 Camellia - Operation_ Zenithfall\Camellia - Operation Zenithfall (Mir) [Final Mission].osu)",
 		R"(D:\output.tfd)");
-	Mapset beatmap(R"(D:\output.tfd)");*/
+	Mapset beatmap(R"(D:\output.tfd)");
 
 	Work::Core::CleanUp::window(window);
 	return result;

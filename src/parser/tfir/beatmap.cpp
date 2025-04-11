@@ -59,7 +59,6 @@ Mapset::Mapset(const char* file_path)
 	for (const auto& hit_object : hit_objects | std::views::values)
 	{
 		// lấy timing point
-		++next_timing_point;
 		while (next_timing_point != timing_points.end() &&
 			hit_object.get_time() >= next_timing_point->first)
 		{
@@ -69,6 +68,7 @@ Mapset::Mapset(const char* file_path)
 			else
 				// uninherited
 				current_beat_length = next_timing_point->second.beat_length;
+			++next_timing_point;
 		}
 
 		// tính hit_object count
