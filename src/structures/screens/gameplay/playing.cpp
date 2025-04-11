@@ -4,10 +4,10 @@
 #include "work/render/layers.h"
 #include "work/render/textures.h"
 
-using namespace Structures::Screen::Gameplay;
 
 //! PLayingScreen
-// Game
+using Structures::Screen::Gameplay::PlayingScreen;
+// ::Game::Score::count
 float PlayingScreen::Game::Score::Count::get_accuracy() const
 {
 	if (count_300 + count_100 + count_50 + count_slider_tick + count_miss == 0) return 100.00f; // tránh chia 0
@@ -26,10 +26,7 @@ unsigned long PlayingScreen::Game::Score::Count::get_elapsed_objects_num() const
 {
 	return count_300 + count_100 + count_50 + count_miss;
 }
-PlayingScreen::Game::Score::Score(const Mapset& beatmap, const float& mod_multiplier)
-	: total_objects_num(beatmap.total_objects_num), total_combo(beatmap.total_combo), mod_multiplier(mod_multiplier)
-{
-}
+// ::Game::Score
 unsigned long PlayingScreen::Game::Score::update_score()
 {
 	// Score = ((700000 * max_combo / total_combo) + (300000 * accuracy ^ 10 * elapsed_objects / total_objects)) * mod_multiplier
@@ -44,12 +41,20 @@ unsigned long PlayingScreen::Game::Score::update_score()
 	const unsigned long accuracy_score = static_cast<unsigned long>
 		(BASE_ACCURACY * std::powf(accuracy, 10) * elapsed_objects / static_cast<float>(total_objects_num));
 	const unsigned long score_no_multiplier = static_cast<unsigned long>
-		(static_cast<float>(combo_score + accuracy_score) * mod_multiplier);
+		(static_cast<float>(combo_score + accuracy_score) * *mod_multiplier);
 	return this->score = static_cast<unsigned long>
-		(static_cast<float>(score_no_multiplier) * mod_multiplier);
+		(static_cast<float>(score_no_multiplier) * *mod_multiplier);
+}
+PlayingScreen::Game::Score::Score(const Mapset& beatmap, const float* mod_multiplier)
+	: total_objects_num(beatmap.total_objects_num), total_combo(beatmap.total_combo), mod_multiplier(mod_multiplier)
+{
+}
+// ::Game
+PlayingScreen::Game::Game(const Mapset* mapset, const int64_t& start_time)
+	: mapset(mapset), timer(start_time) {
 }
 
-// Render
+// ::Render
 PlayingScreen::Render::Components::Components(
 	RenderObjectStorage* storage,
 	Layer* playground_layer, Layer* cursor_layer) :
@@ -82,17 +87,12 @@ PlayingScreen::Render::Render
 	);
 	components.cursor.render_item = cursor_layer.render_buffer.add_collection(components.cursor.storage_item->get());
 }
-
-// Total
+// total
 PlayingScreen::PlayingScreen(const char* beatmap_path) :
 	mapset(std::make_unique<const Mapset>(beatmap_path)),
 	game(mapset.get()),
 	render(&game.current_direction, *Work::Render::Layers::playground,
 		*Work::Render::Layers::cursor, *Work::Render::Textures::skin, *this->mapset)
 {
-}
-
-PlayingScreen::Game::Game(const Mapset* mapset)
-	: mapset(mapset)
-{
+	//TODO: Tìm StartTime đẻ nhét vào game.timer
 }

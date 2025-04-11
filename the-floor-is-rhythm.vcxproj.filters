@@ -90,6 +90,9 @@
     <ClCompile Include="src\structures\render\layers\objects\gameplay\hud.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\structures\action.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\structures\game\metadata.h">

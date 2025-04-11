@@ -31,6 +31,7 @@ namespace Utilities
 		}
 		inline float max_float(const float& a, const float& b) { return a > b ? a : b; }
 		inline float min_float(const float& a, const float& b) { return a < b ? a : b; }
+		inline bool in_range(const float& correction, const float& range, const float& value) { return (correction - range <= value && value <= correction + range); }
 
 		namespace FPoint
 		{
@@ -55,15 +56,22 @@ namespace Utilities
 	}
 	namespace Time
 	{
-		inline std::string get_current_time(const char* format = "%Y-%m-%d_%H-%M-%S")
-		{
-			const auto now = std::chrono::system_clock::now();
-			const auto time_t_now = std::chrono::system_clock::to_time_t(now);
+        inline std::string get_current_time(const char* format = "%Y-%m-%d_%H-%M-%S")  
+        {  
+           const auto now = std::chrono::system_clock::now();  
+           const auto time_t_now = std::chrono::system_clock::to_time_t(now);  
 
-			std::stringstream ss;
-			ss << std::put_time(std::localtime(&time_t_now), format);
-			return ss.str();
-		}
+           std::tm local_time;
+			#ifdef _WIN32
+		   if (localtime_s(&local_time, &time_t_now) != 0) return {};
+			#else
+		   if (!localtime_r(&time_t_now, &local_time)) return {};
+			#endif
+
+           std::stringstream ss;
+           ss << std::put_time(&local_time, format);
+           return ss.str();
+        }
 	}
 	namespace String
 	{

@@ -121,8 +121,18 @@ void CalculatedDifficulty::OverallDifficulty::apply(const float& v)
 {
 	value = v;
 	perfect = GameConfig::Difficulty::OD::Base::PERFECT - v * GameConfig::Difficulty::OD::Multiply::PERFECT;
-	good = GameConfig::Difficulty::OD::Base::GOOD - v * GameConfig::Difficulty::OD::Multiply::GOOD;
+	great = GameConfig::Difficulty::OD::Base::GOOD - v * GameConfig::Difficulty::OD::Multiply::GOOD;
 	bad = GameConfig::Difficulty::OD::Base::BAD - v * GameConfig::Difficulty::OD::Multiply::BAD;
+}
+unsigned long CalculatedDifficulty::OverallDifficulty::get_score(const int32_t& click_moment, const int32_t& hit_object_time) const
+{
+	if (Utilities::Math::in_range(static_cast<float>(hit_object_time), perfect, static_cast<float>(click_moment)))
+		return 300;
+	if (Utilities::Math::in_range(static_cast<float>(hit_object_time), great, static_cast<float>(click_moment)))
+		return 100;
+	if (Utilities::Math::in_range(static_cast<float>(hit_object_time), bad, static_cast<float>(click_moment)))
+		return 50;
+	return 0;
 }
 // ::HPDrainRate
 void CalculatedDifficulty::HPDrainRate::apply(const float& v)

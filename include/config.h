@@ -25,20 +25,20 @@ namespace UserConfig
 	{
 		namespace Direction
 		{
-			inline int32_t up = SDL_SCANCODE_UP;
-			inline int32_t down = SDL_SCANCODE_DOWN;
-			inline int32_t left = SDL_SCANCODE_LEFT;
-			inline int32_t right = SDL_SCANCODE_RIGHT;
-			inline bool is_direction(const int32_t& key)
+			inline SDL_Scancode up = SDL_SCANCODE_UP;
+			inline SDL_Scancode down = SDL_SCANCODE_DOWN;
+			inline SDL_Scancode left = SDL_SCANCODE_LEFT;
+			inline SDL_Scancode right = SDL_SCANCODE_RIGHT;
+			inline bool is_direction(const SDL_Scancode& key)
 			{
 				return key == up || key == down || key == left || key == right;
 			}
 		}
 		namespace Click
 		{
-			inline int32_t k1 = SDL_SCANCODE_Z;
-			inline int32_t k2 = SDL_SCANCODE_X;
-			inline bool is_click(const int32_t& key)
+			inline SDL_Scancode k1 = SDL_SCANCODE_Z;
+			inline SDL_Scancode k2 = SDL_SCANCODE_X;
+			inline bool is_click(const SDL_Scancode& key)
 			{
 				return key == k1 || key == k2;
 			}

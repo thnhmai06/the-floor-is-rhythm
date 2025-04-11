@@ -60,10 +60,11 @@ namespace GameObjects::Metadata
 		struct OverallDifficulty
 		{
 			// Follow: https://osu.ppy.sh/wiki/en/Beatmap/Overall_difficulty
-			float value = -1, perfect = -1, good = -1, bad = -1;
+			float value = -1, perfect = -1, great = -1, bad = -1;
 
 			void apply(const float& v);
 			void apply() { apply(value); }
+			[[nodiscard]] unsigned long get_score(const int32_t& click_moment, const int32_t& hit_object_time) const;
 
 			OverallDifficulty() = default;
 			OverallDifficulty(const float value) { apply(value); }

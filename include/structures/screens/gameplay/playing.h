@@ -7,74 +7,92 @@
 namespace Structures::Screen::Gameplay
 {
 	using Render::RenderObjects::RenderObjectStorage, Render::Textures::TextureMemory, Render::Layers::Layer;
+	using Timer::Timer, Action::KeyObserver;
 
 	struct PlayingScreen : private Screens::Screen
 	{
 		std::unique_ptr<const Mapset> mapset;
-		GameObjects::HitObjects::HitObjects::iterator current_hit_object;
+		float mod_multiplier = 1.0f;
 
 		struct Game final
 		{
 			const Mapset* mapset = nullptr;
+			//std::queue<GameObjects::HitObjects::HitObject*> active_hit_object;
 
 		private:
 			Template::Game::Direction::Direction require_direction = Template::Game::Direction::Direction::RIGHT;
 			Timer timer;
-			PlayingKeyQueue key_pressed;
+			KeyObserver key_observer;
 
 		public:
 			uint8_t health = 200;
-			int64_t current_time = -2000; // ms
 			Template::Game::Direction::Direction current_direction = Template::Game::Direction::Direction::RIGHT;
 			struct Keystroke
 			{
+				struct KeyCounter
+				{
+					SDL_Scancode target;
+					unsigned long count = 0;
+					bool is_hold = false;
+
+					void update(KeyObserver& observer)
+					{
+						const auto& [target_is_pressed, target_is_hold] = observer[target];
+						if (target_is_pressed) count++;
+						this->is_hold = target_is_hold;
+					}
+					void reset() { count = 0; is_hold = false; }
+					explicit KeyCounter(const SDL_Scancode& target) : target(target) {}
+				};
+
 				struct
 				{
-					unsigned long right = 0;
-					unsigned long left = 0;
-					unsigned long up = 0;
-					unsigned long down = 0;
+					KeyCounter right{ UserConfig::KeyBinding::Direction::right };
+					KeyCounter left{ UserConfig::KeyBinding::Direction::left };
+					KeyCounter up{ UserConfig::KeyBinding::Direction::up };
+					KeyCounter down{ UserConfig::KeyBinding::Direction::down };
 
 					void reset()
 					{
-						right = 0;  left = 0; up = 0; down = 0;
+						right.reset();
+						left.reset();
+						up.reset();
+						down.reset();
 					}
-					void count_for(const int& key)
+					void update(KeyObserver& observer)
 					{
-						if (key == UserConfig::KeyBinding::Direction::right) right++;
-						else if (key == UserConfig::KeyBinding::Direction::left) left++;
-						else if (key == UserConfig::KeyBinding::Direction::up) up++;
-						else if (key == UserConfig::KeyBinding::Direction::down) down++;
+						right.update(observer);
+						left.update(observer);
+						up.update(observer);
+						down.update(observer);
 					}
 				} direction;
 				struct
 				{
-					unsigned long k1 = 0;
-					unsigned long k2 = 0;
+					KeyCounter k1{ UserConfig::KeyBinding::Click::k1 };
+					KeyCounter k2{ UserConfig::KeyBinding::Click::k2 };
 
 					void reset()
 					{
-						k1 = 0; k2 = 0;
+						k1.reset();
+						k2.reset();
 					}
-					void count_for(const int& key)
+					void update(KeyObserver& observer)
 					{
-
-						if (key == UserConfig::KeyBinding::Click::k1) k1++;
-						else if (key == UserConfig::KeyBinding::Click::k2) k2++;
+						k1.update(observer);
+						k2.update(observer);
 					}
 				} click;
 
-				void count_for(const int& key)
-				{
-					if (UserConfig::KeyBinding::Direction::is_direction(key))
-						direction.count_for(key);
-					else if (UserConfig::KeyBinding::Click::is_click(key))
-						click.count_for(key);
-				}
 				void reset()
 				{
 					direction.reset();
 					click.reset();
+				}
+				void update(KeyObserver& observer)
+				{
+					direction.update(observer);
+					click.update(observer);
 				}
 			} key_stoke;
 			struct Score
@@ -82,7 +100,7 @@ namespace Structures::Screen::Gameplay
 			private:
 				unsigned long total_objects_num = 1;
 				unsigned long total_combo = 1;
-				float mod_multiplier = 1.0f;
+				const float* mod_multiplier;
 
 			public:
 				unsigned long score = 0;
@@ -102,38 +120,19 @@ namespace Structures::Screen::Gameplay
 
 				unsigned long update_score();
 
-				explicit Score(const Mapset& beatmap, const float& mod_multiplier = 1.0f);
-			};
+				explicit Score(const Mapset& beatmap, const float* mod_multiplier);
+			} score{ *mapset, &mod_multiplier };
 
 			[[nodiscard]] bool is_paused() const { return timer.is_paused(); }
 			void pause() { timer.pause(); }
 			void resume() { timer.resume(); }
 			void make_time_step()
 			{
-				current_time = timer.get_time();
-				while (!key_pressed.empty())
-				{
-					const auto key = key_pressed.front();
-					key_pressed.pop();
-					key_stoke.count_for(key);
-					if (UserConfig::KeyBinding::Direction::is_direction(key))
-					{
-                        if (key == UserConfig::KeyBinding::Direction::right)
-                        	current_direction = Template::Game::Direction::Direction::RIGHT;
-                        else if (key == UserConfig::KeyBinding::Direction::left)
-                            current_direction = Template::Game::Direction::Direction::LEFT;
-                        else if (key == UserConfig::KeyBinding::Direction::up)
-                            current_direction = Template::Game::Direction::Direction::UP;
-                        else if (key == UserConfig::KeyBinding::Direction::down)
-                            current_direction = Template::Game::Direction::Direction::DOWN;
-					}
+				key_stoke.update(key_observer);
 
-					// TODO: Xử lý key
-					/*if (current_hit_object->first)*/
-				}
+				//TODO: object interaction
 			}
-
-			Game(const Mapset* mapset);
+			explicit Game(const Mapset* mapset, const int64_t& start_time = 0);
 		} game;
 		struct Render : Screen::Render
 		{

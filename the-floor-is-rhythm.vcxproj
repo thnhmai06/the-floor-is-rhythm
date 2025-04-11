@@ -195,6 +195,7 @@
     <ClInclude Include="include\work\render\layers.h" />
     <ClInclude Include="include\work\screens.h" />
     <ClInclude Include="include\work\render\textures.h" />
+    <ClCompile Include="src\structures\action.cpp" />
     <ClCompile Include="src\format\skin.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
@@ -244,7 +245,7 @@
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\structures\render\layers\objects\gameplay\hud.cpp">
-        <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\structures\render\layers\objects\gameplay\mapset.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
@@ -262,7 +263,7 @@
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\structures\timer.cpp">
-        <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\work\core.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
