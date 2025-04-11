@@ -24,9 +24,10 @@ static SDL_FPoint get_size_follow_speed(const float& width)
 	return size;
 }
 
+using namespace Structures::Render::RenderObjects::Gameplay::Mapset;
 //! Structures::Render::PolyRenderObject::Gameplay
 //! ::Components
-using namespace Structures::Render::RenderObjects::Gameplay::Components;
+using namespace Components;
 using SkinFormat::HitObject::HitObjectType, SkinFormat::HitObject::HitObjectSkin;
 // ::RenderHitObject
 //? static
@@ -92,7 +93,7 @@ RenderFloor::RenderFloor(
 	const float& current_timing_velocity,
 	const RenderHitObject* previous) :
 	RenderHitObject(memory.find(HitObjectSkin[current_direction += floor_hit_object.get_rotation()][HitObjectType::FLOOR]),
-		floor_hit_object, current_timing_velocity* diff.velocity.speed, previous)
+		floor_hit_object, current_timing_velocity * diff.velocity.speed, previous)
 {
 }
 
@@ -182,7 +183,7 @@ RenderSlider::RenderSlider(
 	const GameObjects::HitObjects::HitObject& slider_object,
 	const TextureMemory& memory,
 	const GameObjects::Metadata::CalculatedDifficulty& diff,
-	const float& current_beatlength,
+	const float& current_beat_length,
 	const float& current_timing_velocity,
 	const RenderHitObject* previous) :
 	RenderHitObject()
@@ -190,6 +191,7 @@ RenderSlider::RenderSlider(
 	hit_object = &slider_object;
 	const auto slider = *std::get_if<GameObjects::HitObjects::Slider>(&slider_object);
 	const auto speed = current_timing_velocity * diff.velocity.speed;
+	const float slider_tick_distance = current_beat_length / speed;
 	// Đầu
 	push_back(create_spacing_object(
 		memory.find(HitObjectSkin[current_direction += slider.rotation][HitObjectType::SLIDER_BEGIN]),
@@ -202,17 +204,18 @@ RenderSlider::RenderSlider(
 	// Thân
 	while (current_slider_time < slider_total_time)
 	{
-		if (const auto next_slider_time = current_slider_time + current_beatlength;
+		// Tạo slider_object line (curve trong line)
+		if (const auto next_slider_time = current_slider_time + slider_tick_distance;
 			current_curve < static_cast<int32_t>(slider.curves.size())
 			&& next_slider_time > static_cast<float>(slider.curves[current_curve].after))
 			// Phát hiện line mới đi qua curve tiếp theo (đã pass trường hợp ko có curve)
 		{
 			const float time_length_after_curve = next_slider_time - static_cast<float>(slider.curves[current_curve].after);
 			//! before curve
-			const float time_length_before_curve = current_beatlength - time_length_after_curve;
+			const float time_length_before_curve = slider_tick_distance - time_length_after_curve;
 			push_back(create_adjacent_object(memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_LINE]),
 				get_size_follow_speed(speed * time_length_before_curve),
-				at(previous_pos), time_length_before_curve / current_beatlength));
+				at(previous_pos), time_length_before_curve / slider_tick_distance));
 			current_slider_time += time_length_before_curve;
 			previous_pos = size() - 1;
 			//! curve
@@ -224,7 +227,7 @@ RenderSlider::RenderSlider(
 			// (giống khi không bị dính curve, nhưng retain từ cuối)
 			push_back(create_adjacent_object(memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_LINE]),
 				get_size_follow_speed(speed * time_length_after_curve), at(previous_pos),
-				time_length_after_curve / current_beatlength, false));
+				time_length_after_curve / slider_tick_distance, false));
 			previous_pos = size() - 1;
 		}
 		// Tạo slider_object line (bình thường)
@@ -232,10 +235,10 @@ RenderSlider::RenderSlider(
 		{
 			push_back(create_adjacent_object(
 				memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_LINE]),
-				get_size_follow_speed(speed * current_beatlength), at(previous_pos)));
+				get_size_follow_speed(speed * slider_tick_distance), at(previous_pos)));
 			previous_pos = size() - 1;
 		}
-		current_slider_time += current_beatlength;
+		current_slider_time += slider_tick_distance;
 
 		// Tạo slider_object point
 		if (current_slider_time < slider_total_time)
@@ -249,8 +252,8 @@ RenderSlider::RenderSlider(
 }
 
 //! ::Collection
+using namespace Collection;
 // ::MapsetCollection
-using namespace Structures::Render::RenderObjects::Gameplay::Collection;
 MapsetCollection::MapsetCollection(
 	const TextureMemory& memory,
 	const GameObjects::HitObjects::HitObjects& hit_objects,
@@ -259,11 +262,12 @@ MapsetCollection::MapsetCollection(
 {
 	auto current_uninherited = timing_points.begin();
 	auto current_inherited = timing_points.begin();
+	auto next_timing_point = timing_points.begin();
 
-	const std::weak_ptr<RenderHitObject> previous;
+	std::weak_ptr<RenderHitObject> previous;
 	for (const auto& hit_object : hit_objects | std::views::values)
 	{
-		auto next_timing_point = std::next(current_uninherited, 1);
+		++next_timing_point;
 		while (next_timing_point != timing_points.end() &&
 			hit_object.get_time() >= next_timing_point->first)
 		{
@@ -273,21 +277,29 @@ MapsetCollection::MapsetCollection(
 			else
 				// uninherited
 				current_uninherited = next_timing_point;
-
-			++next_timing_point;
 		}
 
 		switch (hit_object.get_type())
 		{
 		case Template::Game::HitObject::HitObjectType::FLOOR:
-			push_back(std::make_shared<RenderFloor>(
-				hit_object, memory, difficulty, current_inherited->second.get_velocity(), (!previous.lock() ? nullptr : previous.lock().get())));
-			break;
+		{
+			const auto current = std::make_shared<RenderFloor>(
+				hit_object, memory, difficulty, current_inherited->second.get_velocity(),
+				(!previous.lock() ? nullptr : previous.lock().get()));
+			push_back(current);
+			previous = current;
+		}
+		break;
 
 		case Template::Game::HitObject::HitObjectType::SLIDER:
-			push_back(std::make_shared<RenderSlider>(hit_object, memory, difficulty, current_uninherited->second.beat_length,
-				current_inherited->second.get_velocity(), (!previous.lock() ? nullptr : previous.lock().get())));
-			break;
+		{
+			const auto current = std::make_shared<RenderSlider>(hit_object, memory, difficulty,
+				current_uninherited->second.beat_length, current_inherited->second.get_velocity(), 
+				(!previous.lock() ? nullptr : previous.lock().get()));
+			push_back(current);
+			previous = current;
+		}
+		break;
 		}
 	}
 }

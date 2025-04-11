@@ -87,6 +87,9 @@
     <ClCompile Include="src\structures\timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\structures\render\layers\objects\gameplay\hud.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\structures\game\metadata.h">
@@ -189,6 +192,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\structures\timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structures\action.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structures\render\layers\objects\gameplay\hud.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

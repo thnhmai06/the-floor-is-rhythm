@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <cstdint>
 #include <SDL3/SDL_audio.h>
+#include <SDL3/SDL_scancode.h>
 
 namespace UserConfig
 {
@@ -28,11 +29,19 @@ namespace UserConfig
 			inline int32_t down = SDL_SCANCODE_DOWN;
 			inline int32_t left = SDL_SCANCODE_LEFT;
 			inline int32_t right = SDL_SCANCODE_RIGHT;
+			inline bool is_direction(const int32_t& key)
+			{
+				return key == up || key == down || key == left || key == right;
+			}
 		}
 		namespace Click
 		{
 			inline int32_t k1 = SDL_SCANCODE_Z;
 			inline int32_t k2 = SDL_SCANCODE_X;
+			inline bool is_click(const int32_t& key)
+			{
+				return key == k1 || key == k2;
+			}
 		}
 	}
 }

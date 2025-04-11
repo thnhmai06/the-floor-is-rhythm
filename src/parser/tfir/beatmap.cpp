@@ -1,5 +1,6 @@
 ﻿#include "parser/tfir/beatmap.h" // Header
 #include <fstream>
+#include <ranges>
 #include <unordered_map>
 #include "format/file.h"
 #include "logger/exceptions.h"
@@ -31,7 +32,7 @@ static std::unordered_map<std::string, std::vector<std::string>> read_content(st
 	}
 	return sections;
 }
-static void parse_beatmap(BeatmapFile& beatmap, const std::unordered_map<std::string, std::vector<std::string>>& sections)
+static void parse_beatmap(Mapset& beatmap, const std::unordered_map<std::string, std::vector<std::string>>& sections)
 {
 	for (const auto& [header, contents] : sections)
 	{
@@ -43,7 +44,7 @@ static void parse_beatmap(BeatmapFile& beatmap, const std::unordered_map<std::st
 	}
 }
 
-BeatmapFile::BeatmapFile(const char* file_path)
+Mapset::Mapset(const char* file_path)
 {
 	std::ifstream reader(file_path);
 	if (!reader)
@@ -51,4 +52,46 @@ BeatmapFile::BeatmapFile(const char* file_path)
 
 	parse_beatmap(*this, read_content(reader));
 	reader.close();
+
+	float current_beat_length = 180;
+	float current_timing_velocity = 1.0f;
+	auto next_timing_point = timing_points.begin();
+	for (const auto& hit_object : hit_objects | std::views::values)
+	{
+		// lấy timing point
+		++next_timing_point;
+		while (next_timing_point != timing_points.end() &&
+			hit_object.get_time() >= next_timing_point->first)
+		{
+			if (next_timing_point->second.beat_length < 0)
+				// inherited
+				current_timing_velocity = next_timing_point->second.get_velocity();
+			else
+				// uninherited
+				current_beat_length = next_timing_point->second.beat_length;
+		}
+
+		// tính hit_object count
+		switch (hit_object.get_type())
+		{
+		case Template::Game::HitObject::HitObjectType::FLOOR:
+			total_floor++;
+			total_combo++;
+			break;
+		case Template::Game::HitObject::HitObjectType::SLIDER:
+			total_slider++;
+			{
+				const auto current_slider = std::get_if<GameObjects::HitObjects::Slider>(&hit_object);
+				const auto time_length = current_slider->end_time - current_slider->time;
+				const auto speed = current_timing_velocity * calculated_difficulty.velocity.value;
+				float tick_num = 0;
+				if (const float tick_spacing_num = static_cast<float>(time_length) * speed / current_beat_length;
+					Utilities::Math::is_integer(tick_spacing_num)) tick_num = Utilities::Math::max_float(0, tick_spacing_num - 1);
+				else tick_num = std::floor(tick_spacing_num);
+				total_combo += static_cast<unsigned long>(tick_num) + 2; // 2 = Đầu Slider + Cuối Slider	
+			}
+			break;
+		}
+	}
+	total_objects_num = total_floor + total_slider;
 }

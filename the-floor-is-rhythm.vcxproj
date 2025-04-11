@@ -169,6 +169,7 @@
     <ClInclude Include="include\parser\osu\beatmap.h" />
     <ClInclude Include="include\parser\tfir\beatmap.h" />
     <ClInclude Include="include\skin.h" />
+    <ClInclude Include="include\structures\action.h" />
     <ClInclude Include="include\structures\audio\buses.h" />
     <ClInclude Include="include\structures\audio\memory.h" />
     <ClInclude Include="include\structures\audio\mixer.h" />
@@ -180,6 +181,7 @@
     <ClInclude Include="include\structures\render\layers\layer.h" />
     <ClInclude Include="include\structures\render\layers\objects\collection.h" />
     <ClInclude Include="include\structures\render\layers\objects\gameplay\cursor.h" />
+    <ClInclude Include="include\structures\render\layers\objects\gameplay\hud.h" />
     <ClInclude Include="include\structures\render\layers\objects\gameplay\mapset.h" />
     <ClInclude Include="include\structures\render\layers\objects\object.h" />
     <ClInclude Include="include\structures\render\textures\texture.h" />
@@ -241,6 +243,9 @@
     <ClCompile Include="src\structures\render\layers\objects\gameplay\cursor.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
+    <ClCompile Include="src\structures\render\layers\objects\gameplay\hud.cpp">
+        <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="src\structures\render\layers\objects\gameplay\mapset.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
@@ -256,7 +261,9 @@
     <ClCompile Include="src\structures\render\textures\texture.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\timer.cpp" />
+    <ClCompile Include="src\structures\timer.cpp">
+        <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="src\work\core.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>

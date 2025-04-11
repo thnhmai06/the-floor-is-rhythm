@@ -1,9 +1,8 @@
 ﻿#pragma once
-#include "structures/render/layers/objects/gameplay/mapset.h"
 #include "structures/render/layers/objects/collection.h"
 #include "template.h"
 
-namespace Structures::Render::RenderObjects::Cursor
+namespace Structures::Render::RenderObjects::Gameplay::Cursor
 {
 	namespace Components
 	{

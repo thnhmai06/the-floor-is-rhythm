@@ -63,10 +63,7 @@ namespace Structures::Render::Layers
 
 			LayerCamera() : RenderConfig()
 			{
-				origin_pos = {
-					Utilities::Math::centre(0, GameConfig::Video::LOGICAL_WIDTH),
-					Utilities::Math::centre(0, GameConfig::Video::LOGICAL_HEIGHT)
-				};
+				origin_pos = { 0, 0 }; // góc trái
 				render_pos = { .x = GameConfig::Video::Camera::DEFAULT_POS_X, .y = GameConfig::Video::Camera::DEFAULT_POS_Y };
 			}
 		} camera;

@@ -5,7 +5,7 @@
 #include "structures/render/textures/texture.h"
 #include "structures/game/timing.h"
 
-namespace Structures::Render::RenderObjects::Gameplay
+namespace Structures::Render::RenderObjects::Gameplay::Mapset
 {
 	namespace Components
 	{
@@ -54,13 +54,14 @@ namespace Structures::Render::RenderObjects::Gameplay
 				const GameObjects::HitObjects::HitObject& slider_object,
 				const TextureMemory& memory,
 				const GameObjects::Metadata::CalculatedDifficulty& diff,
-				const float& current_beatlength,
+				const float& current_beat_length,
 				const float& current_timing_velocity = 1,
 				const RenderHitObject* previous = nullptr);
 		};
 	}
 
-	namespace Collection
+	namespace 
+		Collection
 	{
 		struct MapsetCollection final : RenderObjectCollection
 		{

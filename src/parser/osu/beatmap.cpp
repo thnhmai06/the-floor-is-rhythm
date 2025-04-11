@@ -50,16 +50,17 @@ static Metadata convert_metadata(const Parser::MetadataSection& metadata)
 }
 //! HitObjects
 using namespace GameObjects::HitObjects;
-static Slider convert_hitobject_slider(const Parser::HitObject& object, bool current_curve_rotation = 0)
+static Slider convert_hit_object_slider(const Parser::HitObject& object, bool& current_curve_rotation)
 {
 	Slider slider;
 	slider.time = object.Time;
-	slider.end_time = object.EndTime;
+	slider.end_time = object.EndTime.value();
 	slider.rotation = get_rotation(object.Type.ColourHax);
 	slider.combo_jump = object.Type.ColourHax;
 	if (object.SliderParameters.has_value())
 	{
-		const float add_time_unit = static_cast<float>(slider.end_time - slider.time) / object.SliderParameters.value().Slides;
+		const float add_time_unit = 
+			static_cast<float>(slider.end_time - slider.time) / object.SliderParameters.value().Slides;
 		for (auto i = 1; i < object.SliderParameters.value().Slides - 1; ++i)
 		{
 			Slider::SliderCurve curve;
@@ -76,7 +77,7 @@ static Slider convert_hitobject_slider(const Parser::HitObject& object, bool cur
 	slider.hit_sample = object.Hitsample;
 	return slider;
 }
-static Floor convert_hitobject_floor(const Parser::HitObject& object)
+static Floor convert_hit_object_floor(const Parser::HitObject& object)
 {
 	Floor floor;
 	floor.time = object.Time;
@@ -86,7 +87,7 @@ static Floor convert_hitobject_floor(const Parser::HitObject& object)
 	floor.hit_sample = object.Hitsample;
 	return floor;
 }
-static HitObjects convert_hitobjects(const std::vector<Parser::HitObject>& objects)
+static HitObjects convert_hit_objects(const std::vector<Parser::HitObject>& objects)
 {
 	HitObjects result;
 	bool current_curve_rotation = 0;
@@ -94,8 +95,8 @@ static HitObjects convert_hitobjects(const std::vector<Parser::HitObject>& objec
 	{
 		const auto back_itr = (result.empty()) ? (result.end()) : (std::prev(result.end()));
 		if (osu_object.Type.HitCircle)
-			result.emplace_hint(back_itr, osu_object.Time, convert_hitobject_floor(osu_object));
-		else result.emplace_hint(back_itr, osu_object.Time, convert_hitobject_slider(osu_object, current_curve_rotation));
+			result.emplace_hint(back_itr, osu_object.Time, convert_hit_object_floor(osu_object));
+		else result.emplace_hint(back_itr, osu_object.Time, convert_hit_object_slider(osu_object, current_curve_rotation));
 	}
 	return result;
 }
@@ -139,7 +140,7 @@ void convert_beatmap(const char* file_name, const char* output)
 	convert_difficulty(beatmap.Difficulty).write(writer);
 	convert_metadata(beatmap.Metadata).write(writer);
 	convert_timing_points(beatmap.TimingPoints).write(writer);
-	convert_hitobjects(beatmap.HitObjects).write(writer);
+	convert_hit_objects(beatmap.HitObjects).write(writer);
 
 	writer.close();
 }

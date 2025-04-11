@@ -123,13 +123,22 @@ void RenderObject::render(const SDL_FPoint& offset) const
 	if (!SDL_RenderTexture(src.memory->renderer, sdl_texture, &src_rect, &dst_rect))
 		THROW_ERROR(SDLExceptions::Texture::SDL_Texture_Render_Failed(src.get_name()));
 }
-RenderObject::RenderObject(TextureMemory::Item texture, const Template::Render::RenderOriginType& origin_type) :
+RenderObject::RenderObject(
+	TextureMemory::Item texture, 
+	const Template::Render::RenderOriginType& origin_type,
+	const SDL_FPoint& render_pos) :
 	src(std::move(texture))
 {
 	set_origin_pos(origin_type);
+	config.render_pos = render_pos;
 }
-RenderObject::RenderObject(TextureMemory::Item texture, const RenderConfig::RenderOriginPoint& custom_origin) :
-	src(std::move(texture)), config(custom_origin) {
+RenderObject::RenderObject(
+	TextureMemory::Item texture, 
+	const RenderConfig::RenderOriginPoint& custom_origin,
+	const SDL_FPoint& render_pos) :
+	src(std::move(texture)), config(custom_origin)
+{
+	config.render_pos = render_pos;
 }
 
 // ::PolyRenderObject

@@ -1,9 +1,10 @@
 ﻿#include "structures/render/layers/objects/gameplay/cursor.h" // Header
 #include "format/skin.h"
 
+using namespace Structures::Render::RenderObjects::Gameplay::Cursor;
 //! Structures::Render::PolyRenderObject::Cursor
 //! ::Components
-using namespace Structures::Render::RenderObjects::Cursor::Components;
+using namespace Components;
 // ::RenderCursorBody
 RenderCursorBody::RenderCursorBody(const TextureMemory& memory) :
 	RenderObject{
@@ -43,7 +44,7 @@ RenderCursorDirection::RenderCursorDirection(
 }
 
 //! ::Collection
-using namespace Structures::Render::RenderObjects::Cursor::Collection;
+using namespace Collection;
 CursorCollection::CursorCollection(const TextureMemory& memory, const Template::Game::Direction::Direction* current_direction)
 	: RenderObjectCollection()
 {

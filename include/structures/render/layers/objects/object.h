@@ -59,8 +59,14 @@ namespace Structures::Render
 			void render(const SDL_FPoint& offset = {0, 0}) const;
 
 			RenderObject() = default;
-			explicit RenderObject(TextureMemory::Item texture, const Template::Render::RenderOriginType& origin_type);
-			explicit RenderObject(TextureMemory::Item texture, const RenderConfig::RenderOriginPoint& custom_origin);
+			explicit RenderObject(
+				TextureMemory::Item texture, 
+				const Template::Render::RenderOriginType& origin_type, 
+				const SDL_FPoint& render_pos = {0, 0});
+			explicit RenderObject(
+				TextureMemory::Item texture, 
+				const RenderConfig::RenderOriginPoint& custom_origin, 
+				const SDL_FPoint& render_pos = { 0, 0 });
 		};
 
 		struct PolyRenderObject : std::vector<RenderObject>
