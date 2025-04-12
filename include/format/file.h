@@ -1,10 +1,10 @@
 ﻿#pragma once
 
-namespace FileFormat
+namespace Format::FileFormat
 {
 	namespace Beatmap
 	{
-		namespace CONVERT
+		namespace ConvertInformation
 		{
 			namespace osu
 			{
@@ -51,7 +51,7 @@ namespace FileFormat
 			}
 			namespace HitSample
 			{
-				constexpr char DELIMETER = ':';
+				constexpr char DELIMITER = ':';
 			}
 		}
 		namespace TimingPoints

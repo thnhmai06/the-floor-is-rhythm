@@ -2,20 +2,20 @@
 #include <variant>
 #include "structures/render/layers/objects/object.h"
 
-namespace Structures::Render::RenderObjects
+namespace Structures::Render::Objects
 {
 	// Single Obj
-	using RenderObjectShared = std::shared_ptr<RenderObject>;
-	using RenderObjectWeak = std::weak_ptr<RenderObject>;
+	using ObjectShared = std::shared_ptr<Object>;
+	using ObjectWeak = std::weak_ptr<Object>;
 
-	using PolyRenderObjectShared = std::shared_ptr<PolyRenderObject>;
-	using PolyRenderObjectWeak = std::weak_ptr<PolyRenderObject>;
+	using PolyObjectShared = std::shared_ptr<PolyObject>;
+	using PolyObjectWeak = std::weak_ptr<PolyObject>;
 
 	// Collection
-	struct RenderObjectCollection : std::vector<std::variant<RenderObjectShared, PolyRenderObjectShared>>
+	struct Collection : std::vector<std::variant<ObjectShared, PolyObjectShared>>
 	{
 	protected:
-		using VALUE = std::variant<RenderObjectShared, PolyRenderObjectShared>;
+		using VALUE = std::variant<ObjectShared, PolyObjectShared>;
 		using BASE = std::vector<VALUE>;
 
 	private:
@@ -27,11 +27,11 @@ namespace Structures::Render::RenderObjects
 		bool visible = true;
 		void render(const SDL_FPoint& camera_offset) const;
 
-		RenderObjectCollection() = default;
-		~RenderObjectCollection();
+		Collection() = default;
+		~Collection();
 	};
-	using RenderObjectCollectionUnique = std::unique_ptr<RenderObjectCollection>;
+	using CollectionUnique = std::unique_ptr<Collection>;
 
 	// Storage
-	using RenderObjectStorage = std::list<RenderObjectCollectionUnique>;
+	using Storage = std::list<CollectionUnique>;
 }

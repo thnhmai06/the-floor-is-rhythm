@@ -1,10 +1,10 @@
-﻿#include "logger/logging.h" // Header
+﻿#include "logging/logger.h" // Header
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <vector>
 #include "utilities.h"
 
-void Logging::init(const std::string name, const spdlog::level::level_enum level, const uint32_t num_backtrace)
+void Logging::Logger::init(const std::string& name, const spdlog::level::level_enum level, const uint32_t num_backtrace)
 {
 	constexpr std::string_view PATTERN = "[%d/%m/%Y %X] %n (thread %t) %s:%# (%!) %^[%l] %v%$";
 	const std::string log_dir = std::format("{}/{}/", PATH, Utilities::Time::get_current_time());

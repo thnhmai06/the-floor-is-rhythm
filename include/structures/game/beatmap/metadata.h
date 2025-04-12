@@ -7,7 +7,7 @@
 #include <string>
 #include <unordered_set>
 
-namespace GameObjects::Metadata
+namespace Structures::Game::Beatmap::Metadata
 {
 	//! Raw
 	struct General
@@ -15,7 +15,7 @@ namespace GameObjects::Metadata
 		std::string audio_file;
 		int32_t start_music_delay = 0;
 		int32_t preview_timestamp = 0;
-		bool epilepsy_warning = 0;
+		bool epilepsy_warning = false;
 		void read(const std::vector<std::string>& contents);
 		void write(std::ofstream& writer) const;
 

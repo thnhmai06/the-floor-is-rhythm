@@ -1,7 +1,7 @@
 ﻿#include "format/skin.h" // Header
 #include <ranges>
 
-SkinFormat::ImageStorage::ImageStorage()
+Format::SkinFormat::ImageNameStorage::ImageNameStorage()
 {
 	// Của Cursor
     insert(Cursor::BODY);
@@ -15,7 +15,7 @@ SkinFormat::ImageStorage::ImageStorage()
 			insert(skin);
 }
 
-SkinFormat::FolderStorage::FolderStorage()
+Format::SkinFormat::FolderNameStorage::FolderNameStorage()
 {
 	// Của Cursor
 	for (const auto& val : Cursor::DIRECTION | std::views::values) 

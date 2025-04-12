@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <SDL3/SDL_audio.h>
 #include "structures/audio/buses.h"
-#include "template.h"
+#include "structures/types.h"
 
 namespace Structures::Audio::Mixer
 {

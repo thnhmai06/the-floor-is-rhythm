@@ -162,33 +162,31 @@
     <ClInclude Include="include\config.h" />
     <ClInclude Include="include\format\file.h" />
     <ClInclude Include="include\format\skin.h" />
-    <ClInclude Include="include\logger\exceptions.h" />
-    <ClInclude Include="include\logger\info.h" />
-    <ClInclude Include="include\logger\logging.h" />
+    <ClInclude Include="include\logging\exceptions.h" />
+    <ClInclude Include="include\logging\info.h" />
+    <ClInclude Include="include\logging\logger.h" />
     <ClInclude Include="include\main.h" />
-    <ClInclude Include="include\parser\osu\beatmap.h" />
-    <ClInclude Include="include\parser\tfir\beatmap.h" />
-    <ClInclude Include="include\skin.h" />
+    <ClInclude Include="include\work\convert\osu\beatmap.h" />
+    <ClInclude Include="include\structures\game\beatmap\beatmap.h" />
+    <ClInclude Include="include\work\skin.h" />
     <ClInclude Include="include\structures\action.h" />
     <ClInclude Include="include\structures\audio\buses.h" />
     <ClInclude Include="include\structures\audio\memory.h" />
     <ClInclude Include="include\structures\audio\mixer.h" />
-    <ClInclude Include="include\structures\game\cursor.h" />
-    <ClInclude Include="include\structures\game\hitobject.h" />
-    <ClInclude Include="include\structures\game\hitsound.h" />
-    <ClInclude Include="include\structures\game\metadata.h" />
-    <ClInclude Include="include\structures\game\timing.h" />
+    <ClInclude Include="include\structures\game\beatmap\hitobject.h" />
+    <ClInclude Include="include\structures\game\beatmap\hitsound.h" />
+    <ClInclude Include="include\structures\game\beatmap\metadata.h" />
+    <ClInclude Include="include\structures\game\beatmap\timing.h" />
     <ClInclude Include="include\structures\render\layers\layer.h" />
     <ClInclude Include="include\structures\render\layers\objects\collection.h" />
     <ClInclude Include="include\structures\render\layers\objects\gameplay\cursor.h" />
     <ClInclude Include="include\structures\render\layers\objects\gameplay\hud.h" />
-    <ClInclude Include="include\structures\render\layers\objects\gameplay\mapset.h" />
+    <ClInclude Include="include\structures\render\layers\objects\gameplay\beatmap.h" />
     <ClInclude Include="include\structures\render\layers\objects\object.h" />
     <ClInclude Include="include\structures\render\textures\texture.h" />
     <ClInclude Include="include\structures\screens\gameplay\playing.h" />
     <ClInclude Include="include\structures\screens\screen.h" />
-    <ClInclude Include="include\structures\timer.h" />
-    <ClInclude Include="include\template.h" />
+    <ClInclude Include="include\structures\types.h" />
     <ClInclude Include="include\utilities.h" />
     <ClInclude Include="include\work\core.h" />
     <ClInclude Include="include\work\render.h" />
@@ -199,19 +197,19 @@
     <ClCompile Include="src\format\skin.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\logger\logging.cpp">
+    <ClCompile Include="src\logging\logger.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\main.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\parser\osu\beatmap.cpp">
+    <ClCompile Include="src\work\convert\osu\beatmap.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\parser\tfir\beatmap.cpp">
+    <ClCompile Include="src\structures\game\beatmap\beatmap.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\skin.cpp">
+    <ClCompile Include="src\work\skin.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\structures\audio\buses.cpp">
@@ -223,16 +221,16 @@
     <ClCompile Include="src\structures\audio\mixer.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\game\hitobject.cpp">
+    <ClCompile Include="src\structures\game\beatmap\hitobject.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\game\hitsound.cpp">
+    <ClCompile Include="src\structures\game\beatmap\hitsound.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\game\metadata.cpp">
+    <ClCompile Include="src\structures\game\beatmap\metadata.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\game\timing.cpp">
+    <ClCompile Include="src\structures\game\beatmap\timing.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\structures\render\layers\layer.cpp">
@@ -247,7 +245,7 @@
     <ClCompile Include="src\structures\render\layers\objects\gameplay\hud.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\render\layers\objects\gameplay\mapset.cpp">
+    <ClCompile Include="src\structures\render\layers\objects\gameplay\beatmap.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\structures\render\layers\objects\object.cpp">
@@ -260,9 +258,6 @@
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\structures\render\textures\texture.cpp">
-      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
-    </ClCompile>
-    <ClCompile Include="src\structures\timer.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\work\core.cpp">

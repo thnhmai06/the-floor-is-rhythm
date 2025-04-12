@@ -1,46 +1,43 @@
 ﻿#pragma once
 #include "structures/render/layers/objects/collection.h"
-#include "template.h"
+#include "structures/types.h"
 
-namespace Structures::Render::RenderObjects::Gameplay::Cursor
+namespace Structures::Render::Objects::Gameplay::Cursor
 {
 	namespace Components
 	{
-		struct RenderCursorBody final : RenderObject
+		struct Body final : Object
 		{
-			explicit RenderCursorBody(const TextureMemory& memory);
+			explicit Body(const TextureMemory& memory);
 		};
-		struct RenderCursorTrail final : PolyRenderObject
+		struct Trail final : PolyObject
 		{
 			//TODO: Thêm trail theo hướng di chuyển
-			explicit RenderCursorTrail(const TextureMemory& memory);
+			explicit Trail(const TextureMemory& memory);
 		};
-		struct RenderCursorDirection final : RenderObject
+		struct Direction final : Object
 		{
 		private:
-			const Template::Game::Direction::Direction* current_direction;
+			const Types::Game::Direction::Direction* current_direction;
 
 		public:
 			void update_src();
-			void change_current_direction_target(const Template::Game::Direction::Direction* new_target);
-			RenderCursorDirection(const TextureMemory& memory, const Template::Game::Direction::Direction* current_direction);
+			void change_current_direction_target(const Types::Game::Direction::Direction* new_target);
+			Direction(const TextureMemory& memory, const Types::Game::Direction::Direction* current_direction);
 		};
 	}
 
-	namespace Collection
+	struct Collection final : Objects::Collection
 	{
-		struct CursorCollection final : RenderObjectCollection
-		{
-		protected:
-			using BASE = RenderObjectCollection;
+	protected:
+		using BASE = Collection;
 
-		public:
-			using BASE::render;
-			std::weak_ptr<Components::RenderCursorBody> body;
-			std::weak_ptr<Components::RenderCursorTrail> trail;
-			std::weak_ptr<Components::RenderCursorDirection> direction;
+	public:
+		using BASE::render;
+		std::weak_ptr<Components::Body> body;
+		std::weak_ptr<Components::Trail> trail;
+		std::weak_ptr<Components::Direction> direction;
 
-			CursorCollection(const TextureMemory& memory, const Template::Game::Direction::Direction* current_direction);
-		};
-	}
+		Collection(const TextureMemory& memory, const Types::Game::Direction::Direction* current_direction);
+	};
 }

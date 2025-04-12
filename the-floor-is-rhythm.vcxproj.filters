@@ -27,16 +27,16 @@
     <ClCompile Include="src\structures\audio\mixer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\logger\logging.cpp">
+    <ClCompile Include="src\logging\logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\game\metadata.cpp">
+    <ClCompile Include="src\structures\game\beatmap\metadata.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\game\hitsound.cpp">
+    <ClCompile Include="src\structures\game\beatmap\hitsound.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\game\hitobject.cpp">
+    <ClCompile Include="src\structures\game\beatmap\hitobject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\structures\render\textures\texture.cpp">
@@ -51,19 +51,19 @@
     <ClCompile Include="src\work\core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\game\timing.cpp">
+    <ClCompile Include="src\structures\game\beatmap\timing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\structures\render\layers\objects\object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\skin.cpp">
+    <ClCompile Include="src\work\skin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\parser\osu\beatmap.cpp">
+    <ClCompile Include="src\work\convert\osu\beatmap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\parser\tfir\beatmap.cpp">
+    <ClCompile Include="src\structures\game\beatmap\beatmap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\format\skin.cpp">
@@ -72,7 +72,7 @@
     <ClCompile Include="src\structures\render\layers\objects\gameplay\cursor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\render\layers\objects\gameplay\mapset.cpp">
+    <ClCompile Include="src\structures\render\layers\objects\gameplay\beatmap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\structures\render\layers\objects\collection.cpp">
@@ -84,9 +84,6 @@
     <ClCompile Include="src\structures\screens\screen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\timer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\structures\render\layers\objects\gameplay\hud.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -95,10 +92,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\structures\game\metadata.h">
+    <ClInclude Include="include\structures\game\beatmap\metadata.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\logger\exceptions.h">
+    <ClInclude Include="include\logging\exceptions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\structures\audio\mixer.h">
@@ -110,13 +107,13 @@
     <ClInclude Include="include\structures\audio\memory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\game\hitsound.h">
+    <ClInclude Include="include\structures\game\beatmap\hitsound.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\game\hitobject.h">
+    <ClInclude Include="include\structures\game\beatmap\hitobject.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\logger\logging.h">
+    <ClInclude Include="include\logging\logger.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="include\main.h">
@@ -134,31 +131,28 @@
     <ClInclude Include="include\work\core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\game\cursor.h">
+    <ClInclude Include="include\structures\game\beatmap\timing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\game\timing.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\template.h">
+    <ClInclude Include="include\structures\types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\structures\render\layers\objects\object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\skin.h">
+    <ClInclude Include="include\work\skin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\logger\info.h">
+    <ClInclude Include="include\logging\info.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\parser\osu\beatmap.h">
+    <ClInclude Include="include\work\convert\osu\beatmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\parser\tfir\beatmap.h">
+    <ClInclude Include="include\structures\game\beatmap\beatmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\format\file.h">
@@ -170,7 +164,7 @@
     <ClInclude Include="include\structures\render\layers\objects\gameplay\cursor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\render\layers\objects\gameplay\mapset.h">
+    <ClInclude Include="include\structures\render\layers\objects\gameplay\beatmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\utilities.h">
@@ -192,9 +186,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\work\screens.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\structures\timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\structures\action.h">

@@ -2,10 +2,10 @@
 #include <osu!parser/Parser/Structures/Beatmap/Objects/HitObject.hpp>
 
 // lưu trữ Hitsound và Hitsample giống như osu!
-// p/s: code trong osu!parser/Parser/Structures/Beatmap/HitObjects.hpp
+// p/s: code trong osu!parser/Convert/Structures/Beatmap/HitObjects.hpp
 // phần Hitsound và HitSample là do mình viết :D
 
-namespace GameObjects::Hitsound
+namespace Structures::Game::Beatmap::Hitsound
 {
 	enum class HitsoundBitmap : std::uint8_t
 	{

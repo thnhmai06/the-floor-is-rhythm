@@ -3,7 +3,7 @@
 #include <SDL3/SDL_audio.h>
 #include <SDL3/SDL_scancode.h>
 
-namespace UserConfig
+namespace Config::UserConfig
 {
 	namespace Video
 	{
@@ -46,7 +46,7 @@ namespace UserConfig
 	}
 }
 
-namespace GameConfig
+namespace Config::GameConfig
 {
 	namespace General
 	{

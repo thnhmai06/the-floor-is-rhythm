@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <SDL3_mixer/SDL_mixer.h>
 #include "structures/audio/memory.h"
-#include "template.h"
+#include "structures/types.h"
 
 namespace Structures::Audio::Buses
 {

@@ -1,0 +1,133 @@
+#include "structures/game/beatmap/hitobject.h" // Header
+#include <fstream>
+#include <ranges>
+#include "logging/exceptions.h"
+#include "logging/logger.h"
+#include "format/file.h"
+#include "structures/types.h"
+#include "utilities.h"
+
+namespace Structures::Game::Beatmap::HitObjects
+{
+	using Format::FileFormat::Beatmap::AND;
+
+	Types::Game::Direction::Direction get_next_direction(const Types::Game::Direction::Direction& prev_direction, uint8_t rotation)
+	{
+		return static_cast<Types::Game::Direction::Direction>((static_cast<uint8_t>(prev_direction) + rotation) % Types::Game::Direction::NUM_DIRECTIONS);
+	}
+
+	//! Floor
+	void Floor::read(const std::vector<std::string>& content)
+	{
+		end_time = time = std::stoi(content[0]);
+		rotation = static_cast<Types::Game::Direction::Rotation>(std::stoi(content[1]));
+		combo_jump = static_cast<uint8_t>(std::stoi(content[2]));
+		hit_sound = Hitsound::Hitsound{ std::stoi(content[4]) };
+		hit_sample = Hitsound::HitSample{ content[5] };
+	}
+	void Floor::write(std::ofstream& writer) const
+	{
+		writer << time << AND << static_cast<int32_t>(rotation) << AND << static_cast<int32_t>(combo_jump) << AND <<
+			static_cast<bool>(type);
+		writer << AND << hit_sound.to_int() << AND << hit_sample.to_string();
+		writer << '\n';
+	}
+
+	//! Slider
+	void Slider::read(const std::vector<std::string>& content)
+	{
+		time = std::stoi(content[0]);
+		rotation = static_cast<Types::Game::Direction::Rotation>(std::stoi(content[1]));
+		combo_jump = static_cast<uint8_t>(std::stoi(content[2]));
+		end_time = std::stoi(content[4]);
+
+		// Curves
+		/*
+		for (const auto curves_str = Utilities::String::split(content[5], Format::FileFormat::Beatmap::HitObjects::Slider::AND);
+			 const auto& curves : curves_str)
+		{
+			const auto curve_str = Utilities::String::split(curves, Format::FileFormat::Beatmap::HitObjects::Slider::CURVE_AND, true);
+			const SliderCurve curve = {
+				.after = std::stoi(curve_str[0]),
+				.rotation = static_cast<Structures::Types::Game::Direction::Rotation>(std::stoi(curve_str[1]))
+			};
+			this->curves.push_back(curve);
+		}
+		*/
+		hit_sound = Hitsound::Hitsound{ std::stoi(content[5]) };
+		hit_sample = Hitsound::HitSample{ content[6] };
+	}
+	void Slider::write(std::ofstream& writer) const
+	{
+		writer << time << AND << static_cast<int32_t>(rotation) << AND << static_cast<int32_t>(combo_jump) << AND <<
+			static_cast<bool>(type) << AND << end_time;
+		/*
+		writer << AND;
+		for (auto ptr = curves.begin(); ptr != curves.end(); ++ptr) {
+			if (ptr != curves.begin()) writer << Format::FileFormat::Beatmap::HitObjects::Slider::AND;
+			writer << ptr->after << Format::FileFormat::Beatmap::HitObjects::Slider::CURVE_AND << static_cast<int32_t>(ptr->rotation);
+		}
+		*/
+		writer << AND << hit_sound.to_int() << AND << hit_sample.to_string();
+		writer << '\n';
+	}
+
+	//! HitObject
+	int32_t HitObject::get_time() const { return std::visit([](const auto& hit_object) { return hit_object.time; }, *this); }
+	int32_t HitObject::get_end_time() const { return std::visit([](const auto& hit_object) { return hit_object.end_time; }, *this); }
+	Types::Game::HitObject::HitObjectType HitObject::get_type() const { return std::visit([](const auto& hit_object) { return hit_object.type; }, *this); }
+	Types::Game::Direction::Rotation HitObject::get_rotation() const { return std::visit([](const auto& hit_object) { return hit_object.rotation; }, *this); }
+	uint8_t HitObject::get_combo_jump() const { return std::visit([](const auto& hit_object) { return hit_object.combo_jump; }, *this); }
+	Hitsound::Hitsound HitObject::get_hitsound() const { return std::visit([](const auto& hit_object) { return hit_object.hit_sound; }, *this); }
+	Hitsound::HitSample HitObject::get_hitsample() const { return std::visit([](const auto& hit_object) { return hit_object.hit_sample; }, *this); }
+	void HitObject::write(std::ofstream& writer) const { std::visit([&writer](const auto& hit_object) { hit_object.write(writer); }, *this); }
+
+	//! HitObjects
+	void HitObjects::read(const std::vector<std::string>& contents)
+	{
+		for (const auto& line : contents)
+		{
+			const auto content = Utilities::String::split(line, AND);
+			if (content.size() < HitObject::MINIMUM_NUM_CONTENT)
+			{
+				LOG_WARNING(Logging::Exceptions::FormatExceptions::HitObjects::Format_HitObjects_NotEnoughContent(line));
+				continue;
+			}
+
+			const auto back_itr = (empty()) ? end() : std::prev(end());
+			switch (std::stoi(content[3]))
+			{
+			case static_cast<int32_t>(Types::Game::HitObject::HitObjectType::FLOOR):
+			{
+				Floor floor(content);
+				const auto time = floor.time;
+				this->emplace_hint(back_itr, time, floor);
+
+				break;
+			}
+			case static_cast<int32_t>(Types::Game::HitObject::HitObjectType::SLIDER):
+			{
+				if (content.size() < Slider::MINIMUM_NUM_CONTENT)
+				{
+					LOG_WARNING(Logging::Exceptions::FormatExceptions::HitObjects::Format_HitObjects_NotEnoughContent(line));
+					continue;
+				}
+				Slider slider(content);
+				const auto time = slider.time;
+				this->emplace_hint(back_itr, time, slider);
+				break;
+			}
+			default:
+				LOG_WARNING(Logging::Exceptions::FormatExceptions::HitObjects::Format_HitObjects_InvalidContent(line));
+				break;
+			}
+		}
+	}
+	void HitObjects::write(std::ofstream& writer) const
+	{
+		writer << Format::FileFormat::Beatmap::HitObjects::HEADER << '\n';
+		for (const auto& hit_object : *this | std::views::values)
+			hit_object.write(writer);
+		writer << '\n';
+	}
+}

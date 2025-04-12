@@ -5,8 +5,12 @@
 
 namespace Logging
 {
-	constexpr std::string_view PATH = "./logs";
-	void init(std::string name, spdlog::level::level_enum level = spdlog::level::debug, uint32_t num_backtrace = 16);
+	namespace Logger
+	{
+		constexpr std::string_view PATH = "./logs";
+		void init(const std::string& name, spdlog::level::level_enum level = spdlog::level::debug,
+		          uint32_t num_backtrace = 16);
+	}
 }
 
 /**
@@ -46,7 +50,7 @@ namespace Logging
  * Chỉ log WARNING nhưng không muốn throw exception
  * @param exception Exception muốn log ra
  */
-#define LOG_WARNNING(exception) \
+#define LOG_WARNING(exception) \
 	do {\
 		try {\
 			spdlog::log(spdlog::source_loc{ __FILE__, __LINE__, SPDLOG_FUNCTION }, spdlog::level::warn, (exception).what()); \

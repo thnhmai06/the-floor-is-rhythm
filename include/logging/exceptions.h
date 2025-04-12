@@ -6,7 +6,7 @@
 
 using std::format;
 
-namespace SDLExceptions
+namespace Logging::Exceptions::SDLExceptions
 {
 	struct SDL_Exception : std::runtime_error
 	{
@@ -62,19 +62,19 @@ namespace SDLExceptions
 		};
 	}
 }
-namespace FileExceptions
+namespace Logging::Exceptions::FileExceptions
 {
 	struct File_Exception : std::runtime_error
 	{
 		explicit File_Exception(const char* file_path, const std::string& message) :
-			std::runtime_error(format("{} ({}): {}", message, file_path , strerror(errno))) {}
+			std::runtime_error(format("{} ({}): {}", message, file_path, strerror(errno))) {}
 	};
 	struct File_Open_Failed : File_Exception
 	{
 		explicit File_Open_Failed(const char* file_path) : File_Exception(file_path, "Couldn't open file") {}
 	};
 }
-namespace FormatExceptions
+namespace Logging::Exceptions::FormatExceptions
 {
 	struct Format_Exception : std::invalid_argument
 	{
@@ -83,20 +83,20 @@ namespace FormatExceptions
 
 	namespace HitObjects
 	{
-		struct Format_HitObjects_NotEnoughtContent : Format_Exception
+		struct Format_HitObjects_NotEnoughContent : Format_Exception
 		{
-			explicit Format_HitObjects_NotEnoughtContent(const std::string& line) : Format_Exception("Not enough Hitobject content", line) {}
+			explicit Format_HitObjects_NotEnoughContent(const std::string& line) : Format_Exception("Not enough HitObject content", line) {}
 		};
 		struct Format_HitObjects_InvalidContent : Format_Exception
 		{
-			explicit Format_HitObjects_InvalidContent(const std::string& line) : Format_Exception("Invalid Hitobject content", line) {}
+			explicit Format_HitObjects_InvalidContent(const std::string& line) : Format_Exception("Invalid HitObject content", line) {}
 		};
 	}
 	namespace TimingPoints
 	{
-		struct Format_TimingPoints_NotEnoughtContent : Format_Exception
+		struct Format_TimingPoints_NotEnoughContent : Format_Exception
 		{
-			explicit Format_TimingPoints_NotEnoughtContent(const std::string& line) : Format_Exception("Not enough TimingPoint content", line) {}
+			explicit Format_TimingPoints_NotEnoughContent(const std::string& line) : Format_Exception("Not enough TimingPoint content", line) {}
 		};
 		struct Format_TimingPoints_InvalidContent : Format_Exception
 		{

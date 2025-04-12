@@ -2,7 +2,7 @@
 #include <concepts>
 #include <SDL3_mixer/SDL_mixer.h>
 
-namespace Template
+namespace Structures::Types
 {
 	namespace Audio
 	{

@@ -3,13 +3,13 @@
 #include <map>
 #include <variant>
 #include <vector>
-#include "template.h"
-#include "structures/game/hitsound.h"
+#include "structures/types.h"
+#include "structures/game/beatmap/hitsound.h"
 
-namespace GameObjects::HitObjects
+namespace Structures::Game::Beatmap::HitObjects
 {
 	constexpr uint8_t NUM_COMBOS = 8;
-	inline Template::Game::Direction::Direction get_next_direction(const Template::Game::Direction::Direction& prev_direction, uint8_t rotation);
+	inline Types::Game::Direction::Direction get_next_direction(const Types::Game::Direction::Direction& prev_direction, uint8_t rotation);
 
 	struct Floor
 	{
@@ -17,8 +17,8 @@ namespace GameObjects::HitObjects
 
 		int32_t time = 0;
 		int32_t end_time = 0;
-		Template::Game::HitObject::HitObjectType type = Template::Game::HitObject::HitObjectType::FLOOR;
-		Template::Game::Direction::Rotation rotation = Template::Game::Direction::Rotation::NO_ROTATE;
+		Types::Game::HitObject::HitObjectType type = Types::Game::HitObject::HitObjectType::FLOOR;
+		Types::Game::Direction::Rotation rotation = Types::Game::Direction::Rotation::NO_ROTATE;
 		uint8_t combo_jump = 0;
 		Hitsound::Hitsound hit_sound;
 		Hitsound::HitSample hit_sample;
@@ -26,7 +26,7 @@ namespace GameObjects::HitObjects
 		void read(const std::vector<std::string>& content);
 		void write(std::ofstream& writer) const;
 
-		Floor() { type = Template::Game::HitObject::HitObjectType::FLOOR; }
+		Floor() { type = Types::Game::HitObject::HitObjectType::FLOOR; }
 		explicit Floor(const std::vector<std::string>& content): Floor() { read(content); }
 	};
 	struct Slider
@@ -35,13 +35,13 @@ namespace GameObjects::HitObjects
 		/*struct SliderCurve
 		{
 			int32_t after = 0;
-			Template::Game::Direction::Rotation rotation = Template::Game::Direction::Rotation::NO_ROTATE;
+			Types::Logic::Direction::Rotation rotation = Types::Logic::Direction::Rotation::NO_ROTATE;
 		};*/
 
 		int32_t time = 0;
 		int32_t end_time = 0;
-		Template::Game::HitObject::HitObjectType type = Template::Game::HitObject::HitObjectType::FLOOR;
-		Template::Game::Direction::Rotation rotation = Template::Game::Direction::Rotation::NO_ROTATE;
+		Types::Game::HitObject::HitObjectType type = Types::Game::HitObject::HitObjectType::FLOOR;
+		Types::Game::Direction::Rotation rotation = Types::Game::Direction::Rotation::NO_ROTATE;
 		uint8_t combo_jump = 0;
 		//std::vector<SliderCurve> curves;
 		Hitsound::Hitsound hit_sound;
@@ -50,7 +50,7 @@ namespace GameObjects::HitObjects
 		void read(const std::vector<std::string>& content);
 		void write(std::ofstream& writer) const;
 
-		Slider() { type = Template::Game::HitObject::HitObjectType::SLIDER; }
+		Slider() { type = Types::Game::HitObject::HitObjectType::SLIDER; }
 		explicit Slider(const std::vector<std::string>& content): Slider() { read(content); }
 	};
 	struct HitObject : std::variant<Floor, Slider>
@@ -60,8 +60,8 @@ namespace GameObjects::HitObjects
 		void write(std::ofstream& writer) const;
 		[[nodiscard]] int32_t get_time() const;
 		[[nodiscard]] int32_t get_end_time() const;
-		[[nodiscard]] Template::Game::HitObject::HitObjectType get_type() const;
-		[[nodiscard]] Template::Game::Direction::Rotation get_rotation() const;
+		[[nodiscard]] Types::Game::HitObject::HitObjectType get_type() const;
+		[[nodiscard]] Types::Game::Direction::Rotation get_rotation() const;
 		[[nodiscard]] uint8_t get_combo_jump() const;
 		[[nodiscard]] Hitsound::Hitsound get_hitsound() const;
 		[[nodiscard]] Hitsound::HitSample get_hitsample() const;

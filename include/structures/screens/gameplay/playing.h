@@ -1,32 +1,32 @@
 ﻿#pragma once
+#include "config.h"
 #include "structures/screens/screen.h"
-#include "structures/timer.h"
-#include "parser/tfir/beatmap.h"
 #include "structures/action.h"
+#include "structures/game/beatmap/beatmap.h"
 
-namespace Structures::Screen::Gameplay
+namespace Structures::Screens::Gameplay
 {
-	using Render::RenderObjects::RenderObjectStorage, Render::Textures::TextureMemory, Render::Layers::Layer;
-	using Timer::Timer, Action::KeyObserver;
+	using Render::Objects::Storage, Render::Textures::TextureMemory, Render::Layers::Layer;
+	using Action::Key::KeyObserver;
 
-	struct PlayingScreen : private Screens::Screen
+	struct PlayingScreen : private Screen
 	{
-		std::unique_ptr<const Mapset> mapset;
+		std::unique_ptr<const Game::Beatmap::Beatmap> beatmap;
 		float mod_multiplier = 1.0f;
 
-		struct Game final
+		struct Logic final
 		{
-			const Mapset* mapset = nullptr;
-			//std::queue<GameObjects::HitObjects::HitObject*> active_hit_object;
+			const Game::Beatmap::Beatmap* beatmap = nullptr;
+			//std::queue<Logic::HitObjects::HitObject*> active_hit_object;
 
 		private:
-			Template::Game::Direction::Direction require_direction = Template::Game::Direction::Direction::RIGHT;
-			Timer timer;
+			Types::Game::Direction::Direction require_direction = Types::Game::Direction::Direction::RIGHT;
+			Action::Time::Timer timer;
 			KeyObserver key_observer;
 
 		public:
 			uint8_t health = 200;
-			Template::Game::Direction::Direction current_direction = Template::Game::Direction::Direction::RIGHT;
+			Types::Game::Direction::Direction current_direction = Types::Game::Direction::Direction::RIGHT;
 			struct Keystroke
 			{
 				struct KeyCounter
@@ -44,13 +44,12 @@ namespace Structures::Screen::Gameplay
 					void reset() { count = 0; is_hold = false; }
 					explicit KeyCounter(const SDL_Scancode& target) : target(target) {}
 				};
-
 				struct
 				{
-					KeyCounter right{ UserConfig::KeyBinding::Direction::right };
-					KeyCounter left{ UserConfig::KeyBinding::Direction::left };
-					KeyCounter up{ UserConfig::KeyBinding::Direction::up };
-					KeyCounter down{ UserConfig::KeyBinding::Direction::down };
+					KeyCounter right{ Config::UserConfig::KeyBinding::Direction::right };
+					KeyCounter left{ Config::UserConfig::KeyBinding::Direction::left };
+					KeyCounter up{ Config::UserConfig::KeyBinding::Direction::up };
+					KeyCounter down{ Config::UserConfig::KeyBinding::Direction::down };
 
 					void reset()
 					{
@@ -69,8 +68,8 @@ namespace Structures::Screen::Gameplay
 				} direction;
 				struct
 				{
-					KeyCounter k1{ UserConfig::KeyBinding::Click::k1 };
-					KeyCounter k2{ UserConfig::KeyBinding::Click::k2 };
+					KeyCounter k1{ Config::UserConfig::KeyBinding::Click::k1 };
+					KeyCounter k2{ Config::UserConfig::KeyBinding::Click::k2 };
 
 					void reset()
 					{
@@ -100,7 +99,7 @@ namespace Structures::Screen::Gameplay
 			private:
 				unsigned long total_objects_num = 1;
 				unsigned long total_combo = 1;
-				const float* mod_multiplier;
+				float mod_multiplier = 1.0f;
 
 			public:
 				unsigned long score = 0;
@@ -120,8 +119,8 @@ namespace Structures::Screen::Gameplay
 
 				unsigned long update_score();
 
-				explicit Score(const Mapset& beatmap, const float* mod_multiplier);
-			} score{ *mapset, &mod_multiplier };
+				explicit Score(const Game::Beatmap::Beatmap& beatmap, const float& mod_multiplier);
+			} score;
 
 			[[nodiscard]] bool is_paused() const { return timer.is_paused(); }
 			void pause() { timer.pause(); }
@@ -132,7 +131,7 @@ namespace Structures::Screen::Gameplay
 
 				//TODO: object interaction
 			}
-			explicit Game(const Mapset* mapset, const int64_t& start_time = 0);
+			explicit Logic(const Game::Beatmap::Beatmap* beatmap, const int64_t& start_time = 0, const float& mod_multiplier = 1.0f);
 		} game;
 		struct Render : Screen::Render
 		{
@@ -142,17 +141,17 @@ namespace Structures::Screen::Gameplay
 				Screen::Render::Item cursor;
 
 				Components(
-					RenderObjectStorage* storage,
+					Storage* storage,
 					Layer* playground_layer,
 					Layer* cursor_layer);
 			} components;
 
 			Render(
-				const Template::Game::Direction::Direction* current_direction,
+				const Types::Game::Direction::Direction* current_direction,
 				Layer& playground_layer,
 				Layer& cursor_layer,
 				const TextureMemory& skin,
-				const Mapset& mapset);
+				const Game::Beatmap::Beatmap& beatmap);
 		} render;
 
 		explicit PlayingScreen(const char* beatmap_path);

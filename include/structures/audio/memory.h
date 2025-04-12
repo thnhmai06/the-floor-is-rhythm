@@ -1,11 +1,11 @@
 ﻿#pragma once
 #include <string>
 #include <unordered_map>
-#include "template.h"
+#include "structures/types.h"
 
 namespace Structures::Audio::Memory
 {
-	using namespace Template::Audio;
+	using namespace Structures::Types::Audio;
 
 	template <AudioPtrType AudioPtr>
 	struct AudioMemory : std::unordered_map<std::string, AudioPtr>

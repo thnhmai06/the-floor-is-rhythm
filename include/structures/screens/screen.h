@@ -4,24 +4,24 @@
 
 namespace Structures::Screens
 {
-	using Render::RenderObjects::RenderObjectStorage;
+	using Render::Objects::Storage;
 	using Render::Layers::Layer;
 
 	struct Screen
 	{
 		struct Render
 		{
-			RenderObjectStorage storage;
+			Storage storage;
 
 			struct Item
 			{
-				RenderObjectStorage* storage;
-				RenderObjectStorage::iterator storage_item;
+				Storage* storage;
+				Storage::iterator storage_item;
 				Layer::RenderBuffer::Item render_item;
 
 				void remove();
 
-				Item(RenderObjectStorage* storage, Layer::RenderBuffer* render_buffer);
+				Item(Storage* storage, Layer::RenderBuffer* render_buffer);
 			};
 		};
 	};

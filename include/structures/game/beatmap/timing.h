@@ -1,9 +1,9 @@
 ﻿#pragma once
 #include <cstdint>
 #include <map>
-#include "hitsound.h"
+#include "structures/game/beatmap/hitsound.h"
 
-namespace GameObjects::Timing
+namespace Structures::Game::Beatmap::TimingPoints
 {
 	struct TimingPoint
 	{

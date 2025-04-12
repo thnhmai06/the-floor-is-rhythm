@@ -4,7 +4,7 @@
 #include <cmath>
 #include <iomanip>
 #include <SDL3_mixer/SDL_mixer.h>
-#include "template.h"
+#include "structures/types.h"
 
 namespace Utilities
 {
@@ -14,17 +14,17 @@ namespace Utilities
 		inline bool is_equal_float(const float& variable, const float& value, const float& epsilon = 0.001f) { return abs(variable - value) <= epsilon; }
 		inline bool is_integer(const float& value, const float& epsilon = 0.001f) { return is_equal_float(std::floor(value), value, epsilon); }
 		inline float centre(const float& size, const float& window_size) { return (window_size - size) / 2; }
-		inline float get_rotation_angle(const Template::Game::Direction::Direction& rotation, const bool clockwise = true)
+		inline float get_rotation_angle(const Structures::Types::Game::Direction::Direction& rotation, const bool clockwise = true)
 		{
 			switch (rotation)
 			{
-			case Template::Game::Direction::Direction::RIGHT:
+			case Structures::Types::Game::Direction::Direction::RIGHT:
 				return 0.0f;
-			case Template::Game::Direction::Direction::LEFT:
+			case Structures::Types::Game::Direction::Direction::LEFT:
 				return 180.0f;
-			case Template::Game::Direction::Direction::UP:
+			case Structures::Types::Game::Direction::Direction::UP:
 				return clockwise ? -90.0f : 90.0f;
-			case Template::Game::Direction::Direction::DOWN:
+			case Structures::Types::Game::Direction::Direction::DOWN:
 				return clockwise ? 90.0f : -90.0f;
 			}
 			return 0.0f;

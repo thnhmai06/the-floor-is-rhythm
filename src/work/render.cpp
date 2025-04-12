@@ -3,10 +3,10 @@
 #include "main.h"
 
 #include <chrono>
-#include "logger/logging.h"
+#include "logging/logger.h"
 #include "structures/screens/gameplay/playing.h"
 #include "format/skin.h"
-#include "skin.h"
+#include "work/skin.h"
 
 using namespace Work::Render;
 
@@ -22,15 +22,15 @@ int32_t Work::Render::render(SDL_Window* window)
 
 	try
 	{
-		load_skin(skin_path, *Textures::skin);
+		Skin::load_skin(skin_path, *Textures::skin);
 
 		SDL_Event quit_event;
-		while (running) 
+		while (is_running) 
 		{
 			const auto previous_render = std::chrono::system_clock::now();
 
 			// quit event
-			if (SDL_PollEvent(&quit_event) && quit_event.type == SDL_EVENT_QUIT) running = false;
+			if (SDL_PollEvent(&quit_event) && quit_event.type == SDL_EVENT_QUIT) is_running = false;
 
 			// render
 			SDL_RenderClear(renderer);
@@ -43,7 +43,7 @@ int32_t Work::Render::render(SDL_Window* window)
 			SPDLOG_DEBUG("Render Latency: {}ms", latency);
 		}
 	} catch (...) {
-		running = false;
+		is_running = false;
 		result = EXIT_FAILURE;
 	}
 	Layers::reset_all(true);

@@ -1,11 +1,12 @@
-﻿#pragma once
+﻿// ReSharper disable StringLiteralTypo
+#pragma once
 #include <array>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
-#include "template.h"
+#include "structures/types.h"
 
-namespace SkinFormat
+namespace Format::SkinFormat
 {
 	const std::unordered_set<std::string_view> SUPPORT_IMAGE_EXTENSIONS = { ".png", ".jpg" };
 
@@ -13,11 +14,11 @@ namespace SkinFormat
 	{
 		const std::string BODY = "cursor";
 		const std::string TRAIL = "cursortrail";
-		inline std::unordered_map<Template::Game::Direction::Direction, const std::string> DIRECTION = {
-			{Template::Game::Direction::Direction::RIGHT, "right/direction"},
-			{Template::Game::Direction::Direction::UP, "up/direction"},
-			{Template::Game::Direction::Direction::DOWN, "down/direction"},
-			{Template::Game::Direction::Direction::LEFT, "left/direction"}
+		inline std::unordered_map<Structures::Types::Game::Direction::Direction, const std::string> DIRECTION = {
+			{Structures::Types::Game::Direction::Direction::RIGHT, "right/direction"},
+			{Structures::Types::Game::Direction::Direction::UP, "up/direction"},
+			{Structures::Types::Game::Direction::Direction::DOWN, "down/direction"},
+			{Structures::Types::Game::Direction::Direction::LEFT, "left/direction"}
 		};
 	}
 
@@ -44,16 +45,16 @@ namespace SkinFormat
 
 		private:
 			VALUE direction_folder;
-			static std::string get_direction_folder(const Template::Game::Direction::Direction& direction) {
+			static std::string get_direction_folder(const Structures::Types::Game::Direction::Direction& direction) {
 				switch (direction)
 				{
-				case Template::Game::Direction::Direction::RIGHT:
+				case Structures::Types::Game::Direction::Direction::RIGHT:
 					return "right/";
-				case Template::Game::Direction::Direction::UP:
+				case Structures::Types::Game::Direction::Direction::UP:
 					return "up/";
-				case Template::Game::Direction::Direction::DOWN:
+				case Structures::Types::Game::Direction::Direction::DOWN:
 					return "down/";
-				case Template::Game::Direction::Direction::LEFT:
+				case Structures::Types::Game::Direction::Direction::LEFT:
 					return "left/";
 				}
 				return "right/";
@@ -68,7 +69,7 @@ namespace SkinFormat
 			{
 				return BASE::operator[](static_cast<HitObjectTypeBase>(type));
 			}
-			explicit HitObjectDirectionSkinType(const Template::Game::Direction::Direction& direction) :
+			explicit HitObjectDirectionSkinType(const Structures::Types::Game::Direction::Direction& direction) :
 				BASE{},
 				direction_folder(get_direction_folder(direction))
 			{
@@ -81,26 +82,26 @@ namespace SkinFormat
 				(*this)[HitObjectType::SLIDER_END] = direction_folder + "sliderend";
 			}
 		};
-		struct HitObjectSkinType : std::array<HitObjectDirectionSkinType, Template::Game::Direction::NUM_DIRECTIONS>
+		struct HitObjectSkinType : std::array<HitObjectDirectionSkinType, Structures::Types::Game::Direction::NUM_DIRECTIONS>
 		{
 		protected:
 			using VALUE = HitObjectDirectionSkinType;
-			using BASE = std::array<VALUE, Template::Game::Direction::NUM_DIRECTIONS>;
+			using BASE = std::array<VALUE, Structures::Types::Game::Direction::NUM_DIRECTIONS>;
 
 		public:
-			reference operator[] (const Template::Game::Direction::Direction& direction)
+			reference operator[] (const Structures::Types::Game::Direction::Direction& direction)
 			{
-				return BASE::operator[](static_cast<Template::Game::Direction::DirectionBase>(direction));
+				return BASE::operator[](static_cast<Structures::Types::Game::Direction::DirectionBase>(direction));
 			}
-			const_reference operator[] (const Template::Game::Direction::Direction& direction) const
+			const_reference operator[] (const Structures::Types::Game::Direction::Direction& direction) const
 			{
-				return BASE::operator[](static_cast<Template::Game::Direction::DirectionBase>(direction));
+				return BASE::operator[](static_cast<Structures::Types::Game::Direction::DirectionBase>(direction));
 			}
 			explicit HitObjectSkinType() : BASE{
-				HitObjectDirectionSkinType(Template::Game::Direction::Direction::RIGHT),
-				HitObjectDirectionSkinType(Template::Game::Direction::Direction::UP),
-				HitObjectDirectionSkinType(Template::Game::Direction::Direction::DOWN),
-				HitObjectDirectionSkinType(Template::Game::Direction::Direction::LEFT)
+				HitObjectDirectionSkinType(Structures::Types::Game::Direction::Direction::RIGHT),
+				HitObjectDirectionSkinType(Structures::Types::Game::Direction::Direction::UP),
+				HitObjectDirectionSkinType(Structures::Types::Game::Direction::Direction::DOWN),
+				HitObjectDirectionSkinType(Structures::Types::Game::Direction::Direction::LEFT)
 			} {
 			}
 		};
@@ -108,6 +109,6 @@ namespace SkinFormat
 	}
 
 	// Dùng string do khi convert string_view -> string insert thì kí tự đầu trở thành null char
-	struct ImageStorage : std::unordered_set<std::string> { ImageStorage(); } const IMAGE_STORAGE;
-	struct FolderStorage : std::unordered_set<std::string> { FolderStorage(); } const FOLDER_STORAGE;
+	struct ImageNameStorage : std::unordered_set<std::string> { ImageNameStorage(); } const IMAGE_STORAGE;
+	struct FolderNameStorage : std::unordered_set<std::string> { FolderNameStorage(); } const FOLDER_STORAGE;
 }

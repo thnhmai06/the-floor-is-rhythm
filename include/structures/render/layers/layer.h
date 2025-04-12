@@ -1,6 +1,5 @@
 ﻿// ReSharper disable CppClangTidyCppcoreguidelinesAvoidConstOrRefDataMembers
 #pragma once
-#include "config.h"
 #include "structures/render/layers/objects/collection.h"
 #include "utilities.h"
 
@@ -23,10 +22,10 @@ namespace Structures::Render::Layers
 	{
 		// buffer
 		struct RenderBufferItem;
-		struct RenderBuffer : std::list<const RenderObjects::RenderObjectCollection*>
+		struct RenderBuffer : std::list<const Objects::Collection*>
 		{
 		protected:
-			using BASE = std::list<RenderObjects::RenderObjectCollection*>;
+			using BASE = std::list<Objects::Collection*>;
 
 		public:
 			struct Item
@@ -42,7 +41,7 @@ namespace Structures::Render::Layers
 
 			const Layer* parent;
 
-			Item add_collection(const RenderObjects::RenderObjectCollection* collection);
+			Item add_collection(const Objects::Collection* collection);
 			static void remove_collection(Item& item);
 
 			RenderBuffer(const Layer* layer) : parent(layer) {}
@@ -50,7 +49,7 @@ namespace Structures::Render::Layers
 
 		// attributes
 		RenderBuffer render_buffer;
-		struct LayerCamera : private RenderConfig
+		struct LayerCamera : private Objects::Object::Config
 		{
 			SDL_FPoint get_object_offset() const;
 
@@ -61,11 +60,7 @@ namespace Structures::Render::Layers
 			void move_x(const float& dx);
 			void move_y(const float& dy);
 
-			LayerCamera() : RenderConfig()
-			{
-				origin_pos = { 0, 0 }; // góc trái
-				render_pos = { .x = GameConfig::Video::Camera::DEFAULT_POS_X, .y = GameConfig::Video::Camera::DEFAULT_POS_Y };
-			}
+			LayerCamera();
 		} camera;
 		bool visible = true;
 

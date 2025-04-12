@@ -1,67 +1,68 @@
 ﻿#include "structures/render/layers/objects/gameplay/cursor.h" // Header
 #include "format/skin.h"
 
-using namespace Structures::Render::RenderObjects::Gameplay::Cursor;
-//! Structures::Render::PolyRenderObject::Cursor
-//! ::Components
-using namespace Components;
-// ::RenderCursorBody
-RenderCursorBody::RenderCursorBody(const TextureMemory& memory) :
-	RenderObject{
-		memory.find(SkinFormat::Cursor::BODY),
-		Template::Render::RenderOriginType::CENTRE } {
-}
-
-// ::RenderCursorTrail
-RenderCursorTrail::RenderCursorTrail(const TextureMemory& memory)
+namespace Structures::Render::Objects::Gameplay::Cursor
 {
-	push_back(RenderObject{
-		memory.find(SkinFormat::Cursor::TRAIL),
-		Template::Render::RenderOriginType::CENTRE });
-}
+	namespace Components
+	{
+		// ::Body
+		Body::Body(const TextureMemory& memory) :
+			Object{
+				memory.find(Format::SkinFormat::Cursor::BODY),
+				Types::Render::RenderOriginType::CENTRE } {
+		}
 
-// ::RenderCursorDirection
-void RenderCursorDirection::update_src()
-{
-	if (current_direction)
-		src.item = src.memory->find(SkinFormat::Cursor::DIRECTION[*current_direction]).item;
-}
-void RenderCursorDirection::change_current_direction_target(const Template::Game::Direction::Direction* new_target)
-{
-	this->current_direction = new_target;
-	update_src();
-}
-RenderCursorDirection::RenderCursorDirection(
-	const TextureMemory& memory,
-	const Template::Game::Direction::Direction* current_direction)
-	: RenderObject{
-		  memory.find(SkinFormat::Cursor::DIRECTION[current_direction
-														? *current_direction
-														: Template::Game::Direction::Direction::RIGHT]),
-		  Template::Render::RenderOriginType::CENTRE },
-	current_direction(current_direction)
-{
-}
+		// ::Trail
+		Trail::Trail(const TextureMemory& memory)
+		{
+			push_back(Object{
+				memory.find(Format::SkinFormat::Cursor::TRAIL),
+				Types::Render::RenderOriginType::CENTRE });
+		}
 
-//! ::Collection
-using namespace Collection;
-CursorCollection::CursorCollection(const TextureMemory& memory, const Template::Game::Direction::Direction* current_direction)
-	: RenderObjectCollection()
-{
-	//! Chú ý thứ tự: Body -> Trail -> Direction
+		// ::Direction
+		void Direction::update_src()
+		{
+			if (current_direction)
+				src.item = src.memory->find(Format::SkinFormat::Cursor::DIRECTION[*current_direction]).item;
+		}
+		void Direction::change_current_direction_target(const Types::Game::Direction::Direction* new_target)
+		{
+			this->current_direction = new_target;
+			update_src();
+		}
+		Direction::Direction(
+			const TextureMemory& memory,
+			const Types::Game::Direction::Direction* current_direction)
+			: Object{
+				  memory.find(Format::SkinFormat::Cursor::DIRECTION[current_direction
+																? *current_direction
+																: Types::Game::Direction::Direction::RIGHT]),
+				  Types::Render::RenderOriginType::CENTRE },
+			current_direction(current_direction)
+		{
+		}
+	}
 
-	// body
-	auto c_body = std::make_shared<RenderCursorBody>(memory);
-	push_back(c_body);
-	body = c_body;
+	Collection::Collection(const TextureMemory& memory, const Types::Game::Direction::Direction* current_direction)
+		: Objects::Collection()
+	{
+		using namespace Components;
 
-	// trail
-	auto c_trail = std::make_shared<RenderCursorTrail>(memory);
-	push_back(c_trail);
-	trail = c_trail;
+		//! Chú ý thứ tự: Body -> Trail -> Direction
+		// body
+		auto c_body = std::make_shared<Body>(memory);
+		push_back(c_body);
+		body = c_body;
 
-	// direction
-	auto c_direction = std::make_shared<RenderCursorDirection>(memory, current_direction);
-	push_back(c_direction);
-	direction = c_direction;
+		// trail
+		auto c_trail = std::make_shared<Trail>(memory);
+		push_back(c_trail);
+		trail = c_trail;
+
+		// direction
+		auto c_direction = std::make_shared<Direction>(memory, current_direction);
+		push_back(c_direction);
+		direction = c_direction;
+	}
 }
