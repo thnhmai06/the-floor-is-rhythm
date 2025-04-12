@@ -50,7 +50,7 @@ namespace Structures::Types
 			};
 			constexpr Direction operator+(const Direction& direction, const Rotation& rotation)
 			{
-				return static_cast<Direction>((static_cast<uint8_t>(direction) + static_cast<uint8_t>(rotation)) % 4);
+				return static_cast<Direction>((static_cast<uint8_t>(direction) + static_cast<uint8_t>(rotation)) % NUM_DIRECTIONS);
 			}
 			constexpr Direction operator+=(Direction& direction, const Rotation& rotation)
 			{

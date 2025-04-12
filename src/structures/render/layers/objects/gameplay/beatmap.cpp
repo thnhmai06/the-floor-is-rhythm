@@ -290,7 +290,7 @@ namespace Structures::Render::Objects::Gameplay::Beatmap
 			{
 				const auto current = std::make_shared<Floor>(
 					hit_object, memory, difficulty, current_inherited->second.get_velocity(),
-					(!previous.lock() ? nullptr : previous.lock().get()));
+					previous.lock().get());
 				push_back(current);
 				previous = current;
 			}
@@ -300,7 +300,7 @@ namespace Structures::Render::Objects::Gameplay::Beatmap
 			{
 				const auto current = std::make_shared<Slider>(hit_object, memory, difficulty,
 					current_uninherited->second.beat_length, current_inherited->second.get_velocity(),
-					(!previous.lock() ? nullptr : previous.lock().get()));
+					previous.lock().get());
 				push_back(current);
 				previous = current;
 			}

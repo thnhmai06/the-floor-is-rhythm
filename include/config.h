@@ -89,6 +89,7 @@ namespace Config::GameConfig
 				constexpr int32_t PERFECT = 80; // 300
 				constexpr int32_t GOOD = 140; // 100
 				constexpr int32_t BAD = 200; // 50
+				constexpr int32_t MISS = 400; // 0 - ngoài tầm này chưa được tính là đã bấm (https://osu.ppy.sh/wiki/en/Gameplay/Judgement/osu%21)
 			}
 
 			namespace Multiply

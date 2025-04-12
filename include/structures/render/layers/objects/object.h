@@ -21,7 +21,7 @@ namespace Structures::Render::Objects
 				[[nodiscard]] SDL_FRect convert_rect_to_origin(const SDL_FRect& rect, const OriginPoint& to_origin = { 0, 0 }) const;
 			};
 			SDL_FPoint render_pos = { 0, 0 }; // chính là dst_rect với size nguyên gốc (muốn đổi size hãy ra ngoài Object tìm set_render_size())
-			OriginPoint origin_pos = { 0, 0 };
+			OriginPoint origin_pos = { 0, 0 }; // góc trái texture
 			SDL_FPoint scale = { 1.0f, 1.0f };
 			uint8_t alpha = 255;
 
@@ -31,8 +31,7 @@ namespace Structures::Render::Objects
 			[[nodiscard]] SDL_FRect get_sdl_dst_rect(const SDL_FPoint& src_size) const; // dst_rect trong params render của sdl
 
 			Config();
-			explicit Config(const SDL_FPoint& render_pos,
-				const OriginPoint& origin = { 0.0f, 0.0f });
+			explicit Config(const SDL_FPoint& render_pos, const OriginPoint& origin = { 0.0f, 0.0f });
 		};
 
 		TextureMemory::Item src;
@@ -57,7 +56,7 @@ namespace Structures::Render::Objects
 		Object() = default;
 		explicit Object(
 			TextureMemory::Item texture,
-			const Types::Render::RenderOriginType& origin_type,
+			const Types::Render::RenderOriginType& origin_type = Types::Render::RenderOriginType::CENTRE,
 			const SDL_FPoint& render_pos = { 0, 0 });
 		explicit Object(
 			TextureMemory::Item texture,

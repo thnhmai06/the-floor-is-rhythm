@@ -7,7 +7,7 @@
 namespace Structures::Screens::Gameplay
 {
 	using Render::Objects::Storage, Render::Textures::TextureMemory, Render::Layers::Layer;
-	using Action::Key::KeyObserver;
+	using Action::Event::KeyboardEventList;
 
 	struct PlayingScreen : private Screen
 	{
@@ -16,32 +16,45 @@ namespace Structures::Screens::Gameplay
 
 		struct Logic final
 		{
-			const Game::Beatmap::Beatmap* beatmap = nullptr;
-			//std::queue<Logic::HitObjects::HitObject*> active_hit_object;
-
 		private:
-			Types::Game::Direction::Direction require_direction = Types::Game::Direction::Direction::RIGHT;
+			const Game::Beatmap::Beatmap* beatmap = nullptr;
+			Types::Game::Direction::Direction required_direction = Types::Game::Direction::Direction::RIGHT;
+			Game::Beatmap::HitObjects::HitObjects::const_iterator current_hit_object = beatmap->hit_objects.cbegin();
 			Action::Time::Timer timer;
-			KeyObserver key_observer;
+
+			void update_required_direction()
+			{
+				if (current_hit_object == beatmap->hit_objects.cend()) return;
+				required_direction += current_hit_object->second.get_rotation();
+			}
 
 		public:
 			uint8_t health = 200;
-			Types::Game::Direction::Direction current_direction = Types::Game::Direction::Direction::RIGHT;
 			struct Keystroke
 			{
 				struct KeyCounter
 				{
 					SDL_Scancode target;
 					unsigned long count = 0;
+					uint8_t recently_pressed_num = 0; // => tính được cps
 					bool is_hold = false;
 
-					void update(KeyObserver& observer)
+					void update(const KeyboardEventList& events)
 					{
-						const auto& [target_is_pressed, target_is_hold] = observer[target];
-						if (target_is_pressed) count++;
-						this->is_hold = target_is_hold;
+						recently_pressed_num = 0;
+						for (const auto& event: events)
+						{
+							if (event.scancode != target) continue;
+							is_hold = event.repeat; // nếu thả ra, sẽ có event KeyUp để cập nhật
+							if (event.down && !event.repeat)
+							{
+								recently_pressed_num++;
+								count++;
+							}
+							else recently_pressed_num = 0; // tránh trường hợp spam press và hold
+						}
 					}
-					void reset() { count = 0; is_hold = false; }
+					void reset() { count = recently_pressed_num = 0; is_hold = false; }
 					explicit KeyCounter(const SDL_Scancode& target) : target(target) {}
 				};
 				struct
@@ -50,6 +63,7 @@ namespace Structures::Screens::Gameplay
 					KeyCounter left{ Config::UserConfig::KeyBinding::Direction::left };
 					KeyCounter up{ Config::UserConfig::KeyBinding::Direction::up };
 					KeyCounter down{ Config::UserConfig::KeyBinding::Direction::down };
+					Types::Game::Direction::Direction current_direction = Types::Game::Direction::Direction::RIGHT;
 
 					void reset()
 					{
@@ -58,12 +72,27 @@ namespace Structures::Screens::Gameplay
 						up.reset();
 						down.reset();
 					}
-					void update(KeyObserver& observer)
+					void update(const KeyboardEventList& events)
 					{
-						right.update(observer);
-						left.update(observer);
-						up.update(observer);
-						down.update(observer);
+						// Cập nhật lần cuối cùng thay đổi direction trong events
+						for (auto event = events.rbegin(); event != events.rend(); ++event)
+						{
+							if (!event->repeat) continue;
+							if (event->scancode == right.target) 
+								current_direction = Types::Game::Direction::Direction::RIGHT;
+							else if (event->scancode == left.target) 
+								current_direction = Types::Game::Direction::Direction::LEFT;
+							else if (event->scancode == up.target) 
+								current_direction = Types::Game::Direction::Direction::UP;
+							else if (event->scancode == down.target) 
+								current_direction = Types::Game::Direction::Direction::DOWN;
+							break;
+						}
+
+						right.update(events);
+						left.update(events);
+						up.update(events);
+						down.update(events);
 					}
 				} direction;
 				struct
@@ -76,10 +105,14 @@ namespace Structures::Screens::Gameplay
 						k1.reset();
 						k2.reset();
 					}
-					void update(KeyObserver& observer)
+					[[nodiscard]] uint16_t get_recently_pressed_num() const
 					{
-						k1.update(observer);
-						k2.update(observer);
+						return k1.recently_pressed_num + k2.recently_pressed_num;
+					}
+					void update(const KeyboardEventList& events)
+					{
+						k1.update(events);
+						k2.update(events);
 					}
 				} click;
 
@@ -88,10 +121,10 @@ namespace Structures::Screens::Gameplay
 					direction.reset();
 					click.reset();
 				}
-				void update(KeyObserver& observer)
+				void update(const KeyboardEventList& events)
 				{
-					direction.update(observer);
-					click.update(observer);
+					direction.update(events);
+					click.update(events);
 				}
 			} key_stoke;
 			struct Score
@@ -125,14 +158,28 @@ namespace Structures::Screens::Gameplay
 			[[nodiscard]] bool is_paused() const { return timer.is_paused(); }
 			void pause() { timer.pause(); }
 			void resume() { timer.resume(); }
-			void make_time_step()
+			void make_time_step(const KeyboardEventList& events)
 			{
-				key_stoke.update(key_observer);
+				key_stoke.update(events);
 
-				//TODO: object interaction
+				const auto current_time = timer.get_time();
+				const auto& od = beatmap->calculated_difficulty.od;
+
+				if (current_hit_object != beatmap->hit_objects.end())
+				{
+					if (const auto current_required_time = current_hit_object->second.get_time();
+						!(current_time <= current_required_time && od.get_score(current_time, current_required_time) < 0))
+						// Không phải là chưa tới thời gian bấm
+					{
+						if (required_direction == key_stoke.direction.current_direction)
+						{
+
+						}
+					}
+				}
 			}
 			explicit Logic(const Game::Beatmap::Beatmap* beatmap, const int64_t& start_time = 0, const float& mod_multiplier = 1.0f);
-		} game;
+		} logic;
 		struct Render : Screen::Render
 		{
 			struct Components

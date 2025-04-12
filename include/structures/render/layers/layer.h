@@ -49,8 +49,12 @@ namespace Structures::Render::Layers
 
 		// attributes
 		RenderBuffer render_buffer;
-		struct LayerCamera : private Objects::Object::Config
+		struct Camera : private Objects::Object::Config
 		{
+		protected:
+			using BASE = Objects::Object::Config;
+
+		public:
 			SDL_FPoint get_object_offset() const;
 
 			[[nodiscard]] uint8_t get_alpha() const;
@@ -60,12 +64,12 @@ namespace Structures::Render::Layers
 			void move_x(const float& dx);
 			void move_y(const float& dy);
 
-			LayerCamera();
+			Camera(const OriginPoint& origin = {0, 0}); // {0, 0} là góc trái màn hình
 		} camera;
 		bool visible = true;
 
 		virtual ~Layer() = default;
-		explicit Layer();
+		explicit Layer(const SDL_FPoint& origin_pos_in_percent = {0, 0});
 		void render() const;
 		void reset(bool to_initial_state = false);
 	};

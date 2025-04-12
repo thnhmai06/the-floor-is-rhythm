@@ -8,7 +8,8 @@ namespace Structures::Audio::Mixer
 {
 	using namespace Structures::Audio::Buses;
 
-	struct Mixer {
+	struct Mixer
+	{
 		int32_t volume;
 		SDL_AudioSpec spec;
 		AudioBus<Music> music;

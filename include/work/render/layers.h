@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <memory>
 #include "structures/render/layers/layer.h"
 
@@ -14,8 +14,8 @@ namespace Work::Render::Layers
 	static void init_all()
 	{
 		background = std::make_unique<Layer>();
-		playground = std::make_unique<Layer>();
-		cursor = std::make_unique<Layer>();
+		playground = std::make_unique<Layer>(SDL_FPoint{ 0.5, 0.5 }); // giữa màn hình
+		cursor = std::make_unique<Layer>(SDL_FPoint{ 0.5, 0.5 }); // giữa màn hình
 		hud = std::make_unique<Layer>();
 	}
 	static void render_all()

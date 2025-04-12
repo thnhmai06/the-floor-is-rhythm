@@ -94,7 +94,7 @@ namespace Structures::Game::Beatmap::HitObjects
 				continue;
 			}
 
-			const auto back_itr = (empty()) ? end() : std::prev(end());
+			const auto back_itr = Utilities::Code::get_last_element_iterator(*this);
 			switch (std::stoi(content[3]))
 			{
 			case static_cast<int32_t>(Types::Game::HitObject::HitObjectType::FLOOR):

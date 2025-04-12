@@ -7,19 +7,19 @@ using namespace Utilities::Math::FPoint;
 namespace Structures::Render::Layers
 {
 	//! Layer
-	// ::LayerCamera
-	uint8_t Layer::LayerCamera::LayerCamera::get_alpha() const { return alpha; }
-	void Layer::LayerCamera::LayerCamera::set_alpha(const uint8_t& value) { alpha = value; }
-	void Layer::LayerCamera::LayerCamera::move_x(const float& dx) { render_pos.x += dx; }
-	void Layer::LayerCamera::LayerCamera::move_y(const float& dy) { render_pos.y += dy; }
-	Layer::LayerCamera::LayerCamera()
+	// ::Camera
+	uint8_t Layer::Camera::Camera::get_alpha() const { return alpha; }
+	void Layer::Camera::Camera::set_alpha(const uint8_t& value) { alpha = value; }
+	void Layer::Camera::Camera::move_x(const float& dx) { render_pos.x += dx; }
+	void Layer::Camera::Camera::move_y(const float& dy) { render_pos.y += dy; }
+	Layer::Camera::Camera(const OriginPoint& origin)
 	{
-		origin_pos = { 0, 0 }; // góc trái
+		origin_pos = origin; // góc trái
 		render_pos = { .x = ::Config::GameConfig::Video::Camera::DEFAULT_POS_X, .y = ::Config::GameConfig::Video::Camera::DEFAULT_POS_Y };
 	}
 
-	SDL_FPoint Layer::LayerCamera::LayerCamera::get_camera_pos() const { return render_pos; }
-	SDL_FPoint Layer::LayerCamera::LayerCamera::get_camera_size(const bool after_scale) const
+	SDL_FPoint Layer::Camera::Camera::get_camera_pos() const { return render_pos; }
+	SDL_FPoint Layer::Camera::Camera::get_camera_size(const bool after_scale) const
 	{
 		return after_scale
 			? SDL_FPoint{
@@ -28,7 +28,7 @@ namespace Structures::Render::Layers
 		}
 		: SDL_FPoint{ ::Config::GameConfig::Video::Camera::DEFAULT_SIZE_WIDTH, ::Config::GameConfig::Video::Camera::DEFAULT_SIZE_HEIGHT };
 	}
-	SDL_FPoint Layer::LayerCamera::get_object_offset() const
+	SDL_FPoint Layer::Camera::get_object_offset() const
 	{
 		return -origin_pos.convert_pos_to_origin(render_pos, { 0, 0 });
 	}
@@ -65,13 +65,22 @@ namespace Structures::Render::Layers
 		for (const auto& collection_ptr : render_buffer)
 			collection_ptr->render(camera.get_object_offset());
 	}
-	Layer::Layer() : render_buffer(this) {}
+	Layer::Layer(const SDL_FPoint& origin_pos_in_percent)
+		: render_buffer(this),
+		  camera({
+			  origin_pos_in_percent * SDL_FPoint{
+				  Config::GameConfig::Video::LOGICAL_WIDTH, Config::GameConfig::Video::LOGICAL_HEIGHT
+			  }
+		  })
+	{
+		
+	}
 	void Layer::reset(const bool to_initial_state)
 	{
 		render_buffer.clear();
 		if (to_initial_state)
 		{
-			camera = LayerCamera();
+			camera = Camera();
 		}
 	}
 }

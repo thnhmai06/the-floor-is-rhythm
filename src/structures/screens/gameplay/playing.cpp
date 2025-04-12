@@ -3,6 +3,7 @@
 #include "structures/render/layers/objects/gameplay/cursor.h"
 #include "work/render/layers.h"
 #include "work/render/textures.h"
+#include "utilities.h"
 
 //! PLayingScreen
 namespace Structures::Screens::Gameplay
@@ -61,8 +62,7 @@ namespace Structures::Screens::Gameplay
 		map_set(storage, &playground_layer->render_buffer),
 		cursor(storage, &cursor_layer->render_buffer) {
 	}
-	PlayingScreen::Render::Render
-	(
+	PlayingScreen::Render::Render(
 		const Types::Game::Direction::Direction* current_direction,
 		Layer& playground_layer,
 		Layer& cursor_layer,
@@ -71,26 +71,28 @@ namespace Structures::Screens::Gameplay
 	{
 		//! Beatmap
 		components.map_set.storage_item = storage.insert(
-			std::prev(storage.end(), 1),
+			Utilities::Code::get_last_element_iterator(storage),
 			std::make_unique<Structures::Render::Objects::Gameplay::Beatmap::Collection>(skin, beatmap.hit_objects, beatmap.calculated_difficulty, beatmap.timing_points)
 		);
-		components.map_set.render_item = playground_layer.render_buffer.add_collection(components.map_set.storage_item->get());
+		components.map_set.render_item = playground_layer.render_buffer.add_collection(components.map_set.storage_item->get()); // Thêm vào render_buffer ở đây nè :D
 		//TODO: set render range
+		components.map_set.storage_item->get()->render_range = { {0, 10} }; // for testing
 
 		//! Cursor
 		components.cursor.storage_item = storage.insert(
-			std::prev(storage.end(), 1),
+			Utilities::Code::get_last_element_iterator(storage),
 			std::make_unique<Structures::Render::Objects::Gameplay::Cursor::Collection>(skin, current_direction)
 		);
-		components.cursor.render_item = cursor_layer.render_buffer.add_collection(components.cursor.storage_item->get());
+		components.cursor.render_item = cursor_layer.render_buffer.add_collection(components.cursor.storage_item->get()); // Thêm vào render_buffer ở đây nè :D
 	}
 	// total
 	PlayingScreen::PlayingScreen(const char* beatmap_path) :
 		beatmap(std::make_unique<const Game::Beatmap::Beatmap>(beatmap_path)),
-		game(beatmap.get()),
-		render(&game.current_direction, *Work::Render::Layers::playground,
-			*Work::Render::Layers::cursor, *Work::Render::Textures::skin, *this->beatmap)
+		logic(beatmap.get()),
+		render(&logic.key_stoke.direction.current_direction,
+			*Work::Render::Layers::playground, *Work::Render::Layers::cursor,
+			*Work::Render::Textures::skin, *this->beatmap)
 	{
-		//TODO: Tìm StartTime đẻ nhét vào game.timer
+		//TODO: Tìm StartTime đẻ nhét vào logic.timer
 	}
 }

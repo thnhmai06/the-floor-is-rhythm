@@ -104,7 +104,7 @@ namespace Work::Convert::osu
 		HitObjects result;
 		for (const Parser::HitObject& osu_object : objects)
 		{
-			const auto back_itr = (result.empty()) ? (result.end()) : (std::prev(result.end()));
+			const auto back_itr = Utilities::Code::get_last_element_iterator(result);
 			if (osu_object.Type.HitCircle)
 				result.emplace_hint(back_itr, osu_object.Time, convert_hit_object_floor(osu_object));
 			else result.emplace_hint(back_itr, osu_object.Time, convert_hit_object_slider(osu_object)); // slider, spinner...
@@ -130,7 +130,7 @@ namespace Work::Convert::osu
 		TimingPoints result;
 		for (const Parser::TimingPoint& timing_point : timing_points)
 		{
-			const auto back_itr = (result.empty()) ? (result.end()) : (std::prev(result.end()));
+			const auto back_itr = Utilities::Code::get_last_element_iterator(result);
 			result.emplace_hint(back_itr, timing_point.Time, convert_timing_point(timing_point));
 		}
 		return result;

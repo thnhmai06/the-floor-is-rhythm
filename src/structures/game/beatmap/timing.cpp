@@ -41,7 +41,7 @@ namespace Structures::Game::Beatmap::TimingPoints
 				continue;
 			}
 
-			const auto back_itr = empty() ? end() : std::prev(end());
+			const auto back_itr = Utilities::Code::get_last_element_iterator(*this);
 			TimingPoint point(content);
 			emplace_hint(back_itr, point.time, point);
 		}

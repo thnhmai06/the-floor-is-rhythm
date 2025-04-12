@@ -6,6 +6,7 @@
 #pragma once
 #include <string>
 #include <unordered_set>
+#include "config.h"
 
 namespace Structures::Game::Beatmap::Metadata
 {
@@ -60,11 +61,12 @@ namespace Structures::Game::Beatmap::Metadata
 		struct OverallDifficulty
 		{
 			// Follow: https://osu.ppy.sh/wiki/en/Beatmap/Overall_difficulty
-			float value = -1, perfect = -1, great = -1, bad = -1;
+			float value = -1;
+			float perfect = -1, great = -1, bad = -1, miss = Config::GameConfig::Difficulty::OD::Base::MISS; // time (in ms)
 
 			void apply(const float& v);
 			void apply() { apply(value); }
-			[[nodiscard]] unsigned long get_score(const int32_t& click_moment, const int32_t& hit_object_time) const;
+			[[nodiscard]] int16_t get_score(const int64_t& click_moment, const int64_t& hit_object_time) const;
 
 			OverallDifficulty() = default;
 			OverallDifficulty(const float value) { apply(value); }

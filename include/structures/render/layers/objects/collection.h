@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <variant>
 #include "structures/render/layers/objects/object.h"
 
@@ -22,7 +22,7 @@ namespace Structures::Render::Objects
 		void render_in_range(const size_t& from, const size_t& to, const SDL_FPoint& total_offset) const;
 
 	public:
-		vector<std::pair<size_t, size_t>> render_range;
+		vector<std::pair<size_t, size_t>> render_range; // Phần tử đầu tiên là 0
 		SDL_FPoint offset = { 0, 0 };
 		bool visible = true;
 		void render(const SDL_FPoint& camera_offset) const;

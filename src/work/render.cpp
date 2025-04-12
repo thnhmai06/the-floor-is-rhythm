@@ -7,6 +7,7 @@
 #include "structures/screens/gameplay/playing.h"
 #include "format/skin.h"
 #include "work/skin.h"
+#include "work/render.h"
 
 using namespace Work::Render;
 
@@ -23,20 +24,26 @@ int32_t Work::Render::render(SDL_Window* window)
 	try
 	{
 		Skin::load_skin(skin_path, *Textures::skin);
+		Screens::playing_screen = std::make_unique<Screens::Gameplay::PlayingScreen>(R"(D:\output.tfd)");
 
-		SDL_Event quit_event;
+		SDL_Event event;
 		while (is_running) 
 		{
 			const auto previous_render = std::chrono::system_clock::now();
 
-			// quit event
-			if (SDL_PollEvent(&quit_event) && quit_event.type == SDL_EVENT_QUIT) is_running = false;
-
 			// render
 			SDL_RenderClear(renderer);
 			Layers::render_all();
-			Layers::playground->camera.move_x(10);
+			Layers::playground->camera.move_x(0.1f);
 			SDL_RenderPresent(renderer);
+			
+			while (SDL_PollEvent(&event)) {
+				if (event.type == SDL_EVENT_QUIT)
+				{
+					is_running = false;
+					break;
+				}
+			}
 
 			const auto after_render = std::chrono::system_clock::now();
 			const auto latency = std::chrono::duration_cast<std::chrono::milliseconds>(after_render - previous_render).count();

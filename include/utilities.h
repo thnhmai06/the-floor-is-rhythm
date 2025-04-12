@@ -40,6 +40,8 @@ namespace Utilities
 			inline SDL_FPoint& operator+=(SDL_FPoint& a, const SDL_FPoint& b) { a.x += b.x; a.y += b.y; return a; }
 			inline SDL_FPoint& operator-=(SDL_FPoint& a, const SDL_FPoint& b) { a.x -= b.x; a.y -= b.y; return a; }
 			inline SDL_FPoint operator-(const SDL_FPoint& a) { return SDL_FPoint{ -a.x, -a.y }; }
+			inline SDL_FPoint operator*(const SDL_FPoint& a, const SDL_FPoint& b) { return SDL_FPoint{ a.x * b.x, a.y * b.y }; }
+			inline SDL_FPoint operator*(const SDL_FPoint& point, const float& value) { return SDL_FPoint{ point.x * value, point.y * value }; }
 		}
 	}
 	namespace Audio
@@ -112,5 +114,20 @@ namespace Utilities
 		inline SDL_FRect merge_pos_size(const SDL_FPoint& pos, const SDL_FPoint& size) { return SDL_FRect{ pos.x, pos.y, size.x, size.y }; }
 		inline SDL_FPoint get_pos_from_rect(const SDL_FRect& rect) { return SDL_FPoint{ rect.x, rect.y }; }
 		inline SDL_FPoint get_size_from_rect(const SDL_FRect& rect) { return SDL_FPoint{ rect.w, rect.h }; }
+	}
+	namespace Code
+	{
+		template <typename Container>
+		typename Container::iterator get_last_element_iterator(Container& container)
+		{
+			if (container.empty()) return container.end();
+			return std::prev(container.end());
+		}
+		template <typename Container>
+		typename Container::const_iterator get_last_element_iterator(const Container& container)
+		{
+			if (container.empty()) return container.cend();
+			return std::prev(container.cend());
+		}
 	}
 }
