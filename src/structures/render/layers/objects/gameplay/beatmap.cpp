@@ -27,21 +27,6 @@ namespace Structures::Render::Objects::Gameplay::Beatmap
 
 		return size;
 	}
-	static Types::Render::RenderOriginType get_centre_origin_type_based_on_direction(const bool reverse = true)
-	{
-		switch (current_direction)
-		{
-		case Types::Game::Direction::Direction::RIGHT:
-			return reverse ? Types::Render::RenderOriginType::CENTRE_LEFT : Types::Render::RenderOriginType::CENTRE_RIGHT;
-		case Types::Game::Direction::Direction::UP:
-			return reverse ? Types::Render::RenderOriginType::BOTTOM_CENTRE : Types::Render::RenderOriginType::TOP_CENTRE;
-		case Types::Game::Direction::Direction::LEFT:
-			return reverse ? Types::Render::RenderOriginType::CENTRE_RIGHT : Types::Render::RenderOriginType::CENTRE_LEFT;
-		case Types::Game::Direction::Direction::DOWN:
-			return reverse ? Types::Render::RenderOriginType::TOP_CENTRE : Types::Render::RenderOriginType::BOTTOM_CENTRE;
-		}
-		return Types::Render::RenderOriginType::CENTRE; // unknown
-	}
 
 	//! ::Components
 	using namespace Components;
@@ -111,44 +96,47 @@ namespace Structures::Render::Objects::Gameplay::Beatmap
 		const bool from_centre_of_previous)
 	{
 		const auto texture = memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_LINE]);
+		const auto previous_render_size = Utilities::Render::get_size_from_rect(previous.get_sdl_dst_rect());
 
-		Object object(texture, Types::Render::RenderOriginType::CENTRE);
-		object.config.render_pos = previous.config.render_pos;
-		object.set_render_size(size);
+		Object current(texture, Types::Render::RenderOriginType::CENTRE);
+		current.config.render_pos = previous.config.render_pos;
+		current.set_render_size(size);
 		switch (current_direction)
 		{
 		case Types::Game::Direction::Direction::RIGHT:
-			object.src_rect_in_percent.w = src_width_in_percent;
-			if (!from_centre_of_previous) object.config.render_pos.x += previous.get_render_size().x / 2;
-			object.config.render_pos.x += object.get_render_size().x / 2;
-			//object.config.render_pos.y += 10; // for debugging
+			current.src_rect_in_percent.w = src_width_in_percent;
+			if (!from_centre_of_previous) current.config.render_pos.x += previous_render_size.x / 2;
+			current.config.render_pos.x += size.x / 2;
+			//current.config.render_pos.y += 10; // for debugging
 			break;
 		case Types::Game::Direction::Direction::UP:
-			object.src_rect_in_percent.h = src_width_in_percent;
-			if (!from_centre_of_previous) object.config.render_pos.y -= previous.get_render_size().y / 2;
-			object.config.render_pos.y -= object.get_render_size().y / 2;
+			current.src_rect_in_percent.h = src_width_in_percent;
+			if (!from_centre_of_previous) current.config.render_pos.y -= previous_render_size.y / 2;
+			current.config.render_pos.y -= size.y / 2;
 			break;
 		case Types::Game::Direction::Direction::LEFT:
-			object.src_rect_in_percent.w = src_width_in_percent;
-			if (!from_centre_of_previous) object.config.render_pos.x -= previous.get_render_size().x / 2;
-			object.config.render_pos.x -= object.get_render_size().x / 2;
+			current.src_rect_in_percent.w = src_width_in_percent;
+			if (!from_centre_of_previous) current.config.render_pos.x -= previous_render_size.x / 2;
+			current.config.render_pos.x -= size.x / 2;
 			break;
 		case Types::Game::Direction::Direction::DOWN:
-			object.src_rect_in_percent.h = src_width_in_percent;
-			if (!from_centre_of_previous) object.config.render_pos.y += previous.get_render_size().y / 2;
-			object.config.render_pos.y += object.get_render_size().y / 2;
+			current.src_rect_in_percent.h = src_width_in_percent;
+			if (!from_centre_of_previous) current.config.render_pos.y += previous_render_size.y / 2;
+			current.config.render_pos.y += size.y / 2;
 			break;
 		}
 
-		return object;
+		return current;
 	}
 	Object Slider::create_slider_point(
 		const TextureMemory& memory,
 		const Object& previous)
 	{
 		const auto texture = memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_POINT]);
-		Object current(texture, Types::Render::RenderOriginType::CENTRE);
+		const auto previous_sdl_render_pos = Utilities::Render::get_pos_from_rect(previous.get_sdl_dst_rect());
+		const auto previous_render_size = Utilities::Render::get_size_from_rect(previous.get_sdl_dst_rect());
 
+		Object current(texture, Types::Render::RenderOriginType::CENTRE);
 		// size
 		SDL_FPoint size = { Config::GameConfig::HitObject::SIZE, Config::GameConfig::HitObject::SIZE };
 		switch (current_direction)
@@ -156,7 +144,6 @@ namespace Structures::Render::Objects::Gameplay::Beatmap
 		case Types::Game::Direction::Direction::RIGHT:
 		case Types::Game::Direction::Direction::LEFT:
 			size.x = Config::GameConfig::HitObject::SLIDER_POINT_SIZE_WIDTH;
-
 			break;
 
 		case Types::Game::Direction::Direction::UP:
@@ -167,19 +154,20 @@ namespace Structures::Render::Objects::Gameplay::Beatmap
 		current.set_render_size(size);
 
 		// pos
+		current.config.render_pos = previous.config.render_pos;
 		switch (current_direction)
 		{
 		case Types::Game::Direction::Direction::RIGHT:
-			current.config.render_pos.x = previous.get_sdl_render_pos().x + previous.get_render_size().x;
+			current.config.render_pos.x = previous_sdl_render_pos.x + previous_render_size.x;
 			break;
 		case Types::Game::Direction::Direction::UP:
-			current.config.render_pos.y = previous.get_sdl_render_pos().y;
+			current.config.render_pos.y = previous_sdl_render_pos.y;
 			break;
 		case Types::Game::Direction::Direction::LEFT:
-			current.config.render_pos.x = previous.get_sdl_render_pos().x;
+			current.config.render_pos.x = previous_sdl_render_pos.x;
 			break;
 		case Types::Game::Direction::Direction::DOWN:
-			current.config.render_pos.y = previous.get_sdl_render_pos().y + previous.get_render_size().y;
+			current.config.render_pos.y = previous_sdl_render_pos.y + previous_render_size.y;
 			break;
 		}
 
@@ -194,8 +182,8 @@ namespace Structures::Render::Objects::Gameplay::Beatmap
 	{
 		const auto texture = memory.find(HitObjectSkin[current_direction += slider.get_rotation()][HitObjectType::SLIDER_POINT]);
 		const auto speed = diff.velocity.speed * current_timing_velocity;
-		Object current(texture, Types::Render::RenderOriginType::CENTRE);
 
+		Object current(texture, Types::Render::RenderOriginType::CENTRE);
 		// pos (giống Floor)
 		if (!previous || !previous->hit_object)
 		{
@@ -211,7 +199,6 @@ namespace Structures::Render::Objects::Gameplay::Beatmap
 			const auto previous_hit_object = previous->hit_object;
 			const float time_distance = static_cast<float>(slider.get_time() - previous_hit_object->get_end_time());
 
-			// pos
 			current.config.render_pos = previous->data.back().config.render_pos;
 			switch (current_direction)
 			{

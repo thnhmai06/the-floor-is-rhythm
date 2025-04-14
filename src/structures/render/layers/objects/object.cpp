@@ -25,9 +25,10 @@ namespace Structures::Render::Objects
 		const auto [new_x, new_y] = convert_pos_to_origin({ .x = rect.x, .y = rect.y }, to_origin);
 		return { new_x, new_y, rect.w, rect.h };
 	}
-	Object::Config::OriginPoint Object::Config::OriginPoint::get_origin_point_from_type(const TextureMemory::Item& src, const Types::Render::RenderOriginType& origin_type)
+	Object::Config::OriginPoint Object::Config::OriginPoint::translate_origin_type_to_point(
+		const SDL_FPoint& size, const Types::Render::RenderOriginType& origin_type)
 	{
-		const auto [w, h] = src.get_size();
+		const auto [w, h] = size;
 		switch (origin_type)
 		{
 		case Types::Render::RenderOriginType::TOP_LEFT:
@@ -51,15 +52,24 @@ namespace Structures::Render::Objects
 		}
 		return { 0, 0 };
 	}
+
 	// ::Config
-	void Object::Config::set_both_scale(const float& value)
+	Object::Config::OriginPoint Object::Config::get_origin_point(const bool based_on_render_size) const
 	{
-		scale = { .x = value, .y = value };
+		if (!based_on_render_size) return origin_point;
+		return { origin_point.x * scale.x, origin_point.y * scale.y };
 	}
-	Object::Config::Config() = default;
-	Object::Config::Config(const SDL_FPoint& render_pos, const OriginPoint& origin) :
-		render_pos(render_pos), origin_point(origin)
+	void Object::Config::set_origin_point(const SDL_FPoint& pos, const bool based_on_render_size)
 	{
+		if (based_on_render_size)
+			origin_point = { pos.x / scale.x, pos.y / scale.y };
+		else
+			origin_point = { pos.x, pos.y };
+	}
+	void Object::Config::set_scale(const SDL_FPoint& value) { scale = value; }
+	void Object::Config::set_scale(const float& value)
+	{
+		set_scale({ value, value });
 	}
 	void Object::Config::set_scale_fixed(const SDL_FPoint& size, const SDL_FPoint& src_size)
 	{
@@ -72,13 +82,18 @@ namespace Structures::Render::Objects
 	}
 	SDL_FRect Object::Config::get_sdl_dst_rect(const SDL_FPoint& src_size) const
 	{
-		return {
-			render_pos.x - origin_point.x * scale.x,
-			render_pos.y - origin_point.y * scale.y,
-			src_size.x * scale.x,
-			src_size.y * scale.y
-		};
+		using Utilities::Math::FPoint::operator*;
+
+		const auto sdl_render_pos = get_origin_point(true).convert_pos_to_origin(render_pos, { 0, 0 });
+		const auto render_size = src_size * scale;
+		return Utilities::Render::merge_pos_size(sdl_render_pos, render_size);
 	}
+	Object::Config::Config() = default;
+	Object::Config::Config(const SDL_FPoint& render_pos, const OriginPoint& origin) :
+		origin_point(origin), render_pos(render_pos)
+	{
+	}
+
 	// ::
 	SDL_FRect Object::get_sdl_src_rect() const
 	{
@@ -89,38 +104,34 @@ namespace Structures::Render::Objects
 	{
 		return config.get_sdl_dst_rect(Utilities::Render::get_size_from_rect(get_sdl_src_rect()));
 	}
-	Object::Config::OriginPoint Object::get_origin_point_from_type(const Types::Render::RenderOriginType& origin_type) const
-	{
-		return Config::OriginPoint::get_origin_point_from_type(src, origin_type);
-	}
-	SDL_FPoint Object::get_sdl_render_pos() const
-	{
-		return Utilities::Render::get_pos_from_rect(get_sdl_dst_rect());
-	}
-	SDL_FPoint Object::get_render_size() const
-	{
-		return Utilities::Render::get_size_from_rect(get_sdl_dst_rect());
-	}
 	void Object::set_render_size(const SDL_FPoint& size)
 	{
 		config.set_scale_fixed(size, Utilities::Render::get_size_from_rect(get_sdl_src_rect()));
 	}
 	void Object::set_render_size(const float& value)
 	{
-		config.set_scale_fixed(value, Utilities::Render::get_size_from_rect(get_sdl_src_rect()));
+		set_render_size({ value, value });
 	}
-	void Object::set_render_size_based_on_src(const SDL_FPoint& src_percent)
+	Object::Config::OriginPoint Object::translate_origin_type_to_point(const Types::Render::RenderOriginType& origin_type, const bool based_on_render_size) const
 	{
-		const auto [src_w, src_h] = src.get_size();
-		set_render_size({ src_w * src_percent.x, src_h * src_percent.y });
+		if (!based_on_render_size)
+		{
+			const auto src_size = Utilities::Render::get_size_from_rect(get_sdl_src_rect());
+			return Config::OriginPoint::translate_origin_type_to_point(src_size, origin_type);
+		}
+		const auto render_size = Utilities::Render::get_size_from_rect(get_sdl_dst_rect());
+		return Config::OriginPoint::translate_origin_type_to_point(render_size, origin_type);
 	}
-	void Object::set_origin_point(const Types::Render::RenderOriginType& origin_type)
+	void Object::update_origin_point(const Config::OriginPoint& custom_origin, const bool move_render_pos, const bool based_on_render_size)
 	{
-		config.origin_point = get_origin_point_from_type(origin_type);
+		const auto previous_origin = config.get_origin_point();
+		config.set_origin_point(custom_origin, based_on_render_size);
+		if (move_render_pos)
+			config.render_pos = config.get_origin_point().convert_pos_from_origin(config.render_pos, previous_origin);
 	}
-	void Object::set_origin_point(const Config::OriginPoint& custom_origin)
+	void Object::update_origin_point(const Types::Render::RenderOriginType& origin_type, const bool move_render_pos)
 	{
-		config.origin_point = custom_origin;
+		update_origin_point(translate_origin_type_to_point(origin_type, false), move_render_pos, false);
 	}
 	void Object::render(const SDL_FPoint& offset) const
 	{
@@ -129,8 +140,7 @@ namespace Structures::Render::Objects
 		const auto sdl_texture = src.item->second;
 		const auto src_rect = get_sdl_src_rect();
 		auto dst_rect = get_sdl_dst_rect();
-		dst_rect.x += offset.x;
-		dst_rect.y += offset.y;
+		dst_rect.x += offset.x; dst_rect.y += offset.y;
 		SDL_SetTextureAlphaMod(sdl_texture, config.alpha);
 		if (!SDL_RenderTexture(src.memory->renderer, sdl_texture, &src_rect, &dst_rect))
 			THROW_ERROR(Logging::Exceptions::SDLExceptions::Texture::SDL_Texture_Render_Failed(src.get_name()));
@@ -141,7 +151,7 @@ namespace Structures::Render::Objects
 		const SDL_FPoint& render_pos) :
 		src(std::move(texture))
 	{
-		set_origin_point(origin_type);
+		update_origin_point(origin_type, false);
 		config.render_pos = render_pos;
 	}
 	Object::Object(

@@ -3,6 +3,11 @@
 #include <unordered_map>
 #include <SDL3/SDL_render.h>
 
+namespace Structures::Render::Objects
+{
+	struct Object;
+}
+
 namespace Structures::Render::Textures
 {
 	struct TextureMemory : std::unordered_map<std::string, SDL_Texture*>
@@ -16,8 +21,12 @@ namespace Structures::Render::Textures
 			const_iterator item;
 			const TextureMemory* memory = nullptr;
 
-			[[nodiscard]] const std::string& get_name() const;
+		private:
 			[[nodiscard]] SDL_FPoint get_size() const;
+
+			friend Objects::Object;
+		public:
+			[[nodiscard]] const std::string& get_name() const;
 			void change_target(const std::string& new_target = {}, const TextureMemory* new_memory = nullptr);
 
 			Item() = default;
