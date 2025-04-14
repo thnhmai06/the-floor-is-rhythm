@@ -14,7 +14,7 @@ namespace Structures::Render::Layers
 	void Layer::Camera::Camera::move_y(const float& dy) { render_pos.y += dy; }
 	Layer::Camera::Camera(const OriginPoint& origin)
 	{
-		origin_pos = origin; // góc trái
+		origin_point = origin; // góc trái
 		render_pos = { .x = ::Config::GameConfig::Video::Camera::DEFAULT_POS_X, .y = ::Config::GameConfig::Video::Camera::DEFAULT_POS_Y };
 	}
 
@@ -30,7 +30,7 @@ namespace Structures::Render::Layers
 	}
 	SDL_FPoint Layer::Camera::get_object_offset() const
 	{
-		return -origin_pos.convert_pos_to_origin(render_pos, { 0, 0 });
+		return -origin_point.convert_pos_to_origin(render_pos, { 0, 0 });
 	}
 	// ::RenderBuffer
 	void Layer::RenderBuffer::remove_collection(Item& item)

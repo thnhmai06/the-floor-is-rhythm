@@ -25,17 +25,14 @@ namespace Format::SkinFormat
 	namespace HitObject
 	{
 		using HitObjectTypeBase = uint8_t;
-		constexpr HitObjectTypeBase NUM_SKIN_TYPE = 7;
+		constexpr HitObjectTypeBase NUM_SKIN_TYPE = 4;
 
 		enum class HitObjectType : HitObjectTypeBase
 		{
-			FLOOR = 0,
-			SLIDER_FOCUS = 1,
-			SLIDER_BEGIN = 2,
-			SLIDER_LINE = 3,
-			SLIDER_POINT = 4,
-			SLIDER_CURVE = 5,
-			SLIDER_END = 6
+			FLOOR,
+			SLIDER_FOCUS,
+			SLIDER_LINE,
+			SLIDER_POINT,
 		};
 		struct HitObjectDirectionSkinType : std::array<std::string, NUM_SKIN_TYPE>
 		{
@@ -75,11 +72,8 @@ namespace Format::SkinFormat
 			{
 				(*this)[HitObjectType::FLOOR] = direction_folder + "floor";
 				(*this)[HitObjectType::SLIDER_FOCUS] = direction_folder + "sliderfocus";
-				(*this)[HitObjectType::SLIDER_BEGIN] = direction_folder + "sliderbegin";
 				(*this)[HitObjectType::SLIDER_LINE] = direction_folder + "sliderline";
 				(*this)[HitObjectType::SLIDER_POINT] = direction_folder + "sliderpoint";
-				(*this)[HitObjectType::SLIDER_CURVE] = direction_folder + "slidercurve";
-				(*this)[HitObjectType::SLIDER_END] = direction_folder + "sliderend";
 			}
 		};
 		struct HitObjectSkinType : std::array<HitObjectDirectionSkinType, Structures::Types::Game::Direction::NUM_DIRECTIONS>

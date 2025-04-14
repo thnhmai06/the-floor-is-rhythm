@@ -15,9 +15,7 @@ namespace Structures::Render::Objects::Gameplay::Cursor
 		// ::Trail
 		Trail::Trail(const TextureMemory& memory)
 		{
-			push_back(Object{
-				memory.find(Format::SkinFormat::Cursor::TRAIL),
-				Types::Render::RenderOriginType::CENTRE });
+			data.emplace_back(memory.find(Format::SkinFormat::Cursor::TRAIL), Types::Render::RenderOriginType::CENTRE);
 		}
 
 		// ::Direction
@@ -51,18 +49,18 @@ namespace Structures::Render::Objects::Gameplay::Cursor
 
 		//! Chú ý thứ tự: Body -> Trail -> Direction
 		// body
-		auto c_body = std::make_shared<Body>(memory);
-		push_back(c_body);
-		body = c_body;
+		ObjectUnique c_body = std::make_unique<Body>(memory);
+		data.emplace_back(std::move(c_body));
+		body = dynamic_cast<Body*>(std::get_if<ObjectUnique>(&data.back())->get());
 
 		// trail
-		auto c_trail = std::make_shared<Trail>(memory);
-		push_back(c_trail);
-		trail = c_trail;
+		auto c_trail = std::make_unique<Trail>(memory);
+		data.emplace_back(std::move(c_trail));
+		trail = dynamic_cast<Trail*>(std::get_if<PolyObjectUnique>(&data.back())->get());
 
 		// direction
-		auto c_direction = std::make_shared<Direction>(memory, current_direction);
-		push_back(c_direction);
-		direction = c_direction;
+		auto c_direction = std::make_unique<Direction>(memory, current_direction);
+		data.emplace_back(std::move(c_direction));
+		direction = dynamic_cast<Direction*>(std::get_if<ObjectUnique>(&data.back())->get());
 	}
 }

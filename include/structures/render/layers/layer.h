@@ -21,7 +21,6 @@ namespace Structures::Render::Layers
 	struct Layer
 	{
 		// buffer
-		struct RenderBufferItem;
 		struct RenderBuffer : std::list<const Objects::Collection*>
 		{
 		protected:

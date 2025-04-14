@@ -1,4 +1,6 @@
 ﻿#pragma once
+#include <queue>
+
 #include "config.h"
 #include "structures/screens/screen.h"
 #include "structures/action.h"
@@ -18,15 +20,12 @@ namespace Structures::Screens::Gameplay
 		{
 		private:
 			const Game::Beatmap::Beatmap* beatmap = nullptr;
+			std::queue<const Game::Beatmap::HitObjects::HitObject*> floor, slider;
+
 			Types::Game::Direction::Direction required_direction = Types::Game::Direction::Direction::RIGHT;
-			Game::Beatmap::HitObjects::HitObjects::const_iterator current_hit_object = beatmap->hit_objects.cbegin();
 			Action::Time::Timer timer;
 
-			void update_required_direction()
-			{
-				if (current_hit_object == beatmap->hit_objects.cend()) return;
-				required_direction += current_hit_object->second.get_rotation();
-			}
+			void update_required_direction();
 
 		public:
 			uint8_t health = 200;
@@ -39,145 +38,93 @@ namespace Structures::Screens::Gameplay
 					uint8_t recently_pressed_num = 0; // => tính được cps
 					bool is_hold = false;
 
-					void update(const KeyboardEventList& events)
-					{
-						recently_pressed_num = 0;
-						for (const auto& event: events)
-						{
-							if (event.scancode != target) continue;
-							is_hold = event.repeat; // nếu thả ra, sẽ có event KeyUp để cập nhật
-							if (event.down && !event.repeat)
-							{
-								recently_pressed_num++;
-								count++;
-							}
-							else recently_pressed_num = 0; // tránh trường hợp spam press và hold
-						}
-					}
-					void reset() { count = recently_pressed_num = 0; is_hold = false; }
-					explicit KeyCounter(const SDL_Scancode& target) : target(target) {}
+					void update(const KeyboardEventList& events);
+					void reset();
+
+					explicit KeyCounter(const SDL_Scancode& target);
 				};
-				struct
+				struct Direction
 				{
+					Types::Game::Direction::Direction current_direction = Types::Game::Direction::Direction::RIGHT;
+
 					KeyCounter right{ Config::UserConfig::KeyBinding::Direction::right };
 					KeyCounter left{ Config::UserConfig::KeyBinding::Direction::left };
 					KeyCounter up{ Config::UserConfig::KeyBinding::Direction::up };
 					KeyCounter down{ Config::UserConfig::KeyBinding::Direction::down };
-					Types::Game::Direction::Direction current_direction = Types::Game::Direction::Direction::RIGHT;
 
-					void reset()
-					{
-						right.reset();
-						left.reset();
-						up.reset();
-						down.reset();
-					}
-					void update(const KeyboardEventList& events)
-					{
-						// Cập nhật lần cuối cùng thay đổi direction trong events
-						for (auto event = events.rbegin(); event != events.rend(); ++event)
-						{
-							if (!event->repeat) continue;
-							if (event->scancode == right.target) 
-								current_direction = Types::Game::Direction::Direction::RIGHT;
-							else if (event->scancode == left.target) 
-								current_direction = Types::Game::Direction::Direction::LEFT;
-							else if (event->scancode == up.target) 
-								current_direction = Types::Game::Direction::Direction::UP;
-							else if (event->scancode == down.target) 
-								current_direction = Types::Game::Direction::Direction::DOWN;
-							break;
-						}
-
-						right.update(events);
-						left.update(events);
-						up.update(events);
-						down.update(events);
-					}
+					void update(const KeyboardEventList& events);
+					void reset();
 				} direction;
-				struct
+				struct Click
 				{
 					KeyCounter k1{ Config::UserConfig::KeyBinding::Click::k1 };
 					KeyCounter k2{ Config::UserConfig::KeyBinding::Click::k2 };
 
-					void reset()
-					{
-						k1.reset();
-						k2.reset();
-					}
-					[[nodiscard]] uint16_t get_recently_pressed_num() const
-					{
-						return k1.recently_pressed_num + k2.recently_pressed_num;
-					}
-					void update(const KeyboardEventList& events)
-					{
-						k1.update(events);
-						k2.update(events);
-					}
+					void reset();
+
+					[[nodiscard]] uint16_t get_recently_pressed_num() const;
+					[[nodiscard]] bool is_hold() const;
+					void update(const KeyboardEventList& events);
 				} click;
 
-				void reset()
-				{
-					direction.reset();
-					click.reset();
-				}
-				void update(const KeyboardEventList& events)
-				{
-					direction.update(events);
-					click.update(events);
-				}
+				void reset();
+				void update(const KeyboardEventList& events);
 			} key_stoke;
 			struct Score
 			{
 			private:
+				// beatmap
 				unsigned long total_objects_num = 1;
 				unsigned long total_combo = 1;
+				// gameplay
+				float score = 0;
+				unsigned long max_combo = 0;
+				unsigned long current_combo = 0;
 				float mod_multiplier = 1.0f;
 
+				float update_score();
+
 			public:
-				unsigned long score = 0;
-				unsigned long max_combo = 0;
+				struct Slider
+				{
+					unsigned long total_ticks = 0;
+					unsigned long completed_ticks = 0;
+
+					[[nodiscard]] uint16_t get_bonus_score() const;
+					void reset();
+				} current_slider_score;
 				struct Count
 				{
+				private:
 					unsigned long count_300 = 0;
 					unsigned long count_100 = 0;
 					unsigned long count_50 = 0;
 					unsigned long count_slider_tick = 0;
 					unsigned long count_miss = 0;
 
+				public:
 					[[nodiscard]] float get_accuracy() const;
 					[[nodiscard]] unsigned long get_elapsed_objects_num() const;
+					void add_count(const uint16_t& score, const unsigned long& num = 1);
+					void reset();
 				} count;
-				unsigned long combo = 0;
 
-				unsigned long update_score();
+				float add_floor_score(const uint16_t& score);
+				float add_slider_tick_score(bool is_tick_completed); // cần phải được add_total_slider_bonus_score khi kết thúc slider
+				float add_total_slider_bonus_score();
+
+				[[nodiscard]] float get_score() const { return score; }
+				[[nodiscard]] unsigned long get_current_combo() const { return current_combo; }
+				[[nodiscard]] unsigned long get_max_combo() const { return max_combo; }
+				[[nodiscard]] float get_mod_multiplier() const { return mod_multiplier; }
 
 				explicit Score(const Game::Beatmap::Beatmap& beatmap, const float& mod_multiplier);
 			} score;
 
 			[[nodiscard]] bool is_paused() const { return timer.is_paused(); }
-			void pause() { timer.pause(); }
-			void resume() { timer.resume(); }
-			void make_time_step(const KeyboardEventList& events)
-			{
-				key_stoke.update(events);
-
-				const auto current_time = timer.get_time();
-				const auto& od = beatmap->calculated_difficulty.od;
-
-				if (current_hit_object != beatmap->hit_objects.end())
-				{
-					if (const auto current_required_time = current_hit_object->second.get_time();
-						!(current_time <= current_required_time && od.get_score(current_time, current_required_time) < 0))
-						// Không phải là chưa tới thời gian bấm
-					{
-						if (required_direction == key_stoke.direction.current_direction)
-						{
-
-						}
-					}
-				}
-			}
+			void pause();
+			void resume();
+			void make_time_step(const KeyboardEventList& events);
 			explicit Logic(const Game::Beatmap::Beatmap* beatmap, const int64_t& start_time = 0, const float& mod_multiplier = 1.0f);
 		} logic;
 		struct Render : Screen::Render

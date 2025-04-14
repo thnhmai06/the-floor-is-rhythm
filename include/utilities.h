@@ -29,8 +29,6 @@ namespace Utilities
 			}
 			return 0.0f;
 		}
-		inline float max_float(const float& a, const float& b) { return a > b ? a : b; }
-		inline float min_float(const float& a, const float& b) { return a < b ? a : b; }
 		inline bool in_range(const float& correction, const float& range, const float& value) { return (correction - range <= value && value <= correction + range); }
 
 		namespace FPoint

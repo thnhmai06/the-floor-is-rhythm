@@ -54,6 +54,16 @@ namespace Work::Convert::osu
 	}
 	//! HitObjects
 	using namespace Structures::Game::Beatmap::HitObjects;
+	static Floor convert_hit_object_floor(const Parser::HitObject& object)
+	{
+		Floor floor;
+		floor.end_time = floor.time = object.Time;
+		floor.rotation = get_rotation(static_cast<uint8_t>(object.Type.ColourHax));
+		floor.combo_jump = static_cast<uint8_t>(object.Type.ColourHax);
+		floor.hit_sound = object.Hitsound;
+		floor.hit_sample = object.Hitsample;
+		return floor;
+	}
 	static Slider convert_hit_object_slider(const Parser::HitObject& object)
 	{
 		Slider slider;
@@ -61,7 +71,9 @@ namespace Work::Convert::osu
 		slider.end_time = slider.time;
 		if (object.EndTime.has_value())
 			slider.end_time = object.EndTime.value();
-		slider.rotation = get_rotation(static_cast<uint8_t>(object.Type.ColourHax));
+		// không cần rotation, vì trước đó rotation đã có ở floor rồi
+		//slider.rotation = get_rotation(static_cast<uint8_t>(object.Type.ColourHax));
+		slider.rotation = get_rotation(0);
 		slider.combo_jump = static_cast<uint8_t>(object.Type.ColourHax);
 
 		// Bên dưới là thêm slider curve dựa trên số lần lặp.
@@ -89,16 +101,6 @@ namespace Work::Convert::osu
 		slider.hit_sample = object.Hitsample;
 		return slider;
 	}
-	static Floor convert_hit_object_floor(const Parser::HitObject& object)
-	{
-		Floor floor;
-		floor.end_time = floor.time = object.Time;
-		floor.rotation = get_rotation(static_cast<uint8_t>(object.Type.ColourHax));
-		floor.combo_jump = static_cast<uint8_t>(object.Type.ColourHax);
-		floor.hit_sound = object.Hitsound;
-		floor.hit_sample = object.Hitsample;
-		return floor;
-	}
 	static HitObjects convert_hit_objects(const std::vector<Parser::HitObject>& objects)
 	{
 		HitObjects result;
@@ -107,7 +109,13 @@ namespace Work::Convert::osu
 			const auto back_itr = Utilities::Code::get_last_element_iterator(result);
 			if (osu_object.Type.HitCircle)
 				result.emplace_hint(back_itr, osu_object.Time, convert_hit_object_floor(osu_object));
-			else result.emplace_hint(back_itr, osu_object.Time, convert_hit_object_slider(osu_object)); // slider, spinner...
+			else if (osu_object.Type.Spinner)
+				result.emplace_hint(back_itr, osu_object.Time, convert_hit_object_slider(osu_object));
+			else 
+			{
+				result.emplace_hint(back_itr, osu_object.Time, convert_hit_object_floor(osu_object));
+				result.emplace_hint(back_itr, osu_object.Time, convert_hit_object_slider(osu_object)); // slider...
+			}
 		}
 		return result;
 	}

@@ -7,7 +7,6 @@
 #include "structures/screens/gameplay/playing.h"
 #include "format/skin.h"
 #include "work/skin.h"
-#include "work/render.h"
 
 using namespace Work::Render;
 

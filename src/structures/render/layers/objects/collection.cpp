@@ -10,7 +10,7 @@ namespace Structures::Render::Objects
 				{
 					if (!object) return;
 					object->render(total_offset);
-				}, (*this)[i]);
+				}, this->data[i]);
 	}
 	void Collection::render(const SDL_FPoint& camera_offset) const
 	{
@@ -19,20 +19,8 @@ namespace Structures::Render::Objects
 		if (!visible) return;
 		const auto total_offset = camera_offset + this->offset;
 		if (render_range.empty())
-			render_in_range(0, size() - 1, total_offset);
+			render_in_range(0, data.size() - 1, total_offset);
 		else for (const auto& [from, to] : render_range)
 			render_in_range(from, to, total_offset);
 	}
-	Collection::~Collection()
-	{
-		for (auto& object : *this)
-		{
-			std::visit([](auto& object)
-				{
-					if (object)
-						object.reset();
-				}, object);
-		}
-		render_range.clear();
 	}
-}

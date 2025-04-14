@@ -6,7 +6,7 @@ namespace Structures::Render::Objects::Gameplay::Cursor
 {
 	namespace Components
 	{
-		struct Body final : Object
+		struct Body : Object
 		{
 			explicit Body(const TextureMemory& memory);
 		};
@@ -27,16 +27,11 @@ namespace Structures::Render::Objects::Gameplay::Cursor
 		};
 	}
 
-	struct Collection final : Objects::Collection
+	struct Collection : Objects::Collection
 	{
-	protected:
-		using BASE = Collection;
-
-	public:
-		using BASE::render;
-		std::weak_ptr<Components::Body> body;
-		std::weak_ptr<Components::Trail> trail;
-		std::weak_ptr<Components::Direction> direction;
+		Components::Body* body;
+		Components::Trail* trail;
+		Components::Direction* direction;
 
 		Collection(const TextureMemory& memory, const Types::Game::Direction::Direction* current_direction);
 	};

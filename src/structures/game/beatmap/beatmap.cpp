@@ -88,7 +88,7 @@ namespace Structures::Game::Beatmap
 					const auto speed = current_timing_velocity * calculated_difficulty.velocity.value;
 					float tick_num;
 					if (const float tick_spacing_num = static_cast<float>(time_length) * speed / current_beat_length;
-						Utilities::Math::is_integer(tick_spacing_num)) tick_num = Utilities::Math::max_float(0, tick_spacing_num - 1);
+						Utilities::Math::is_integer(tick_spacing_num)) tick_num = std::max(0.0f, tick_spacing_num - 1);
 					else tick_num = std::floor(tick_spacing_num);
 					total_combo += static_cast<unsigned long>(tick_num) + 2; // 2 = Đầu Slider + Cuối Slider	
 				}

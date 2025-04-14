@@ -25,6 +25,32 @@ namespace Structures::Render::Objects
 		const auto [new_x, new_y] = convert_pos_to_origin({ .x = rect.x, .y = rect.y }, to_origin);
 		return { new_x, new_y, rect.w, rect.h };
 	}
+	Object::Config::OriginPoint Object::Config::OriginPoint::get_origin_point_from_type(const TextureMemory::Item& src, const Types::Render::RenderOriginType& origin_type)
+	{
+		const auto [w, h] = src.get_size();
+		switch (origin_type)
+		{
+		case Types::Render::RenderOriginType::TOP_LEFT:
+			return { 0, 0 };
+		case Types::Render::RenderOriginType::BOTTOM_LEFT:
+			return { 0, h };
+		case Types::Render::RenderOriginType::BOTTOM_RIGHT:
+			return { w, h };
+		case Types::Render::RenderOriginType::TOP_RIGHT:
+			return { w, 0 };
+		case Types::Render::RenderOriginType::TOP_CENTRE:
+			return { w / 2, 0 };
+		case Types::Render::RenderOriginType::BOTTOM_CENTRE:
+			return { w / 2, h };
+		case Types::Render::RenderOriginType::CENTRE_LEFT:
+			return { 0, h / 2 };
+		case Types::Render::RenderOriginType::CENTRE_RIGHT:
+			return { w, h / 2 };
+		case Types::Render::RenderOriginType::CENTRE:
+			return { w / 2, h / 2 };
+		}
+		return { 0, 0 };
+	}
 	// ::Config
 	void Object::Config::set_both_scale(const float& value)
 	{
@@ -32,7 +58,7 @@ namespace Structures::Render::Objects
 	}
 	Object::Config::Config() = default;
 	Object::Config::Config(const SDL_FPoint& render_pos, const OriginPoint& origin) :
-		render_pos(render_pos), origin_pos(origin)
+		render_pos(render_pos), origin_point(origin)
 	{
 	}
 	void Object::Config::set_scale_fixed(const SDL_FPoint& size, const SDL_FPoint& src_size)
@@ -47,8 +73,8 @@ namespace Structures::Render::Objects
 	SDL_FRect Object::Config::get_sdl_dst_rect(const SDL_FPoint& src_size) const
 	{
 		return {
-			render_pos.x - origin_pos.x * scale.x,
-			render_pos.y - origin_pos.y * scale.y,
+			render_pos.x - origin_point.x * scale.x,
+			render_pos.y - origin_point.y * scale.y,
 			src_size.x * scale.x,
 			src_size.y * scale.y
 		};
@@ -63,7 +89,11 @@ namespace Structures::Render::Objects
 	{
 		return config.get_sdl_dst_rect(Utilities::Render::get_size_from_rect(get_sdl_src_rect()));
 	}
-	SDL_FPoint Object::get_render_sdl_pos() const
+	Object::Config::OriginPoint Object::get_origin_point_from_type(const Types::Render::RenderOriginType& origin_type) const
+	{
+		return Config::OriginPoint::get_origin_point_from_type(src, origin_type);
+	}
+	SDL_FPoint Object::get_sdl_render_pos() const
 	{
 		return Utilities::Render::get_pos_from_rect(get_sdl_dst_rect());
 	}
@@ -84,43 +114,13 @@ namespace Structures::Render::Objects
 		const auto [src_w, src_h] = src.get_size();
 		set_render_size({ src_w * src_percent.x, src_h * src_percent.y });
 	}
-	void Object::set_origin_pos(const Types::Render::RenderOriginType& origin_type)
+	void Object::set_origin_point(const Types::Render::RenderOriginType& origin_type)
 	{
-		const auto [w, h] = Utilities::Render::get_size_from_rect(get_sdl_src_rect());
-		switch (origin_type)
-		{
-		case Types::Render::RenderOriginType::TOP_LEFT:
-			config.origin_pos = { 0, 0 };
-			break;
-		case Types::Render::RenderOriginType::CENTRE:
-			config.origin_pos = { w / 2, h / 2 };
-			break;
-		case Types::Render::RenderOriginType::BOTTOM_LEFT:
-			config.origin_pos = { 0, h };
-			break;
-		case Types::Render::RenderOriginType::BOTTOM_RIGHT:
-			config.origin_pos = { w, h };
-			break;
-		case Types::Render::RenderOriginType::TOP_RIGHT:
-			config.origin_pos = { w, 0 };
-			break;
-		case Types::Render::RenderOriginType::TOP_CENTRE:
-			config.origin_pos = { w / 2, 0 };
-			break;
-		case Types::Render::RenderOriginType::BOTTOM_CENTRE:
-			config.origin_pos = { w / 2, h };
-			break;
-		case Types::Render::RenderOriginType::CENTRE_LEFT:
-			config.origin_pos = { 0, h / 2 };
-			break;
-		case Types::Render::RenderOriginType::CENTRE_RIGHT:
-			config.origin_pos = { w, h / 2 };
-			break;
-		}
+		config.origin_point = get_origin_point_from_type(origin_type);
 	}
-	void Object::set_origin_pos(const Config::OriginPoint& custom_origin)
+	void Object::set_origin_point(const Config::OriginPoint& custom_origin)
 	{
-		config.origin_pos = custom_origin;
+		config.origin_point = custom_origin;
 	}
 	void Object::render(const SDL_FPoint& offset) const
 	{
@@ -141,7 +141,7 @@ namespace Structures::Render::Objects
 		const SDL_FPoint& render_pos) :
 		src(std::move(texture))
 	{
-		set_origin_pos(origin_type);
+		set_origin_point(origin_type);
 		config.render_pos = render_pos;
 	}
 	Object::Object(
@@ -157,18 +157,18 @@ namespace Structures::Render::Objects
 	auto PolyObject::operator+=(const CONTAINER& other)
 	{
 		for (const auto& object : other)
-			push_back(object);
+			data.push_back(object);
 		return *this;
 	}
 	auto PolyObject::operator+=(const Object& obj)
 	{
-		push_back(obj);
+		data.push_back(obj);
 		return *this;
 	}
 	void PolyObject::render(const SDL_FPoint& offset) const
 	{
 		if (!visible) return;
-		for (const auto& object : *this)
+		for (const auto& object : data)
 			object.render(offset);
 	}
 }
