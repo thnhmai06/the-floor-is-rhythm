@@ -1,6 +1,6 @@
 ﻿#include "structures/game/beatmap/metadata.h" // Header
 #include <fstream>
-#include "utilities.h"
+#include "utilities.hpp"
 #include "format/file.h"
 
 namespace Structures::Game::Beatmap::Metadata
@@ -124,15 +124,25 @@ namespace Structures::Game::Beatmap::Metadata
 		great = Config::GameConfig::Difficulty::OD::Base::GOOD - v * Config::GameConfig::Difficulty::OD::Multiply::GOOD;
 		bad = Config::GameConfig::Difficulty::OD::Base::BAD - v * Config::GameConfig::Difficulty::OD::Multiply::BAD;
 	}
-	int16_t CalculatedDifficulty::OverallDifficulty::get_score(const int64_t& click_moment, const int64_t& hit_object_time) const
+	int16_t CalculatedDifficulty::OverallDifficulty::get_score(
+		const int64_t& click_moment, const int64_t& hit_object_time,
+		const Types::Game::Direction::Direction& required_direction,
+		const Types::Game::Direction::Direction& current_direction) const
 	{
-		if (Utilities::Math::in_range(static_cast<float>(hit_object_time), perfect, static_cast<float>(click_moment)))
-			return 300;
-		if (Utilities::Math::in_range(static_cast<float>(hit_object_time), great, static_cast<float>(click_moment)))
-			return 100;
-		if (Utilities::Math::in_range(static_cast<float>(hit_object_time), bad, static_cast<float>(click_moment)))
-			return 50;
-		if (Utilities::Math::in_range(static_cast<float>(hit_object_time), miss, static_cast<float>(click_moment)))
+		if (required_direction == current_direction)
+		{
+			if (Utilities::Math::in_offset_range(static_cast<float>(hit_object_time), perfect, static_cast<float>(click_moment)))
+				return 300;
+			if (Utilities::Math::in_offset_range(static_cast<float>(hit_object_time), great, static_cast<float>(click_moment)))
+				return 100;
+			if (Utilities::Math::in_offset_range(static_cast<float>(hit_object_time), bad, static_cast<float>(click_moment)))
+				return 50;
+			if (Utilities::Math::in_offset_range(static_cast<float>(hit_object_time), miss, static_cast<float>(click_moment))
+				|| static_cast<float>(click_moment) > static_cast<float>(hit_object_time) + miss)
+				return 0;
+		}
+		else if (Utilities::Math::in_offset_range(static_cast<float>(hit_object_time), miss, static_cast<float>(click_moment))
+			|| static_cast<float>(click_moment) > static_cast<float>(hit_object_time) + miss) 
 			return 0;
 		return -1; // chưa tới tầm với
 	}

@@ -1,9 +1,9 @@
 ﻿#pragma once
+#include "structures/game/beatmap/beatmap.h"
 #include "structures/game/beatmap/hitobject.h"
 #include "structures/game/beatmap/metadata.h"
 #include "structures/render/layers/objects/collection.h"
 #include "structures/render/textures/texture.h"
-#include "structures/game/beatmap/timing.h"
 
 namespace Structures::Render::Objects::Gameplay::Beatmap
 {
@@ -20,6 +20,7 @@ namespace Structures::Render::Objects::Gameplay::Beatmap
 				const TextureMemory& memory,
 				const Game::Beatmap::Metadata::CalculatedDifficulty& diff,
 				const float& current_timing_velocity = 1,
+				bool no_rotation = false,
 				const HitObject* previous = nullptr);
 		};
 		struct Slider final : HitObject
@@ -46,16 +47,14 @@ namespace Structures::Render::Objects::Gameplay::Beatmap
 				const TextureMemory& memory,
 				const Game::Beatmap::Metadata::CalculatedDifficulty& diff,
 				const float& current_beat_length,
-				const float& current_timing_velocity = 1,
+				const float& current_timing_velocity,
+				bool no_rotation = false,
 				const HitObject* previous = nullptr);
 		};
 	}
 
 	struct Collection : Objects::Collection
 	{
-		Collection(const TextureMemory& memory,
-			const Game::Beatmap::HitObjects::HitObjects& hit_objects,
-			const Game::Beatmap::Metadata::CalculatedDifficulty& difficulty,
-			const Game::Beatmap::TimingPoints::TimingPoints& timing_points);
+		Collection(const TextureMemory& memory, const Game::Beatmap::Beatmap& beatmap);
 	};
 }

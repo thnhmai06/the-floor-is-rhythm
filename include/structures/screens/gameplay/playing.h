@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include <queue>
-
 #include "config.h"
 #include "structures/screens/screen.h"
 #include "structures/action.h"
@@ -19,13 +17,10 @@ namespace Structures::Screens::Gameplay
 		struct Logic final
 		{
 		private:
-			const Game::Beatmap::Beatmap* beatmap = nullptr;
-			std::queue<const Game::Beatmap::HitObjects::HitObject*> floor, slider;
-
-			Types::Game::Direction::Direction required_direction = Types::Game::Direction::Direction::RIGHT;
+			const Game::Beatmap::Beatmap* beatmap;
+			std::queue<const Game::Beatmap::HitObjects::Floor::Action> floor;
+			std::queue<const Game::Beatmap::HitObjects::Slider::Action> slider;
 			Action::Time::Timer timer;
-
-			void update_required_direction();
 
 		public:
 			uint8_t health = 200;
@@ -74,8 +69,8 @@ namespace Structures::Screens::Gameplay
 			{
 			private:
 				// beatmap
-				unsigned long total_objects_num = 1;
-				unsigned long total_combo = 1;
+				const Game::Beatmap::Beatmap::Stats* beatmap_stats;
+
 				// gameplay
 				float score = 0;
 				unsigned long max_combo = 0;
@@ -110,8 +105,8 @@ namespace Structures::Screens::Gameplay
 				} count;
 
 				float add_floor_score(const uint16_t& score);
-				float add_slider_tick_score(bool is_tick_completed); // cần phải được add_total_slider_bonus_score khi kết thúc slider
-				float add_total_slider_bonus_score();
+				float add_slider_tick_score(bool is_tick_completed); //! CẦN DÙNG add_slider_bonus_score() sau khi hoàn thành slider
+				float add_slider_bonus_score();
 
 				[[nodiscard]] float get_score() const { return score; }
 				[[nodiscard]] unsigned long get_current_combo() const { return current_combo; }

@@ -1,6 +1,6 @@
 ﻿#include "structures/render/layers/layer.h" // Header
 #include "config.h"
-#include "utilities.h"
+#include "utilities.hpp"
 
 using namespace Utilities::Math::FPoint;
 

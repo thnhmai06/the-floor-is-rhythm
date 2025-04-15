@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <cmath>
 #include <iomanip>
+#include <queue>
 #include <SDL3_mixer/SDL_mixer.h>
 #include "structures/types.h"
 
@@ -29,7 +30,27 @@ namespace Utilities
 			}
 			return 0.0f;
 		}
-		inline bool in_range(const float& correction, const float& range, const float& value) { return (correction - range <= value && value <= correction + range); }
+		template <typename ComparableType>
+		bool in_range(const ComparableType& min, const ComparableType& max,
+			const ComparableType& value, const bool include_equal_left = true, const bool include_equal_right = true)
+		{
+			if (include_equal_left && include_equal_right) return (min <= value && value <= max);
+			if (include_equal_left) return (min <= value && value < max);
+			if (include_equal_right) return (min < value && value <= max);
+			return (min < value && value < max);
+		}
+		template <typename ComparableType>
+		bool in_offset_range(const ComparableType& correct_value, const ComparableType& offset,
+			const ComparableType& value, const bool include_equal_left = true, const bool include_equal_right = true)
+		{
+			return in_range(correct_value - offset, correct_value + offset, value, include_equal_left, include_equal_right);
+		}
+		template <typename ComparableType>
+		bool has_contain_part(const std::pair<ComparableType, ComparableType>& a, const std::pair<ComparableType, ComparableType>& b)
+		{
+			return in_range(a.first, a.second, b.first) || in_range(a.first, a.second, b.second)
+				|| in_range(b.first, b.second, a.first) || in_range(b.first, b.second, a.second);
+		}
 
 		namespace FPoint
 		{
@@ -56,22 +77,22 @@ namespace Utilities
 	}
 	namespace Time
 	{
-        inline std::string get_current_time(const char* format = "%Y-%m-%d_%H-%M-%S")  
-        {  
-           const auto now = std::chrono::system_clock::now();  
-           const auto time_t_now = std::chrono::system_clock::to_time_t(now);  
+		inline std::string get_current_time(const char* format = "%Y-%m-%d_%H-%M-%S")
+		{
+			const auto now = std::chrono::system_clock::now();
+			const auto time_t_now = std::chrono::system_clock::to_time_t(now);
 
-           std::tm local_time;
-			#ifdef _WIN32
-		   if (localtime_s(&local_time, &time_t_now) != 0) return {};
-			#else
-		   if (!localtime_r(&time_t_now, &local_time)) return {};
-			#endif
+			std::tm local_time;
+#ifdef _WIN32
+			if (localtime_s(&local_time, &time_t_now) != 0) return {};
+#else
+			if (!localtime_r(&time_t_now, &local_time)) return {};
+#endif
 
-           std::stringstream ss;
-           ss << std::put_time(&local_time, format);
-           return ss.str();
-        }
+			std::stringstream ss;
+			ss << std::put_time(&local_time, format);
+			return ss.str();
+		}
 	}
 	namespace String
 	{
@@ -113,7 +134,7 @@ namespace Utilities
 		inline SDL_FPoint get_pos_from_rect(const SDL_FRect& rect) { return SDL_FPoint{ rect.x, rect.y }; }
 		inline SDL_FPoint get_size_from_rect(const SDL_FRect& rect) { return SDL_FPoint{ rect.w, rect.h }; }
 	}
-	namespace Code
+	namespace Container
 	{
 		template <typename Container>
 		typename Container::iterator get_last_element_iterator(Container& container)
@@ -126,6 +147,41 @@ namespace Utilities
 		{
 			if (container.empty()) return container.cend();
 			return std::prev(container.cend());
+		}
+
+		template <typename Type>
+		Type get_front_and_pop(std::queue<Type>& queue)
+		{
+			Type front = queue.front();
+			queue.pop();
+			return front;
+		}
+	}
+	namespace Game
+	{
+		namespace Beatmap
+		{
+			template <typename TimeBasedObject>
+			const TimeBasedObject* get_front_pair_queue(
+				std::queue<const TimeBasedObject*>& q1,
+				std::queue<const TimeBasedObject*>& q2
+			)
+			{
+				if (q1.empty() && q2.empty()) return nullptr;
+
+				const TimeBasedObject* hit_object;
+				if (q1.empty() || q2.front()->get_time() < q1.front()->get_time())
+				{
+					hit_object = q2.front();
+					q2.pop();
+				}
+				else
+				{
+					hit_object = q1.front();
+					q1.pop();
+				}
+				return hit_object;
+			}
 		}
 	}
 }

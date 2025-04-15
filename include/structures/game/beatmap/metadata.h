@@ -7,6 +7,7 @@
 #include <string>
 #include <unordered_set>
 #include "config.h"
+#include "structures/types.h"
 
 namespace Structures::Game::Beatmap::Metadata
 {
@@ -66,7 +67,9 @@ namespace Structures::Game::Beatmap::Metadata
 
 			void apply(const float& v);
 			void apply() { apply(value); }
-			[[nodiscard]] int16_t get_score(const int64_t& click_moment, const int64_t& hit_object_time) const;
+			[[nodiscard]] int16_t get_score(const int64_t& click_moment, const int64_t& hit_object_time,
+			                                const Types::Game::Direction::Direction& required_direction,
+			                                const Types::Game::Direction::Direction& current_direction) const;
 
 			OverallDifficulty() = default;
 			OverallDifficulty(const float value) { apply(value); }

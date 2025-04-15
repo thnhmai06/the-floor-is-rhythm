@@ -2,7 +2,7 @@
 #include <SDL3/SDL_init.h>
 #include "logging/logger.h"
 #include "logging/exceptions.h"
-#include "utilities.h"
+#include "utilities.hpp"
 #include "config.h"
 
 using namespace Utilities::Audio;

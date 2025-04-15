@@ -4,7 +4,7 @@
 #include "logging/logger.h"
 #include "logging/exceptions.h"
 #include "format/file.h"
-#include "utilities.h"
+#include "utilities.hpp"
 
 using namespace Format::FileFormat::Beatmap::TimingPoints;
 using Format::FileFormat::Beatmap::AND;
@@ -27,6 +27,8 @@ namespace Structures::Game::Beatmap::TimingPoints
 		writer << time << AND << beat_length << AND << static_cast<int32_t>(sample_set) << AND <<
 			sample_index << AND << volume << AND << kiai << '\n';
 	}
+
+	int64_t TimingPoint::get_time() const { return time; }
 	float TimingPoint::get_velocity() const { return (inherited) ? 100 / (-beat_length) : 1; }
 
 	//! TimingPoints
@@ -41,10 +43,22 @@ namespace Structures::Game::Beatmap::TimingPoints
 				continue;
 			}
 
-			const auto back_itr = Utilities::Code::get_last_element_iterator(*this);
+			const auto back_itr = Utilities::Container::get_last_element_iterator(*this);
 			TimingPoint point(content);
 			emplace_hint(back_itr, point.time, point);
 		}
+	}
+	std::pair<std::queue<const TimingPoint*>, std::queue<const TimingPoint*>> TimingPoints::split_to_queue() const
+	{
+		std::queue<const TimingPoint*> inherited, uninherited;
+		for (const auto& point : *this | std::views::values)
+		{
+			if (point.inherited)
+				inherited.push(&point);
+			else
+				uninherited.push(&point);
+		}
+		return { inherited, uninherited };
 	}
 	void TimingPoints::write(std::ofstream& writer) const
 	{

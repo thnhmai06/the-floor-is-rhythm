@@ -3,7 +3,7 @@
 #include "structures/types.h"
 #include "logging/logger.h"
 #include "logging/exceptions.h"
-#include "utilities.h"
+#include "utilities.hpp"
 
 using namespace Utilities::Audio;
 

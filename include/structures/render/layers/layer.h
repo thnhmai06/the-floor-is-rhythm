@@ -1,7 +1,7 @@
 ﻿// ReSharper disable CppClangTidyCppcoreguidelinesAvoidConstOrRefDataMembers
 #pragma once
 #include "structures/render/layers/objects/collection.h"
-#include "utilities.h"
+#include "utilities.hpp"
 
 namespace Structures::Render::Layers
 {

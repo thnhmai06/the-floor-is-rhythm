@@ -3,7 +3,7 @@
 #include <SDL3_image/SDL_image.h>
 #include "logging/logger.h"
 #include "logging/exceptions.h"
-#include "utilities.h"
+#include "utilities.hpp"
 
 namespace Structures::Render::Textures
 {

@@ -1,6 +1,6 @@
 #include "structures/render/layers/objects/gameplay/hud.h" // Header
 #include "config.h"
-#include "utilities.h"
+#include "utilities.hpp"
 
 namespace Structures::Render::Objects::Gameplay::HUD
 {

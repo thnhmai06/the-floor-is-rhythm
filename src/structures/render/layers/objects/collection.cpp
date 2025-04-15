@@ -1,5 +1,5 @@
 #include "structures/render/layers/objects/collection.h" // Header
-#include "utilities.h"
+#include "utilities.hpp"
 
 namespace Structures::Render::Objects
 {

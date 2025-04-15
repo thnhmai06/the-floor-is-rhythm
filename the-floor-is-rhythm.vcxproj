@@ -134,12 +134,16 @@
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>SDL3_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -187,7 +191,7 @@
     <ClInclude Include="include\structures\screens\gameplay\playing.h" />
     <ClInclude Include="include\structures\screens\screen.h" />
     <ClInclude Include="include\structures\types.h" />
-    <ClInclude Include="include\utilities.h" />
+    <ClInclude Include="include\utilities.hpp" />
     <ClInclude Include="include\work\core.h" />
     <ClInclude Include="include\work\render.h" />
     <ClInclude Include="include\work\render\layers.h" />

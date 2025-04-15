@@ -1,10 +1,11 @@
-﻿#include "structures/screens/gameplay/playing.h" // Header
+﻿// ReSharper disable CppClangTidyClangDiagnosticShadow
+#include "structures/screens/gameplay/playing.h" // Header
 #include <ranges>
 #include "structures/render/layers/objects/gameplay/beatmap.h"
 #include "structures/render/layers/objects/gameplay/cursor.h"
 #include "work/render/layers.h"
 #include "work/render/textures.h"
-#include "utilities.h"
+#include "utilities.hpp"
 
 //! PLayingScreen
 namespace Structures::Screens::Gameplay
@@ -82,8 +83,8 @@ namespace Structures::Screens::Gameplay
 		const float accuracy = count.get_accuracy();
 		const float elapsed_objects = static_cast<float>(count.get_elapsed_objects_num());
 
-		const float combo_score = BASE_COMBO * static_cast<float>(max_combo) / static_cast<float>(total_combo);
-		const float accuracy_score = BASE_ACCURACY * std::powf(accuracy, 10) * elapsed_objects / static_cast<float>(total_objects_num);
+		const float combo_score = BASE_COMBO * static_cast<float>(max_combo) / static_cast<float>(beatmap_stats->total_combo);
+		const float accuracy_score = BASE_ACCURACY * std::powf(accuracy, 10) * elapsed_objects / static_cast<float>(beatmap_stats->get_total_objects_num());
 		const float score_no_multiplier = (combo_score + accuracy_score) * mod_multiplier;
 		return this->score = score_no_multiplier * mod_multiplier;
 	}
@@ -113,7 +114,7 @@ namespace Structures::Screens::Gameplay
 		const auto current_score = update_score();
 		return current_score - previous_score;
 	}
-	float PlayingScreen::Logic::Score::add_total_slider_bonus_score()
+	float PlayingScreen::Logic::Score::add_slider_bonus_score()
 	{
 		const auto previous_score = get_score();
 
@@ -124,7 +125,7 @@ namespace Structures::Screens::Gameplay
 		return current_score - previous_score;
 	}
 	PlayingScreen::Logic::Score::Score(const Game::Beatmap::Beatmap& beatmap, const float& mod_multiplier)
-		: total_objects_num(beatmap.total_objects_num), total_combo(beatmap.total_combo), mod_multiplier(mod_multiplier)
+		: beatmap_stats(&beatmap.stats), mod_multiplier(mod_multiplier)
 	{
 	}
 
@@ -216,27 +217,6 @@ namespace Structures::Screens::Gameplay
 	}
 
 	// ::Logic
-	void PlayingScreen::Logic::update_required_direction()
-	{
-		// empty
-		if (floor.empty() && slider.empty()) return;
-		if (floor.empty())
-		{
-			key_stoke.direction.current_direction += slider.front()->get_rotation();
-			return;
-		}
-		if (slider.empty())
-		{
-			key_stoke.direction.current_direction += floor.front()->get_rotation();
-			return;
-		}
-
-		// valid
-		if (slider.front()->get_time() < floor.front()->get_time())
-			key_stoke.direction.current_direction += slider.front()->get_rotation();
-		else
-			key_stoke.direction.current_direction += floor.front()->get_rotation();
-	}
 	void PlayingScreen::Logic::pause() { timer.pause(); }
 	void PlayingScreen::Logic::resume() { timer.resume(); }
 	void PlayingScreen::Logic::make_time_step(const KeyboardEventList& events)
@@ -246,58 +226,36 @@ namespace Structures::Screens::Gameplay
 		const auto current_time = timer.get_time();
 		const auto& od = beatmap->calculated_difficulty.od;
 
-		//// Tính điểm cho các hitobject ngoài Khoảng chấp nhận (trên)
-		//while (current_hit_object != beatmap->hit_objects.end()
-		//	&& od.get_score(current_time, current_hit_object->second.get_time()) < 0
-		//	&& current_time > current_hit_object->second.get_time())
-		//{
-		//	if (current_hit_object->second.get_type() == Types::Game::HitObject::HitObjectType::SLIDER
-		//		&& current_time <= std::get_if<Game::Beatmap::HitObjects::Slider>(&current_hit_object->second)->end_time)
-		//		break;
+		// Floor
+		while (!floor.empty() && floor.front().time <= current_time)
+		{
+			const auto current_floor = Utilities::Container::get_front_and_pop(floor);
+			score.add_floor_score(
+				od.get_score(current_time, current_floor.time, current_floor.direction, key_stoke.direction.current_direction)
+			);
+		}
 
-		//	switch (current_hit_object->second.get_type())
-		//	{
-		//	case Types::Game::HitObject::HitObjectType::FLOOR:
-		//		score.add_floor_score(0);
-		//		break;
-		//	case Types::Game::HitObject::HitObjectType::SLIDER:
-		//		score.add_total_slider_bonus_score(); // kết thúc slider
-		//		break;
-		//	}
-		//	++current_hit_object;
-		//}
-		//// => Đến hit_object tương ứng thời gian hiện tại
+		//TODO: Slider
 
-		//// Trong trường hợp các hit_object ở trong Khoảng chấp nhận
-		//auto pressed_num = key_stoke.click.get_recently_pressed_num();
-		//while (current_hit_object != beatmap->hit_objects.end()
-		//	&& key_stoke.direction.current_direction == required_direction)
-		//{
-		//	if (current_hit_object->second.get_type() == Types::Game::HitObject::HitObjectType::FLOOR
-		//		&& !od.get_score(current_time, current_hit_object->second.get_time() < 0) // Trong khoảng chấp nhận
-		//	)
-		//	{
-		//		score.add_floor_score(od.get_score(current_time, current_hit_object->second.get_time()));
-		//		++current_hit_object;
-		//		pressed_num--;
-		//	}
-		//	else if (current_hit_object->second.get_type() == Types::Game::HitObject::HitObjectType::SLIDER)
-		//	{
+		// Slider (on hold)
+		while (!slider.empty() && Utilities::Math::in_range(slider.front().time, slider.front().end_time, current_time))
+		{
+			
+		}
 
-		//	}
-		//}
+		// Slider (finished)
+		while (!slider.empty() && slider.front().end_time <= current_time)
+		{
+			
+		}
 	}
 
 	PlayingScreen::Logic::Logic(const Game::Beatmap::Beatmap* beatmap, const int64_t& start_time, const float& mod_multiplier)
 		: beatmap(beatmap), timer(start_time), score(*beatmap, mod_multiplier)
 	{
-		for (const auto& hit_object : beatmap->hit_objects | std::views::values)
-		{
-			if (hit_object.get_type() == Types::Game::HitObject::HitObjectType::FLOOR)
-				floor.push(&hit_object);
-			else if (hit_object.get_type() == Types::Game::HitObject::HitObjectType::SLIDER)
-				slider.push(&hit_object);
-		}
+		auto [floor, slider] = beatmap->make_action_queue();
+		this->floor = std::move(floor);
+		this->slider = std::move(slider);
 	}
 
 	// ::Render
@@ -316,8 +274,8 @@ namespace Structures::Screens::Gameplay
 	{
 		//! Beatmap
 		components.map_set.storage_item = storage.insert(
-			Utilities::Code::get_last_element_iterator(storage),
-			std::make_unique<Structures::Render::Objects::Gameplay::Beatmap::Collection>(skin, beatmap.hit_objects, beatmap.calculated_difficulty, beatmap.timing_points)
+			Utilities::Container::get_last_element_iterator(storage),
+			std::make_unique<Structures::Render::Objects::Gameplay::Beatmap::Collection>(skin, beatmap)
 		);
 		components.map_set.render_item = playground_layer.render_buffer.add_collection(components.map_set.storage_item->get()); // Thêm vào render_buffer ở đây nè :D
 		//TODO: set render range
@@ -325,7 +283,7 @@ namespace Structures::Screens::Gameplay
 
 		//! Cursor
 		components.cursor.storage_item = storage.insert(
-			Utilities::Code::get_last_element_iterator(storage),
+			Utilities::Container::get_last_element_iterator(storage),
 			std::make_unique<Structures::Render::Objects::Gameplay::Cursor::Collection>(skin, current_direction)
 		);
 		components.cursor.render_item = cursor_layer.render_buffer.add_collection(components.cursor.storage_item->get()); // Thêm vào render_buffer ở đây nè :D

@@ -1,6 +1,6 @@
 #include "structures/game/beatmap/hitsound.h" // Header
 #include "format/file.h"
-#include "utilities.h"
+#include "utilities.hpp"
 
 namespace Structures::Game::Beatmap::Hitsound
 {

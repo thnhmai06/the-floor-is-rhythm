@@ -5,13 +5,11 @@
 #include "format/file.h"
 #include "logging/exceptions.h"
 #include "logging/logger.h"
-#include "utilities.h"
+#include "utilities.hpp"
 
 namespace Structures::Game::Beatmap
 {
-	using Metadata::Difficulty;
 	static constexpr int32_t MINIMUM_LINE_CHARACTERS = 3;
-
 	static std::unordered_map<std::string, std::vector<std::string>> read_content(std::ifstream& reader)
 	{
 		std::unordered_map<std::string, std::vector<std::string>> sections;
@@ -40,12 +38,108 @@ namespace Structures::Game::Beatmap
 		{
 			if (header == Format::FileFormat::Beatmap::General::HEADER) beatmap.general.read(contents);
 			else if (header == Format::FileFormat::Beatmap::Metadata::HEADER) beatmap.metadata.read(contents);
-			else if (header == Format::FileFormat::Beatmap::Difficulty::HEADER) beatmap.calculated_difficulty.apply(Difficulty(contents));
+			else if (header == Format::FileFormat::Beatmap::Difficulty::HEADER) beatmap.calculated_difficulty.apply(Metadata::Difficulty(contents));
 			else if (header == Format::FileFormat::Beatmap::HitObjects::HEADER) beatmap.hit_objects.read(contents);
 			else if (header == Format::FileFormat::Beatmap::TimingPoints::HEADER) beatmap.timing_points.read(contents);
 		}
 	}
 
+	// Beatmap::Stats
+	unsigned long Beatmap::Stats::get_total_objects_num() const { return total_floor + total_slider; }
+	void Beatmap::Stats::calculate(const Beatmap& beatmap)
+	{
+		auto [floor, slider] = beatmap.make_action_queue();
+
+		while (!floor.empty())
+		{
+			floor.pop();
+			total_floor++;
+			total_combo++;
+		}
+		while (!slider.empty())
+		{
+			const auto current = Utilities::Container::get_front_and_pop(slider);
+			total_slider++;
+			total_combo += current.tick_num;
+		}
+	}
+
+	// Beatmap
+	std::pair<std::queue<const HitObjects::Floor::Action>, std::queue<const HitObjects::Slider::Action>> Beatmap::
+		make_action_queue() const
+	{
+		std::queue<const HitObjects::Floor::Action> floor_queue;
+		std::queue<const HitObjects::Slider::Action> slider_queue;
+
+		auto previous_direction = Types::Game::Direction::Direction::RIGHT;
+		const HitObjects::HitObject* current_hit_object;
+		float current_timing_point_velocity;
+		float current_beat_length;
+
+		auto if_floor = [&]()
+			{
+				floor_queue.emplace(*std::get_if<HitObjects::Floor>(current_hit_object), previous_direction);
+				previous_direction += current_hit_object->get_rotation();
+			};
+
+		auto if_slider = [&]()
+			{
+				slider_queue.emplace(*std::get_if<HitObjects::Slider>(current_hit_object), current_timing_point_velocity,
+					calculated_difficulty.velocity.speed, current_beat_length);
+				previous_direction += current_hit_object->get_rotation();
+			};
+
+		for_all_hit_objects(if_floor, if_slider, current_hit_object, current_timing_point_velocity, current_beat_length);
+		return { std::move(floor_queue), std::move(slider_queue) };
+	}
+	void Beatmap::for_all_hit_objects(const HitObjectStepFunction& if_floor, const HitObjectStepFunction& if_slider,
+		const HitObjects::HitObject*& current_hit_object_ptr) const
+	{
+		for (const auto& hit_object : hit_objects | std::views::values)
+		{
+			current_hit_object_ptr = &hit_object;
+
+			switch (hit_object.get_type())
+			{
+			case Types::Game::HitObject::HitObjectType::FLOOR:
+				if_floor();
+				break;
+			case Types::Game::HitObject::HitObjectType::SLIDER:
+				if_slider();
+				break;
+			}
+		}
+	}
+	void Beatmap::for_all_hit_objects(const HitObjectStepFunction& if_floor, const HitObjectStepFunction& if_slider,
+		const HitObjects::HitObject*& current_hit_object_ptr,
+		float& current_timing_point_velocity, float& current_beat_length) const
+	{
+		auto [inherited, uninherited] = timing_points.split_to_queue();
+
+		current_timing_point_velocity = 1;
+		current_beat_length = 180;
+		for (const auto& hit_object : hit_objects | std::views::values)
+		{
+			current_hit_object_ptr = &hit_object;
+
+			// update timing point
+			while (!inherited.empty() && hit_object.get_time() >= inherited.front()->get_time())
+				current_timing_point_velocity = Utilities::Container::get_front_and_pop(inherited)->get_velocity();
+			while (!uninherited.empty() && hit_object.get_time() >= uninherited.front()->get_time())
+				current_beat_length = Utilities::Container::get_front_and_pop(uninherited)->beat_length;
+
+			// do obj
+			switch (hit_object.get_type())
+			{
+			case Types::Game::HitObject::HitObjectType::FLOOR:
+				if_floor();
+				break;
+			case Types::Game::HitObject::HitObjectType::SLIDER:
+				if_slider();
+				break;
+			}
+		}
+	}
 	Beatmap::Beatmap(const char* file_path)
 	{
 		std::ifstream reader(file_path);
@@ -55,46 +149,6 @@ namespace Structures::Game::Beatmap
 		parse_beatmap(*this, read_content(reader));
 		reader.close();
 
-		float current_beat_length = 180;
-		float current_timing_velocity = 1.0f;
-		auto next_timing_point = timing_points.begin();
-		for (const auto& hit_object : hit_objects | std::views::values)
-		{
-			// lấy timing point
-			while (next_timing_point != timing_points.end() &&
-				hit_object.get_time() >= next_timing_point->first)
-			{
-				if (next_timing_point->second.beat_length < 0)
-					// inherited
-					current_timing_velocity = next_timing_point->second.get_velocity();
-				else
-					// uninherited
-					current_beat_length = next_timing_point->second.beat_length;
-				++next_timing_point;
-			}
-
-			// tính hit_object count
-			switch (hit_object.get_type())
-			{
-			case Types::Game::HitObject::HitObjectType::FLOOR:
-				total_floor++;
-				total_combo++;
-				break;
-			case Types::Game::HitObject::HitObjectType::SLIDER:
-				total_slider++;
-				{
-					const auto current_slider = std::get_if<HitObjects::Slider>(&hit_object);
-					const auto time_length = current_slider->end_time - current_slider->time;
-					const auto speed = current_timing_velocity * calculated_difficulty.velocity.value;
-					float tick_num;
-					if (const float tick_spacing_num = static_cast<float>(time_length) * speed / current_beat_length;
-						Utilities::Math::is_integer(tick_spacing_num)) tick_num = std::max(0.0f, tick_spacing_num - 1);
-					else tick_num = std::floor(tick_spacing_num);
-					total_combo += static_cast<unsigned long>(tick_num) + 2; // 2 = Đầu Slider + Cuối Slider	
-				}
-				break;
-			}
-		}
-		total_objects_num = total_floor + total_slider;
+		stats.calculate(*this);
 	}
 }

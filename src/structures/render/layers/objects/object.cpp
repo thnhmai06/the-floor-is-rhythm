@@ -1,7 +1,7 @@
 ﻿#include "structures/render/layers/objects/object.h" // Header
 #include "logging/exceptions.h"
 #include "logging/logger.h"
-#include "utilities.h"
+#include "utilities.hpp"
 
 namespace Structures::Render::Objects
 {

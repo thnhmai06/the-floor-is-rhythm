@@ -1,17 +1,16 @@
-#include "structures/game/beatmap/hitobject.h" // Header
+﻿#include "structures/game/beatmap/hitobject.h" // Header
 #include <fstream>
 #include <ranges>
-#include "logging/exceptions.h"
 #include "logging/logger.h"
+#include "logging/exceptions.h"
 #include "format/file.h"
-#include "structures/types.h"
-#include "utilities.h"
+#include "utilities.hpp"
 
 namespace Structures::Game::Beatmap::HitObjects
 {
 	using Format::FileFormat::Beatmap::AND;
 
-	Types::Game::Direction::Direction get_next_direction(const Types::Game::Direction::Direction& prev_direction, uint8_t rotation)
+	Types::Game::Direction::Direction get_next_direction(const Types::Game::Direction::Direction& prev_direction, const uint8_t& rotation)
 	{
 		return static_cast<Types::Game::Direction::Direction>((static_cast<uint8_t>(prev_direction) + rotation) % Types::Game::Direction::NUM_DIRECTIONS);
 	}
@@ -19,18 +18,23 @@ namespace Structures::Game::Beatmap::HitObjects
 	//! Floor
 	void Floor::read(const std::vector<std::string>& content)
 	{
-		end_time = time = std::stoi(content[0]);
+		time = std::stoi(content[0]);
 		rotation = static_cast<Types::Game::Direction::Rotation>(std::stoi(content[1]));
-		combo_jump = static_cast<uint8_t>(std::stoi(content[2]));
+		combo_colour = static_cast<uint8_t>(std::stoi(content[2]));
 		hit_sound = Hitsound::Hitsound{ std::stoi(content[4]) };
 		hit_sample = Hitsound::HitSample{ content[5] };
 	}
 	void Floor::write(std::ofstream& writer) const
 	{
-		writer << time << AND << static_cast<int32_t>(rotation) << AND << static_cast<int32_t>(combo_jump) << AND <<
+		writer << time << AND << static_cast<int32_t>(rotation) << AND << static_cast<int32_t>(combo_colour) << AND <<
 			static_cast<bool>(type);
 		writer << AND << hit_sound.to_int() << AND << hit_sample.to_string();
 		writer << '\n';
+	}
+	// ::Action
+	Floor::Action::Action(const Floor& floor, const Types::Game::Direction::Direction& previous_direction) :
+		type(floor.type), direction(previous_direction + floor.rotation), time(floor.time)
+	{
 	}
 
 	//! Slider
@@ -38,7 +42,7 @@ namespace Structures::Game::Beatmap::HitObjects
 	{
 		time = std::stoi(content[0]);
 		rotation = static_cast<Types::Game::Direction::Rotation>(std::stoi(content[1]));
-		combo_jump = static_cast<uint8_t>(std::stoi(content[2]));
+		combo_colour = static_cast<uint8_t>(std::stoi(content[2]));
 		end_time = std::stoi(content[4]);
 
 		// Curves
@@ -59,7 +63,7 @@ namespace Structures::Game::Beatmap::HitObjects
 	}
 	void Slider::write(std::ofstream& writer) const
 	{
-		writer << time << AND << static_cast<int32_t>(rotation) << AND << static_cast<int32_t>(combo_jump) << AND <<
+		writer << time << AND << static_cast<int32_t>(rotation) << AND << static_cast<int32_t>(combo_colour) << AND <<
 			static_cast<bool>(type) << AND << end_time;
 		/*
 		writer << AND;
@@ -71,13 +75,33 @@ namespace Structures::Game::Beatmap::HitObjects
 		writer << AND << hit_sound.to_int() << AND << hit_sample.to_string();
 		writer << '\n';
 	}
+	//:: Action
+	Slider::Action::Action(const Slider& slider, const float& timing_velocity, const float& diff_velocity,
+		const float& beat_length, const Types::Game::Direction::Direction& previous_direction) : type(slider.type), direction(previous_direction + slider.rotation),
+		time(slider.time), end_time(slider.end_time)
+	{
+		const auto time_length = static_cast<float>(end_time - time);
+		const auto speed = timing_velocity * diff_velocity;
+		tick_length = time_length * speed;
+
+		if (const auto tick_spacing_num = tick_length / beat_length;
+			Utilities::Math::is_integer(tick_spacing_num))
+			tick_num = static_cast<unsigned long>(std::max(0.0f, tick_spacing_num - 1));
+		else tick_num = static_cast<unsigned long>(std::floor(tick_spacing_num));
+		tick_num += 2; // 2 = Đầu Slider + Cuối Slider
+	}
 
 	//! HitObject
-	int32_t HitObject::get_time() const { return std::visit([](const auto& hit_object) { return hit_object.time; }, *this); }
-	int32_t HitObject::get_end_time() const { return std::visit([](const auto& hit_object) { return hit_object.end_time; }, *this); }
+	int64_t HitObject::get_time() const { return std::visit([](const auto& hit_object) { return hit_object.time; }, *this); }
+	int64_t HitObject::get_end_time() const
+	{
+		if (std::holds_alternative<Floor>(*this)) 
+			return this->get_time();
+		return std::get_if<Slider>(this)->end_time;
+	}
 	Types::Game::HitObject::HitObjectType HitObject::get_type() const { return std::visit([](const auto& hit_object) { return hit_object.type; }, *this); }
 	Types::Game::Direction::Rotation HitObject::get_rotation() const { return std::visit([](const auto& hit_object) { return hit_object.rotation; }, *this); }
-	uint8_t HitObject::get_combo_jump() const { return std::visit([](const auto& hit_object) { return hit_object.combo_jump; }, *this); }
+	uint8_t HitObject::get_combo_colour() const { return std::visit([](const auto& hit_object) { return hit_object.combo_colour; }, *this); }
 	Hitsound::Hitsound HitObject::get_hitsound() const { return std::visit([](const auto& hit_object) { return hit_object.hit_sound; }, *this); }
 	Hitsound::HitSample HitObject::get_hitsample() const { return std::visit([](const auto& hit_object) { return hit_object.hit_sample; }, *this); }
 	void HitObject::write(std::ofstream& writer) const { std::visit([&writer](const auto& hit_object) { hit_object.write(writer); }, *this); }
@@ -94,7 +118,7 @@ namespace Structures::Game::Beatmap::HitObjects
 				continue;
 			}
 
-			const auto back_itr = Utilities::Code::get_last_element_iterator(*this);
+			const auto back_itr = Utilities::Container::get_last_element_iterator(*this);
 			switch (std::stoi(content[3]))
 			{
 			case static_cast<int32_t>(Types::Game::HitObject::HitObjectType::FLOOR):
@@ -122,6 +146,18 @@ namespace Structures::Game::Beatmap::HitObjects
 				break;
 			}
 		}
+	}
+	std::pair<std::queue<const HitObject*>, std::queue<const HitObject*>> HitObjects::split_to_queue() const
+	{
+		std::queue<const HitObject*> floor, slider;
+		for (const auto& hit_object : *this | std::views::values)
+		{
+			if (hit_object.get_type() == Types::Game::HitObject::HitObjectType::FLOOR)
+				floor.push(&hit_object);
+			else if (hit_object.get_type() == Types::Game::HitObject::HitObjectType::SLIDER)
+				slider.push(&hit_object);
+		}
+		return { floor, slider };
 	}
 	void HitObjects::write(std::ofstream& writer) const
 	{

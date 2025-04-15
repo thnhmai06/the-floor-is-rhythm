@@ -167,7 +167,7 @@
     <ClInclude Include="include\structures\render\layers\objects\gameplay\beatmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\utilities.h">
+    <ClInclude Include="include\utilities.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\structures\render\layers\objects\collection.h">
