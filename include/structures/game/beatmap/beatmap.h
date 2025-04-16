@@ -16,9 +16,18 @@ namespace Structures::Game::Beatmap
 
 		struct Stats
 		{
-			unsigned long total_floor = 0;
-			unsigned long total_slider = 0;
-			unsigned long total_combo = 0;
+			struct
+			{
+				int64_t start_time = 0;
+				int64_t start_playing_time = 0;
+				int64_t length = 0;
+			} time;
+			struct
+			{
+				unsigned long floor = 0;
+				unsigned long slider = 0;
+				unsigned long total_combo = 0;
+			} count;
 
 			[[nodiscard]] unsigned long get_total_objects_num() const;
 			void calculate(const Beatmap& beatmap);
@@ -27,7 +36,9 @@ namespace Structures::Game::Beatmap
 			explicit Stats(const Beatmap& completed_beatmap) { calculate(completed_beatmap); }
 		} stats;
 
-		[[nodiscard]] std::pair<std::queue<const HitObjects::Floor::Action>, std::queue<const HitObjects::Slider::Action>> make_action_queue() const;
+		using FloorActionQueue = std::queue<std::shared_ptr<const HitObjects::Floor::Action>>;
+		using SliderActionQueue = std::queue<std::shared_ptr<const HitObjects::Slider::Action>>;
+		[[nodiscard]] std::pair<FloorActionQueue, SliderActionQueue> make_action_queue() const;
 
 		using HitObjectStepFunction = std::function<void()>;
 		void for_all_hit_objects(const HitObjectStepFunction& if_floor, const HitObjectStepFunction& if_slider,

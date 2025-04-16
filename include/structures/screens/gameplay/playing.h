@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿// ♪ https://youtu.be/i0fw1thgnK0 <3
+
+#pragma once
 #include "config.h"
 #include "structures/screens/screen.h"
 #include "structures/action.h"
@@ -18,11 +20,11 @@ namespace Structures::Screens::Gameplay
 		{
 		private:
 			const Game::Beatmap::Beatmap* beatmap;
-			std::queue<const Game::Beatmap::HitObjects::Floor::Action> floor;
-			std::queue<const Game::Beatmap::HitObjects::Slider::Action> slider;
-			Action::Time::Timer timer;
+			Game::Beatmap::Beatmap::FloorActionQueue floor;
+			Game::Beatmap::Beatmap::SliderActionQueue slider;
 
 		public:
+			Action::Time::Timer timer;
 			uint8_t health = 200;
 			struct Keystroke
 			{
@@ -38,6 +40,7 @@ namespace Structures::Screens::Gameplay
 
 					explicit KeyCounter(const SDL_Scancode& target);
 				};
+
 				struct Direction
 				{
 					Types::Game::Direction::Direction current_direction = Types::Game::Direction::Direction::RIGHT;
@@ -80,15 +83,23 @@ namespace Structures::Screens::Gameplay
 				float update_score();
 
 			public:
-				struct Slider
+				struct SliderScore
 				{
-					unsigned long total_ticks = 0;
-					unsigned long completed_ticks = 0;
+					std::unordered_set<float> completed_ticks;
 
+				private:
+					std::weak_ptr<const Game::Beatmap::HitObjects::Slider::Action> slider_action;
 					[[nodiscard]] uint16_t get_bonus_score() const;
-					void reset();
-				} current_slider_score;
-				struct Count
+
+				public:
+					float check_and_add_slider_tick_score(const int64_t& current_time, bool is_hold, Score& score, const float& current_input_latency = 0);
+					float add_final_bonus_score(const int64_t& current_time, Score& score) const;
+
+					SliderScore(const std::shared_ptr<const Game::Beatmap::HitObjects::Slider::Action>& slider_action);
+				};
+				std::unordered_map<std::shared_ptr<const Game::Beatmap::HitObjects::Slider::Action>, SliderScore> current_slider;
+
+				struct ScoreCounter
 				{
 				private:
 					unsigned long count_300 = 0;
@@ -105,8 +116,6 @@ namespace Structures::Screens::Gameplay
 				} count;
 
 				float add_floor_score(const uint16_t& score);
-				float add_slider_tick_score(bool is_tick_completed); //! CẦN DÙNG add_slider_bonus_score() sau khi hoàn thành slider
-				float add_slider_bonus_score();
 
 				[[nodiscard]] float get_score() const { return score; }
 				[[nodiscard]] unsigned long get_current_combo() const { return current_combo; }
@@ -119,7 +128,7 @@ namespace Structures::Screens::Gameplay
 			[[nodiscard]] bool is_paused() const { return timer.is_paused(); }
 			void pause();
 			void resume();
-			void make_time_step(const KeyboardEventList& events);
+			void make_time_step(const KeyboardEventList& events, const float& current_input_latency = 0);
 			explicit Logic(const Game::Beatmap::Beatmap* beatmap, const int64_t& start_time = 0, const float& mod_multiplier = 1.0f);
 		} logic;
 		struct Render : Screen::Render

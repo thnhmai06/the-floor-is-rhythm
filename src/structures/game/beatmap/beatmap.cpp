@@ -45,31 +45,35 @@ namespace Structures::Game::Beatmap
 	}
 
 	// Beatmap::Stats
-	unsigned long Beatmap::Stats::get_total_objects_num() const { return total_floor + total_slider; }
+	unsigned long Beatmap::Stats::get_total_objects_num() const { return count.floor + count.slider; }
 	void Beatmap::Stats::calculate(const Beatmap& beatmap)
 	{
-		auto [floor, slider] = beatmap.make_action_queue();
+		// tính thời gian
+		time.start_playing_time = beatmap.hit_objects.begin()->second.get_time();
+		time.start_time = time.start_playing_time; // tạm thời là vậy đến khi làm xong storyboard
+		time.length = beatmap.hit_objects.rbegin()->second.get_end_time() - time.start_playing_time;
 
+		// đếm số object
+		auto [floor, slider] = beatmap.make_action_queue();
 		while (!floor.empty())
 		{
 			floor.pop();
-			total_floor++;
-			total_combo++;
+			count.floor++;
+			count.total_combo++;
 		}
 		while (!slider.empty())
 		{
 			const auto current = Utilities::Container::get_front_and_pop(slider);
-			total_slider++;
-			total_combo += current.tick_num;
+			count.slider++;
+			count.total_combo += current->tick_num;
 		}
 	}
 
 	// Beatmap
-	std::pair<std::queue<const HitObjects::Floor::Action>, std::queue<const HitObjects::Slider::Action>> Beatmap::
-		make_action_queue() const
+	std::pair<Beatmap::FloorActionQueue, Beatmap::SliderActionQueue> Beatmap::make_action_queue() const
 	{
-		std::queue<const HitObjects::Floor::Action> floor_queue;
-		std::queue<const HitObjects::Slider::Action> slider_queue;
+		FloorActionQueue floor_queue;
+		SliderActionQueue slider_queue;
 
 		auto previous_direction = Types::Game::Direction::Direction::RIGHT;
 		const HitObjects::HitObject* current_hit_object;
@@ -78,14 +82,18 @@ namespace Structures::Game::Beatmap
 
 		auto if_floor = [&]()
 			{
-				floor_queue.emplace(*std::get_if<HitObjects::Floor>(current_hit_object), previous_direction);
+				const HitObjects::Floor::Action current_floor_action{ *std::get_if<HitObjects::Floor>(current_hit_object), previous_direction };
+				floor_queue.emplace(std::make_shared<const HitObjects::Floor::Action>(current_floor_action));
 				previous_direction += current_hit_object->get_rotation();
 			};
 
 		auto if_slider = [&]()
 			{
-				slider_queue.emplace(*std::get_if<HitObjects::Slider>(current_hit_object), current_timing_point_velocity,
-					calculated_difficulty.velocity.speed, current_beat_length);
+				const HitObjects::Slider::Action current_slider_action{
+					*std::get_if<HitObjects::Slider>(current_hit_object), current_timing_point_velocity,
+					calculated_difficulty.velocity.speed, current_beat_length
+				};
+				slider_queue.emplace(std::make_shared<const HitObjects::Slider::Action>(current_slider_action));
 				previous_direction += current_hit_object->get_rotation();
 			};
 

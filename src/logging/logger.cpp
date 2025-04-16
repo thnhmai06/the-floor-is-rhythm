@@ -1,5 +1,5 @@
 ﻿#include "logging/logger.h" // Header
-#include <spdlog/sinks/stdout_colour_sinks.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <vector>
 #include "utilities.hpp"
@@ -9,7 +9,7 @@ void Logging::Logger::init(const std::string& name, const spdlog::level::level_e
 	constexpr std::string_view PATTERN = "[%d/%m/%Y %X] %n (thread %t) %s:%# (%!) %^[%l] %v%$";
 	const std::string log_dir = std::format("{}/{}/", PATH, Utilities::Time::get_current_time());
 
-	const auto console_sink = std::make_shared<spdlog::sinks::stdout_colour_sink_mt>();
+	const auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 	const auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(log_dir + "main.log", true);
 	const auto error_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(log_dir + "error.log", true);
 

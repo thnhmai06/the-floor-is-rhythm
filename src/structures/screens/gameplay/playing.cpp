@@ -11,7 +11,7 @@
 namespace Structures::Screens::Gameplay
 {
 	// ::Logic::Score::count
-	float PlayingScreen::Logic::Score::Count::get_accuracy() const
+	float PlayingScreen::Logic::Score::ScoreCounter::get_accuracy() const
 	{
 		if (count_300 + count_100 + count_50 + count_slider_tick + count_miss == 0) return 100.00f; // tránh chia 0
 
@@ -26,16 +26,16 @@ namespace Structures::Screens::Gameplay
 		return static_cast<float>(total) / static_cast<float>(total_if_perfect);
 	}
 
-	void PlayingScreen::Logic::Score::Count::reset()
+	void PlayingScreen::Logic::Score::ScoreCounter::reset()
 	{
 		count_300 = count_100 = count_50 = count_slider_tick = count_miss = 0;
 	}
 
-	unsigned long PlayingScreen::Logic::Score::Count::get_elapsed_objects_num() const
+	unsigned long PlayingScreen::Logic::Score::ScoreCounter::get_elapsed_objects_num() const
 	{
 		return count_300 + count_100 + count_50 + count_miss;
 	}
-	void PlayingScreen::Logic::Score::Count::add_count(const uint16_t& score, const unsigned long& num)
+	void PlayingScreen::Logic::Score::ScoreCounter::add_count(const uint16_t& score, const unsigned long& num)
 	{
 		switch (score)
 		{
@@ -57,19 +57,73 @@ namespace Structures::Screens::Gameplay
 		}
 	}
 
-	// ::Logic::Score::Slider
-	uint16_t PlayingScreen::Logic::Score::Slider::get_bonus_score() const
+	// ::Logic::Score::SliderScore
+	uint16_t PlayingScreen::Logic::Score::SliderScore::get_bonus_score() const
 	{
-		if (completed_ticks == 0) return 0;
-		if (completed_ticks == total_ticks)
+		const auto slider_action = this->slider_action.lock();
+
+		if (completed_ticks.empty()) return 0;
+		if (completed_ticks.size() == slider_action->tick_num)
 			return 300;
-		if (completed_ticks >= static_cast<unsigned long>(ceil(static_cast<float>(total_ticks) / 2)))
+		if (completed_ticks.size() >= static_cast<unsigned long>(ceil(static_cast<float>(slider_action->tick_num) / 2)))
 			return 100;
 		return 50;
 	}
-	void PlayingScreen::Logic::Score::Slider::reset()
+	float PlayingScreen::Logic::Score::SliderScore::check_and_add_slider_tick_score(
+		const int64_t& current_time, const bool is_hold,
+		Score& score, const float& current_input_latency)
 	{
-		total_ticks = completed_ticks = 0;
+		const auto slider_action = this->slider_action.lock();
+		const float current_slider_time = static_cast<float>(current_time - slider_action->time);
+		const auto end_slider_time = static_cast<float>(slider_action->end_time - slider_action->time);
+
+		float nearest_tick_slider_time;
+		if (current_slider_time < 0)
+			nearest_tick_slider_time = 0;
+		else
+		{
+			nearest_tick_slider_time = std::min(
+				std::round(current_slider_time / slider_action->tick_length) * slider_action->tick_length,
+				end_slider_time
+			);
+
+			while (completed_ticks.contains(nearest_tick_slider_time))
+			{
+				nearest_tick_slider_time += slider_action->tick_length; // vì không thể đi ngược lại, chỉ có thể đi tiến
+				if (nearest_tick_slider_time > end_slider_time)
+				{
+					nearest_tick_slider_time = end_slider_time;
+					break;
+				}
+			}
+		}
+
+		const auto previous_score = score.get_score();
+		if (Utilities::Math::in_range(nearest_tick_slider_time, nearest_tick_slider_time + current_input_latency, current_slider_time))
+		{
+			if (is_hold && !completed_ticks.contains(nearest_tick_slider_time))
+			{
+				completed_ticks.insert(nearest_tick_slider_time);
+				score.count.add_count(10);
+				score.current_combo++;
+			}
+			else score.current_combo = 0;
+		}
+		else return 0;
+
+		const auto current_score = score.update_score();
+		return current_score - previous_score;
+	}
+	float PlayingScreen::Logic::Score::SliderScore::add_final_bonus_score(const int64_t& current_time, Score& score) const
+	{
+		const auto previous_score = score.get_score();
+		score.count.add_count(get_bonus_score());
+		const auto current_score = score.update_score();
+		return current_score - previous_score;
+	}
+	PlayingScreen::Logic::Score::SliderScore::SliderScore(const std::shared_ptr<const Game::Beatmap::HitObjects::Slider::Action>& slider_action)
+		: slider_action(slider_action)
+	{
 	}
 
 	// ::Logic::Score
@@ -83,7 +137,7 @@ namespace Structures::Screens::Gameplay
 		const float accuracy = count.get_accuracy();
 		const float elapsed_objects = static_cast<float>(count.get_elapsed_objects_num());
 
-		const float combo_score = BASE_COMBO * static_cast<float>(max_combo) / static_cast<float>(beatmap_stats->total_combo);
+		const float combo_score = BASE_COMBO * static_cast<float>(max_combo) / static_cast<float>(beatmap_stats->count.total_combo);
 		const float accuracy_score = BASE_ACCURACY * std::powf(accuracy, 10) * elapsed_objects / static_cast<float>(beatmap_stats->get_total_objects_num());
 		const float score_no_multiplier = (combo_score + accuracy_score) * mod_multiplier;
 		return this->score = score_no_multiplier * mod_multiplier;
@@ -96,30 +150,6 @@ namespace Structures::Screens::Gameplay
 		if (score == 0) current_combo = 0;
 		else current_combo++;
 		max_combo = std::max(current_combo, max_combo);
-
-		const auto current_score = update_score();
-		return current_score - previous_score;
-	}
-	float PlayingScreen::Logic::Score::add_slider_tick_score(const bool is_tick_completed)
-	{
-		current_slider_score.total_ticks++;
-		const auto previous_score = get_score();
-		if (is_tick_completed)
-		{
-			current_slider_score.completed_ticks++;
-			count.add_count(10);
-			current_combo++;
-		}
-		else current_combo = 0;
-		const auto current_score = update_score();
-		return current_score - previous_score;
-	}
-	float PlayingScreen::Logic::Score::add_slider_bonus_score()
-	{
-		const auto previous_score = get_score();
-
-		count.add_count(current_slider_score.get_bonus_score());
-		current_slider_score.reset();
 
 		const auto current_score = update_score();
 		return current_score - previous_score;
@@ -150,8 +180,9 @@ namespace Structures::Screens::Gameplay
 		count = recently_pressed_num = 0;
 		is_hold = false;
 	}
-	PlayingScreen::Logic::Keystroke::KeyCounter::KeyCounter(const SDL_Scancode& target): target(target)
-	{}
+	PlayingScreen::Logic::Keystroke::KeyCounter::KeyCounter(const SDL_Scancode& target) : target(target)
+	{
+	}
 
 	// ::Logic::Keystroke::Direction
 	void PlayingScreen::Logic::Keystroke::Direction::update(const KeyboardEventList& events)
@@ -219,40 +250,47 @@ namespace Structures::Screens::Gameplay
 	// ::Logic
 	void PlayingScreen::Logic::pause() { timer.pause(); }
 	void PlayingScreen::Logic::resume() { timer.resume(); }
-	void PlayingScreen::Logic::make_time_step(const KeyboardEventList& events)
+	void PlayingScreen::Logic::make_time_step(const KeyboardEventList& events, const float& current_input_latency)
 	{
 		key_stoke.update(events);
-
 		const auto current_time = timer.get_time();
+
+		//! Tính điểm
 		const auto& od = beatmap->calculated_difficulty.od;
 
 		// Floor
-		while (!floor.empty() && floor.front().time <= current_time)
+		while (!floor.empty() && floor.front()->time <= current_time)
 		{
 			const auto current_floor = Utilities::Container::get_front_and_pop(floor);
 			score.add_floor_score(
-				od.get_score(current_time, current_floor.time, current_floor.direction, key_stoke.direction.current_direction)
+				od.get_score(current_time, current_floor->time, current_floor->direction, key_stoke.direction.current_direction)
 			);
 		}
 
-		//TODO: Slider
-
-		// Slider (on hold)
-		while (!slider.empty() && Utilities::Math::in_range(slider.front().time, slider.front().end_time, current_time))
+		// Slider
+		while (!slider.empty() && Utilities::Math::in_range(slider.front()->time, slider.front()->end_time, current_time))
 		{
-			
+			if (const auto current_slider = Utilities::Container::get_front_and_pop(slider);
+				!score.current_slider.contains(current_slider)) // cho chắc
+				score.current_slider.insert({ current_slider, Score::SliderScore{current_slider} });
 		}
-
-		// Slider (finished)
-		while (!slider.empty() && slider.front().end_time <= current_time)
+		for (auto& [slider_action, slider_score] : score.current_slider)
 		{
-			
+			slider_score.check_and_add_slider_tick_score(current_time, key_stoke.click.is_hold(), score, current_input_latency);
+			if (current_time > slider_action->end_time)
+			{
+				slider_score.add_final_bonus_score(current_time, score);
+				score.current_slider.erase(slider_action);
+			}
 		}
 	}
 
 	PlayingScreen::Logic::Logic(const Game::Beatmap::Beatmap* beatmap, const int64_t& start_time, const float& mod_multiplier)
 		: beatmap(beatmap), timer(start_time), score(*beatmap, mod_multiplier)
 	{
+		constexpr int64_t START_TIME_OFFSET = 3000; // 3s
+		timer.start_time = beatmap->stats.time.start_time - START_TIME_OFFSET;
+
 		auto [floor, slider] = beatmap->make_action_queue();
 		this->floor = std::move(floor);
 		this->slider = std::move(slider);
@@ -296,6 +334,5 @@ namespace Structures::Screens::Gameplay
 			*Work::Render::Layers::playground, *Work::Render::Layers::cursor,
 			*Work::Render::Textures::skin, *this->beatmap)
 	{
-		//TODO: Tìm StartTime đẻ nhét vào logic.timer
 	}
 }

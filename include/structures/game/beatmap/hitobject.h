@@ -17,10 +17,10 @@ namespace Structures::Game::Beatmap::HitObjects
 	{
 		static constexpr int32_t MINIMUM_NUM_CONTENT = 6;
 
-		int64_t time = 0;
+		int64_t time;
 		const Types::Game::HitObject::HitObjectType type = Types::Game::HitObject::HitObjectType::FLOOR;
-		Types::Game::Direction::Rotation rotation = Types::Game::Direction::Rotation::NO_ROTATE;
-		uint8_t combo_colour = 0;
+		Types::Game::Direction::Rotation rotation;
+		uint8_t combo_colour;
 		Hitsound::Hitsound hit_sound;
 		Hitsound::HitSample hit_sample;
 
@@ -45,11 +45,11 @@ namespace Structures::Game::Beatmap::HitObjects
 	{
 		static constexpr int32_t MINIMUM_NUM_CONTENT = 7;
 
-		int64_t time = 0;
-		int64_t end_time = 0;
+		int64_t time;
+		int64_t end_time;
 		const Types::Game::HitObject::HitObjectType type = Types::Game::HitObject::HitObjectType::SLIDER;
-		Types::Game::Direction::Rotation rotation = Types::Game::Direction::Rotation::NO_ROTATE;
-		uint8_t combo_colour = 0;
+		Types::Game::Direction::Rotation rotation;
+		uint8_t combo_colour;
 		Hitsound::Hitsound hit_sound;
 		Hitsound::HitSample hit_sample;
 
@@ -88,7 +88,7 @@ namespace Structures::Game::Beatmap::HitObjects
 	struct HitObjects : std::multimap<int32_t, HitObject>
 	{
 		// [Floor, Slider]
-		[[nodiscard]] std::pair<std::queue<const HitObject*>, std::queue<const HitObject*>> split_to_queue() const;
+		[[nodiscard]] std::pair<std::queue<const Floor*>, std::queue<const Slider*>> split_to_queue() const;
 
 		void read(const std::vector<std::string>& contents);
 		void write(std::ofstream& writer) const;

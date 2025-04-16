@@ -95,7 +95,7 @@ namespace Structures::Game::Beatmap::HitObjects
 	int64_t HitObject::get_time() const { return std::visit([](const auto& hit_object) { return hit_object.time; }, *this); }
 	int64_t HitObject::get_end_time() const
 	{
-		if (std::holds_alternative<Floor>(*this)) 
+		if (std::holds_alternative<Floor>(*this))
 			return this->get_time();
 		return std::get_if<Slider>(this)->end_time;
 	}
@@ -107,6 +107,19 @@ namespace Structures::Game::Beatmap::HitObjects
 	void HitObject::write(std::ofstream& writer) const { std::visit([&writer](const auto& hit_object) { hit_object.write(writer); }, *this); }
 
 	//! HitObjects
+	static std::pair<std::queue<Floor*>, std::queue<Slider*>> split_hit_objects_to_non_const_queue(HitObjects& hit_objects)
+	{
+		std::queue<Floor*> floor;
+		std::queue<Slider*> slider;
+		for (auto& hit_object : hit_objects | std::views::values)
+		{
+			if (std::holds_alternative<Floor>(hit_object))
+				floor.push(std::get_if<Floor>(&hit_object));
+			else if (std::holds_alternative<Slider>(hit_object))
+				slider.push(std::get_if<Slider>(&hit_object));
+		}
+		return { floor, slider };
+	}
 	void HitObjects::read(const std::vector<std::string>& contents)
 	{
 		for (const auto& line : contents)
@@ -146,16 +159,19 @@ namespace Structures::Game::Beatmap::HitObjects
 				break;
 			}
 		}
+
+		//TODO: Kiểm tra nếu Floor/Slider nằm trên/chứa trong Slider khác thì những Floor/Slider đó không được xoay
 	}
-	std::pair<std::queue<const HitObject*>, std::queue<const HitObject*>> HitObjects::split_to_queue() const
+	std::pair<std::queue<const Floor*>, std::queue<const Slider*>> HitObjects::split_to_queue() const
 	{
-		std::queue<const HitObject*> floor, slider;
+		std::queue<const Floor*> floor;
+		std::queue<const Slider*> slider;
 		for (const auto& hit_object : *this | std::views::values)
 		{
-			if (hit_object.get_type() == Types::Game::HitObject::HitObjectType::FLOOR)
-				floor.push(&hit_object);
-			else if (hit_object.get_type() == Types::Game::HitObject::HitObjectType::SLIDER)
-				slider.push(&hit_object);
+			if (std::holds_alternative<Floor>(hit_object))
+				floor.push(std::get_if<Floor>(&hit_object));
+			else if (std::holds_alternative<Slider>(hit_object))
+				slider.push(std::get_if<Slider>(&hit_object));
 		}
 		return { floor, slider };
 	}

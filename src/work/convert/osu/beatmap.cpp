@@ -29,7 +29,7 @@ namespace Work::Convert::osu
 	}
 	static uint8_t get_combo_colour(const uint8_t& previous_colour, const uint8_t& colour_hax)
 	{
-		return static_cast<uint8_t>((static_cast<uint16_t>(previous_colour) + colour_hax) %
+		return static_cast<uint8_t>((static_cast<uint8_t>(previous_colour) + colour_hax) %
 			Structures::Game::Beatmap::HitObjects::NUM_COMBOS);
 	}
 
@@ -100,17 +100,16 @@ namespace Work::Convert::osu
 		floor.hit_sample = object.Hitsample;
 		return floor;
 	}
-	static Slider convert_hit_object_slider(const Parser::HitObject& object, uint8_t& current_combo_colour)
+	static Slider convert_hit_object_slider(const Parser::HitObject& object, const uint8_t& current_combo_colour)
 	{
 		Slider slider;
 		slider.time = object.Time;
 		slider.end_time = slider.time;
 		if (object.EndTime.has_value())
 			slider.end_time = object.EndTime.value();
-		// không cần rotation, vì trước đó đã xét rotation ở floor rồi
+		// không cần thay đổi rotation và combo_colour, vì trước đó đã xét ở floor rồi
 		slider.rotation = Structures::Types::Game::Direction::Rotation::NO_ROTATE;
-		slider.combo_colour = current_combo_colour = get_combo_colour(current_combo_colour,
-			static_cast<uint8_t>(object.Type.ColourHax));
+		slider.combo_colour = current_combo_colour;
 
 		// Bên dưới là thêm slider curve dựa trên số lần lặp.
 		// Nah slides trong osu! nhiều khi nó lặp nhanh quá, nên mình không muốn thêm curve
@@ -152,14 +151,15 @@ namespace Work::Convert::osu
 			else if (osu_object.Type.Spinner)
 			{
 				result.emplace_hint(back_itr, osu_object.Time, convert_hit_object_slider(osu_object, current_combo_colour));
-				current_combo_colour++; total_note_of_current_rotation++;
+				current_combo_colour++;
+				total_note_of_current_rotation += 2; // spinner sẽ là ngoại lệ
 			}
 			else // slider
 			{
 				result.emplace_hint(back_itr, osu_object.Time, convert_hit_object_floor(osu_object, current_combo_colour, total_note_of_current_rotation));
 				result.emplace_hint(back_itr, osu_object.Time, convert_hit_object_slider(osu_object, current_combo_colour));
 				current_combo_colour += 2;
-				total_note_of_current_rotation += 2; // vẫn tính là 2 cho slider (slider sẽ luôn là ngoại lệ)
+				total_note_of_current_rotation += 2; // vẫn tính là 2 cho slider => slider sẽ là ngoại lệ
 			}
 		}
 		return result;
