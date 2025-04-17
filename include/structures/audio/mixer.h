@@ -1,22 +1,26 @@
 ﻿#pragma once
-#include <cstdint>
 #include <SDL3/SDL_audio.h>
 #include "structures/audio/buses.h"
 #include "structures/types.h"
 
-namespace Structures::Audio::Mixer
+namespace Structures::Audio
 {
-	using namespace Structures::Audio::Buses;
-
 	struct Mixer
 	{
-		int32_t volume;
-		SDL_AudioSpec spec;
-		AudioBus<Music> music;
-		AudioBus<Effect> effect;
+	private:
+		float volume;
 
-		int32_t set_master_volume(int32_t value = -1);
-		void quit();
-		Mixer();
+	public:
+		SDL_AudioSpec spec;
+		Bus<Music> music;
+		Bus<Effect> effect;
+
+		[[nodiscard]] float get_volume() const;
+		float set_volume(const float& percent);
+		static void quit();
+
+		Mixer(const SDL_AudioSpec& spec, const float& master_volume, const float& music_volume,
+		      const float& effects_volume, const int32_t& max_channels = 8);
+		~Mixer();
 	};
 }

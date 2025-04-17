@@ -5,57 +5,79 @@
 #include "logging/exceptions.h"
 #include "utilities.hpp"
 
-using namespace Utilities::Audio;
-
-namespace Structures::Audio::Buses
+namespace Structures::Audio
 {
-	// ::AudioBus<Music>
-	int32_t AudioBus<Music>::set_volume(const int32_t value)
+	// Bus<Music>
+	float Bus<Music>::get_volume() const { return volume; }
+	float Bus<Music>::set_volume(const float& percent)
 	{
-		if (value >= 0) volume = value;
-		return get_real_volume(Mix_VolumeMusic(get_volume(value)));
+		if (percent < 0) return set_volume(0);
+		if (percent > 1) return set_volume(1);
+
+		volume = percent;
+		return Utilities::Math::to_percent(
+			Mix_VolumeMusic(
+				Utilities::Math::to_value(percent, 0, MIX_MAX_VOLUME)),
+			0, MIX_MAX_VOLUME);
 	}
-	void AudioBus<Music>::play(const std::string& name) const
+	void Bus<Music>::play(const Memory<Music>::Item& music)
 	{
+		if (!music.parent || music.item != music.parent->items.end()) return;
+
 		if (has_song_playing()) stop();
-
-		const auto it = memory.find(name);
-		if (it == memory.end())
-			THROW_ERROR(Logging::Exceptions::SDLExceptions::Audio::SDL_Audio_PlayMusic_Failed(name));
-
-		if (!Mix_PlayMusic(it->second, -1))
-			THROW_ERROR(Logging::Exceptions::SDLExceptions::Audio::SDL_Audio_PlayMusic_Failed(name));
+		if (!Mix_PlayMusic(music.item->second, -1))
+			THROW_ERROR(Logging::Exceptions::SDLExceptions::Audio::SDL_Audio_PlayMusic_Failed(music.item->first));
 	}
-	bool AudioBus<Music>::has_song_playing() { return (Mix_PlayingMusic() != 0); }
-	bool AudioBus<Music>::is_playing() { return has_song_playing() && (Mix_PausedMusic() == 1); }
-	void AudioBus<Music>::pause() { Mix_PauseMusic(); }
-	void AudioBus<Music>::resume() { Mix_ResumeMusic(); }
-	void AudioBus<Music>::stop() { return Mix_HaltMusic(); }
+	bool Bus<Music>::has_song_playing() { return (Mix_PlayingMusic() != 0); }
+	bool Bus<Music>::is_playing() { return has_song_playing() && (Mix_PausedMusic() == 1); }
+	void Bus<Music>::pause() { Mix_PauseMusic(); }
+	void Bus<Music>::resume() { Mix_ResumeMusic(); }
+	void Bus<Music>::stop() { return Mix_HaltMusic(); }
+	Bus<Music>::Bus(const float& volume) { set_volume(volume); }
 
-	// ::AudioBus<Effects>
-	int32_t AudioBus<Effect>::set_volume(const int32_t value)
+	// Bus<Effects>
+	float Bus<Effect>::get_volume() const { return volume; }
+	float Bus<Effect>::get_volume(const Memory<Effect>::Item& sound)
 	{
-		if (value >= 0) volume = value;
-		return get_real_volume(Mix_Volume(-1, get_volume(value)));
-	}
-	int32_t AudioBus<Effect>::set_effect_volume(const std::string& name, const int32_t value) const
-	{
-		const auto it = memory.find(name);
-		if (it == memory.end()) return -1;
-		Effect audio = it->second;
-		if (value < 0)
-			return get_real_volume(Mix_VolumeChunk(audio, -1));
-		return get_real_volume(Mix_VolumeChunk(audio, get_volume(value)));
-	}
-	int32_t AudioBus<Effect>::play(const std::string& name) const
-	{
-		const auto it = memory.find(name);
-		if (it == memory.end())
-			THROW_ERROR(Logging::Exceptions::SDLExceptions::Audio::SDL_Audio_PlayEffect_Failed(name));
+		if (!sound.parent || sound.item != sound.parent->items.end())
+			return -1;
 
-		const int32_t result = Mix_PlayChannel(-1, it->second, 0);
+		return Utilities::Math::to_percent(
+			Mix_VolumeChunk(sound.item->second, -1),
+			0, MIX_MAX_VOLUME);
+	}
+	float Bus<Effect>::set_volume(const float& percent)
+	{
+		if (percent < 0) return set_volume(0);
+		if (percent > 1) return set_volume(1);
+
+		volume = percent;
+		return Utilities::Math::to_percent(
+			Mix_Volume(-1, Utilities::Math::to_value(percent, 0, MIX_MAX_VOLUME)),
+			0, MIX_MAX_VOLUME);
+	}
+	float Bus<Effect>::set_volume(const Memory<Effect>::Item& sound, const float& percent)
+	{
+		if (!sound.parent || sound.item != sound.parent->items.end())
+			return -1;
+
+		if (percent < 0) return set_volume(sound, 0);
+		if (percent > 1) return set_volume(sound, 1);
+
+		return Utilities::Math::to_percent(
+			Mix_VolumeChunk(sound.item->second, 
+				Utilities::Math::to_value(percent, 0, MIX_MAX_VOLUME)),
+			0, MIX_MAX_VOLUME);
+	}
+	int32_t Bus<Effect>::play(const Memory<Effect>::Item& sound)
+	{
+		if (!sound.parent || sound.item != sound.parent->items.end()) 
+			return -1;
+
+		const int32_t result = Mix_PlayChannel(-1, sound.item->second, 0);
 		if (result < 0)
-			THROW_ERROR(Logging::Exceptions::SDLExceptions::Audio::SDL_Audio_PlayEffect_Failed(name));
+			THROW_ERROR(Logging::Exceptions::SDLExceptions::Audio::SDL_Audio_PlayEffect_Failed(sound.item->first));
 		return result;
 	}
+	Bus<Mix_Chunk*>::Bus(const float& volume) { set_volume(volume); }
 }

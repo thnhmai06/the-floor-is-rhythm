@@ -87,7 +87,13 @@
     <ClCompile Include="src\structures\render\layers\objects\gameplay\hud.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\action.cpp">
+    <ClCompile Include="src\structures\action\time.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\structures\action\event\callback\render.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\structures\action\event\callback.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -188,10 +194,19 @@
     <ClInclude Include="include\work\screens.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\action.h">
+    <ClInclude Include="include\structures\action\event\callback\render.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\structures\render\layers\objects\gameplay\hud.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structures\action\time.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structures\action\event\input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structures\action\event\callback.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

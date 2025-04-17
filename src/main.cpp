@@ -13,12 +13,8 @@ constexpr bool DEBUG_MODE = true;
 int32_t main(int32_t argc, char* argv[])
 {
 	int32_t result = EXIT_SUCCESS;
-	Logging::Logger::init("root", DEBUG_MODE ? spdlog::level::debug : spdlog::level::info);
-	if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO))
-		THROW_CRITICAL(Logging::Exceptions::SDLExceptions::Video::SDL_Video_InitSDL_Failed());
-
-	// Window & Renderer
 	SDL_Window* window = nullptr;
+	Work::Core::Init::system(DEBUG_MODE);
 	Work::Core::Init::window(window);
 
 	// Render
@@ -29,5 +25,5 @@ int32_t main(int32_t argc, char* argv[])
 	result = Work::Render::render(window);
 
 	Work::Core::CleanUp::window(window);
-	return result;
+	Work::Core::CleanUp::system();
 }

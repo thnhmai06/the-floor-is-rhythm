@@ -2,14 +2,15 @@
 
 #pragma once
 #include "config.h"
+#include "structures/action/time.h"
+#include "structures/action/event/input.h"
 #include "structures/screens/screen.h"
-#include "structures/action.h"
 #include "structures/game/beatmap/beatmap.h"
 
 namespace Structures::Screens::Gameplay
 {
 	using Render::Objects::Storage, Render::Textures::TextureMemory, Render::Layers::Layer;
-	using Action::Event::KeyboardEventList;
+	using Action::Event::Input::KeyboardEventList;
 
 	struct PlayingScreen : private Screen
 	{

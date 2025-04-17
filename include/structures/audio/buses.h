@@ -3,43 +3,43 @@
 #include "structures/audio/memory.h"
 #include "structures/types.h"
 
-namespace Structures::Audio::Buses
+namespace Structures::Audio
 {
-	using namespace Structures::Audio::Memory;
-
 	template <AudioPtrType AudioPtr>
-	struct AudioBus
-	{
-		AudioMemory<AudioPtr> memory;
-	};
+	struct Bus;
 
 	template<>
-	struct AudioBus<Music>
+	struct Bus<Music>
 	{
-		AudioMemory<Music> memory;
-		int32_t volume;
+	private:
+		float volume;
 
-		int32_t set_volume(int32_t value = -1);
-		void play(const std::string& name) const;
+	public:
+		[[nodiscard]] float get_volume() const;
+		float set_volume(const float& percent);
+		static void play(const Memory<Music>::Item& music);
 		static bool has_song_playing();
 		static bool is_playing();
 		static void pause();
 		static void resume();
 		static void stop();
 
-		explicit AudioBus(const int32_t value = MIX_MAX_VOLUME) : volume(value) {}
+		explicit Bus(const float& volume);
 	};
 
 	template<>
-	struct AudioBus<Effect>
+	struct Bus<Effect>
 	{
-		AudioMemory<Effect> memory;
-		int32_t volume;
+	private:
+		float volume;
 
-		int32_t set_volume(int32_t value = -1);
-		int32_t set_effect_volume(const std::string& name, int32_t value = -1) const;
-		int32_t play(const std::string& name) const;
+	public:
+		[[nodiscard]] float get_volume() const;
+		[[nodiscard]] static float get_volume(const Memory<Effect>::Item& sound);
+		float set_volume(const float& percent);
+		static float set_volume(const Memory<Effect>::Item& sound, const float& percent);
+		static int32_t play(const Memory<Effect>::Item& sound);
 
-		explicit AudioBus(const int32_t value = MIX_MAX_VOLUME) : volume(value) {}
+		explicit Bus(const float& volume);
 	};
 }

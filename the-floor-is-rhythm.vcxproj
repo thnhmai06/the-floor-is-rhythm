@@ -60,28 +60,32 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="dependencies\dependencies.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="dependencies\dependencies.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="dependencies\dependencies.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="dependencies\dependencies.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)build\bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)build\objects\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>.\dependencies\SDL_mixer-build\include;.\dependencies\osu-parser\include;.\include;$(IncludePath)</IncludePath>
+    <IncludePath>.\include;$(IncludePath)</IncludePath>
     <LibraryPath>.\dependencies\SDL_mixer-build\lib;.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib\manual-link;.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib;$(LibraryPath)</LibraryPath>
     <SourcePath>;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)build\bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)build\objects\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>.\dependencies\SDL_mixer-build\include;.\dependencies\osu-parser\include;.\include;$(IncludePath)</IncludePath>
+    <IncludePath>.\include;$(IncludePath)</IncludePath>
     <LibraryPath>.\dependencies\SDL_mixer-build\lib;.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib\manual-link;.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib;$(LibraryPath)</LibraryPath>
     <SourcePath>;$(SourcePath)</SourcePath>
   </PropertyGroup>
@@ -170,10 +174,13 @@
     <ClInclude Include="include\logging\info.h" />
     <ClInclude Include="include\logging\logger.h" />
     <ClInclude Include="include\main.h" />
+    <ClInclude Include="include\structures\action\event\callback.h" />
+    <ClInclude Include="include\structures\action\event\input.h" />
+    <ClInclude Include="include\structures\action\time.h" />
     <ClInclude Include="include\work\convert\osu\beatmap.h" />
     <ClInclude Include="include\structures\game\beatmap\beatmap.h" />
     <ClInclude Include="include\work\skin.h" />
-    <ClInclude Include="include\structures\action.h" />
+    <ClInclude Include="include\structures\action\event\callback\render.h" />
     <ClInclude Include="include\structures\audio\buses.h" />
     <ClInclude Include="include\structures\audio\memory.h" />
     <ClInclude Include="include\structures\audio\mixer.h" />
@@ -197,7 +204,9 @@
     <ClInclude Include="include\work\render\layers.h" />
     <ClInclude Include="include\work\screens.h" />
     <ClInclude Include="include\work\render\textures.h" />
-    <ClCompile Include="src\structures\action.cpp" />
+    <ClCompile Include="dependencies\easing\src\easing.cpp">
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="src\format\skin.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
@@ -206,6 +215,15 @@
     </ClCompile>
     <ClCompile Include="src\main.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\structures\action\event\callback.cpp">
+        <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\structures\action\event\callback\render.cpp">
+        <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\structures\action\time.cpp">
+        <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\work\convert\osu\beatmap.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>

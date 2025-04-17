@@ -51,16 +51,13 @@ namespace Structures::Render::Objects::Gameplay::Cursor
 		// body
 		ObjectUnique c_body = std::make_unique<Body>(memory);
 		data.emplace_back(std::move(c_body));
-		body = dynamic_cast<Body*>(std::get_if<ObjectUnique>(&data.back())->get());
 
 		// trail
 		auto c_trail = std::make_unique<Trail>(memory);
 		data.emplace_back(std::move(c_trail));
-		trail = dynamic_cast<Trail*>(std::get_if<PolyObjectUnique>(&data.back())->get());
 
 		// direction
 		auto c_direction = std::make_unique<Direction>(memory, current_direction);
 		data.emplace_back(std::move(c_direction));
-		direction = dynamic_cast<Direction*>(std::get_if<ObjectUnique>(&data.back())->get());
 	}
 }

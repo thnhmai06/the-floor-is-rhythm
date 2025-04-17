@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <PropertyGroup Label="Dependencies">
+        <SDL_MIXER>$(ProjectDir)\dependencies\SDL_mixer-build\include</SDL_MIXER>
+        <OSU_PARSER>$(ProjectDir)\dependencies\osu-parser\include</OSU_PARSER>
+        <EASING>$(ProjectDir)\dependencies\easing\src</EASING>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <IncludePath>$(IncludePath);$(SDL_MIXER);$(OSU_PARSER);$(EASING)</IncludePath>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <AdditionalIncludeDirectories Include="$(SDL_MIXER);$(OSU_PARSER);$(EASING)" />
+    </ItemGroup>
+
+</Project>

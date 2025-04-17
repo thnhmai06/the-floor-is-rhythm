@@ -28,7 +28,7 @@ namespace Structures::Render::Layers
 		}
 		: SDL_FPoint{ ::Config::GameConfig::Video::Camera::DEFAULT_SIZE_WIDTH, ::Config::GameConfig::Video::Camera::DEFAULT_SIZE_HEIGHT };
 	}
-	SDL_FPoint Layer::Camera::get_object_offset() const
+	SDL_FPoint Layer::Camera::get_camera_object_offset() const
 	{
 		return -origin_point.convert_pos_to_origin(render_pos, { 0, 0 });
 	}
@@ -63,7 +63,7 @@ namespace Structures::Render::Layers
 	{
 		if (!visible || render_buffer.empty()) return;
 		for (const auto& collection_ptr : render_buffer)
-			collection_ptr->render(camera.get_object_offset());
+			collection_ptr->render(camera.get_camera_object_offset());
 	}
 	Layer::Layer(const SDL_FPoint& origin_pos_in_percent)
 		: render_buffer(this),

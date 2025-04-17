@@ -1,4 +1,5 @@
 #include "work/core.h" // Header
+#include <SDL3/SDL_init.h>
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_video.h>
 #include "config.h"
@@ -10,6 +11,12 @@ namespace Work::Core
 {
 	namespace Init
 	{
+		void system(const bool debug)
+		{
+			Logging::Logger::init("root", debug ? spdlog::level::debug : spdlog::level::info);
+			if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS))
+				THROW_CRITICAL(Logging::Exceptions::SDLExceptions::Video::SDL_Video_InitSDL_Failed());
+		}
 		void window(SDL_Window*& window)
 		{
 			window = SDL_CreateWindow(
@@ -39,6 +46,7 @@ namespace Work::Core
 
 	namespace CleanUp
 	{
+		void system() { SDL_Quit(); }
 		void window(SDL_Window* window) { SDL_DestroyWindow(window); }
 		void renderer(SDL_Renderer* renderer) { SDL_DestroyRenderer(renderer); }
 	}

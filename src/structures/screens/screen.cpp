@@ -2,7 +2,6 @@
 
 namespace Structures::Screens
 {
-	//! Screen
 	// ::Item
 	void Screen::Render::Item::remove()
 	{
@@ -16,7 +15,7 @@ namespace Structures::Screens
 			storage_item = storage->end();
 		}
 	}
-	Screen::Render::Item::Item(Storage* storage, Layer::RenderBuffer* render_buffer) :
+	Screen::Render::Item::Item(Structures::Render::Objects::Storage* storage, Structures::Render::Layers::Layer::RenderBuffer* render_buffer) :
 		storage(storage), storage_item(storage->end()), render_item(render_buffer)
 	{
 	}

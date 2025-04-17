@@ -27,6 +27,7 @@ namespace Structures::Render::Layers
 			using BASE = std::list<Objects::Collection*>;
 
 		public:
+			const Layer* parent;
 			struct Item
 			{
 				RenderBuffer* render_buffer;
@@ -37,8 +38,6 @@ namespace Structures::Render::Layers
 				explicit Item(RenderBuffer* render_buffer);
 				Item(RenderBuffer* render_buffer, iterator item);
 			};
-
-			const Layer* parent;
 
 			Item add_collection(const Objects::Collection* collection);
 			static void remove_collection(Item& item);
@@ -54,8 +53,7 @@ namespace Structures::Render::Layers
 			using BASE = Objects::Object::Config;
 
 		public:
-			SDL_FPoint get_object_offset() const;
-
+			SDL_FPoint get_camera_object_offset() const;
 			[[nodiscard]] uint8_t get_alpha() const;
 			[[nodiscard]] SDL_FPoint get_camera_pos() const;
 			[[nodiscard]] SDL_FPoint get_camera_size(bool after_scale = true) const;

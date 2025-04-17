@@ -85,5 +85,5 @@ namespace Structures::Render::Objects
 	};
 
 	using ObjectUnique = std::unique_ptr<Object>;
-	using PolyObjectUnique = std::unique_ptr<PolyObject>;;
+	using PolyObjectUnique = std::unique_ptr<PolyObject>;
 }

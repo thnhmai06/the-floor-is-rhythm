@@ -54,10 +54,10 @@ namespace Config::GameConfig
 	}
 	namespace Audio
 	{
-		constexpr int32_t MAX_CHANNELS = 8;
+		constexpr uint8_t MAX_CHANNELS = 8;
 		constexpr int32_t SAMPLE_FREQUENCY = 48000;
 		constexpr SDL_AudioFormat AUDIO_FORMAT = SDL_AUDIO_F32LE;
-		constexpr int32_t MONO = 1, STEREO = 2;
+		constexpr int32_t CHANNELS_MONO = 1, CHANNELS_STEREO = 2;
 		constexpr int32_t BUFFER_SIZE = 256;
 	}
 	namespace Video

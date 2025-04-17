@@ -4,7 +4,6 @@
 #include <cmath>
 #include <iomanip>
 #include <queue>
-#include <SDL3_mixer/SDL_mixer.h>
 #include "structures/types.h"
 
 namespace Utilities
@@ -12,8 +11,8 @@ namespace Utilities
 	namespace Math
 	{
 		inline bool is_bit_enabled(const std::int32_t& value, const std::int32_t& bitmask) { return (value & bitmask) != 0; }
-		inline bool is_equal_float(const float& variable, const float& value, const float& epsilon = 0.001f) { return abs(variable - value) <= epsilon; }
-		inline bool is_integer(const float& value, const float& epsilon = 0.001f) { return is_equal_float(std::floor(value), value, epsilon); }
+		inline bool is_equal(const float& variable, const float& value, const float& epsilon = 0.001f) { return abs(variable - value) <= epsilon; }
+		inline bool is_integer(const float& value, const float& epsilon = 0.001f) { return is_equal(std::floor(value), value, epsilon); }
 		inline float centre(const float& size, const float& window_size) { return (window_size - size) / 2; }
 		inline float get_rotation_angle(const Structures::Types::Game::Direction::Direction& rotation, const bool clockwise = true)
 		{
@@ -30,6 +29,19 @@ namespace Utilities
 			}
 			return 0.0f;
 		}
+		template <typename NumberType>
+		float to_percent(const NumberType& value, const NumberType& from, const NumberType& to)
+		{
+			if (from == to) return 0.0f;
+			return (from < to) ? (value - from) / (to - from) : (to - value) / (to - from);
+		}
+		template <typename NumberType>
+		NumberType to_value(const float& percent, const NumberType& from, const NumberType& to)
+		{
+			if (from == to) return from;
+			return from + (to - from) * ((from < to) ? percent : (1.0f - percent));
+		}
+
 		template <typename ComparableType>
 		bool in_range(const ComparableType& min, const ComparableType& max,
 			const ComparableType& value, const bool include_equal_left = true, const bool include_equal_right = true)
@@ -61,18 +73,6 @@ namespace Utilities
 			inline SDL_FPoint operator-(const SDL_FPoint& a) { return SDL_FPoint{ -a.x, -a.y }; }
 			inline SDL_FPoint operator*(const SDL_FPoint& a, const SDL_FPoint& b) { return SDL_FPoint{ a.x * b.x, a.y * b.y }; }
 			inline SDL_FPoint operator*(const SDL_FPoint& point, const float& value) { return SDL_FPoint{ point.x * value, point.y * value }; }
-		}
-	}
-	namespace Audio
-	{
-		inline int32_t get_volume(const int32_t v)
-		{
-			if (v < 0) return -1;
-			return (MIX_MAX_VOLUME * v) / 100;
-		}
-		inline int32_t get_real_volume(const int32_t v)
-		{
-			return (v * 100) / MIX_MAX_VOLUME;
 		}
 	}
 	namespace Time
