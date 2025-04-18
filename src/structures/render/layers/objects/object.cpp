@@ -62,23 +62,31 @@ namespace Structures::Render::Objects
 	void Object::Config::set_origin_point(const SDL_FPoint& pos, const bool based_on_render_size)
 	{
 		if (based_on_render_size)
-			origin_point = { pos.x / scale.x, pos.y / scale.y };
+			origin_point = {
+				!Utilities::Math::is_equal(scale.x, 0) ? pos.x / scale.x : 0,
+				!Utilities::Math::is_equal(scale.y, 0) ? pos.y / scale.y : 0
+		};
 		else
 			origin_point = { pos.x, pos.y };
 	}
-	void Object::Config::set_scale(const SDL_FPoint& value) { scale = value; }
-	void Object::Config::set_scale(const float& value)
+	void Object::Config::set_scale(const SDL_FPoint& value)
 	{
-		set_scale({ value, value });
+		const auto old_render_origin = get_origin_point(true);
+		scale = value;
+		const auto new_render_origin = get_origin_point(true);
+
+		render_pos.x += old_render_origin.x - new_render_origin.x;
+		render_pos.y += old_render_origin.y - new_render_origin.y;
 	}
-	void Object::Config::set_scale_fixed(const SDL_FPoint& size, const SDL_FPoint& src_size)
+	void Object::Config::set_scale(const float& value) { set_scale({ value, value }); }
+	void Object::Config::set_fixed_render_size(const SDL_FPoint& size, const SDL_FPoint& src_size)
 	{
 		if (src_size.x > 0) scale.x = size.x / src_size.x;
 		if (src_size.y > 0) scale.y = size.y / src_size.y;
 	}
-	void Object::Config::set_scale_fixed(const float& value, const SDL_FPoint& src_size)
+	void Object::Config::set_fixed_render_size(const float& value, const SDL_FPoint& src_size)
 	{
-		set_scale_fixed({ value, value }, src_size);
+		set_fixed_render_size({ value, value }, src_size);
 	}
 	SDL_FRect Object::Config::get_sdl_dst_rect(const SDL_FPoint& src_size) const
 	{
@@ -89,8 +97,8 @@ namespace Structures::Render::Objects
 		return Utilities::Render::merge_pos_size(sdl_render_pos, render_size);
 	}
 	Object::Config::Config() = default;
-	Object::Config::Config(const SDL_FPoint& render_pos, const OriginPoint& origin) :
-		origin_point(origin), render_pos(render_pos)
+	Object::Config::Config(const SDL_FPoint& render_pos, const OriginPoint& origin_pos) :
+		origin_point(origin_pos), render_pos(render_pos)
 	{
 	}
 
@@ -106,7 +114,7 @@ namespace Structures::Render::Objects
 	}
 	void Object::set_render_size(const SDL_FPoint& size)
 	{
-		config.set_scale_fixed(size, Utilities::Render::get_size_from_rect(get_sdl_src_rect()));
+		config.set_fixed_render_size(size, Utilities::Render::get_size_from_rect(get_sdl_src_rect()));
 	}
 	void Object::set_render_size(const float& value)
 	{
@@ -141,9 +149,13 @@ namespace Structures::Render::Objects
 		const auto src_rect = get_sdl_src_rect();
 		auto dst_rect = get_sdl_dst_rect();
 		dst_rect.x += offset.x; dst_rect.y += offset.y;
+		const SDL_FPoint render_origin_point = config.get_origin_point(true);
 		SDL_SetTextureAlphaMod(sdl_texture, config.alpha);
-		if (!SDL_RenderTexture(src.memory->renderer, sdl_texture, &src_rect, &dst_rect))
+
+		if (!SDL_RenderTextureRotated(src.memory->renderer, sdl_texture, &src_rect, 
+			&dst_rect, config.angle, &render_origin_point, config.flip_mode))
 			THROW_ERROR(Logging::Exceptions::SDLExceptions::Texture::SDL_Texture_Render_Failed(src.get_name()));
+
 	}
 	Object::Object(
 		TextureMemory::Item texture,
@@ -158,9 +170,8 @@ namespace Structures::Render::Objects
 		TextureMemory::Item texture,
 		const Config::OriginPoint& custom_origin,
 		const SDL_FPoint& render_pos) :
-		src(std::move(texture)), config(custom_origin)
+		src(std::move(texture)), config(render_pos, custom_origin)
 	{
-		config.render_pos = render_pos;
 	}
 
 	//! PolyObject

@@ -1,10 +1,11 @@
 ﻿#pragma once
 #include <chrono>
-#include <cstdint>
 #include <cmath>
 #include <iomanip>
+#include <numbers>
 #include <queue>
 #include "structures/types.h"
+#define USE_MATH_DEFINES
 
 namespace Utilities
 {
@@ -14,7 +15,7 @@ namespace Utilities
 		inline bool is_equal(const float& variable, const float& value, const float& epsilon = 0.001f) { return abs(variable - value) <= epsilon; }
 		inline bool is_integer(const float& value, const float& epsilon = 0.001f) { return is_equal(std::floor(value), value, epsilon); }
 		inline float centre(const float& size, const float& window_size) { return (window_size - size) / 2; }
-		inline float get_rotation_angle(const Structures::Types::Game::Direction::Direction& rotation, const bool clockwise = true)
+		inline float get_rotation_degree(const Structures::Types::Game::Direction::Direction& rotation, const bool clockwise = true)
 		{
 			switch (rotation)
 			{
@@ -29,13 +30,30 @@ namespace Utilities
 			}
 			return 0.0f;
 		}
+		inline float degree_to_radian(const float& degree) { return degree * std::numbers::pi_v<float> / 180.0f; }
+		inline float radian_to_degree(const float& radian) { return radian * 180.0f / std::numbers::pi_v<float>; }
+
+		namespace FPoint
+		{
+			inline SDL_FPoint operator+(const SDL_FPoint& a, const SDL_FPoint& b) { return SDL_FPoint{ a.x + b.x, a.y + b.y }; }
+			inline SDL_FPoint operator-(const SDL_FPoint& a, const SDL_FPoint& b) { return SDL_FPoint{ a.x - b.x, a.y - b.y }; }
+			inline SDL_FPoint& operator+=(SDL_FPoint& a, const SDL_FPoint& b) { a.x += b.x; a.y += b.y; return a; }
+			inline SDL_FPoint& operator-=(SDL_FPoint& a, const SDL_FPoint& b) { a.x -= b.x; a.y -= b.y; return a; }
+			inline SDL_FPoint operator-(const SDL_FPoint& a) { return SDL_FPoint{ -a.x, -a.y }; }
+			inline SDL_FPoint operator*(const SDL_FPoint& a, const SDL_FPoint& b) { return SDL_FPoint{ a.x * b.x, a.y * b.y }; }
+			inline SDL_FPoint operator*(const SDL_FPoint& point, const float& value) { return SDL_FPoint{ point.x * value, point.y * value }; }
+			inline bool operator==(const SDL_FPoint& a, const SDL_FPoint& b) { return  is_equal(a.x, b.x) && is_equal(a.y, b.y); }
+		}
+
 		template <typename NumberType>
+		//! HÀM NÀY KHÔNG PHÙ HỢP CHO CẶP 2 SỐ
 		float to_percent(const NumberType& value, const NumberType& from, const NumberType& to)
 		{
 			if (from == to) return 0.0f;
 			return (from < to) ? (value - from) / (to - from) : (to - value) / (to - from);
 		}
 		template <typename NumberType>
+		//! HÀM NÀY KHÔNG PHÙ HỢP CHO CẶP 2 SỐ
 		NumberType to_value(const float& percent, const NumberType& from, const NumberType& to)
 		{
 			if (from == to) return from;
@@ -62,17 +80,6 @@ namespace Utilities
 		{
 			return in_range(a.first, a.second, b.first) || in_range(a.first, a.second, b.second)
 				|| in_range(b.first, b.second, a.first) || in_range(b.first, b.second, a.second);
-		}
-
-		namespace FPoint
-		{
-			inline SDL_FPoint operator+(const SDL_FPoint& a, const SDL_FPoint& b) { return SDL_FPoint{ a.x + b.x, a.y + b.y }; }
-			inline SDL_FPoint operator-(const SDL_FPoint& a, const SDL_FPoint& b) { return SDL_FPoint{ a.x - b.x, a.y - b.y }; }
-			inline SDL_FPoint& operator+=(SDL_FPoint& a, const SDL_FPoint& b) { a.x += b.x; a.y += b.y; return a; }
-			inline SDL_FPoint& operator-=(SDL_FPoint& a, const SDL_FPoint& b) { a.x -= b.x; a.y -= b.y; return a; }
-			inline SDL_FPoint operator-(const SDL_FPoint& a) { return SDL_FPoint{ -a.x, -a.y }; }
-			inline SDL_FPoint operator*(const SDL_FPoint& a, const SDL_FPoint& b) { return SDL_FPoint{ a.x * b.x, a.y * b.y }; }
-			inline SDL_FPoint operator*(const SDL_FPoint& point, const float& value) { return SDL_FPoint{ point.x * value, point.y * value }; }
 		}
 	}
 	namespace Time

@@ -6,6 +6,7 @@
 namespace Structures::Render::Objects
 {
 	using namespace Structures::Render::Textures;
+	constexpr uint8_t SDL_MAX_ALPHA = 255;
 
 	struct Object
 	{
@@ -22,24 +23,25 @@ namespace Structures::Render::Objects
 				[[nodiscard]] SDL_FRect convert_rect_to_origin(const SDL_FRect& rect, const OriginPoint& to_origin = { 0, 0 }) const;
 			};
 		protected:
-			OriginPoint origin_point = { 0, 0 }; //! QUY ƯỚC THEO SRC
-			// SỬ DỤNG get/update_origin_point() thay vì truy cập trực tiếp!!!
+			OriginPoint origin_point = { 0, 0 }; //! QUY ƯỚC THEO SRC, SỬ DỤNG get/set_origin_point() thay vì lấy trực tiếp!!
+			SDL_FPoint scale = { 1.0f, 1.0f }; // an toàn cho set scale = 0
 
 		public:
-			SDL_FPoint render_pos = { 0, 0 }; // chính là dst_rect với size nguyên gốc (muốn đổi size hãy ra ngoài Object tìm set_render_size())
-			SDL_FPoint scale = { 1.0f, 1.0f };
-			uint8_t alpha = 255;
+			SDL_FPoint render_pos; // chính là dst_rect với size nguyên gốc (muốn đổi size hãy ra ngoài Object tìm set_render_size())
+			float angle = 0.0f; // theo chiều kim đồng hồ, tính bằng độ (degree), chỉ xoay hình được render ra chứ không thay đổi vị trí gốc (hitbox vẫn giữ nguyên)
+			SDL_FlipMode flip_mode = SDL_FLIP_NONE; // chỉ ảnh hưởng hình được render ra (cũng tương tự như angle)
+			uint8_t alpha = SDL_MAX_ALPHA;
 
 			[[nodiscard]] OriginPoint get_origin_point(bool based_on_render_size = false) const;
 			void set_origin_point(const SDL_FPoint& pos, bool based_on_render_size = false);
-			void set_scale(const SDL_FPoint& value); // như phép gán scale
+			void set_scale(const SDL_FPoint& value);
 			void set_scale(const float& value);
-			void set_scale_fixed(const SDL_FPoint& size, const SDL_FPoint& src_size); // cần src_size để chia ra tỉ lệ
-			void set_scale_fixed(const float& value, const SDL_FPoint& src_size); // cần src_size để chia ra tỉ lệ
+			void set_fixed_render_size(const SDL_FPoint& size, const SDL_FPoint& src_size); // cần src_size để chia ra tỉ lệ
+			void set_fixed_render_size(const float& value, const SDL_FPoint& src_size); // cần src_size để chia ra tỉ lệ
 			[[nodiscard]] SDL_FRect get_sdl_dst_rect(const SDL_FPoint& src_size) const; // dst_rect trong params render của sdl
 
 			Config();
-			explicit Config(const SDL_FPoint& render_pos, const OriginPoint& origin = { 0.0f, 0.0f });
+			explicit Config(const SDL_FPoint& render_pos, const OriginPoint& origin_pos);
 		};
 
 		TextureMemory::Item src;
