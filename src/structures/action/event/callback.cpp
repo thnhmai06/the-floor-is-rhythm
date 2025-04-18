@@ -1,5 +1,4 @@
 #include "structures/action/event/callback.h" // Header
-
 #include "utilities.hpp"
 
 namespace Structures::Action::Event

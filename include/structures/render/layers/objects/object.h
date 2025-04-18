@@ -29,8 +29,9 @@ namespace Structures::Render::Objects
 		public:
 			SDL_FPoint render_pos; // chính là dst_rect với size nguyên gốc (muốn đổi size hãy ra ngoài Object tìm set_render_size())
 			float angle = 0.0f; // theo chiều kim đồng hồ, tính bằng độ (degree), chỉ xoay hình được render ra chứ không thay đổi vị trí gốc (hitbox vẫn giữ nguyên)
+			SDL_Color color = { 255, 255, 255, SDL_MAX_ALPHA }; // chỉ ảnh hưởng hình được render ra (cũng tương tự như angle)
 			SDL_FlipMode flip_mode = SDL_FLIP_NONE; // chỉ ảnh hưởng hình được render ra (cũng tương tự như angle)
-			uint8_t alpha = SDL_MAX_ALPHA;
+			SDL_BlendMode blend_mode = SDL_BLENDMODE_BLEND; // chỉ ảnh hưởng hình được render ra (cũng tương tự như angle)
 
 			[[nodiscard]] OriginPoint get_origin_point(bool based_on_render_size = false) const;
 			void set_origin_point(const SDL_FPoint& pos, bool based_on_render_size = false);

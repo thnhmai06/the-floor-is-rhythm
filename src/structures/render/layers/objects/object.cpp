@@ -145,12 +145,15 @@ namespace Structures::Render::Objects
 	{
 		if (!visible) return;
 
-		const auto sdl_texture = src.item->second;
+		const auto& sdl_texture = src.item->second;
 		const auto src_rect = get_sdl_src_rect();
 		auto dst_rect = get_sdl_dst_rect();
 		dst_rect.x += offset.x; dst_rect.y += offset.y;
 		const SDL_FPoint render_origin_point = config.get_origin_point(true);
-		SDL_SetTextureAlphaMod(sdl_texture, config.alpha);
+		// https://stackoverflow.com/questions/24969783/is-it-safe-acceptable-to-call-sdl-settexturecolormod-every-frame-multiple-times
+		SDL_SetTextureBlendMode(sdl_texture, config.blend_mode);
+		SDL_SetTextureAlphaMod(sdl_texture, config.color.a);
+		SDL_SetTextureColorMod(sdl_texture, config.color.r, config.color.g, config.color.b); 
 
 		if (!SDL_RenderTextureRotated(src.memory->renderer, sdl_texture, &src_rect, 
 			&dst_rect, config.angle, &render_origin_point, config.flip_mode))

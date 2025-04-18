@@ -8,8 +8,8 @@ namespace Structures::Render::Layers
 {
 	//! Layer
 	// ::Camera
-	uint8_t Layer::Camera::Camera::get_alpha() const { return alpha; }
-	void Layer::Camera::Camera::set_alpha(const uint8_t& value) { alpha = value; }
+	uint8_t Layer::Camera::Camera::get_alpha() const { return color.a; }
+	void Layer::Camera::Camera::set_alpha(const uint8_t& value) { color.a = value; }
 	void Layer::Camera::Camera::move_x(const float& dx) { render_pos.x += dx; }
 	void Layer::Camera::Camera::move_y(const float& dy) { render_pos.y += dy; }
 	Layer::Camera::Camera(const OriginPoint& origin)

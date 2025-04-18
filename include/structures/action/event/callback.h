@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <list>
 #include <memory>
 
@@ -18,6 +18,7 @@ namespace Structures::Action::Event
 
 	struct CallbackBuffer
 	{
+		// đây là CallbackBuffer, không phải kho chứa Callback!
 	protected:
 		using BASE = std::list<CallbackUnique>;
 
