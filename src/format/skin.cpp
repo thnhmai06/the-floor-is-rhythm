@@ -64,7 +64,7 @@ namespace Format::Skin
 	//! Namespace
 	ImageNamespace::ImageNamespace()
 	{
-		// Của Cursor
+		//! Cursor
 		insert(Cursor::body);
 		insert(Cursor::trail);
 		for (const auto& val : Cursor::direction_skin | std::views::values)
@@ -72,18 +72,22 @@ namespace Format::Skin
 			insert(val);
 		}
 
-		// Của HealthBar
+		//! HealthBar
 		insert(HealthBar::background);
 		insert(HealthBar::colour);
 
-		// Của HitObjects
+		//! HitObjects
 		for (const auto& direction_skin : HitObject::hit_objects_skin)
 			for (const auto& skin : direction_skin)
 				insert(skin);
+
+		//! Score
+		for (const auto& score_skin_filename : Score::alphabet | std::views::values)
+			insert(score_skin_filename);
 	}
 	FolderNamespace::FolderNamespace()
 	{
-		// Của Cursor
+		//! Cursor
 		for (const auto& val : Cursor::direction_skin | std::views::values)
 		{
 			if (const auto first_slash = val.find('/');
@@ -91,7 +95,7 @@ namespace Format::Skin
 				insert(val.substr(0, first_slash));
 		}
 
-		// Của HitObjects
+		//! HitObjects
 		for (const auto& val : image_namespace)
 		{
 			if (const auto first_slash = val.find('/');

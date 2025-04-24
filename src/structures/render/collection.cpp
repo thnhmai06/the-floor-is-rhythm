@@ -5,12 +5,18 @@ namespace Structures::Render::Objects
 {
 	void Collection::render_in_range(const size_t& from, const size_t& to, const SDL_FPoint& total_offset) const
 	{
-		for (auto i = from; i < to; ++i)
-			std::visit([&](auto& object)
-				{
-					if (!object) return;
-					object->render(total_offset);
-				}, this->data[i]);
+		for (auto i = from; i <= to; ++i)
+		{
+			if (const auto& object = data[i]; 
+				std::holds_alternative<ObjectShared>(object))
+			{
+				std::get<ObjectShared>(object)->render(total_offset);
+			}
+			else if (std::holds_alternative<PolyObjectShared>(object))
+			{
+				std::get<PolyObjectShared>(object)->render(total_offset);
+			}
+		}
 	}
 	void Collection::render(const SDL_FPoint& camera_offset) const
 	{
@@ -23,4 +29,4 @@ namespace Structures::Render::Objects
 		else for (const auto& [from, to] : render_range)
 			render_in_range(from, to, total_offset);
 	}
-	}
+}

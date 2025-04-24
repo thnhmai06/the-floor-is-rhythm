@@ -18,6 +18,12 @@ namespace Structures::Render::Objects
 		set_render_size(render_size);
 	}
 
+	void PercentObject::render(const SDL_FPoint& offset)
+	{
+		update();
+		Object::render(offset);
+	}
+
 	PercentObject::PercentObject(
 		const TextureMemory::Item& texture,
 		const SDL_FPoint& render_size_when_full,

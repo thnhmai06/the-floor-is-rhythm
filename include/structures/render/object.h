@@ -11,7 +11,7 @@ namespace Structures::Render::Objects
 	struct Object
 	{
 		// Không còn cho tự render toàn màn hình nữa (dstrect = nullptr);
-		// nếu muốn thì set config.render_pos về {0, 0}, set config.origin_point về góc trái, rồi chỉnh set_render_size là logical character_render_size của màn hình
+		// nếu muốn thì set config.render_pos về {0, 0}, set config.origin_point_in_percent về góc trái, rồi chỉnh set_render_size là logical character_render_size của màn hình
 		struct Config
 		{
 			struct OriginPoint : SDL_FPoint

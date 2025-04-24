@@ -43,10 +43,9 @@ namespace Structures::Render::Objects
 			const Alphabet* alphabet,
 			const SDL_FPoint& render_pos,
 			const SDL_FPoint& character_render_size,
-			const Types::Render::OriginType& origin_type = Types::Render::OriginType::CENTRE,
-			const bool relative_origin = true)
+			const Types::Render::OriginType& origin_type = Types::Render::OriginType::CENTRE)
 			: HorizontalString(&raw_string, skin, alphabet, render_pos,
-				character_render_size, origin_type, relative_origin),
+				character_render_size, origin_type),
 			number(number)
 		{
 		}
@@ -56,10 +55,9 @@ namespace Structures::Render::Objects
 			const Alphabet* alphabet,
 			const SDL_FPoint& render_pos,
 			const SDL_FPoint& character_render_size,
-			const Object::Config::OriginPoint& custom_origin,
-			const bool relative_origin = true)
+			const Object::Config::OriginPoint& custom_origin)
 			: HorizontalString(&raw_string, skin, alphabet, render_pos,
-				character_render_size, custom_origin, relative_origin),
+				character_render_size, custom_origin),
 			number(number)
 		{
 		}

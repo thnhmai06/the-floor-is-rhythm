@@ -10,9 +10,9 @@ namespace Structures::Screens::Gameplay::Playing::HealthBar
 	namespace Components
 	{
 		inline SDL_FPoint render_size = {
-		Config::GameConfig::Video::LOGICAL_WIDTH * 0.5f,
-		Config::GameConfig::Video::LOGICAL_HEIGHT * 0.75f
-		};
+			Config::GameConfig::Video::LOGICAL_WIDTH * 0.4f,
+			Config::GameConfig::Video::LOGICAL_WIDTH * 0.08f,
+		}; // 5:1
 
 		struct Background : Object
 		{

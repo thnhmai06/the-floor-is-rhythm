@@ -83,7 +83,7 @@ namespace Structures::Screens::Gameplay
 				unsigned long current_combo = 0;
 				float mod_multiplier = 1.0f;
 
-				float update_score();
+				void update_score();
 
 			public:
 				struct SliderScore
@@ -98,13 +98,13 @@ namespace Structures::Screens::Gameplay
 					float check_and_add_slider_tick_score(const int64_t& current_time, bool is_hold, Score& score, const float& current_input_latency = 0);
 					float add_final_bonus_score(const int64_t& current_time, Score& score) const;
 
-					SliderScore(const std::shared_ptr<const Game::Beatmap::HitObjects::Slider::Action>& slider_action);
+					explicit SliderScore(const std::shared_ptr<const Game::Beatmap::HitObjects::Slider::Action>& slider_action);
 				};
-				std::unordered_map<std::shared_ptr<const Game::Beatmap::HitObjects::Slider::Action>, SliderScore> current_slider;
-
+				std::unordered_map<std::shared_ptr<const Game::Beatmap::HitObjects::Slider::Action>, SliderScore> current_slider; //? Tại sạo lại là shared_ptr mà ko phải weak?
 				struct ScoreCounter
 				{
 				private:
+					float accuracy = 1;
 					unsigned long count_300 = 0;
 					unsigned long count_100 = 0;
 					unsigned long count_50 = 0;
@@ -112,18 +112,23 @@ namespace Structures::Screens::Gameplay
 					unsigned long count_miss = 0;
 
 				public:
-					[[nodiscard]] float get_accuracy() const;
+					[[nodiscard]] const float* get_accuracy() const { return &accuracy; }
+					[[nodiscard]] const unsigned long* get_count_300() const { return &count_300; }
+					[[nodiscard]] const unsigned long* get_count_100() const { return &count_100; }
+					[[nodiscard]] const unsigned long* get_count_50() const { return &count_50; }
+					[[nodiscard]] const unsigned long* get_count_slider_tick() const { return &count_slider_tick; }
+					[[nodiscard]] const unsigned long* get_count_miss() const { return &count_miss; }
 					[[nodiscard]] unsigned long get_elapsed_objects_num() const;
+					void update_accuracy();
 					void add_count(const uint16_t& score, const unsigned long& num = 1);
 					void reset();
-				} count;
+				} counter;
 
 				float add_floor_score(const uint16_t& score);
-
-				[[nodiscard]] float get_score() const { return score; }
-				[[nodiscard]] unsigned long get_current_combo() const { return current_combo; }
-				[[nodiscard]] unsigned long get_max_combo() const { return max_combo; }
-				[[nodiscard]] float get_mod_multiplier() const { return mod_multiplier; }
+				[[nodiscard]] const float* get_score() const;
+				[[nodiscard]] const unsigned long* get_current_combo() const;
+				[[nodiscard]] const unsigned long* get_max_combo() const;
+				[[nodiscard]] float get_mod_multiplier() const;
 
 				explicit Score(const Game::Beatmap::Beatmap& beatmap, const float& mod_multiplier);
 			} score;
@@ -134,7 +139,7 @@ namespace Structures::Screens::Gameplay
 				bool no_fail = false;
 
 			public:
-				float hp = 1;
+				float value = 1;
 				bool is_pause = false;
 
 				bool update(const int16_t& note_score, const unsigned long& current_combo); // -> return: người chơi có fail không?
@@ -143,7 +148,7 @@ namespace Structures::Screens::Gameplay
 				explicit Health(const Game::Beatmap::Beatmap& beatmap, bool no_fail = false);
 			} health;
 
-			[[nodiscard]] bool is_paused() const { return timer.is_paused(); }
+			[[nodiscard]] bool is_paused() const;
 			void pause();
 			void resume();
 			void make_time_step(const KeyboardEventList& events, const float& current_input_latency = 0);
@@ -152,7 +157,7 @@ namespace Structures::Screens::Gameplay
 				const int64_t& start_time = 0, 
 				const float& mod_multiplier = 1.0f, 
 				bool no_fail = false);
-		} logic;
+		} logic_core;
 
 		//! Render
 		struct Render final : Screen::Render
@@ -162,17 +167,19 @@ namespace Structures::Screens::Gameplay
 				Screen::Render::Item map;
 				Screen::Render::Item cursor;
 				Screen::Render::Item health_bar;
-				//Screen::Render::Item score;
-				//Screen::Render::Item combo;
+				Screen::Render::Item score;
+				Screen::Render::Item combo;
 
 				explicit Components(Storage* storage);
 			} components;
 
 			Render(
 				const Types::Game::Direction::Direction* current_direction,
-				const Game::Beatmap::Beatmap& beatmap);
+				const Game::Beatmap::Beatmap& beatmap,
+				const Core& logic_core);
 		} render;
 
+		//! Audio
 		struct Audio final
 		{
 			Structures::Audio::Mixer* mixer = nullptr;

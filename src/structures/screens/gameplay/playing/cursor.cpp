@@ -48,7 +48,7 @@ namespace Structures::Screens::Gameplay::Playing::Cursor
 		using namespace Components;
 		data.reserve(3);
 
-		//! Chú ý thứ tự: Body -> Trail -> Direction
+		//! Chú ý thứ tự: Body -> Trail -> Direction ( sau ra trước)
 		// body
 		auto c_body = std::make_shared<Body>(memory);
 		body = c_body;

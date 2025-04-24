@@ -1,4 +1,4 @@
-#include "structures/screens/gameplay/playing/health_bar.h" // Header
+﻿#include "structures/screens/gameplay/playing/health_bar.h" // Header
 #include "format/skin.h"
 
 namespace Structures::Screens::Gameplay::Playing::HealthBar
@@ -30,6 +30,7 @@ namespace Structures::Screens::Gameplay::Playing::HealthBar
 	HealthBar::HealthBar(const TextureMemory& skin, const float* percent)
 	{
 		data.reserve(2);
+		//! Thứ tự: Background -> Colour
 
 		// Background
 		auto c_background = std::make_shared<Components::Background>(skin);
