@@ -16,7 +16,7 @@ namespace Structures::Audio
 		Bus<Effect> effect;
 
 		[[nodiscard]] float get_volume() const;
-		float set_volume(const float& percent);
+		float set_volume(float percent);
 		static void quit();
 
 		Mixer(const SDL_AudioSpec& spec, const float& master_volume, const float& music_volume,

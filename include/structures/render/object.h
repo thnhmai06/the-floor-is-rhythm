@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <memory>
-#include "structures/render/textures/texture.h"
+#include "structures/render/texture.h"
 #include "structures/types.h"
 
 namespace Structures::Render::Objects
@@ -11,23 +11,28 @@ namespace Structures::Render::Objects
 	struct Object
 	{
 		// Không còn cho tự render toàn màn hình nữa (dstrect = nullptr);
-		// nếu muốn thì set config.render_pos về {0, 0}, set config.origin_point về góc trái, rồi chỉnh set_render_size là logical size của màn hình
+		// nếu muốn thì set config.render_pos về {0, 0}, set config.origin_point về góc trái, rồi chỉnh set_render_size là logical character_render_size của màn hình
 		struct Config
 		{
 			struct OriginPoint : SDL_FPoint
 			{
-				[[nodiscard]] static OriginPoint translate_origin_type_to_point(const SDL_FPoint& size, const Types::Render::RenderOriginType& origin_type);
+				[[nodiscard]] static OriginPoint translate_origin_type_to_point(const Types::Render::OriginType& origin_type, const SDL_FPoint& size);
 				[[nodiscard]] SDL_FPoint convert_pos_from_origin(const SDL_FPoint& pos, const OriginPoint& from_origin = { 0, 0 }) const;
 				[[nodiscard]] SDL_FPoint convert_pos_to_origin(const SDL_FPoint& pos, const OriginPoint& to_origin = { 0, 0 }) const;
 				[[nodiscard]] SDL_FRect convert_rect_from_origin(const SDL_FRect& rect, const OriginPoint& to_origin = { 0, 0 }) const;
 				[[nodiscard]] SDL_FRect convert_rect_to_origin(const SDL_FRect& rect, const OriginPoint& to_origin = { 0, 0 }) const;
+
+				OriginPoint() = default;
+				OriginPoint(const float x, const float y) : SDL_FPoint{.x = x, .y = y } {}
+				OriginPoint(const SDL_FPoint& point) : SDL_FPoint(point) {}
+				explicit OriginPoint(const Types::Render::OriginType& origin_type, const SDL_FPoint& size);
 			};
 		protected:
 			OriginPoint origin_point = { 0, 0 }; //! QUY ƯỚC THEO SRC, SỬ DỤNG get/set_origin_point() thay vì lấy trực tiếp!!
 			SDL_FPoint scale = { 1.0f, 1.0f }; // an toàn cho set scale = 0
 
 		public:
-			SDL_FPoint render_pos; // chính là dst_rect với size nguyên gốc (muốn đổi size hãy ra ngoài Object tìm set_render_size())
+			SDL_FPoint render_pos; // chính là dst_rect với character_render_size nguyên gốc (muốn đổi character_render_size hãy ra ngoài Object tìm set_render_size())
 			float angle = 0.0f; // theo chiều kim đồng hồ, tính bằng độ (degree), chỉ xoay hình được render ra chứ không thay đổi vị trí gốc (hitbox vẫn giữ nguyên)
 			SDL_Color color = { 255, 255, 255, SDL_MAX_ALPHA }; // chỉ ảnh hưởng hình được render ra (cũng tương tự như angle)
 			SDL_FlipMode flip_mode = SDL_FLIP_NONE; // chỉ ảnh hưởng hình được render ra (cũng tương tự như angle)
@@ -37,8 +42,8 @@ namespace Structures::Render::Objects
 			void set_origin_point(const SDL_FPoint& pos, bool based_on_render_size = false);
 			void set_scale(const SDL_FPoint& value);
 			void set_scale(const float& value);
-			void set_fixed_render_size(const SDL_FPoint& size, const SDL_FPoint& src_size); // cần src_size để chia ra tỉ lệ
-			void set_fixed_render_size(const float& value, const SDL_FPoint& src_size); // cần src_size để chia ra tỉ lệ
+			void set_render_size(const SDL_FPoint& size, const SDL_FPoint& src_size); // cần src_size để chia ra tỉ lệ
+			void set_render_size(const float& value, const SDL_FPoint& src_size); // cần src_size để chia ra tỉ lệ
 			[[nodiscard]] SDL_FRect get_sdl_dst_rect(const SDL_FPoint& src_size) const; // dst_rect trong params render của sdl
 
 			Config();
@@ -53,18 +58,18 @@ namespace Structures::Render::Objects
 		[[nodiscard]] SDL_FRect get_sdl_src_rect() const; // CẨN THẬN NHẦM LẪN KHI LẤY previous_render_size -> cần dùng get_sdl_dst_rect()
 		[[nodiscard]] SDL_FRect get_sdl_dst_rect() const;
 		[[nodiscard]] Config::OriginPoint translate_origin_type_to_point(
-			const Types::Render::RenderOriginType& origin_type, bool based_on_render_size = false) const;
+			const Types::Render::OriginType& origin_type, bool based_on_render_size = false) const;
 		
-		void set_render_size(const SDL_FPoint& size); // chính là đang set dst_rect size (muốn set pos vào trong Collection::Object::Config tìm render_pos)
+		void set_render_size(const SDL_FPoint& size); // chính là đang set dst_rect character_render_size (muốn set pos vào trong Mapset::Object::Config tìm render_pos)
 		void set_render_size(const float& value);
 		void update_origin_point(const Config::OriginPoint& custom_origin, bool move_render_pos = false, bool based_on_render_size = false);
-		void update_origin_point(const Types::Render::RenderOriginType& origin_type, bool move_render_pos = false);
-		void render(const SDL_FPoint& offset = { 0, 0 }) const;
+		void update_origin_point(const Types::Render::OriginType& origin_type, bool move_render_pos = false);
+		virtual void render(const SDL_FPoint& offset = { 0, 0 });
 
 		Object() = default;
 		explicit Object(
 			TextureMemory::Item texture,
-			const Types::Render::RenderOriginType& origin_type = Types::Render::RenderOriginType::CENTRE,
+			const Types::Render::OriginType& origin_type = Types::Render::OriginType::CENTRE,
 			const SDL_FPoint& render_pos = { 0, 0 });
 		explicit Object(
 			TextureMemory::Item texture,
@@ -74,19 +79,14 @@ namespace Structures::Render::Objects
 	};
 	struct PolyObject
 	{
-	protected:
-		using CONTAINER = std::vector<Object>;
-
-	public:
-		CONTAINER data;
+		// TODO: Thêm Config vào đây -> Các object trong data sẽ set render_pos theo hệ quy chiếu của PolyObject
+		std::vector<Object> data;
 		bool visible = true;
-		void render(const SDL_FPoint& offset = { 0, 0 }) const;
+		virtual void render(const SDL_FPoint& offset = { 0, 0 });
 
-		auto operator+=(const CONTAINER& other);
-		auto operator+=(const Object& obj);
 		virtual ~PolyObject() = default;
 	};
 
-	using ObjectUnique = std::unique_ptr<Object>;
-	using PolyObjectUnique = std::unique_ptr<PolyObject>;
+	using ObjectShared = std::shared_ptr<Object>;
+	using PolyObjectShared = std::shared_ptr<PolyObject>;
 }

@@ -6,8 +6,8 @@
 #include "format/file.h"
 #include "utilities.hpp"
 
-using namespace Format::FileFormat::Beatmap::TimingPoints;
-using Format::FileFormat::Beatmap::AND;
+using namespace Format::File::Beatmap::TimingPoints;
+using Format::File::Beatmap::AND;
 
 namespace Structures::Game::Beatmap::TimingPoints
 {
@@ -16,7 +16,7 @@ namespace Structures::Game::Beatmap::TimingPoints
 	{
 		time = std::stoi(content[0]);
 		beat_length = std::stof(content[1]);
-		sample_set = static_cast<Hitsound::SampleSetType>(std::stoi(content[2]));
+		sample_set = static_cast<Hitsound::HitSampleType>(std::stoi(content[2]));
 		sample_index = std::stoi(content[3]);
 		volume = std::stoi(content[4]);
 		inherited = (beat_length < 0);

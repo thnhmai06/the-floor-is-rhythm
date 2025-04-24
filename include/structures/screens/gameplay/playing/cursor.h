@@ -1,9 +1,11 @@
 ﻿#pragma once
-#include "structures/render/layers/objects/collection.h"
+#include "structures/render/collection.h"
 #include "structures/types.h"
 
-namespace Structures::Render::Objects::Gameplay::Cursor
+namespace Structures::Screens::Gameplay::Playing::Cursor
 {
+	using namespace Structures::Render::Objects;
+
 	namespace Components
 	{
 		struct Body : Object
@@ -27,12 +29,12 @@ namespace Structures::Render::Objects::Gameplay::Cursor
 		};
 	}
 
-	struct Collection : Objects::Collection
+	struct Cursor : Collection
 	{
-		Components::Body* body;
-		Components::Trail* trail;
-		Components::Direction* direction;
+		std::shared_ptr<Components::Body> body;
+		std::shared_ptr<Components::Trail> trail;
+		std::shared_ptr<Components::Direction> direction;
 
-		Collection(const TextureMemory& memory, const Types::Game::Direction::Direction* current_direction);
+		Cursor(const TextureMemory& memory, const Types::Game::Direction::Direction* current_direction);
 	};
 }

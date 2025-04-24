@@ -1,4 +1,4 @@
-﻿#include "structures/render/textures/texture.h" // Header
+﻿#include "structures/render/texture.h" // Header
 #include <ranges>
 #include <SDL3_image/SDL_image.h>
 #include "logging/logger.h"
@@ -105,8 +105,8 @@ namespace Structures::Render::Textures
 		if (!new_target.empty())
 			item = memory->find(new_target).item;
 	}
-	TextureMemory::Item::Item(const std::string& name, const TextureMemory* memory) : item(memory->find(name).item), memory(memory) {
+	TextureMemory::Item::Item(const std::string& name, const TextureMemory* memory) : memory(memory), item(memory->find(name).item) {
 	}
-	TextureMemory::Item::Item(const_iterator item_in_memory, const TextureMemory* memory) : item(std::move(item_in_memory)), memory(memory) {
+	TextureMemory::Item::Item(const_iterator item_in_memory, const TextureMemory* memory) : memory(memory), item(std::move(item_in_memory)) {
 	}
 }

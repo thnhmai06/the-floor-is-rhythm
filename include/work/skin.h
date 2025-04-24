@@ -1,6 +1,6 @@
 #pragma once
 #include <unordered_set>
-#include "structures/render/textures/texture.h"
+#include "structures/render/texture.h"
 
 namespace Work::Skin
 {

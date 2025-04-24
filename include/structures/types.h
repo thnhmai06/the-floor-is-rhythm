@@ -1,6 +1,8 @@
 #pragma once
 #include <concepts>
 #include <SDL3_mixer/SDL_mixer.h>
+#include <unordered_map>
+#include <string>
 
 namespace Structures::Types
 {
@@ -14,7 +16,7 @@ namespace Structures::Types
 	}
 	namespace Render
 	{
-		enum class RenderOriginType : uint8_t
+		enum class OriginType : uint8_t
 		{
 			TOP_LEFT,
 			CENTRE,
@@ -65,6 +67,13 @@ namespace Structures::Types
 				FLOOR = 0,
 				SLIDER = 1
 			};
+		}
+	}
+	namespace Format
+	{
+		namespace Skin
+		{
+			using Alphabet = std::unordered_map<char, std::string>;
 		}
 	}
 }

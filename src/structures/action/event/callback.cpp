@@ -9,6 +9,16 @@ namespace Structures::Action::Event
 		return Utilities::Math::in_range(start_time, end_time, current_time);
 	}
 
+	int64_t Callback::get_relative_time(const int64_t& current_time) const
+	{
+		return current_time - start_time;
+	}
+
+	int64_t Callback::get_duration() const
+	{
+		return end_time - start_time;
+	}
+
 	// CallbackBuffer
 	void CallbackBuffer::execute(const int64_t& current_time)
 	{

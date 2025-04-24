@@ -12,7 +12,7 @@ namespace Structures::Game::Beatmap::TimingPoints
 
 		int64_t time = 0;
 		float beat_length;
-		Hitsound::SampleSetType sample_set = Hitsound::SampleSetType::NO_CUSTOM;
+		Hitsound::HitSampleType sample_set = Hitsound::HitSampleType::NO_CUSTOM;
 		int32_t sample_index = 0;
 		int32_t volume = 100;
 		bool inherited = false;
@@ -25,7 +25,7 @@ namespace Structures::Game::Beatmap::TimingPoints
 		[[nodiscard]] float get_velocity() const;
 
 		TimingPoint() = default;
-		TimingPoint(const std::vector<std::string>& content) { read(content); }
+		explicit TimingPoint(const std::vector<std::string>& content) { read(content); }
 	};
 
 	struct TimingPoints : std::multimap<int32_t, TimingPoint>

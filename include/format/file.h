@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-namespace Format::FileFormat
+namespace Format::File
 {
 	namespace Beatmap
 	{
@@ -8,7 +8,7 @@ namespace Format::FileFormat
 		{
 			namespace osu
 			{
-				constexpr std::string_view VERSION = "convert from osu file format v";
+				constexpr std::string_view VERSION = "//convert from osu file format v";
 				constexpr std::string_view SOURCE = "(from osu!)";
 			}
 		}
@@ -57,6 +57,14 @@ namespace Format::FileFormat
 		namespace TimingPoints
 		{
 			constexpr std::string_view HEADER = "[TimingPoints]";
+		}
+		namespace Variables
+		{
+			constexpr std::string_view HEADER = "[Variables]";
+		}
+		namespace Events
+		{
+			constexpr std::string_view HEADER = "[Events]";
 		}
 	}
 }

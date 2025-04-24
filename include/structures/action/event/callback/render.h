@@ -2,7 +2,8 @@
 #include <easing.h>
 #include <osu!parser/Parser/Structures/Beatmap/Objects/Event.hpp>
 #include "structures/action/event/callback.h"
-#include "structures/render/layers/objects/object.h"
+#include "structures/action/event/triggers/playing.h"
+#include "structures/render/object.h"
 
 namespace Structures::Action::Event::Render
 {
@@ -25,6 +26,7 @@ namespace Structures::Action::Event::Render
 	struct FadeCallback : RenderCallback
 	{
 		uint8_t from, to;
+		std::vector<uint8_t> sequence;
 
 		void execute(const int64_t& current_time) override;
 
@@ -36,18 +38,21 @@ namespace Structures::Action::Event::Render
 	struct MoveCallback : RenderCallback
 	{
 		SDL_FPoint from, to;
+		std::vector<SDL_FPoint> sequence;
 
 		void execute(const int64_t& current_time) override;
 	};
 	struct MoveXCallback : RenderCallback
 	{
 		float from_x, to_x;
+		std::vector<float> sequence;
 
 		void execute(const int64_t& current_time) override;
 	};
 	struct MoveYCallback : RenderCallback
 	{
 		float from_y, to_y;
+		std::vector<float> sequence;
 
 		void execute(const int64_t& current_time) override;
 	};
@@ -55,7 +60,8 @@ namespace Structures::Action::Event::Render
 	//! Scale
 	struct ScaleCallback : RenderCallback
 	{
-		SDL_FPoint from, to;
+		SDL_FPoint from, to; // scale size x, y
+		std::vector<SDL_FPoint> sequence;
 
 		void execute(const int64_t& current_time) override;
 
@@ -67,6 +73,7 @@ namespace Structures::Action::Event::Render
 	struct RotateCallback : RenderCallback
 	{
 		float from, to;
+		std::vector<float> sequence;
 
 		void execute(const int64_t& current_time) override;
 	};
@@ -76,6 +83,7 @@ namespace Structures::Action::Event::Render
 	{
 		struct Color { uint8_t r, g, b; }; // giống SDL_Color nhưng bỏ alpha
 		Color from, to;
+		std::vector<Color> sequence;
 
 		void execute(const int64_t& current_time) override;
 	};
@@ -84,6 +92,7 @@ namespace Structures::Action::Event::Render
 	struct ParameterCallback : RenderCallback
 	{
 	protected:
+		using Parameter = OsuParser::Beatmap::Objects::Event::Type::Commands::Args::Parameter::Parameter;
 		struct
 		{
 			SDL_FlipMode flip_mode;
@@ -92,8 +101,9 @@ namespace Structures::Action::Event::Render
 		void reset_to_previous() const;
 
 	public:
-		Parser::Beatmap::Event::Type::Command::Parameter::Parameter parameter;
+		Parameter parameter;
 		bool in_active = false;
+		std::vector<Parameter> sequence;
 
 		void execute(const int64_t& current_time) override;
 
@@ -101,9 +111,24 @@ namespace Structures::Action::Event::Render
 	};
 
 	//! Loop
-	struct LoopCallback : RenderCallback
+	struct LoopCallback : Callback
 	{
+	protected:
+		uint32_t current_loop_count = 0;
+
+	public:
+		Structures::Render::Objects::Object* target_object = nullptr;
 		uint32_t loop_count;
+		std::vector<CallbackUnique> callbacks;
+
+		void execute(const int64_t& current_time) override;
+	};
+
+	//! Trigger
+	struct TriggerCallback : Callback
+	{
+		Structures::Render::Objects::Object* target_object = nullptr;
+		Triggers::Playing::StoryboardTrigger condition;
 		std::vector<CallbackUnique> callbacks;
 
 		void execute(const int64_t& current_time) override;

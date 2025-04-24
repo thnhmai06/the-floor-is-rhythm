@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-#include "structures/render/textures/texture.h"
+#include "structures/render/texture.h"
 
 namespace Work::Render::Textures
 {

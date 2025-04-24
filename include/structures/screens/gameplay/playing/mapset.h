@@ -1,12 +1,14 @@
 ﻿#pragma once
-#include "structures/game/beatmap/beatmap.h"
+#include "structures/game/beatmap.h"
 #include "structures/game/beatmap/hitobject.h"
 #include "structures/game/beatmap/metadata.h"
-#include "structures/render/layers/objects/collection.h"
-#include "structures/render/textures/texture.h"
+#include "structures/render/collection.h"
+#include "structures/render/texture.h"
 
-namespace Structures::Render::Objects::Gameplay::Beatmap
+namespace Structures::Screens::Gameplay::Playing::Mapset
 {
+	using namespace Structures::Render::Objects;
+
 	namespace Components
 	{
 		struct HitObject : PolyObject
@@ -53,8 +55,8 @@ namespace Structures::Render::Objects::Gameplay::Beatmap
 		};
 	}
 
-	struct Collection : Objects::Collection
+	struct Mapset : Collection
 	{
-		Collection(const TextureMemory& memory, const Game::Beatmap::Beatmap& beatmap);
+		Mapset(const TextureMemory& memory, const Game::Beatmap::Beatmap& beatmap);
 	};
 }

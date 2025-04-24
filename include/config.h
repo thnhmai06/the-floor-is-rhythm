@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include <cstdint>
 #include <SDL3/SDL_audio.h>
 #include <SDL3/SDL_scancode.h>
 
@@ -10,11 +9,11 @@ namespace Config::UserConfig
 		inline int32_t width = 1366;
 		inline int32_t height = 768;
 	}
-	namespace Volume
+	namespace Audio::Volume
 	{
-		inline int32_t master = 80;
-		inline int32_t music = 80;
-		inline int32_t hitsound = 80;
+		inline float master = 0.8f;
+		inline float music = 0.8f;
+		inline float effects = 0.8f;
 	}
 	namespace Cursor
 	{
@@ -98,6 +97,12 @@ namespace Config::GameConfig
 				constexpr int32_t GOOD = 8; // 100
 				constexpr int32_t BAD = 10; // 50
 			}
+		}
+		namespace HP
+		{
+			constexpr float BASE = 0.2f;
+			constexpr float EASIER_MULTIPLY = 0.02f;
+			constexpr float HARDER_MULTIPLY = 0.04f;
 		}
 		namespace Velocity
 		{

@@ -1,4 +1,4 @@
-﻿#include "structures/game/beatmap/beatmap.h" // Header
+﻿#include "structures/game/beatmap.h" // Header
 #include <fstream>
 #include <ranges>
 #include <unordered_map>
@@ -9,41 +9,63 @@
 
 namespace Structures::Game::Beatmap
 {
-	static constexpr int32_t MINIMUM_LINE_CHARACTERS = 3;
+	static constexpr size_t MINIMUM_LINE_CHARACTERS = 3;
 	static std::unordered_map<std::string, std::vector<std::string>> read_content(std::ifstream& reader)
 	{
 		std::unordered_map<std::string, std::vector<std::string>> sections;
 
 		std::string current_line;
-		std::getline(reader, current_line);
+		std::string current_section = {};
+		
 		while (std::getline(reader, current_line))
 		{
-			current_line = Utilities::String::trim(current_line);
-			static std::string current_section;
+			if (current_section == Format::File::Beatmap::Events::HEADER)
+			{
+				current_line = Utilities::String::trim(current_line, true);
+				const auto current_line_if_trim_all = Utilities::String::trim(current_line);
 
-			// Nếu current_line là một Header của section
-			if (!current_line.empty() && current_line.front() == '[' && current_line.back() == ']')
-				current_section = Utilities::String::trim(current_line);
-			// Bỏ qua những line không đủ kí tự (điều kiện cần)
-			else if (current_line.size() < MINIMUM_LINE_CHARACTERS) {}
+				if (current_line_if_trim_all.size() < MINIMUM_LINE_CHARACTERS) continue;
+				if (current_line_if_trim_all[0] == '/' && current_line_if_trim_all[1] == '/') continue; // comment
+			}
 			else
-				// Những line còn lại là content, sẽ được thêm vào section hiện tại
-				sections[current_section].push_back(current_line);
+			{
+				current_line = Utilities::String::trim(current_line);
+				if (current_line.size() < MINIMUM_LINE_CHARACTERS) continue;
+				if (current_line[0] == '/' && current_line[1] == '/') continue; // comment
+			}
+
+			if (!current_line.empty() && current_line.front() == '[' && current_line.back() == ']')
+			{
+				current_section = Utilities::String::trim(current_line);
+				continue;
+			}
+			
+			sections[current_section].push_back(current_line);
 		}
 		return sections;
 	}
-	static void parse_beatmap(Beatmap& beatmap, const std::unordered_map<std::string, std::vector<std::string>>& sections)
+
+	//! Storyboard
+	void Storyboard::parse(std::unordered_map<std::string, std::vector<std::string>>& sections)
 	{
-		for (const auto& [header, contents] : sections)
+		for (auto& [header, contents] : sections)
 		{
-			if (header == Format::FileFormat::Beatmap::General::HEADER) beatmap.general.read(contents);
-			else if (header == Format::FileFormat::Beatmap::Metadata::HEADER) beatmap.metadata.read(contents);
-			else if (header == Format::FileFormat::Beatmap::Difficulty::HEADER) beatmap.calculated_difficulty.apply(Metadata::Difficulty(contents));
-			else if (header == Format::FileFormat::Beatmap::HitObjects::HEADER) beatmap.hit_objects.read(contents);
-			else if (header == Format::FileFormat::Beatmap::TimingPoints::HEADER) beatmap.timing_points.read(contents);
+			if (header == Format::File::Beatmap::Variables::HEADER) variables.Parse(contents);
+			else if (header == Format::File::Beatmap::Events::HEADER) events.Parse(contents, variables);
 		}
 	}
+	Storyboard::Storyboard(const char* file_path)
+	{
+		std::ifstream reader(file_path);
+		if (!reader)
+			THROW_ERROR(Logging::Exceptions::FileExceptions::File_Open_Failed(file_path));
+		auto sections = read_content(reader);
+		reader.close();
 
+		parse(sections);
+	}
+
+	//! Beatmap
 	// Beatmap::Stats
 	unsigned long Beatmap::Stats::get_total_objects_num() const { return count.floor + count.slider; }
 	void Beatmap::Stats::calculate(const Beatmap& beatmap)
@@ -97,10 +119,10 @@ namespace Structures::Game::Beatmap
 				previous_direction += current_hit_object->get_rotation();
 			};
 
-		for_all_hit_objects(if_floor, if_slider, current_hit_object, current_timing_point_velocity, current_beat_length);
+		for_in_hit_objects(if_floor, if_slider, current_hit_object, current_timing_point_velocity, current_beat_length);
 		return { std::move(floor_queue), std::move(slider_queue) };
 	}
-	void Beatmap::for_all_hit_objects(const HitObjectStepFunction& if_floor, const HitObjectStepFunction& if_slider,
+	void Beatmap::for_in_hit_objects(const HitObjectStepFunction& if_floor, const HitObjectStepFunction& if_slider,
 		const HitObjects::HitObject*& current_hit_object_ptr) const
 	{
 		for (const auto& hit_object : hit_objects | std::views::values)
@@ -118,7 +140,7 @@ namespace Structures::Game::Beatmap
 			}
 		}
 	}
-	void Beatmap::for_all_hit_objects(const HitObjectStepFunction& if_floor, const HitObjectStepFunction& if_slider,
+	void Beatmap::for_in_hit_objects(const HitObjectStepFunction& if_floor, const HitObjectStepFunction& if_slider,
 		const HitObjects::HitObject*& current_hit_object_ptr,
 		float& current_timing_point_velocity, float& current_beat_length) const
 	{
@@ -148,15 +170,29 @@ namespace Structures::Game::Beatmap
 			}
 		}
 	}
+	//::
+	void Beatmap::parse(std::unordered_map<std::string, std::vector<std::string>>& sections)
+	{
+		for (auto& [header, contents] : sections)
+		{
+			if (header == Format::File::Beatmap::General::HEADER) general.read(contents);
+			else if (header == Format::File::Beatmap::Metadata::HEADER) metadata.read(contents);
+			else if (header == Format::File::Beatmap::Difficulty::HEADER) calculated_difficulty.apply(Metadata::Difficulty(contents));
+			else if (header == Format::File::Beatmap::HitObjects::HEADER) hit_objects.read(contents);
+			else if (header == Format::File::Beatmap::TimingPoints::HEADER) timing_points.read(contents);
+			else if (header == Format::File::Beatmap::Events::HEADER) events.Parse(contents);
+		}
+	}
 	Beatmap::Beatmap(const char* file_path)
 	{
 		std::ifstream reader(file_path);
 		if (!reader)
 			THROW_ERROR(Logging::Exceptions::FileExceptions::File_Open_Failed(file_path));
 
-		parse_beatmap(*this, read_content(reader));
+		auto sections = read_content(reader);
 		reader.close();
 
+		parse(sections);
 		stats.calculate(*this);
 	}
 }

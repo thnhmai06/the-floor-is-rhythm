@@ -39,13 +39,13 @@
     <ClCompile Include="src\structures\game\beatmap\hitobject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\render\textures\texture.cpp">
+    <ClCompile Include="src\structures\render\texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\work\render.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\render\layers\layer.cpp">
+    <ClCompile Include="src\structures\render\layer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\work\core.cpp">
@@ -54,7 +54,7 @@
     <ClCompile Include="src\structures\game\beatmap\timing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\render\layers\objects\object.cpp">
+    <ClCompile Include="src\structures\render\object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\work\skin.cpp">
@@ -63,28 +63,25 @@
     <ClCompile Include="src\work\convert\osu\beatmap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\game\beatmap\beatmap.cpp">
+    <ClCompile Include="src\structures\game\beatmap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\format\skin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\render\layers\objects\gameplay\cursor.cpp">
+    <ClCompile Include="src\structures\screens\gameplay\playing\cursor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\render\layers\objects\gameplay\beatmap.cpp">
+    <ClCompile Include="src\structures\screens\gameplay\playing\mapset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\render\layers\objects\collection.cpp">
+    <ClCompile Include="src\structures\render\collection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\structures\screens\gameplay\playing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\structures\screens\screen.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\structures\render\layers\objects\gameplay\hud.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\structures\action\time.cpp">
@@ -94,6 +91,27 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\structures\action\event\callback.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dependencies\easing\src\easing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\structures\action\event\triggers\playing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\structures\screens\gameplay\playing\health_bar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\structures\render\objects\percent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\structures\render\objects\number.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\structures\render\objects\string.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\structures\screens\gameplay\playing\score.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -125,13 +143,13 @@
     <ClInclude Include="include\main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\render\textures\texture.h">
+    <ClInclude Include="include\structures\render\texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\work\render.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\render\layers\layer.h">
+    <ClInclude Include="include\structures\render\layer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\work\core.h">
@@ -143,7 +161,7 @@
     <ClInclude Include="include\structures\types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\render\layers\objects\object.h">
+    <ClInclude Include="include\structures\render\object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\work\skin.h">
@@ -158,7 +176,7 @@
     <ClInclude Include="include\work\convert\osu\beatmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\game\beatmap\beatmap.h">
+    <ClInclude Include="include\structures\game\beatmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\format\file.h">
@@ -167,16 +185,16 @@
     <ClInclude Include="include\format\skin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\render\layers\objects\gameplay\cursor.h">
+    <ClInclude Include="include\structures\screens\gameplay\playing\cursor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\render\layers\objects\gameplay\beatmap.h">
+    <ClInclude Include="include\structures\screens\gameplay\playing\mapset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\utilities.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\render\layers\objects\collection.h">
+    <ClInclude Include="include\structures\render\collection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\work\render\textures.h">
@@ -197,9 +215,6 @@
     <ClInclude Include="include\structures\action\event\callback\render.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\render\layers\objects\gameplay\hud.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\structures\action\time.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -207,6 +222,30 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\structures\action\event\callback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structures\action\event\trigger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\work\audio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structures\action\event\triggers\playing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structures\screens\gameplay\playing\health_bar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structures\render\objects\percent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structures\screens\gameplay\playing\score.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structures\render\objects\number.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structures\render\objects\string.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

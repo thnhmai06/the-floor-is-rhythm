@@ -1,9 +1,4 @@
-﻿/**
- *	@file metadata.h
- *	@brief Các lớp biểu diễn Metadata của Beatmap
- *	@author Mai Thành (@thnhmai06)
- */
-#pragma once
+﻿#pragma once
 #include <string>
 #include <unordered_set>
 #include "config.h"
@@ -11,7 +6,6 @@
 
 namespace Structures::Game::Beatmap::Metadata
 {
-	//! Raw
 	struct General
 	{
 		std::string audio_file;
@@ -22,18 +16,17 @@ namespace Structures::Game::Beatmap::Metadata
 		void write(std::ofstream& writer) const;
 
 		General() = default;
-		General(const std::vector<std::string>& contents) { read(contents); }
+		explicit General(const std::vector<std::string>& contents) { read(contents); }
 	};
 	struct Metadata
 	{
 		std::string title, artist, creator, difficulty_name, source;
-		//std::unordered_set<std::string> tags; TODO: Tìm CTDL Phù hợp cho truy vấn tìm kiếm beatmap
 		std::vector<std::string> tags;
 		void read(const std::vector<std::string>& contents);
 		void write(std::ofstream& writer) const;
 
 		Metadata() = default;
-		Metadata(const std::vector<std::string>& contents) { read(contents); }
+		explicit Metadata(const std::vector<std::string>& contents) { read(contents); }
 
 	};
 	struct Difficulty
@@ -43,27 +36,19 @@ namespace Structures::Game::Beatmap::Metadata
 		void write(std::ofstream& writer) const;
 
 		Difficulty() = default;
-		Difficulty(const std::vector<std::string>& contents) { read(contents); }
+		explicit Difficulty(const std::vector<std::string>& contents) { read(contents); }
 	};
 
-	//! Calculated
-	/**
-	 * @class CalculatedDifficulty
-	 * @ingroup beatmap
-	 * @brief Biểu diễn độ khó của beatmap
-	 */
 	struct CalculatedDifficulty
 	{
-		/**
-		 * @class OverallDifficulty
-		 * @ingroup beatmap difficulty
-		 * @brief Biểu diễn OD của map (Khoảng thời gian chấp nhận là chính xác hơn).
-		 */
 		struct OverallDifficulty
 		{
-			// Follow: https://osu.ppy.sh/wiki/en/Beatmap/Overall_difficulty
-			float value = -1;
-			float perfect = -1, great = -1, bad = -1, miss = Config::GameConfig::Difficulty::OD::Base::MISS; // time (in ms)
+		private:
+			float value = 5;
+
+			friend CalculatedDifficulty;
+		public:
+			float perfect = -1, great = -1, bad = -1, miss = Config::GameConfig::Difficulty::OD::Base::MISS;    
 
 			void apply(const float& v);
 			void apply() { apply(value); }
@@ -72,38 +57,45 @@ namespace Structures::Game::Beatmap::Metadata
 			                                const Types::Game::Direction::Direction& current_direction) const;
 
 			OverallDifficulty() = default;
-			OverallDifficulty(const float value) { apply(value); }
+			explicit OverallDifficulty(const float value) { apply(value); }
 		} od;
-		/**
-		 * @class HPDrainRate
-		 * @ingroup beatmap difficulty
-		 * @brief Biểu diễn HP của map (Độ tụt HP khi bấm không chính xác).
-		 */
-		struct HPDrainRate
+		struct HealthPoint
 		{
-			float value = -1;
+		protected:
+			float drain;
 
+		private:
+			float value = 5;
+
+			friend CalculatedDifficulty;
+
+		public:
 			void apply(const float& v);
 			void apply() { apply(value); }
+			[[nodiscard]] float get_note_hp(const int16_t& note_score, const unsigned long& current_combo) const;
 
-			HPDrainRate() = default;
-			HPDrainRate(const float value) { apply(value); }
+			HealthPoint() = default;
+			explicit HealthPoint(const float value) { apply(value); }
 		} hp;
 		struct Velocity
 		{
-			float value = 1.4f, speed;
+		private:
+			float value = 1.4f;
+
+			friend CalculatedDifficulty;
+		public:
+			float speed;
 			void apply(const float& v);
 			void apply() { apply(value); }
 
-			Velocity() { apply(1.4f); }
-			Velocity(const float value) { apply(value); }
+			Velocity() { apply(value); }
+			explicit Velocity(const float value) { apply(value); }
 		} velocity;
 
 		void apply(const Difficulty& basic);
 		void write(std::ofstream& writer) const;
 
 		CalculatedDifficulty() = default;
-		CalculatedDifficulty(const Difficulty& basic) { apply(basic); }
+		explicit CalculatedDifficulty(const Difficulty& basic) { apply(basic); }
 	};
-
 }

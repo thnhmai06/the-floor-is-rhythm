@@ -1,4 +1,4 @@
-﻿#include "structures/render/layers/layer.h" // Header
+﻿#include "structures/render/layer.h" // Header
 #include "config.h"
 #include "utilities.hpp"
 
@@ -8,18 +8,18 @@ namespace Structures::Render::Layers
 {
 	//! Layer
 	// ::Camera
-	uint8_t Layer::Camera::Camera::get_alpha() const { return color.a; }
-	void Layer::Camera::Camera::set_alpha(const uint8_t& value) { color.a = value; }
-	void Layer::Camera::Camera::move_x(const float& dx) { render_pos.x += dx; }
-	void Layer::Camera::Camera::move_y(const float& dy) { render_pos.y += dy; }
+	uint8_t Layer::Camera::get_alpha() const { return color.a; }
+	void Layer::Camera::set_alpha(const uint8_t& value) { color.a = value; }
+	void Layer::Camera::move_x(const float& dx) { render_pos.x += dx; }
+	void Layer::Camera::move_y(const float& dy) { render_pos.y += dy; }
 	Layer::Camera::Camera(const OriginPoint& origin)
 	{
 		origin_point = origin; // góc trái
 		render_pos = { .x = ::Config::GameConfig::Video::Camera::DEFAULT_POS_X, .y = ::Config::GameConfig::Video::Camera::DEFAULT_POS_Y };
 	}
 
-	SDL_FPoint Layer::Camera::Camera::get_camera_pos() const { return render_pos; }
-	SDL_FPoint Layer::Camera::Camera::get_camera_size(const bool after_scale) const
+	SDL_FPoint Layer::Camera::get_camera_pos() const { return render_pos; }
+	SDL_FPoint Layer::Camera::get_camera_size(const bool after_scale) const
 	{
 		return after_scale
 			? SDL_FPoint{

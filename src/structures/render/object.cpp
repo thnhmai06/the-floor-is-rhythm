@@ -1,4 +1,4 @@
-﻿#include "structures/render/layers/objects/object.h" // Header
+﻿#include "structures/render/object.h" // Header
 #include "logging/exceptions.h"
 #include "logging/logger.h"
 #include "utilities.hpp"
@@ -26,31 +26,36 @@ namespace Structures::Render::Objects
 		return { new_x, new_y, rect.w, rect.h };
 	}
 	Object::Config::OriginPoint Object::Config::OriginPoint::translate_origin_type_to_point(
-		const SDL_FPoint& size, const Types::Render::RenderOriginType& origin_type)
+		const Types::Render::OriginType& origin_type, const SDL_FPoint& size)
 	{
 		const auto [w, h] = size;
 		switch (origin_type)
 		{
-		case Types::Render::RenderOriginType::TOP_LEFT:
+		case Types::Render::OriginType::TOP_LEFT:
 			return { 0, 0 };
-		case Types::Render::RenderOriginType::BOTTOM_LEFT:
+		case Types::Render::OriginType::BOTTOM_LEFT:
 			return { 0, h };
-		case Types::Render::RenderOriginType::BOTTOM_RIGHT:
+		case Types::Render::OriginType::BOTTOM_RIGHT:
 			return { w, h };
-		case Types::Render::RenderOriginType::TOP_RIGHT:
+		case Types::Render::OriginType::TOP_RIGHT:
 			return { w, 0 };
-		case Types::Render::RenderOriginType::TOP_CENTRE:
+		case Types::Render::OriginType::TOP_CENTRE:
 			return { w / 2, 0 };
-		case Types::Render::RenderOriginType::BOTTOM_CENTRE:
+		case Types::Render::OriginType::BOTTOM_CENTRE:
 			return { w / 2, h };
-		case Types::Render::RenderOriginType::CENTRE_LEFT:
+		case Types::Render::OriginType::CENTRE_LEFT:
 			return { 0, h / 2 };
-		case Types::Render::RenderOriginType::CENTRE_RIGHT:
+		case Types::Render::OriginType::CENTRE_RIGHT:
 			return { w, h / 2 };
-		case Types::Render::RenderOriginType::CENTRE:
+		case Types::Render::OriginType::CENTRE:
 			return { w / 2, h / 2 };
 		}
 		return { 0, 0 };
+	}
+	Object::Config::OriginPoint::OriginPoint(
+		const Types::Render::OriginType& origin_type, const SDL_FPoint& size)
+			: OriginPoint(translate_origin_type_to_point(origin_type, size))
+	{
 	}
 
 	// ::Config
@@ -79,14 +84,14 @@ namespace Structures::Render::Objects
 		render_pos.y += old_render_origin.y - new_render_origin.y;
 	}
 	void Object::Config::set_scale(const float& value) { set_scale({ value, value }); }
-	void Object::Config::set_fixed_render_size(const SDL_FPoint& size, const SDL_FPoint& src_size)
+	void Object::Config::set_render_size(const SDL_FPoint& size, const SDL_FPoint& src_size)
 	{
 		if (src_size.x > 0) scale.x = size.x / src_size.x;
 		if (src_size.y > 0) scale.y = size.y / src_size.y;
 	}
-	void Object::Config::set_fixed_render_size(const float& value, const SDL_FPoint& src_size)
+	void Object::Config::set_render_size(const float& value, const SDL_FPoint& src_size)
 	{
-		set_fixed_render_size({ value, value }, src_size);
+		set_render_size({ value, value }, src_size);
 	}
 	SDL_FRect Object::Config::get_sdl_dst_rect(const SDL_FPoint& src_size) const
 	{
@@ -114,21 +119,21 @@ namespace Structures::Render::Objects
 	}
 	void Object::set_render_size(const SDL_FPoint& size)
 	{
-		config.set_fixed_render_size(size, Utilities::Render::get_size_from_rect(get_sdl_src_rect()));
+		config.set_render_size(size, Utilities::Render::get_size_from_rect(get_sdl_src_rect()));
 	}
 	void Object::set_render_size(const float& value)
 	{
 		set_render_size({ value, value });
 	}
-	Object::Config::OriginPoint Object::translate_origin_type_to_point(const Types::Render::RenderOriginType& origin_type, const bool based_on_render_size) const
+	Object::Config::OriginPoint Object::translate_origin_type_to_point(const Types::Render::OriginType& origin_type, const bool based_on_render_size) const
 	{
 		if (!based_on_render_size)
 		{
 			const auto src_size = Utilities::Render::get_size_from_rect(get_sdl_src_rect());
-			return Config::OriginPoint::translate_origin_type_to_point(src_size, origin_type);
+			return Config::OriginPoint::translate_origin_type_to_point(origin_type, src_size);
 		}
 		const auto render_size = Utilities::Render::get_size_from_rect(get_sdl_dst_rect());
-		return Config::OriginPoint::translate_origin_type_to_point(render_size, origin_type);
+		return Config::OriginPoint::translate_origin_type_to_point(origin_type, render_size);
 	}
 	void Object::update_origin_point(const Config::OriginPoint& custom_origin, const bool move_render_pos, const bool based_on_render_size)
 	{
@@ -137,11 +142,11 @@ namespace Structures::Render::Objects
 		if (move_render_pos)
 			config.render_pos = config.get_origin_point().convert_pos_from_origin(config.render_pos, previous_origin);
 	}
-	void Object::update_origin_point(const Types::Render::RenderOriginType& origin_type, const bool move_render_pos)
+	void Object::update_origin_point(const Types::Render::OriginType& origin_type, const bool move_render_pos)
 	{
 		update_origin_point(translate_origin_type_to_point(origin_type, false), move_render_pos, false);
 	}
-	void Object::render(const SDL_FPoint& offset) const
+	void Object::render(const SDL_FPoint& offset)
 	{
 		if (!visible) return;
 
@@ -158,11 +163,10 @@ namespace Structures::Render::Objects
 		if (!SDL_RenderTextureRotated(src.memory->renderer, sdl_texture, &src_rect, 
 			&dst_rect, config.angle, &render_origin_point, config.flip_mode))
 			THROW_ERROR(Logging::Exceptions::SDLExceptions::Texture::SDL_Texture_Render_Failed(src.get_name()));
-
 	}
 	Object::Object(
 		TextureMemory::Item texture,
-		const Types::Render::RenderOriginType& origin_type,
+		const Types::Render::OriginType& origin_type,
 		const SDL_FPoint& render_pos) :
 		src(std::move(texture))
 	{
@@ -178,21 +182,12 @@ namespace Structures::Render::Objects
 	}
 
 	//! PolyObject
-	auto PolyObject::operator+=(const CONTAINER& other)
+	void PolyObject::render(const SDL_FPoint& offset)
 	{
-		for (const auto& object : other)
-			data.push_back(object);
-		return *this;
-	}
-	auto PolyObject::operator+=(const Object& obj)
-	{
-		data.push_back(obj);
-		return *this;
-	}
-	void PolyObject::render(const SDL_FPoint& offset) const
-	{
-		if (!visible) return;
-		for (const auto& object : data)
+		using Utilities::Math::FPoint::operator+;
+
+		if (!visible || data.empty()) return;
+		for (auto& object : data)
 			object.render(offset);
 	}
 }

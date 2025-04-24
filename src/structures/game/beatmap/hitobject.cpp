@@ -8,7 +8,7 @@
 
 namespace Structures::Game::Beatmap::HitObjects
 {
-	using Format::FileFormat::Beatmap::AND;
+	using Format::File::Beatmap::AND;
 
 	Types::Game::Direction::Direction get_next_direction(const Types::Game::Direction::Direction& prev_direction, const uint8_t& rotation)
 	{
@@ -21,7 +21,7 @@ namespace Structures::Game::Beatmap::HitObjects
 		time = std::stoi(content[0]);
 		rotation = static_cast<Types::Game::Direction::Rotation>(std::stoi(content[1]));
 		combo_colour = static_cast<uint8_t>(std::stoi(content[2]));
-		hit_sound = Hitsound::Hitsound{ std::stoi(content[4]) };
+		hit_sound = Hitsound::HitSound{ std::stoi(content[4]) };
 		hit_sample = Hitsound::HitSample{ content[5] };
 	}
 	void Floor::write(std::ofstream& writer) const
@@ -47,10 +47,10 @@ namespace Structures::Game::Beatmap::HitObjects
 
 		// Curves
 		/*
-		for (const auto curves_str = Utilities::String::split(content[5], Format::FileFormat::Beatmap::HitObjects::Slider::AND);
+		for (const auto curves_str = Utilities::String::split(content[5], Format::File::Beatmap::HitObjects::Slider::AND);
 			 const auto& curves : curves_str)
 		{
-			const auto curve_str = Utilities::String::split(curves, Format::FileFormat::Beatmap::HitObjects::Slider::CURVE_AND, true);
+			const auto curve_str = Utilities::String::split(curves, Format::File::Beatmap::HitObjects::Slider::CURVE_AND, true);
 			const SliderCurve curve = {
 				.after = std::stoi(curve_str[0]),
 				.rotation = static_cast<Structures::Types::Game::Direction::Rotation>(std::stoi(curve_str[1]))
@@ -58,7 +58,7 @@ namespace Structures::Game::Beatmap::HitObjects
 			this->curves.push_back(curve);
 		}
 		*/
-		hit_sound = Hitsound::Hitsound{ std::stoi(content[5]) };
+		hit_sound = Hitsound::HitSound{ std::stoi(content[5]) };
 		hit_sample = Hitsound::HitSample{ content[6] };
 	}
 	void Slider::write(std::ofstream& writer) const
@@ -68,8 +68,8 @@ namespace Structures::Game::Beatmap::HitObjects
 		/*
 		writer << AND;
 		for (auto ptr = curves.begin(); ptr != curves.end(); ++ptr) {
-			if (ptr != curves.begin()) writer << Format::FileFormat::Beatmap::HitObjects::Slider::AND;
-			writer << ptr->after << Format::FileFormat::Beatmap::HitObjects::Slider::CURVE_AND << static_cast<int32_t>(ptr->rotation);
+			if (ptr != curves.begin()) writer << Format::File::Beatmap::HitObjects::Slider::AND;
+			writer << ptr->after << Format::File::Beatmap::HitObjects::Slider::CURVE_AND << static_cast<int32_t>(ptr->rotation);
 		}
 		*/
 		writer << AND << hit_sound.to_int() << AND << hit_sample.to_string();
@@ -102,7 +102,7 @@ namespace Structures::Game::Beatmap::HitObjects
 	Types::Game::HitObject::HitObjectType HitObject::get_type() const { return std::visit([](const auto& hit_object) { return hit_object.type; }, *this); }
 	Types::Game::Direction::Rotation HitObject::get_rotation() const { return std::visit([](const auto& hit_object) { return hit_object.rotation; }, *this); }
 	uint8_t HitObject::get_combo_colour() const { return std::visit([](const auto& hit_object) { return hit_object.combo_colour; }, *this); }
-	Hitsound::Hitsound HitObject::get_hitsound() const { return std::visit([](const auto& hit_object) { return hit_object.hit_sound; }, *this); }
+	Hitsound::HitSound HitObject::get_hitsound() const { return std::visit([](const auto& hit_object) { return hit_object.hit_sound; }, *this); }
 	Hitsound::HitSample HitObject::get_hitsample() const { return std::visit([](const auto& hit_object) { return hit_object.hit_sample; }, *this); }
 	void HitObject::write(std::ofstream& writer) const { std::visit([&writer](const auto& hit_object) { hit_object.write(writer); }, *this); }
 
@@ -177,7 +177,7 @@ namespace Structures::Game::Beatmap::HitObjects
 	}
 	void HitObjects::write(std::ofstream& writer) const
 	{
-		writer << Format::FileFormat::Beatmap::HitObjects::HEADER << '\n';
+		writer << Format::File::Beatmap::HitObjects::HEADER << '\n';
 		for (const auto& hit_object : *this | std::views::values)
 			hit_object.write(writer);
 		writer << '\n';

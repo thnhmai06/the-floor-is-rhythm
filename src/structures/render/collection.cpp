@@ -1,4 +1,4 @@
-#include "structures/render/layers/objects/collection.h" // Header
+#include "structures/render/collection.h" // Header
 #include "utilities.hpp"
 
 namespace Structures::Render::Objects

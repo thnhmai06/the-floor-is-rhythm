@@ -1,4 +1,4 @@
-#include "structures/action/event/callback/render.h" // Header
+﻿#include "structures/action/event/callback/render.h" // Header
 #include <utilities.hpp>
 
 namespace Structures::Action::Event::Render
@@ -119,13 +119,13 @@ namespace Structures::Action::Event::Render
 			previous.flip_mode = target_object->config.flip_mode;
 			switch (parameter)
 			{
-			case Parser::Beatmap::Event::Type::Command::Parameter::Parameter::AdditiveColour:
+			case Parameter::AdditiveColour:
 				target_object->config.blend_mode = SDL_BLENDMODE_ADD;
 				break;
-			case Parser::Beatmap::Event::Type::Command::Parameter::Parameter::Horizontal:
+			case Parameter::Horizontal:
 				target_object->config.flip_mode = SDL_FLIP_HORIZONTAL;
 				break;
-			case Parser::Beatmap::Event::Type::Command::Parameter::Parameter::Vertical:
+			case Parameter::Vertical:
 				target_object->config.flip_mode = SDL_FLIP_VERTICAL;
 				break;
 			}
@@ -133,7 +133,7 @@ namespace Structures::Action::Event::Render
 
 	}
 	ParameterCallback::ParameterCallback(const char& parameter) :
-		previous(), parameter(static_cast<Parser::Beatmap::Event::Type::Command::Parameter::Parameter>(parameter))
+		previous(), parameter(static_cast<Parameter>(parameter))
 	{
 	}
 
@@ -141,11 +141,27 @@ namespace Structures::Action::Event::Render
 	void LoopCallback::execute(const int64_t& current_time)
 	{
 		if (!is_active(current_time)) return;
-		const auto current_relative_time = current_time - start_time;
 
-		for (uint32_t time = 1; time <= loop_count; time++)
+		if (current_loop_count < loop_count)
+		{
 			for (const auto& callback : callbacks)
-				if (callback)
-					callback->execute(current_relative_time);
+				if (callback) callback->execute(get_relative_time(current_time));
+			current_loop_count++;
+		}
+	}
+
+	//! Trigger
+	void TriggerCallback::execute(const int64_t& current_time)
+	{
+		if (!is_active(current_time)) return;
+
+		// kiểm tra condition
+		if (std::holds_alternative<Triggers::Playing::HitSound>(condition))
+		{
+			
+		}
+
+		for (const auto& callback : callbacks)
+			if (callback) callback->execute(get_relative_time(current_time));
 	}
 }

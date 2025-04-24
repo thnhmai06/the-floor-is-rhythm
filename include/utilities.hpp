@@ -32,17 +32,44 @@ namespace Utilities
 		}
 		inline float degree_to_radian(const float& degree) { return degree * std::numbers::pi_v<float> / 180.0f; }
 		inline float radian_to_degree(const float& radian) { return radian * 180.0f / std::numbers::pi_v<float>; }
+		inline double round(const double& value, const uint8_t& precision_num = 0)
+		{
+			const double factor = std::pow(10, precision_num);
+			return std::round(value / factor) * factor;
+		}
+		inline std::pair<double, double> decimal_separate(const double& value)
+		{
+			double integer;
+			const double fraction = std::modf(value, &integer);
+			return { integer, fraction };
+		}
+		inline size_t count_digits(const size_t& value)
+		{
+			if (value < 1) return 1;
+			return static_cast<size_t>(std::log10(value)) + 1;
+		}
 
 		namespace FPoint
 		{
 			inline SDL_FPoint operator+(const SDL_FPoint& a, const SDL_FPoint& b) { return SDL_FPoint{ a.x + b.x, a.y + b.y }; }
-			inline SDL_FPoint operator-(const SDL_FPoint& a, const SDL_FPoint& b) { return SDL_FPoint{ a.x - b.x, a.y - b.y }; }
 			inline SDL_FPoint& operator+=(SDL_FPoint& a, const SDL_FPoint& b) { a.x += b.x; a.y += b.y; return a; }
-			inline SDL_FPoint& operator-=(SDL_FPoint& a, const SDL_FPoint& b) { a.x -= b.x; a.y -= b.y; return a; }
+
 			inline SDL_FPoint operator-(const SDL_FPoint& a) { return SDL_FPoint{ -a.x, -a.y }; }
+			inline SDL_FPoint operator-(const SDL_FPoint& a, const SDL_FPoint& b) { return a + (-b); }
+			inline SDL_FPoint& operator-=(SDL_FPoint& a, const SDL_FPoint& b) { return a += (-b); }
+
 			inline SDL_FPoint operator*(const SDL_FPoint& a, const SDL_FPoint& b) { return SDL_FPoint{ a.x * b.x, a.y * b.y }; }
 			inline SDL_FPoint operator*(const SDL_FPoint& point, const float& value) { return SDL_FPoint{ point.x * value, point.y * value }; }
+			inline SDL_FPoint& operator*=(SDL_FPoint& a, const SDL_FPoint& b) { a.x *= b.x; a.y *= b.y; return a; }
+			inline SDL_FPoint& operator*=(SDL_FPoint& point, const float& value) { point.x *= value; point.y *= value; return point; }
+
+			inline SDL_FPoint operator/(const SDL_FPoint& a, const SDL_FPoint& b) { return SDL_FPoint{ a.x / b.x, a.y / b.y }; }
+			inline SDL_FPoint operator/(const SDL_FPoint& point, const float& value) { return SDL_FPoint{ point.x / value, point.y / value }; }
+			inline SDL_FPoint& operator/=(SDL_FPoint& a, const SDL_FPoint& b) { a.x /= b.x; a.y /= b.y; return a; }
+			inline SDL_FPoint& operator/=(SDL_FPoint& point, const float& value) { point.x /= value; point.y /= value; return point; }
+
 			inline bool operator==(const SDL_FPoint& a, const SDL_FPoint& b) { return  is_equal(a.x, b.x) && is_equal(a.y, b.y); }
+			inline bool operator!=(const SDL_FPoint& a, const SDL_FPoint& b) { return !operator==(a, b); }
 		}
 
 		template <typename NumberType>
@@ -50,14 +77,14 @@ namespace Utilities
 		float to_percent(const NumberType& value, const NumberType& from, const NumberType& to)
 		{
 			if (from == to) return 0.0f;
-			return (from < to) ? (value - from) / (to - from) : (to - value) / (to - from);
+			return static_cast<float>((from < to) ? (value - from) / (to - from) : (to - value) / (to - from));
 		}
 		template <typename NumberType>
 		//! HÀM NÀY KHÔNG PHÙ HỢP CHO CẶP 2 SỐ
 		NumberType to_value(const float& percent, const NumberType& from, const NumberType& to)
 		{
 			if (from == to) return from;
-			return from + (to - from) * ((from < to) ? percent : (1.0f - percent));
+			return from + static_cast<NumberType>(static_cast<float>(to - from) * ((from < to) ? percent : (1.0f - percent)));
 		}
 
 		template <typename ComparableType>
@@ -103,10 +130,10 @@ namespace Utilities
 	}
 	namespace String
 	{
-		inline std::string trim(std::string str)
+		inline std::string trim(std::string str, const bool only_trim_right = false)
 		{
 			unsigned long long start = 0;
-			for (const auto& c : str)
+			if (!only_trim_right) for (const auto& c : str)
 			{
 				if (c == ' ' || c == '\t' || c == '\n' || c == '\r') start++;
 				else break;

@@ -18,8 +18,8 @@ namespace Structures::Render::Textures
 	public:
 		struct Item
 		{
-			const_iterator item;
 			const TextureMemory* memory = nullptr;
+			const_iterator item;
 
 		private:
 			[[nodiscard]] SDL_FPoint get_size() const;

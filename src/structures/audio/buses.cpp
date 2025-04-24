@@ -9,10 +9,10 @@ namespace Structures::Audio
 {
 	// Bus<Music>
 	float Bus<Music>::get_volume() const { return volume; }
-	float Bus<Music>::set_volume(const float& percent)
+	float Bus<Music>::set_volume(float percent)
 	{
-		if (percent < 0) return set_volume(0);
-		if (percent > 1) return set_volume(1);
+		if (percent < 0) percent = 0;
+		else if (percent > 1) percent = 1;
 
 		volume = percent;
 		return Utilities::Math::to_percent(
@@ -46,23 +46,23 @@ namespace Structures::Audio
 			Mix_VolumeChunk(sound.item->second, -1),
 			0, MIX_MAX_VOLUME);
 	}
-	float Bus<Effect>::set_volume(const float& percent)
+	float Bus<Effect>::set_volume(float percent)
 	{
-		if (percent < 0) return set_volume(0);
-		if (percent > 1) return set_volume(1);
+		if (percent < 0) percent = 0;
+		else if (percent > 1) percent = 1;
 
 		volume = percent;
 		return Utilities::Math::to_percent(
 			Mix_Volume(-1, Utilities::Math::to_value(percent, 0, MIX_MAX_VOLUME)),
 			0, MIX_MAX_VOLUME);
 	}
-	float Bus<Effect>::set_volume(const Memory<Effect>::Item& sound, const float& percent)
+	float Bus<Effect>::set_volume(const Memory<Effect>::Item& sound, float percent)
 	{
 		if (!sound.parent || sound.item != sound.parent->items.end())
 			return -1;
 
-		if (percent < 0) return set_volume(sound, 0);
-		if (percent > 1) return set_volume(sound, 1);
+		if (percent < 0) percent = 0;
+		else if (percent > 1) percent = 1;
 
 		return Utilities::Math::to_percent(
 			Mix_VolumeChunk(sound.item->second, 

@@ -13,6 +13,8 @@
 namespace Work::Convert::osu
 {
 	using namespace Structures::Game::Beatmap::Metadata;
+	using namespace OsuParser::Beatmap;
+
 	static Structures::Types::Game::Direction::Rotation get_rotation(const uint8_t colour_hax, const unsigned long& total_note_of_current_rotation)
 	{
 		// Loại bỏ hai hướng là cùng phương là hướng hiện tại và hướng ngược với nó,
@@ -34,7 +36,7 @@ namespace Work::Convert::osu
 	}
 
 	//! Metadata
-	static General convert_general(const Parser::GeneralSection& general)
+	static General convert_general(const Sections::General::GeneralSection& general)
 	{
 		General result;
 		if (!general.AudioFilename.empty()) result.audio_file = general.AudioFilename;
@@ -43,7 +45,7 @@ namespace Work::Convert::osu
 		if (!general.EpilepsyWarning.empty()) result.epilepsy_warning = (std::stoi(general.EpilepsyWarning) == 1);
 		return result;
 	}
-	static Difficulty convert_difficulty(const Parser::DifficultySection& difficulty)
+	static Difficulty convert_difficulty(const Sections::Difficulty::DifficultySection& difficulty)
 	{
 		Difficulty result;
 		if (!difficulty.OverallDifficulty.empty()) result.od = std::stof(difficulty.OverallDifficulty);
@@ -51,7 +53,7 @@ namespace Work::Convert::osu
 		if (!difficulty.SliderMultiplier.empty()) result.velocity = std::stof(difficulty.SliderMultiplier);
 		return result;
 	}
-	static Metadata convert_metadata(const Parser::MetadataSection& metadata)
+	static Metadata convert_metadata(const Sections::Metadata::MetadataSection& metadata)
 	{
 		Metadata result;
 		if (!metadata.Title.empty()) result.title = metadata.Title;
@@ -59,28 +61,28 @@ namespace Work::Convert::osu
 		if (!metadata.Creator.empty()) result.creator = metadata.Creator;
 		if (!metadata.Version.empty()) result.difficulty_name = metadata.Version;
 		if (!metadata.Source.empty()) { result.source = metadata.Source; result.source.push_back(' '); }
-		result.source.append(Format::FileFormat::Beatmap::ConvertInformation::osu::SOURCE);
+		result.source.append(Format::File::Beatmap::ConvertInformation::osu::SOURCE);
 		result.tags = metadata.Tags;
 		return result;
 	}
 	//! TimingPoints
 	using namespace Structures::Game::Beatmap::TimingPoints;
-	using Structures::Game::Beatmap::Hitsound::SampleSetType;
-	static TimingPoint convert_timing_point(const Parser::TimingPoint& timing_point)
+	using Structures::Game::Beatmap::Hitsound::HitSampleType;
+	static TimingPoint convert_timing_point(const Objects::TimingPoint::TimingPoint& timing_point)
 	{
 		TimingPoint result;
 		result.time = timing_point.Time;
 		result.beat_length = static_cast<float>(timing_point.BeatLength);
-		result.sample_set = static_cast<SampleSetType>(timing_point.SampleSet);
+		result.sample_set = static_cast<HitSampleType>(timing_point.SampleSet);
 		result.sample_index = timing_point.SampleIndex;
 		result.volume = timing_point.Volume;
 		result.kiai = timing_point.Effects.kiai;
 		return result;
 	}
-	static TimingPoints convert_timing_points(const std::vector<Parser::TimingPoint>& timing_points)
+	static TimingPoints convert_timing_points(const std::vector<Objects::TimingPoint::TimingPoint>& timing_points)
 	{
 		TimingPoints result;
-		for (const Parser::TimingPoint& timing_point : timing_points)
+		for (const auto timing_point : timing_points)
 		{
 			const auto back_itr = Utilities::Container::get_last_element_iterator(result);
 			result.emplace_hint(back_itr, timing_point.Time, convert_timing_point(timing_point));
@@ -89,7 +91,7 @@ namespace Work::Convert::osu
 	}
 	//! HitObjects
 	using namespace Structures::Game::Beatmap::HitObjects;
-	static Floor convert_hit_object_floor(const Parser::HitObject& object, uint8_t& current_combo_colour, unsigned long& total_note_of_current_rotation)
+	static Floor convert_hit_object_floor(const Objects::HitObject::HitObject& object, uint8_t& current_combo_colour, unsigned long& total_note_of_current_rotation)
 	{
 		Floor floor;
 		floor.time = object.Time;
@@ -100,7 +102,7 @@ namespace Work::Convert::osu
 		floor.hit_sample = object.Hitsample;
 		return floor;
 	}
-	static Slider convert_hit_object_slider(const Parser::HitObject& object, const uint8_t& current_combo_colour)
+	static Slider convert_hit_object_slider(const Objects::HitObject::HitObject& object, const uint8_t& current_combo_colour)
 	{
 		Slider slider;
 		slider.time = object.Time;
@@ -136,11 +138,11 @@ namespace Work::Convert::osu
 		slider.hit_sample = object.Hitsample;
 		return slider;
 	}
-	static HitObjects convert_hit_objects(const std::vector<Parser::HitObject>& objects,
+	static HitObjects convert_hit_objects(const std::vector<Objects::HitObject::HitObject>& objects,
 		uint8_t& current_combo_colour, unsigned long& total_note_of_current_rotation)
 	{
 		HitObjects result;
-		for (const Parser::HitObject& osu_object : objects)
+		for (const auto& osu_object : objects)
 		{
 			const auto back_itr = Utilities::Container::get_last_element_iterator(result);
 			if (osu_object.Type.HitCircle)
@@ -167,23 +169,25 @@ namespace Work::Convert::osu
 
 	void convert_beatmap(const char* file_name, const char* output)
 	{
-		Parser::Beatmap beatmap(file_name);
+		const Beatmap beatmap(file_name);
 		std::ofstream writer(output);
 		if (!writer)
 			THROW_ERROR(Logging::Exceptions::FileExceptions::File_Open_Failed(output));
 		// Version
-		writer << Format::FileFormat::Beatmap::FORMAT_VERSION << '\n';
-		writer << Format::FileFormat::Beatmap::ConvertInformation::osu::VERSION << beatmap.Version << '\n';
+		writer << Format::File::Beatmap::FORMAT_VERSION << '\n';
+		writer << Format::File::Beatmap::ConvertInformation::osu::VERSION << beatmap.Version << '\n';
 		writer << '\n';
 		// Contents
 		convert_general(beatmap.General).write(writer);
 		convert_difficulty(beatmap.Difficulty).write(writer);
 		convert_metadata(beatmap.Metadata).write(writer);
 		convert_timing_points(beatmap.TimingPoints).write(writer);
-
+		// HitObjects
 		uint8_t current_combo_colour = 0;
 		unsigned long total_note_of_current_rotation = 0;
 		convert_hit_objects(beatmap.HitObjects, current_combo_colour, total_note_of_current_rotation).write(writer);
+		// Events
+		writer << beatmap.Events.to_string();
 
 		writer.close();
 	}

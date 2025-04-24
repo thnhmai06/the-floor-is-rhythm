@@ -13,30 +13,30 @@ namespace Structures::Game::Beatmap::Metadata
 		for (const auto& line : contents)
 		{
 			if (line.size() < MINIMUM_LINE_CHARACTERS) continue;
-			if (line.find(Format::FileFormat::Beatmap::SEPARATOR) == std::string::npos) continue;
-			const auto content = Utilities::String::split(line, Format::FileFormat::Beatmap::SEPARATOR, true);
+			if (line.find(Format::File::Beatmap::SEPARATOR) == std::string::npos) continue;
+			const auto content = Utilities::String::split(line, Format::File::Beatmap::SEPARATOR, true);
 			if (content.size() <= 1) continue;
 
 			// [0] là key, [1] là value
-			if (content[0] == Format::FileFormat::Beatmap::General::AUDIO_FILE)
+			if (content[0] == Format::File::Beatmap::General::AUDIO_FILE)
 				audio_file = content[1];
-			else if (content[0] == Format::FileFormat::Beatmap::General::MUSIC_DELAY)
+			else if (content[0] == Format::File::Beatmap::General::MUSIC_DELAY)
 				start_music_delay = std::stoi(content[1]);
-			else if (content[0] == Format::FileFormat::Beatmap::General::PREVIEW_TIMESTAMP)
+			else if (content[0] == Format::File::Beatmap::General::PREVIEW_TIMESTAMP)
 				preview_timestamp = std::stoi(content[1]);
-			else if (content[0] == Format::FileFormat::Beatmap::General::EPILEPSY_WARNING)
+			else if (content[0] == Format::File::Beatmap::General::EPILEPSY_WARNING)
 				epilepsy_warning = std::stoi(content[1]);
 		}
 	}
 	void General::write(std::ofstream& writer) const
 	{
-		using namespace Format::FileFormat::Beatmap::General;
+		using namespace Format::File::Beatmap::General;
 
 		writer << HEADER << '\n';
-		writer << AUDIO_FILE << Format::FileFormat::Beatmap::SEPARATOR << audio_file << '\n';
-		writer << MUSIC_DELAY << Format::FileFormat::Beatmap::SEPARATOR << start_music_delay << '\n';
-		writer << PREVIEW_TIMESTAMP << Format::FileFormat::Beatmap::SEPARATOR << preview_timestamp << '\n';
-		writer << EPILEPSY_WARNING << Format::FileFormat::Beatmap::SEPARATOR << epilepsy_warning << '\n';
+		writer << AUDIO_FILE << Format::File::Beatmap::SEPARATOR << audio_file << '\n';
+		writer << MUSIC_DELAY << Format::File::Beatmap::SEPARATOR << start_music_delay << '\n';
+		writer << PREVIEW_TIMESTAMP << Format::File::Beatmap::SEPARATOR << preview_timestamp << '\n';
+		writer << EPILEPSY_WARNING << Format::File::Beatmap::SEPARATOR << epilepsy_warning << '\n';
 		writer << '\n';
 	}
 
@@ -46,27 +46,27 @@ namespace Structures::Game::Beatmap::Metadata
 		for (const auto& line : contents)
 		{
 			if (line.size() < MINIMUM_LINE_CHARACTERS) continue;
-			if (line.find(Format::FileFormat::Beatmap::SEPARATOR) == std::string::npos) continue;
-			const auto content = Utilities::String::split(line, Format::FileFormat::Beatmap::SEPARATOR, true);
+			if (line.find(Format::File::Beatmap::SEPARATOR) == std::string::npos) continue;
+			const auto content = Utilities::String::split(line, Format::File::Beatmap::SEPARATOR, true);
 			if (content.size() <= 1) continue;
 			// [0] là key, [1] là value
-			if (content[0] == Format::FileFormat::Beatmap::Metadata::TITLE)
+			if (content[0] == Format::File::Beatmap::Metadata::TITLE)
 				title = content[1];
-			else if (content[0] == Format::FileFormat::Beatmap::Metadata::ARTIST)
+			else if (content[0] == Format::File::Beatmap::Metadata::ARTIST)
 				artist = content[1];
-			else if (content[0] == Format::FileFormat::Beatmap::Metadata::CREATOR)
+			else if (content[0] == Format::File::Beatmap::Metadata::CREATOR)
 				creator = content[1];
-			else if (content[0] == Format::FileFormat::Beatmap::Metadata::DIFF_NAME)
+			else if (content[0] == Format::File::Beatmap::Metadata::DIFF_NAME)
 				difficulty_name = content[1];
-			else if (content[0] == Format::FileFormat::Beatmap::Metadata::SOURCE)
+			else if (content[0] == Format::File::Beatmap::Metadata::SOURCE)
 				source = content[1];
-			else if (content[0] == Format::FileFormat::Beatmap::Metadata::TAGS)
+			else if (content[0] == Format::File::Beatmap::Metadata::TAGS)
 				tags = Utilities::String::split(content[1], ' ');
 		}
 	}
 	void Metadata::write(std::ofstream& writer) const
 	{
-		using namespace Format::FileFormat::Beatmap::Metadata;
+		using namespace Format::File::Beatmap::Metadata;
 
 		// Chuyển unordered_set thành string
 		std::string str_tags;
@@ -77,12 +77,12 @@ namespace Structures::Game::Beatmap::Metadata
 		}
 
 		writer << HEADER << '\n';
-		writer << TITLE << Format::FileFormat::Beatmap::SEPARATOR << title << '\n';
-		writer << ARTIST << Format::FileFormat::Beatmap::SEPARATOR << artist << '\n';
-		writer << CREATOR << Format::FileFormat::Beatmap::SEPARATOR << creator << '\n';
-		writer << DIFF_NAME << Format::FileFormat::Beatmap::SEPARATOR << difficulty_name << '\n';
-		writer << SOURCE << Format::FileFormat::Beatmap::SEPARATOR << source << '\n';
-		writer << TAGS << Format::FileFormat::Beatmap::SEPARATOR << str_tags << '\n';
+		writer << TITLE << Format::File::Beatmap::SEPARATOR << title << '\n';
+		writer << ARTIST << Format::File::Beatmap::SEPARATOR << artist << '\n';
+		writer << CREATOR << Format::File::Beatmap::SEPARATOR << creator << '\n';
+		writer << DIFF_NAME << Format::File::Beatmap::SEPARATOR << difficulty_name << '\n';
+		writer << SOURCE << Format::File::Beatmap::SEPARATOR << source << '\n';
+		writer << TAGS << Format::File::Beatmap::SEPARATOR << str_tags << '\n';
 		writer << '\n';
 	}
 
@@ -92,26 +92,26 @@ namespace Structures::Game::Beatmap::Metadata
 		for (const auto& line : contents)
 		{
 			if (line.size() < MINIMUM_LINE_CHARACTERS) continue;
-			if (line.find(Format::FileFormat::Beatmap::SEPARATOR) == std::string::npos) continue;
-			const auto content = Utilities::String::split(line, Format::FileFormat::Beatmap::SEPARATOR, true);
+			if (line.find(Format::File::Beatmap::SEPARATOR) == std::string::npos) continue;
+			const auto content = Utilities::String::split(line, Format::File::Beatmap::SEPARATOR, true);
 			if (content.size() <= 1) continue;
 			// [0] là key, [1] là value
-			if (content[0] == Format::FileFormat::Beatmap::Difficulty::HP)
+			if (content[0] == Format::File::Beatmap::Difficulty::HP)
 				hp = std::stof(content[1]);
-			else if (content[0] == Format::FileFormat::Beatmap::Difficulty::OD)
+			else if (content[0] == Format::File::Beatmap::Difficulty::OD)
 				od = std::stof(content[1]);
-			else if (content[0] == Format::FileFormat::Beatmap::Difficulty::VELOCITY)
+			else if (content[0] == Format::File::Beatmap::Difficulty::VELOCITY)
 				velocity = std::stof(content[1]);
 		}
 	}
 	void Difficulty::write(std::ofstream& writer) const
 	{
-		using namespace Format::FileFormat::Beatmap::Difficulty;
+		using namespace Format::File::Beatmap::Difficulty;
 
 		writer << HEADER << '\n';
-		writer << HP << Format::FileFormat::Beatmap::SEPARATOR << hp << '\n';
-		writer << OD << Format::FileFormat::Beatmap::SEPARATOR << od << '\n';
-		writer << VELOCITY << Format::FileFormat::Beatmap::SEPARATOR << velocity << '\n';
+		writer << HP << Format::File::Beatmap::SEPARATOR << hp << '\n';
+		writer << OD << Format::File::Beatmap::SEPARATOR << od << '\n';
+		writer << VELOCITY << Format::File::Beatmap::SEPARATOR << velocity << '\n';
 		writer << '\n';
 	}
 
@@ -142,16 +142,39 @@ namespace Structures::Game::Beatmap::Metadata
 				return 0;
 		}
 		else if (Utilities::Math::in_offset_range(static_cast<float>(hit_object_time), miss, static_cast<float>(click_moment))
-			|| static_cast<float>(click_moment) > static_cast<float>(hit_object_time) + miss) 
+			|| static_cast<float>(click_moment) > static_cast<float>(hit_object_time) + miss)
 			return 0;
 		return -1; // chưa tới tầm với
 	}
-	// ::HPDrainRate
-	void CalculatedDifficulty::HPDrainRate::apply(const float& v)
+	// ::HealthPoint
+	void CalculatedDifficulty::HealthPoint::apply(const float& v)
 	{
-		// Follow Rules: https://osu.ppy.sh/wiki/en/Gameplay/Health#osu!taiko
-		// TODO: later, I have no idea with math
 		value = v;
+		using namespace Config::GameConfig::Difficulty::HP;
+
+		if (value < 5) 
+			drain = BASE - EASIER_MULTIPLY * (5 - value);
+		else 
+			drain = BASE + HARDER_MULTIPLY * (value - 5);
+	}
+	float CalculatedDifficulty::HealthPoint::get_note_hp(const int16_t& note_score, const unsigned long& current_combo) const
+	{
+		float note_multiply;
+		switch (note_score)
+		{
+		case 100: note_multiply = 0.8f;	break;
+		case 50: note_multiply = 0.5f;	break;
+		case 0:	note_multiply = 0.0f;	break;
+		default: // 300, slider tick
+			note_multiply = 1.0f;
+			break;
+		}
+
+		if (current_combo <= 5)
+			return drain * note_multiply - drain;
+		if (current_combo <= 10)
+			return (drain * note_multiply - drain) + (drain * 0.2f * static_cast<float>(current_combo - 5) / 5);
+		return (drain * note_multiply - drain) + (drain * 0.2f); // 0.2 => safe for 100 (0.8)
 	}
 	void CalculatedDifficulty::Velocity::apply(const float& v)
 	{
@@ -161,12 +184,12 @@ namespace Structures::Game::Beatmap::Metadata
 	// ::
 	void CalculatedDifficulty::write(std::ofstream& writer) const
 	{
-		using namespace  Format::FileFormat::Beatmap::Difficulty;
+		using namespace  Format::File::Beatmap::Difficulty;
 
 		writer << HEADER << '\n';
-		writer << HP << Format::FileFormat::Beatmap::SEPARATOR << hp.value << '\n';
-		writer << OD << Format::FileFormat::Beatmap::SEPARATOR << od.value << '\n';
-		writer << VELOCITY << Format::FileFormat::Beatmap::SEPARATOR << velocity.value << '\n';
+		writer << HP << Format::File::Beatmap::SEPARATOR << hp.value << '\n';
+		writer << OD << Format::File::Beatmap::SEPARATOR << od.value << '\n';
+		writer << VELOCITY << Format::File::Beatmap::SEPARATOR << velocity.value << '\n';
 		writer << '\n';
 	}
 	void CalculatedDifficulty::apply(const Difficulty& basic)

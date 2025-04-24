@@ -1,16 +1,18 @@
 {
   "dependencies": [
+    "7zip",
     "sdl3",
     {
       "name": "sdl3-image",
       "features": [
-        "png",
         "jpeg",
+        "png",
         "tiff",
         "webp"
       ]
     },
     "sdl3-ttf",
-    "spdlog"
+    "spdlog",
+    "ffmpeg"
   ]
 }

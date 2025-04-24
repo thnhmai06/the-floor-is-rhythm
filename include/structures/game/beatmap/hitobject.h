@@ -21,7 +21,7 @@ namespace Structures::Game::Beatmap::HitObjects
 		const Types::Game::HitObject::HitObjectType type = Types::Game::HitObject::HitObjectType::FLOOR;
 		Types::Game::Direction::Rotation rotation;
 		uint8_t combo_colour;
-		Hitsound::Hitsound hit_sound;
+		Hitsound::HitSound hit_sound;
 		Hitsound::HitSample hit_sample;
 
 		struct Action
@@ -50,7 +50,7 @@ namespace Structures::Game::Beatmap::HitObjects
 		const Types::Game::HitObject::HitObjectType type = Types::Game::HitObject::HitObjectType::SLIDER;
 		Types::Game::Direction::Rotation rotation;
 		uint8_t combo_colour;
-		Hitsound::Hitsound hit_sound;
+		Hitsound::HitSound hit_sound;
 		Hitsound::HitSample hit_sample;
 
 		struct Action
@@ -81,7 +81,7 @@ namespace Structures::Game::Beatmap::HitObjects
 		[[nodiscard]] Types::Game::HitObject::HitObjectType get_type() const;
 		[[nodiscard]] Types::Game::Direction::Rotation get_rotation() const;
 		[[nodiscard]] uint8_t get_combo_colour() const;
-		[[nodiscard]] Hitsound::Hitsound get_hitsound() const;
+		[[nodiscard]] Hitsound::HitSound get_hitsound() const;
 		[[nodiscard]] Hitsound::HitSample get_hitsample() const;
 	};
 

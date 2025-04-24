@@ -1,17 +1,17 @@
 ﻿#pragma once
 #include <variant>
-#include "structures/render/layers/objects/object.h"
+#include "structures/render/object.h"
 
 namespace Structures::Render::Objects
 {
-	// Collection
+	// Mapset
 	struct Collection
 	{
 	private:
 		void render_in_range(const size_t& from, const size_t& to, const SDL_FPoint& total_offset) const;
 
 	public:
-		std::vector<std::variant<ObjectUnique, PolyObjectUnique>> data;
+		std::vector<std::variant<ObjectShared, PolyObjectShared>> data;
 		std::vector<std::pair<size_t, size_t>> render_range; // Phần tử đầu tiên là 0
 		SDL_FPoint offset = { 0, 0 };
 		bool visible = true;
@@ -20,8 +20,8 @@ namespace Structures::Render::Objects
 		Collection() = default;
 		virtual ~Collection() = default;
 	};
-	using CollectionUnique = std::unique_ptr<Collection>;
+	using CollectionShared = std::shared_ptr<Collection>;
 
 	// Storage
-	using Storage = std::list<CollectionUnique>;
+	using Storage = std::list<CollectionShared>;
 }

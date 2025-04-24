@@ -1,11 +1,11 @@
-﻿#include "structures/render/layers/objects/gameplay/beatmap.h" // Header
+﻿#include "structures/screens/gameplay/playing/mapset.h" // Header
 #include <ranges>
 #include "format/skin.h"
 #include "config.h"
 #include "structures/types.h"
 #include "utilities.hpp"
 
-namespace Structures::Render::Objects::Gameplay::Beatmap
+namespace Structures::Screens::Gameplay::Playing::Mapset
 {
 	static auto current_direction = Types::Game::Direction::Direction::RIGHT;
 	static SDL_FPoint translate_width_based_on_direction(const float& width, const float& default_size = Config::GameConfig::HitObject::SIZE)
@@ -29,7 +29,7 @@ namespace Structures::Render::Objects::Gameplay::Beatmap
 
 	//! ::Components
 	using namespace Components;
-	using Format::SkinFormat::HitObject::HitObjectType, Format::SkinFormat::HitObject::HitObjectSkin;
+	using Format::Skin::HitObject::HitObjectType, Format::Skin::HitObject::hit_objects_skin;
 	// ::Floor
 	Floor::Floor(
 		const Game::Beatmap::HitObjects::HitObject& floor,
@@ -43,10 +43,10 @@ namespace Structures::Render::Objects::Gameplay::Beatmap
 		if (!no_rotation) current_direction += floor.get_rotation();
 
 		const auto texture = memory.find(
-			HitObjectSkin[current_direction][
+			hit_objects_skin[current_direction][
 				HitObjectType::FLOOR]);
 		const auto speed = diff.velocity.speed * current_timing_velocity;
-		Object current{ texture, Types::Render::RenderOriginType::CENTRE };
+		Object current{ texture, Types::Render::OriginType::CENTRE };
 
 		// pos
 		if (!previous || !previous->hit_object)
@@ -99,10 +99,10 @@ namespace Structures::Render::Objects::Gameplay::Beatmap
 		const float src_width_in_percent,
 		const bool from_centre_of_previous)
 	{
-		const auto texture = memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_LINE]);
+		const auto texture = memory.find(hit_objects_skin[current_direction][HitObjectType::SLIDER_LINE]);
 		const auto previous_render_size = Utilities::Render::get_size_from_rect(previous.get_sdl_dst_rect());
 
-		Object current(texture, Types::Render::RenderOriginType::CENTRE);
+		Object current(texture, Types::Render::OriginType::CENTRE);
 		current.config.render_pos = previous.config.render_pos;
 		current.set_render_size(size);
 		switch (current_direction)
@@ -136,11 +136,11 @@ namespace Structures::Render::Objects::Gameplay::Beatmap
 		const TextureMemory& memory,
 		const Object& previous)
 	{
-		const auto texture = memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_POINT]);
+		const auto texture = memory.find(hit_objects_skin[current_direction][HitObjectType::SLIDER_POINT]);
 		const auto previous_sdl_render_pos = Utilities::Render::get_pos_from_rect(previous.get_sdl_dst_rect());
 		const auto previous_render_size = Utilities::Render::get_size_from_rect(previous.get_sdl_dst_rect());
 
-		Object current(texture, Types::Render::RenderOriginType::CENTRE);
+		Object current(texture, Types::Render::OriginType::CENTRE);
 		// size
 		SDL_FPoint size = { Config::GameConfig::HitObject::SIZE, Config::GameConfig::HitObject::SIZE };
 		switch (current_direction)
@@ -184,10 +184,10 @@ namespace Structures::Render::Objects::Gameplay::Beatmap
 		const float& current_timing_velocity,
 		const HitObject* previous)
 	{
-		const auto texture = memory.find(HitObjectSkin[current_direction][HitObjectType::SLIDER_POINT]);
+		const auto texture = memory.find(hit_objects_skin[current_direction][HitObjectType::SLIDER_POINT]);
 		const auto speed = diff.velocity.speed * current_timing_velocity;
 
-		Object current(texture, Types::Render::RenderOriginType::CENTRE);
+		Object current(texture, Types::Render::OriginType::CENTRE);
 		// pos (giống Floor)
 		if (!previous || !previous->hit_object)
 		{
@@ -296,56 +296,58 @@ namespace Structures::Render::Objects::Gameplay::Beatmap
 		data.push_back(create_slider_point(memory, data.back()));
 	}
 
-	// ::Collection
-	Collection::Collection(const TextureMemory& memory, const Game::Beatmap::Beatmap& beatmap)
+	// ::Mapset
+	Mapset::Mapset(const TextureMemory& memory, const Game::Beatmap::Beatmap& beatmap)
 	{
-		//TODO: Chuyển sang dùng Beatmap::Action để vẽ
+		//TODO: Chuyển sang dùng Playing::Action để vẽ
 
 		const auto& difficulty = beatmap.calculated_difficulty;
 		const Game::Beatmap::HitObjects::HitObject* current_hit_object = nullptr;
 		float current_timing_point_velocity, current_beat_length;
 
-		const HitObject* previous_floor = nullptr;
-		const HitObject* previous_slider = nullptr;
+		std::weak_ptr<Floor> previous_floor;
+		std::weak_ptr<Slider> previous_slider;
 		auto get_previous = [&previous_floor, &previous_slider]() -> const HitObject*
 			{
-				if (!previous_floor && !previous_slider) return nullptr;
-				if (previous_floor && !previous_slider) return previous_floor;
-				if (!previous_floor && previous_slider) return previous_slider;
-				if (previous_floor->hit_object->get_end_time() < previous_slider->hit_object->get_end_time())
-					return previous_floor;
-				return previous_slider;
+				if (previous_floor.expired() && previous_slider.expired()) return nullptr;
+				if (!previous_floor.expired() && previous_slider.expired()) return previous_floor.lock().get();
+				if (previous_floor.expired() && !previous_slider.expired()) return previous_slider.lock().get();
+				if (previous_floor.lock()->hit_object->get_end_time() < previous_slider.lock()->hit_object->get_end_time())
+					return previous_floor.lock().get();
+				return previous_slider.lock().get();
 			};
 		auto if_floor = [&]()
 			{
 				bool no_rotation = false;
 				// nằm trên slider trước đó thì không xoay
-				if (previous_slider && Utilities::Math::in_range(
-					previous_slider->hit_object->get_time(),
-					previous_slider->hit_object->get_end_time(),
-					current_hit_object->get_time(), false, false)) no_rotation = true;
+				if (!previous_slider.expired() && Utilities::Math::in_range(
+					previous_slider.lock()->hit_object->get_time(),
+					previous_slider.lock()->hit_object->get_end_time(),
+					current_hit_object->get_time(), false, false))
+					no_rotation = true;
 
-				auto current = std::make_unique<Floor>(*current_hit_object, memory, difficulty,
+				auto current = std::make_shared<Floor>(*current_hit_object, memory, difficulty,
 					current_timing_point_velocity, no_rotation, get_previous());
+				previous_floor = current;
 				data.emplace_back(std::move(current));
-				previous_floor = dynamic_cast<HitObject*>(std::get_if<PolyObjectUnique>(&data.back())->get());
 			};
 		auto if_slider = [&]()
 			{
 				bool no_rotation = false;
 				// nằm trên slider trước đó thì không xoay
-				if (previous_slider && Utilities::Math::in_range(
-					previous_slider->hit_object->get_time(),
-					previous_slider->hit_object->get_end_time(),
-					current_hit_object->get_time(), false, false)) no_rotation = true;
+				if (!previous_slider.expired() && Utilities::Math::in_range(
+					previous_slider.lock()->hit_object->get_time(),
+					previous_slider.lock()->hit_object->get_end_time(),
+					current_hit_object->get_time(), false, false))
+					no_rotation = true;
 
-				auto current = std::make_unique<Slider>(*current_hit_object, memory, difficulty,
+				auto current = std::make_shared<Slider>(*current_hit_object, memory, difficulty,
 					current_beat_length, current_timing_point_velocity, no_rotation, get_previous());
+				previous_slider = current;
 				data.emplace_back(std::move(current));
-				previous_slider = dynamic_cast<HitObject*>(std::get_if<PolyObjectUnique>(&data.back())->get());
 			};
 
-		beatmap.for_all_hit_objects(if_floor, if_slider, current_hit_object, current_timing_point_velocity, current_beat_length);
+		beatmap.for_in_hit_objects(if_floor, if_slider, current_hit_object, current_timing_point_velocity, current_beat_length);
 	}
 }
 

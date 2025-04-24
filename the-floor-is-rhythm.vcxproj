@@ -176,9 +176,17 @@
     <ClInclude Include="include\main.h" />
     <ClInclude Include="include\structures\action\event\callback.h" />
     <ClInclude Include="include\structures\action\event\input.h" />
+    <ClInclude Include="include\structures\action\event\trigger.h" />
+    <ClInclude Include="include\structures\action\event\triggers\playing.h" />
     <ClInclude Include="include\structures\action\time.h" />
+    <ClInclude Include="include\structures\render\objects\number.hpp" />
+    <ClInclude Include="include\structures\render\objects\percent.h" />
+    <ClInclude Include="include\structures\render\objects\string.h" />
+    <ClInclude Include="include\structures\screens\gameplay\playing\health_bar.h" />
+    <ClInclude Include="include\structures\screens\gameplay\playing\score.h" />
+    <ClInclude Include="include\work\audio.h" />
     <ClInclude Include="include\work\convert\osu\beatmap.h" />
-    <ClInclude Include="include\structures\game\beatmap\beatmap.h" />
+    <ClInclude Include="include\structures\game\beatmap.h" />
     <ClInclude Include="include\work\skin.h" />
     <ClInclude Include="include\structures\action\event\callback\render.h" />
     <ClInclude Include="include\structures\audio\buses.h" />
@@ -188,13 +196,12 @@
     <ClInclude Include="include\structures\game\beatmap\hitsound.h" />
     <ClInclude Include="include\structures\game\beatmap\metadata.h" />
     <ClInclude Include="include\structures\game\beatmap\timing.h" />
-    <ClInclude Include="include\structures\render\layers\layer.h" />
-    <ClInclude Include="include\structures\render\layers\objects\collection.h" />
-    <ClInclude Include="include\structures\render\layers\objects\gameplay\cursor.h" />
-    <ClInclude Include="include\structures\render\layers\objects\gameplay\hud.h" />
-    <ClInclude Include="include\structures\render\layers\objects\gameplay\beatmap.h" />
-    <ClInclude Include="include\structures\render\layers\objects\object.h" />
-    <ClInclude Include="include\structures\render\textures\texture.h" />
+    <ClInclude Include="include\structures\render\layer.h" />
+    <ClInclude Include="include\structures\render\collection.h" />
+    <ClInclude Include="include\structures\screens\gameplay\playing\cursor.h" />
+    <ClInclude Include="include\structures\screens\gameplay\playing\mapset.h" />
+    <ClInclude Include="include\structures\render\object.h" />
+    <ClInclude Include="include\structures\render\texture.h" />
     <ClInclude Include="include\structures\screens\gameplay\playing.h" />
     <ClInclude Include="include\structures\screens\screen.h" />
     <ClInclude Include="include\structures\types.h" />
@@ -207,6 +214,9 @@
     <ClCompile Include="dependencies\easing\src\easing.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
+    <ClCompile Include="src\structures\screens\gameplay\playing\score.cpp">
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="src\format\skin.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
@@ -217,18 +227,30 @@
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\structures\action\event\callback.cpp">
-        <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\structures\action\event\callback\render.cpp">
-        <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\structures\action\event\triggers\playing.cpp">
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\structures\action\time.cpp">
-        <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\structures\render\objects\percent.cpp">
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\structures\render\objects\string.cpp">
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\structures\screens\gameplay\playing\health_bar.cpp">
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\work\convert\osu\beatmap.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\game\beatmap\beatmap.cpp">
+    <ClCompile Include="src\structures\game\beatmap.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\work\skin.cpp">
@@ -255,22 +277,19 @@
     <ClCompile Include="src\structures\game\beatmap\timing.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\render\layers\layer.cpp">
+    <ClCompile Include="src\structures\render\layer.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\render\layers\objects\collection.cpp">
+    <ClCompile Include="src\structures\render\collection.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\render\layers\objects\gameplay\cursor.cpp">
+    <ClCompile Include="src\structures\screens\gameplay\playing\cursor.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\render\layers\objects\gameplay\hud.cpp">
+    <ClCompile Include="src\structures\screens\gameplay\playing\mapset.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\render\layers\objects\gameplay\beatmap.cpp">
-      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
-    </ClCompile>
-    <ClCompile Include="src\structures\render\layers\objects\object.cpp">
+    <ClCompile Include="src\structures\render\object.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\structures\screens\gameplay\playing.cpp">
@@ -279,7 +298,7 @@
     <ClCompile Include="src\structures\screens\screen.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\render\textures\texture.cpp">
+    <ClCompile Include="src\structures\render\texture.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\work\core.cpp">

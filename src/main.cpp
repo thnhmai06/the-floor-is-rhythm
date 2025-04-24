@@ -5,7 +5,7 @@
 #include "work/render.h"
 #include "work/core.h"
 
-#include "structures/game/beatmap/beatmap.h"
+#include "structures/game/beatmap.h"
 #include "work/convert/osu/beatmap.h"
 
 constexpr bool DEBUG_MODE = true;

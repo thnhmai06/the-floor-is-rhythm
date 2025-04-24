@@ -2,14 +2,16 @@
 
 #pragma once
 #include "config.h"
-#include "structures/action/time.h"
-#include "structures/action/event/input.h"
 #include "structures/screens/screen.h"
-#include "structures/game/beatmap/beatmap.h"
+#include "structures/action/event/input.h"
+#include "structures/audio/mixer.h"
+#include "structures/action/time.h"
+#include "structures/game/beatmap.h"
 
 namespace Structures::Screens::Gameplay
 {
-	using Render::Objects::Storage, Render::Textures::TextureMemory, Render::Layers::Layer;
+	using namespace Render::Objects;
+	using Render::Layers::Layer;
 	using Action::Event::Input::KeyboardEventList;
 
 	struct PlayingScreen : private Screen
@@ -17,7 +19,8 @@ namespace Structures::Screens::Gameplay
 		std::unique_ptr<const Game::Beatmap::Beatmap> beatmap;
 		float mod_multiplier = 1.0f;
 
-		struct Logic final
+		//! Core
+		struct Core final
 		{
 		private:
 			const Game::Beatmap::Beatmap* beatmap;
@@ -26,7 +29,6 @@ namespace Structures::Screens::Gameplay
 
 		public:
 			Action::Time::Timer timer;
-			uint8_t health = 200;
 			struct Keystroke
 			{
 				struct KeyCounter
@@ -125,33 +127,57 @@ namespace Structures::Screens::Gameplay
 
 				explicit Score(const Game::Beatmap::Beatmap& beatmap, const float& mod_multiplier);
 			} score;
+			struct Health
+			{
+			private:
+				const Game::Beatmap::Metadata::CalculatedDifficulty::HealthPoint* diff_hp;
+				bool no_fail = false;
+
+			public:
+				float hp = 1;
+				bool is_pause = false;
+
+				bool update(const int16_t& note_score, const unsigned long& current_combo); // -> return: người chơi có fail không?
+
+				explicit Health(const Game::Beatmap::Metadata::CalculatedDifficulty::HealthPoint* diff_hp, bool no_fail = false);
+				explicit Health(const Game::Beatmap::Beatmap& beatmap, bool no_fail = false);
+			} health;
 
 			[[nodiscard]] bool is_paused() const { return timer.is_paused(); }
 			void pause();
 			void resume();
 			void make_time_step(const KeyboardEventList& events, const float& current_input_latency = 0);
-			explicit Logic(const Game::Beatmap::Beatmap* beatmap, const int64_t& start_time = 0, const float& mod_multiplier = 1.0f);
+			explicit Core(
+				const Game::Beatmap::Beatmap* beatmap, 
+				const int64_t& start_time = 0, 
+				const float& mod_multiplier = 1.0f, 
+				bool no_fail = false);
 		} logic;
-		struct Render : Screen::Render
+
+		//! Render
+		struct Render final : Screen::Render
 		{
 			struct Components
 			{
-				Screen::Render::Item map_set;
+				Screen::Render::Item map;
 				Screen::Render::Item cursor;
+				Screen::Render::Item health_bar;
+				//Screen::Render::Item score;
+				//Screen::Render::Item combo;
 
-				Components(
-					Storage* storage,
-					Layer* playground_layer,
-					Layer* cursor_layer);
+				explicit Components(Storage* storage);
 			} components;
 
 			Render(
 				const Types::Game::Direction::Direction* current_direction,
-				Layer& playground_layer,
-				Layer& cursor_layer,
-				const TextureMemory& skin,
 				const Game::Beatmap::Beatmap& beatmap);
 		} render;
+
+		struct Audio final
+		{
+			Structures::Audio::Mixer* mixer = nullptr;
+
+		};
 
 		explicit PlayingScreen(const char* beatmap_path);
 	};

@@ -1,6 +1,6 @@
 #pragma once
-#include "structures/render/layers/objects/collection.h"
-#include "structures/render/layers/layer.h"
+#include "structures/render/collection.h"
+#include "structures/render/layer.h"
 
 namespace Structures::Screens
 {
@@ -13,7 +13,7 @@ namespace Structures::Screens
 			struct Item
 			{
 				Structures::Render::Objects::Storage* storage;
-				Structures::Render::Objects::Storage::iterator storage_item;
+				Structures::Render::Objects::Storage::iterator collection;
 				Structures::Render::Layers::Layer::RenderBuffer::Item render_item;
 
 				void remove();
