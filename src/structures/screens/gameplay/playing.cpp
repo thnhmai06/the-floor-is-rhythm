@@ -1,6 +1,7 @@
 ﻿// ReSharper disable CppClangTidyClangDiagnosticShadow
 #include "structures/screens/gameplay/playing.h" // Header
 #include <ranges>
+#include <spdlog/spdlog.h>
 #include "structures/screens/gameplay/playing/mapset.h"
 #include "structures/screens/gameplay/playing/cursor.h"
 #include "structures/screens/gameplay/playing/health_bar.h"
@@ -8,6 +9,7 @@
 #include "work/render/layers.h"
 #include "work/render/textures.h"
 #include "utilities.hpp"
+#include "work/audio.h"
 
 //! PLayingScreen
 namespace Structures::Screens::Gameplay
@@ -53,71 +55,8 @@ namespace Structures::Screens::Gameplay
 	}
 
 	// ::Core::Score::SliderScore
-	uint16_t PlayingScreen::Core::Score::SliderScore::get_bonus_score() const
-	{
-		const auto slider_action = this->slider_action.lock();
-
-		if (completed_ticks.empty()) return 0;
-		if (completed_ticks.size() == slider_action->tick_num)
-			return 300;
-		if (completed_ticks.size() >= static_cast<unsigned long>(ceil(static_cast<float>(slider_action->tick_num) / 2)))
-			return 100;
-		return 50;
-	}
-	float PlayingScreen::Core::Score::SliderScore::check_and_add_slider_tick_score(
-		const int64_t& current_time, const bool is_hold,
-		Score& score, const float& current_input_latency)
-	{
-		const auto slider_action = this->slider_action.lock();
-		const float current_slider_time = static_cast<float>(current_time - slider_action->time);
-		const auto end_slider_time = static_cast<float>(slider_action->end_time - slider_action->time);
-
-		float nearest_tick_slider_time;
-		if (current_slider_time < 0)
-			nearest_tick_slider_time = 0;
-		else
-		{
-			nearest_tick_slider_time = std::min(
-				std::round(current_slider_time / slider_action->tick_length) * slider_action->tick_length,
-				end_slider_time
-			);
-
-			while (completed_ticks.contains(nearest_tick_slider_time))
-			{
-				nearest_tick_slider_time += slider_action->tick_length; // vì không thể đi ngược lại, chỉ có thể đi tiến
-				if (nearest_tick_slider_time > end_slider_time)
-				{
-					nearest_tick_slider_time = end_slider_time;
-					break;
-				}
-			}
-		}
-
-		const auto previous_score = *score.get_score();
-		if (Utilities::Math::in_range(nearest_tick_slider_time, nearest_tick_slider_time + current_input_latency, current_slider_time))
-		{
-			if (is_hold && !completed_ticks.contains(nearest_tick_slider_time))
-			{
-				completed_ticks.insert(nearest_tick_slider_time);
-				score.counter.add_count(10);
-				score.current_combo++;
-			}
-			else score.current_combo = 0;
-		}
-		else return 0;
-
-		score.update_score();
-		return *score.get_score() - previous_score;
-	}
-	float PlayingScreen::Core::Score::SliderScore::add_final_bonus_score(const int64_t& current_time, Score& score) const
-	{
-		const auto previous_score = *score.get_score();
-		score.counter.add_count(get_bonus_score());
-		score.update_score();
-		return *score.get_score() - previous_score;
-	}
-	PlayingScreen::Core::Score::SliderScore::SliderScore(const std::shared_ptr<const Game::Beatmap::HitObjects::Slider::Action>& slider_action)
-		: slider_action(slider_action)
+	PlayingScreen::Core::Score::SliderScore::SliderScore(const std::shared_ptr<const Game::Beatmap::HitObjects::Slider::ActionInfo>& slider_action)
+		: action_info(slider_action)
 	{
 	}
 
@@ -133,29 +72,105 @@ namespace Structures::Screens::Gameplay
 		const float& accuracy = *counter.get_accuracy();
 		const float elapsed_objects = static_cast<float>(counter.get_elapsed_objects_num());
 
-		const float combo_score = BASE_COMBO * static_cast<float>(max_combo) / static_cast<float>(beatmap_stats->count.total_combo);
-		const float accuracy_score = BASE_ACCURACY * std::powf(accuracy, 10) * elapsed_objects / static_cast<float>(beatmap_stats->get_total_objects_num());
+		const float combo_score = BASE_COMBO * static_cast<float>(max_combo) / static_cast<float>(beatmap->stats.count.total_combo);
+		const float accuracy_score = BASE_ACCURACY * std::powf(accuracy, 10) * elapsed_objects / static_cast<float>(beatmap->stats.get_total_objects_num());
 		const float score_no_multiplier = (combo_score + accuracy_score) * mod_multiplier;
 		this->score = score_no_multiplier * mod_multiplier;
 	}
-	float PlayingScreen::Core::Score::add_floor_score(const uint16_t& score)
+	float PlayingScreen::Core::Score::check_and_add_floor_score(const int64_t& current_time, const float& input_latency)
 	{
-		const auto previous_score = *get_score();
+		const auto previous_score = score;
+		const float click_moment = static_cast<float>(current_time) - input_latency;
+		auto click_num = key_stoke->click.get_recently_clicked_num();
 
-		counter.add_count(score);
-		if (score == 0) current_combo = 0; else current_combo++;
-		max_combo = std::max(current_combo, max_combo);
+		while (!floor->empty() && static_cast<float>(floor->front()->time) <= click_moment + beatmap->calculated_difficulty.od.miss)
+		{
+			const auto current_floor = floor->front();
+			const int16_t floor_score = beatmap->calculated_difficulty.od.get_score(
+				click_num > 0, click_moment,
+				current_floor->time, current_floor->direction,
+				key_stoke->direction.current_direction);
+			if (floor_score < 0) break; // chưa đến
+			if (click_num > 0) --click_num;
 
+			floor->pop();
+			counter.add_count(floor_score);
+			if (floor_score == 0) current_combo = 0; else current_combo++;
+			max_combo = std::max(current_combo, max_combo);
+		}
 		update_score();
-		return *get_score() - previous_score;
+		return score - previous_score;
+	}
+	float PlayingScreen::Core::Score::check_and_add_slider_score(const int64_t& current_time, const float& input_latency)
+	{
+		const float previous_score = score;
+		const float hold_moment = static_cast<float>(current_time) - input_latency;
+
+		if (!slider->empty() && static_cast<float>(slider->front()->time) <= hold_moment)
+		{
+			const auto& current_slider = slider->front();
+			//! Ở đây đã vô hiệu hóa nhiều slider cùng lúc
+			if (static_cast<float>(current_slider->end_time) < hold_moment) // đã xong slider
+				slider->pop();
+			else if (!active_sliders.contains(current_slider))
+				active_sliders.insert({ current_slider, SliderScore{current_slider} });
+		}
+
+		auto slider = active_sliders.begin();
+		while (slider != active_sliders.end())
+		{
+			// slider_time: time khi chọn mốc thời gian lúc bắt đầu slider
+			const auto& action = slider->second.action_info.lock();
+			const float current_slider_time = hold_moment - static_cast<float>(action->time);
+			const float end_slider_time = static_cast<float>(action->end_time - action->time);
+
+			//! Điểm tick
+			if (current_slider_time < 0) return 0;
+			if (slider->second.last_uncompleted_tick_slider_time <= current_slider_time
+				&& slider->second.last_uncompleted_tick_slider_time <= end_slider_time)
+			{
+				if (Utilities::Math::is_equal(current_slider_time, slider->second.last_uncompleted_tick_slider_time, 5.0f)) // đã đến lúc hold tick (5ms)
+				{
+					if (key_stoke->click.is_hold())
+					{
+						slider->second.last_uncompleted_tick_slider_time += action->tick_length;
+						++slider->second.completed_ticks_num;
+						counter.add_count(10);
+						current_combo++;
+					}
+				}
+				else
+				{
+					current_combo = 0;
+					slider->second.last_uncompleted_tick_slider_time += action->tick_length;
+				}
+			}
+
+			//! Điểm slider bonus
+			int16_t bonus_score = -1; // TODO: Cập nhật điểm note bắt đầu lấy dữ liệu ở đây
+			if (current_slider_time >= end_slider_time)
+			{
+				if (slider->second.completed_ticks_num == 0) bonus_score = 0;
+				else if (slider->second.completed_ticks_num >= action->tick_num) bonus_score = 300;
+				else if (slider->second.completed_ticks_num >= static_cast<unsigned long>(ceil(static_cast<float>(action->tick_num) / 2)))
+					bonus_score = 100;
+				else bonus_score = 50;
+				counter.add_count(bonus_score);
+				slider = active_sliders.erase(slider);
+			}
+			else ++slider;
+		}
+		update_score();
+		return score - previous_score;
 	}
 	const float* PlayingScreen::Core::Score::get_score() const { return &score; }
 	const unsigned long* PlayingScreen::Core::Score::get_current_combo() const { return &current_combo; }
 	const unsigned long* PlayingScreen::Core::Score::get_max_combo() const { return &max_combo; }
-	float PlayingScreen::Core::Score::get_mod_multiplier() const { return mod_multiplier; }
+	const float* PlayingScreen::Core::Score::get_mod_multiplier() const { return &mod_multiplier; }
 
-	PlayingScreen::Core::Score::Score(const Game::Beatmap::Beatmap& beatmap, const float& mod_multiplier)
-		: beatmap_stats(&beatmap.stats), mod_multiplier(mod_multiplier)
+	PlayingScreen::Core::Score::Score(Core* core, const float& mod_multiplier)
+		: key_stoke(&core->key_stoke), beatmap(core->playing_screen->beatmap.get()),
+		floor(&core->floor), slider(&core->slider), mod_multiplier(mod_multiplier)
 	{
 	}
 
@@ -190,7 +205,6 @@ namespace Structures::Screens::Gameplay
 		// Cập nhật lần cuối cùng thay đổi direction trong beatmap_events
 		for (auto event = events.rbegin(); event != events.rend(); ++event)
 		{
-			if (!event->repeat) continue;
 			if (event->scancode == right.target)
 				current_direction = Types::Game::Direction::Direction::RIGHT;
 			else if (event->scancode == left.target)
@@ -199,7 +213,6 @@ namespace Structures::Screens::Gameplay
 				current_direction = Types::Game::Direction::Direction::UP;
 			else if (event->scancode == down.target)
 				current_direction = Types::Game::Direction::Direction::DOWN;
-			break;
 		}
 
 		right.update(events);
@@ -221,7 +234,7 @@ namespace Structures::Screens::Gameplay
 		k1.reset();
 		k2.reset();
 	}
-	uint16_t PlayingScreen::Core::Keystroke::Click::get_recently_pressed_num() const
+	uint16_t PlayingScreen::Core::Keystroke::Click::get_recently_clicked_num() const
 	{
 		return k1.recently_pressed_num + k2.recently_pressed_num;
 	}
@@ -259,7 +272,7 @@ namespace Structures::Screens::Gameplay
 		const bool no_fail) : diff_hp(diff_hp), no_fail(no_fail)
 	{
 	}
-	PlayingScreen::Core::Health::Health(const Game::Beatmap::Beatmap& beatmap, const bool no_fail) : Health(&beatmap.calculated_difficulty.hp, no_fail)
+	PlayingScreen::Core::Health::Health(const Game::Beatmap::Beatmap* beatmap, const bool no_fail) : Health(&beatmap->calculated_difficulty.hp, no_fail)
 	{
 	}
 
@@ -275,48 +288,76 @@ namespace Structures::Screens::Gameplay
 		timer.resume();
 		health.is_pause = false;
 	}
-	void PlayingScreen::Core::make_time_step(const KeyboardEventList& events, const float& current_input_latency)
+	void PlayingScreen::Core::make_time_step(const EventList& events, const float& input_latency)
 	{
-		key_stoke.update(events);
+		KeyboardEventList keyboard_events{};
+		for (const auto& event : events)
+		{
+			if (event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_KEY_UP)
+				keyboard_events.push_back(event.key);
+		}
+
 		const auto current_time = timer.get_time();
+		key_stoke.update(keyboard_events);
 
 		//! Tính điểm
-		const auto& od = beatmap->calculated_difficulty.od;
-		// Floor
-		while (!floor.empty() && floor.front()->time <= current_time)
+		score.check_and_add_floor_score(current_time, input_latency);
+		score.check_and_add_slider_score(current_time, input_latency);
+
+		//! Cập nhật current object
+		while (current_timing_point != playing_screen->beatmap->timing_points.end() && current_timing_point->first < current_time)
 		{
-			const auto current_floor = Utilities::Container::get_front_and_pop(floor);
-			//? Chưa kiểm tra input
-			score.add_floor_score(
-				od.get_score(current_time, current_floor->time, current_floor->direction, key_stoke.direction.current_direction)
-			);
+			const auto next_itr = std::next(current_timing_point, 1);
+			if (next_itr == playing_screen->beatmap->timing_points.end()) break;
+			if (next_itr->first > current_time) break;
+			++current_timing_point;
+			if (current_timing_point->second.inherited)
+				current_inherited_point = current_timing_point;
+			else current_uninherited_point = current_timing_point;
 		}
-		// Slider
-		while (!slider.empty() && Utilities::Math::in_range(slider.front()->time, slider.front()->end_time, current_time))
-		{
-			if (const auto current_slider = Utilities::Container::get_front_and_pop(slider);
-				!score.current_slider.contains(current_slider)) // cho chắc
-				score.current_slider.insert({ current_slider, Score::SliderScore{current_slider} });
-		}
-		for (auto& [slider_action, slider_score] : score.current_slider)
-		{
-			slider_score.check_and_add_slider_tick_score(current_time, key_stoke.click.is_hold(), score, current_input_latency);
-			if (current_time > slider_action->end_time)
-			{
-				slider_score.add_final_bonus_score(current_time, score);
-				score.current_slider.erase(slider_action);
-			}
-		}
+		//SPDLOG_INFO("Current: {}", std::min(floor.front()->time, slider.front()->time));
+		//SPDLOG_INFO("Current time: {}", current_time);
+
+		//! Cập nhật hướng đi & di chuyển
+		const auto time_delta = static_cast<float>(current_time - previous_time);
+		const auto distance = time_delta * playing_screen->beatmap->calculated_difficulty.velocity.speed * current_inherited_point->second.get_velocity();
+
+		const Types::Game::Direction::Direction current_direction =
+			Utilities::Container::get_front_dual_queue(floor, slider,
+				[](
+					const std::weak_ptr<const Game::Beatmap::HitObjects::Floor::ActionInfo>& left, 
+					const std::weak_ptr<const Game::Beatmap::HitObjects::Slider::ActionInfo>& right)
+				{
+					return right.lock()->time < left.lock()->time;
+				}) ? slider.front()->direction : floor.front()->direction;
+		//SPDLOG_INFO("Current Direction: {}", static_cast<uint8_t>(current_direction));
+		const auto mapset = dynamic_cast<Playing::Mapset::Mapset*>(playing_screen->render.components.map.collection->get());
+		//mapset->move(distance, current_direction);
+		SPDLOG_INFO("Add Distance: {}", distance);
+
+		// TODO: make it relative
+		const auto left = floor.size() + slider.size();
+		const auto total = playing_screen->beatmap->stats.get_total_objects_num();
+		const int64_t current_hit_object_num = total - left;
+		mapset->render_range.front() = { current_hit_object_num - 100, current_hit_object_num + 100 };
+
+		previous_time = current_time;
 	}
-	PlayingScreen::Core::Core(const Game::Beatmap::Beatmap* beatmap, const int64_t& start_time, const float& mod_multiplier, const bool no_fail)
-		: beatmap(beatmap), timer(start_time), score(*beatmap, mod_multiplier), health(*beatmap, no_fail)
+	PlayingScreen::Core::Core(
+		const PlayingScreen* playing_screen,
+		const int64_t& start_time,
+		const float& mod_multiplier,
+		const bool no_fail)
+		: playing_screen(playing_screen), timer(start_time), score(this, mod_multiplier), health(playing_screen->beatmap.get(), no_fail)
 	{
-		constexpr int64_t START_TIME_OFFSET = 3000; // 3s
-		timer.start_time = beatmap->stats.time.start_time - START_TIME_OFFSET;
+		const auto& beatmap = playing_screen->beatmap;
 
 		auto [floor, slider] = beatmap->make_action_queue();
 		this->floor = std::move(floor);
 		this->slider = std::move(slider);
+
+		constexpr int64_t START_TIME_OFFSET = 0;
+		previous_time = timer.start_time = beatmap->stats.time.start_time - START_TIME_OFFSET;
 	}
 
 	// ::Render
@@ -324,12 +365,10 @@ namespace Structures::Screens::Gameplay
 		map(storage, &Work::Render::Layers::playground->render_buffer),
 		cursor(storage, &Work::Render::Layers::cursor->render_buffer),
 		health_bar(storage, &Work::Render::Layers::hud->render_buffer),
-		score(storage, &Work::Render::Layers::hud->render_buffer),
-		combo(storage, &Work::Render::Layers::hud->render_buffer)
+		score(storage, &Work::Render::Layers::hud->render_buffer)
 	{
 	}
 	PlayingScreen::Render::Render(
-		const Types::Game::Direction::Direction* current_direction,
 		const Game::Beatmap::Beatmap& beatmap,
 		const Core& logic_core) :
 		components(&storage)
@@ -340,12 +379,12 @@ namespace Structures::Screens::Gameplay
 			std::make_shared<Playing::Mapset::Mapset>(*Work::Render::Textures::skin, beatmap)
 		);
 		components.map.render_item = Work::Render::Layers::playground->render_buffer.add_collection(components.map.collection->get()); // Thêm vào render_buffer ở đây nè :D
-		components.map.collection->get()->render_range = { {0, 10} }; // for testing TODO: set render range
+		components.map.collection->get()->render_range = { {-10, 10} };
 
 		//! Cursor
 		components.cursor.collection = storage.insert(
 			Utilities::Container::get_last_element_iterator(storage),
-			std::make_shared<Playing::Cursor::Cursor>(*Work::Render::Textures::skin, current_direction)
+			std::make_shared<Playing::Cursor::Cursor>(*Work::Render::Textures::skin, &logic_core.key_stoke.direction.current_direction)
 		);
 		components.cursor.render_item = Work::Render::Layers::cursor->render_buffer.add_collection(components.cursor.collection->get()); // Thêm vào render_buffer ở đây nè :D
 
@@ -359,15 +398,30 @@ namespace Structures::Screens::Gameplay
 		//! Score
 		components.score.collection = storage.insert(
 			Utilities::Container::get_last_element_iterator(storage),
-			std::make_shared<Playing::Score::Score>(*Work::Render::Textures::skin, logic_core.score.get_score(), logic_core.score.counter.get_accuracy())
+			std::make_shared<Playing::Score::Score>(
+				*Work::Render::Textures::skin, logic_core.score.get_score(),
+				logic_core.score.counter.get_accuracy(),
+				logic_core.score.get_current_combo())
 		);
 		components.score.render_item = Work::Render::Layers::hud->render_buffer.add_collection(components.score.collection->get()); // Thêm vào render_buffer ở đây nè :D
 	}
-	// ::
-	PlayingScreen::PlayingScreen(const char* beatmap_path) :
-		beatmap(std::make_unique<const Game::Beatmap::Beatmap>(beatmap_path)),
-		logic_core(beatmap.get()),
-		render(&logic_core.key_stoke.direction.current_direction, *this->beatmap, logic_core)
+
+	// ::Audio
+	PlayingScreen::Audio::Audio(const Game::Beatmap::Beatmap& beatmap, const std::filesystem::path& beatmap_root)
+		: beatmap(&beatmap)
 	{
+		/*const auto beatmap_audio_file = beatmap_root / beatmap.general.audio_file;
+		Work::Audio::Memory::Beatmap::music.load(beatmap_audio_file, beatmap_audio_file.filename().string());
+		Work::Audio::Memory::Beatmap::effect.load(beatmap_root);*/
+	}
+
+	// ::
+	PlayingScreen::PlayingScreen(const std::filesystem::path& beatmap) :
+		beatmap(std::make_unique<const Game::Beatmap::Beatmap>(beatmap)),
+		logic_core(this),
+		render(*this->beatmap, logic_core),
+		audio(*this->beatmap, beatmap.parent_path())
+	{
+		logic_core.timer.resume();
 	}
 }

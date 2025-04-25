@@ -5,7 +5,7 @@ namespace Structures::Render::Objects
 {
 	void Collection::render_in_range(const size_t& from, const size_t& to, const SDL_FPoint& total_offset) const
 	{
-		for (auto i = from; i <= to; ++i)
+		for (auto i = std::max(from, static_cast<size_t>(0)); i <= std::min(data.size()-1, to); ++i)
 		{
 			if (const auto& object = data[i]; 
 				std::holds_alternative<ObjectShared>(object))

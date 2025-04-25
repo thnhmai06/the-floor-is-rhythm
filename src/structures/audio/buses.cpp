@@ -46,15 +46,19 @@ namespace Structures::Audio
 			Mix_VolumeChunk(sound.item->second, -1),
 			0, MIX_MAX_VOLUME);
 	}
-	float Bus<Effect>::set_volume(float percent)
+	void Bus<Effect>::set_volume(float percent)
 	{
 		if (percent < 0) percent = 0;
 		else if (percent > 1) percent = 1;
 
 		volume = percent;
-		return Utilities::Math::to_percent(
+
+		// bị lỗi từ sdl_mixer
+		/*return Utilities::Math::to_percent(
 			Mix_Volume(-1, Utilities::Math::to_value(percent, 0, MIX_MAX_VOLUME)),
-			0, MIX_MAX_VOLUME);
+			0, MIX_MAX_VOLUME);*/
+		for (int32_t i = 0; i < Config::GameConfig::Audio::MAX_CHANNELS; ++i)
+			Mix_Volume(i, Utilities::Math::to_value(percent, 0, MIX_MAX_VOLUME));
 	}
 	float Bus<Effect>::set_volume(const Memory<Effect>::Item& sound, float percent)
 	{

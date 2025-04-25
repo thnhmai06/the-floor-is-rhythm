@@ -12,7 +12,7 @@ namespace Structures::Render::Objects
 
 	public:
 		std::vector<std::variant<ObjectShared, PolyObjectShared>> data;
-		std::vector<std::pair<size_t, size_t>> render_range; // Phần tử đầu tiên là 0
+		std::vector<std::pair<int64_t, int64_t>> render_range; // Phần tử đầu tiên là 0
 		SDL_FPoint offset = { 0, 0 };
 		bool visible = true;
 		void render(const SDL_FPoint& camera_offset) const;

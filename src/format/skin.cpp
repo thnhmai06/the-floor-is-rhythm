@@ -4,91 +4,93 @@
 
 namespace Format::Skin
 {
-	namespace HitObject
+	namespace Image
 	{
-		//! HitObjectsInDirection
-		std::string HitObjectsInDirection::get_direction_folder(
-			const Structures::Types::Game::Direction::Direction& direction)
+		namespace HitObject
 		{
-			switch (direction)
+			//! HitObjectsInDirection
+			std::string HitObjectsInDirection::get_direction_folder(
+				const Structures::Types::Game::Direction::Direction& direction)
 			{
-			case Structures::Types::Game::Direction::Direction::RIGHT:
+				switch (direction)
+				{
+				case Structures::Types::Game::Direction::Direction::RIGHT:
+					return "right/";
+				case Structures::Types::Game::Direction::Direction::UP:
+					return "up/";
+				case Structures::Types::Game::Direction::Direction::DOWN:
+					return "down/";
+				case Structures::Types::Game::Direction::Direction::LEFT:
+					return "left/";
+				}
 				return "right/";
-			case Structures::Types::Game::Direction::Direction::UP:
-				return "up/";
-			case Structures::Types::Game::Direction::Direction::DOWN:
-				return "down/";
-			case Structures::Types::Game::Direction::Direction::LEFT:
-				return "left/";
 			}
-			return "right/";
-		}
-		HitObjectsInDirection::reference HitObjectsInDirection::operator[](const HitObjectType& type)
-		{
-			return BASE::operator[](static_cast<uint8_t>(type));
-		}
-		HitObjectsInDirection::const_reference HitObjectsInDirection::operator[](const HitObjectType& type) const
-		{
-			return BASE::operator[](static_cast<uint8_t>(type));
-		}
-		HitObjectsInDirection::HitObjectsInDirection(const Structures::Types::Game::Direction::Direction& direction) :
-			BASE{},
-			direction_folder(get_direction_folder(direction))
-		{
-			(*this)[HitObjectType::FLOOR] = direction_folder + "floor";
-			(*this)[HitObjectType::SLIDER_FOCUS] = direction_folder + "sliderfocus";
-			(*this)[HitObjectType::SLIDER_LINE] = direction_folder + "sliderline";
-			(*this)[HitObjectType::SLIDER_POINT] = direction_folder + "sliderpoint";
-		}
+			HitObjectsInDirection::reference HitObjectsInDirection::operator[](const HitObjectType& type)
+			{
+				return BASE::operator[](static_cast<uint8_t>(type));
+			}
+			HitObjectsInDirection::const_reference HitObjectsInDirection::operator[](const HitObjectType& type) const
+			{
+				return BASE::operator[](static_cast<uint8_t>(type));
+			}
+			HitObjectsInDirection::HitObjectsInDirection(const Structures::Types::Game::Direction::Direction& direction) :
+				BASE{},
+				direction_folder(get_direction_folder(direction))
+			{
+				(*this)[HitObjectType::FLOOR] = direction_folder + "floor";
+				(*this)[HitObjectType::SLIDER_FOCUS] = direction_folder + "sliderfocus";
+				(*this)[HitObjectType::SLIDER_LINE] = direction_folder + "sliderline";
+				(*this)[HitObjectType::SLIDER_POINT] = direction_folder + "sliderpoint";
+			}
 
-		//! HitObjectSkins
-		HitObjectSkins::reference HitObjectSkins::operator[](
-			const Structures::Types::Game::Direction::Direction& direction)
-		{
-			return BASE::operator[](static_cast<Structures::Types::Game::Direction::DirectionBase>(direction));
-		}
-		HitObjectSkins::const_reference HitObjectSkins::operator[](
-			const Structures::Types::Game::Direction::Direction& direction) const
-		{
-			return BASE::operator[](static_cast<Structures::Types::Game::Direction::DirectionBase>(direction));
-		}
-		HitObjectSkins::HitObjectSkins() : BASE{
-				HitObjectsInDirection(Structures::Types::Game::Direction::Direction::RIGHT),
-				HitObjectsInDirection(Structures::Types::Game::Direction::Direction::UP),
-				HitObjectsInDirection(Structures::Types::Game::Direction::Direction::DOWN),
-				HitObjectsInDirection(Structures::Types::Game::Direction::Direction::LEFT) }
-		{
+			//! HitObjectSkins
+			HitObjectSkins::reference HitObjectSkins::operator[](
+				const Structures::Types::Game::Direction::Direction& direction)
+			{
+				return BASE::operator[](static_cast<Structures::Types::Game::Direction::DirectionBase>(direction));
+			}
+			HitObjectSkins::const_reference HitObjectSkins::operator[](
+				const Structures::Types::Game::Direction::Direction& direction) const
+			{
+				return BASE::operator[](static_cast<Structures::Types::Game::Direction::DirectionBase>(direction));
+			}
+			HitObjectSkins::HitObjectSkins() : BASE{
+					HitObjectsInDirection(Structures::Types::Game::Direction::Direction::RIGHT),
+					HitObjectsInDirection(Structures::Types::Game::Direction::Direction::UP),
+					HitObjectsInDirection(Structures::Types::Game::Direction::Direction::DOWN),
+					HitObjectsInDirection(Structures::Types::Game::Direction::Direction::LEFT) }
+			{
+			}
 		}
 	}
-
-	//! Namespace
-	ImageNamespace::ImageNamespace()
+	// !Namespace
+		ImageNamespace::ImageNamespace()
 	{
-		//! Cursor
-		insert(Cursor::body);
-		insert(Cursor::trail);
-		for (const auto& val : Cursor::direction_skin | std::views::values)
+		//! Image::Cursor
+		insert(Image::Cursor::body);
+		insert(Image::Cursor::trail);
+		for (const auto& val : Image::Cursor::direction_skin | std::views::values)
 		{
 			insert(val);
 		}
 
-		//! HealthBar
-		insert(HealthBar::background);
-		insert(HealthBar::colour);
+		//! Image::HealthBar
+		insert(Image::HealthBar::background);
+		insert(Image::HealthBar::colour);
 
 		//! HitObjects
-		for (const auto& direction_skin : HitObject::hit_objects_skin)
+		for (const auto& direction_skin : Image::HitObject::hit_objects_skin)
 			for (const auto& skin : direction_skin)
 				insert(skin);
 
 		//! Score
-		for (const auto& score_skin_filename : Score::alphabet | std::views::values)
+		for (const auto& score_skin_filename : Image::Score::alphabet | std::views::values)
 			insert(score_skin_filename);
 	}
 	FolderNamespace::FolderNamespace()
 	{
-		//! Cursor
-		for (const auto& val : Cursor::direction_skin | std::views::values)
+		//! Image::Cursor
+		for (const auto& val : Image::Cursor::direction_skin | std::views::values)
 		{
 			if (const auto first_slash = val.find('/');
 				first_slash != std::string_view::npos)

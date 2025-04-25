@@ -8,7 +8,7 @@ namespace Structures::Screens::Gameplay::Playing::HealthBar
 		Background::Background(
 			const TextureMemory& skin)
 			: Object(skin.find(
-				Format::Skin::HealthBar::background),
+				Format::Skin::Image::HealthBar::background),
 				Types::Render::OriginType::TOP_LEFT,
 				{ 0, 0 })
 		{
@@ -20,7 +20,7 @@ namespace Structures::Screens::Gameplay::Playing::HealthBar
 			const float* percent
 		)
 			: PercentObject(
-				skin.find(Format::Skin::HealthBar::colour),
+				skin.find(Format::Skin::Image::HealthBar::colour),
 				render_size, percent, true, false,
 				Types::Render::OriginType::TOP_LEFT, SDL_FPoint{ 0, 0 })
 		{

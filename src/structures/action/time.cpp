@@ -2,6 +2,10 @@
 
 namespace Structures::Action::Time
 {
+	Uint64 Timer::get_current_tick()
+	{
+		return SDL_GetTicks();
+	}
 	// Timer
 	void Timer::create_pause_snapshot(const Uint64& current_tick)
 	{

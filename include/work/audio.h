@@ -13,8 +13,16 @@ namespace Work::Audio
 
 	namespace Memory
 	{
-		inline Structures::Audio::Memory<Music> music;
-		inline Structures::Audio::Memory<Effect> effect;
+		namespace Beatmap
+		{
+			inline Structures::Audio::Memory<Music> music;
+			inline Structures::Audio::Memory<Effect> effect;
+		}
+		namespace Skin
+		{
+			inline Structures::Audio::Memory<Music> music;
+			inline Structures::Audio::Memory<Effect> effect;
+		}
 	}
 
 	inline void init()

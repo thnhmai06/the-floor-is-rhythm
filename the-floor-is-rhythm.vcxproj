@@ -186,11 +186,12 @@
     <ClInclude Include="include\structures\screens\gameplay\playing\score.h" />
     <ClInclude Include="include\work\audio.h" />
     <ClInclude Include="include\work\convert\osu\beatmap.h" />
+    <ClInclude Include="include\work\convert\osu\mapset.h" />
     <ClInclude Include="include\structures\game\beatmap.h" />
     <ClInclude Include="include\work\skin.h" />
     <ClInclude Include="include\structures\action\event\callback\render.h" />
     <ClInclude Include="include\structures\audio\buses.h" />
-    <ClInclude Include="include\structures\audio\memory.h" />
+    <ClInclude Include="include\structures\audio\memory.hpp" />
     <ClInclude Include="include\structures\audio\mixer.h" />
     <ClInclude Include="include\structures\game\beatmap\hitobject.h" />
     <ClInclude Include="include\structures\game\beatmap\hitsound.h" />
@@ -247,7 +248,8 @@
     <ClCompile Include="src\structures\screens\gameplay\playing\health_bar.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\work\convert\osu\beatmap.cpp">
+    <ClCompile Include="src\work\convert\osu\beatmap.cpp" />
+    <ClCompile Include="src\work\convert\osu\mapset.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\structures\game\beatmap.cpp">

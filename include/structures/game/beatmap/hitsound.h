@@ -9,10 +9,10 @@ namespace Structures::Game::Beatmap::Hitsound
 {
 	enum class HitSoundType : std::uint8_t
 	{
-		NORMAL = 1 << 0,
-		WHISTLE = 1 << 1,
-		FINISH = 1 << 2,
-		CLAP = 1 << 3
+		NORMAL = 0,
+		WHISTLE = 1,
+		FINISH = 2,
+		CLAP = 3
 	};
 	enum class HitSampleType : std::uint8_t
 	{

@@ -60,7 +60,7 @@
     <ClCompile Include="src\work\skin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\work\convert\osu\beatmap.cpp">
+    <ClCompile Include="src\work\convert\osu\mapset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\structures\game\beatmap.cpp">
@@ -105,13 +105,13 @@
     <ClCompile Include="src\structures\render\objects\percent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\render\objects\number.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\structures\render\objects\string.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\structures\screens\gameplay\playing\score.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\work\convert\osu\beatmap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -128,7 +128,7 @@
     <ClInclude Include="include\structures\audio\buses.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\audio\memory.h">
+    <ClInclude Include="include\structures\audio\memory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\structures\game\beatmap\hitsound.h">
@@ -173,7 +173,7 @@
     <ClInclude Include="include\config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\work\convert\osu\beatmap.h">
+    <ClInclude Include="include\work\convert\osu\mapset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\structures\game\beatmap.h">
@@ -242,10 +242,13 @@
     <ClInclude Include="include\structures\screens\gameplay\playing\score.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\render\objects\number.h">
+    <ClInclude Include="include\structures\render\objects\string.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\render\objects\string.h">
+    <ClInclude Include="include\structures\render\objects\number.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\work\convert\osu\beatmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

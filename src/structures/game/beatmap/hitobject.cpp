@@ -8,7 +8,7 @@
 
 namespace Structures::Game::Beatmap::HitObjects
 {
-	using Format::File::Beatmap::AND;
+	using Format::File::Floor::Mapset::AND;
 
 	Types::Game::Direction::Direction get_next_direction(const Types::Game::Direction::Direction& prev_direction, const uint8_t& rotation)
 	{
@@ -31,8 +31,8 @@ namespace Structures::Game::Beatmap::HitObjects
 		writer << AND << hit_sound.to_int() << AND << hit_sample.to_string();
 		writer << '\n';
 	}
-	// ::Action
-	Floor::Action::Action(const Floor& floor, const Types::Game::Direction::Direction& previous_direction) :
+	// ::ActionInfo
+	Floor::ActionInfo::ActionInfo(const Floor& floor, const Types::Game::Direction::Direction& previous_direction) :
 		type(floor.type), direction(previous_direction + floor.rotation), time(floor.time)
 	{
 	}
@@ -47,10 +47,10 @@ namespace Structures::Game::Beatmap::HitObjects
 
 		// Curves
 		/*
-		for (const auto curves_str = Utilities::String::split(content[5], Format::File::Beatmap::HitObjects::Slider::AND);
+		for (const auto curves_str = Utilities::String::split(content[5], Format::File::Floor::Mapset::HitObjects::Slider::AND);
 			 const auto& curves : curves_str)
 		{
-			const auto curve_str = Utilities::String::split(curves, Format::File::Beatmap::HitObjects::Slider::CURVE_AND, true);
+			const auto curve_str = Utilities::String::split(curves, Format::File::Floor::Mapset::HitObjects::Slider::CURVE_AND, true);
 			const SliderCurve curve = {
 				.after = std::stoi(curve_str[0]),
 				.rotation = static_cast<Structures::Types::Game::Direction::Rotation>(std::stoi(curve_str[1]))
@@ -68,15 +68,15 @@ namespace Structures::Game::Beatmap::HitObjects
 		/*
 		writer << AND;
 		for (auto ptr = curves.begin(); ptr != curves.end(); ++ptr) {
-			if (ptr != curves.begin()) writer << Format::File::Beatmap::HitObjects::Slider::AND;
-			writer << ptr->after << Format::File::Beatmap::HitObjects::Slider::CURVE_AND << static_cast<int32_t>(ptr->rotation);
+			if (ptr != curves.begin()) writer << Format::File::Floor::Mapset::HitObjects::Slider::AND;
+			writer << ptr->after << Format::File::Floor::Mapset::HitObjects::Slider::CURVE_AND << static_cast<int32_t>(ptr->rotation);
 		}
 		*/
 		writer << AND << hit_sound.to_int() << AND << hit_sample.to_string();
 		writer << '\n';
 	}
-	//:: Action
-	Slider::Action::Action(const Slider& slider, const float& timing_velocity, const float& diff_velocity,
+	//:: ActionInfo
+	Slider::ActionInfo::ActionInfo(const Slider& slider, const float& timing_velocity, const float& diff_velocity,
 		const float& beat_length, const Types::Game::Direction::Direction& previous_direction) : type(slider.type), direction(previous_direction + slider.rotation),
 		time(slider.time), end_time(slider.end_time)
 	{
@@ -177,7 +177,7 @@ namespace Structures::Game::Beatmap::HitObjects
 	}
 	void HitObjects::write(std::ofstream& writer) const
 	{
-		writer << Format::File::Beatmap::HitObjects::HEADER << '\n';
+		writer << Format::File::Floor::Mapset::HitObjects::HEADER << '\n';
 		for (const auto& hit_object : *this | std::views::values)
 			hit_object.write(writer);
 		writer << '\n';

@@ -29,7 +29,7 @@ namespace Structures::Screens::Gameplay::Playing::Mapset
 
 	//! ::Components
 	using namespace Components;
-	using Format::Skin::HitObject::HitObjectType, Format::Skin::HitObject::hit_objects_skin;
+	using Format::Skin::Image::HitObject::HitObjectType, Format::Skin::Image::HitObject::hit_objects_skin;
 	// ::Floor
 	Floor::Floor(
 		const Game::Beatmap::HitObjects::HitObject& floor,
@@ -297,9 +297,27 @@ namespace Structures::Screens::Gameplay::Playing::Mapset
 	}
 
 	// ::Mapset
+	void Mapset::move(const float& distance, const Types::Game::Direction::Direction& direction)
+	{
+		switch (direction)
+		{
+		case Types::Game::Direction::Direction::RIGHT:
+			offset.x -= distance;
+			break;
+		case Types::Game::Direction::Direction::LEFT:
+			offset.x += distance;
+			break;
+		case Types::Game::Direction::Direction::UP:
+			offset.y += distance;
+			break;
+		case Types::Game::Direction::Direction::DOWN:
+			offset.y -= distance;
+			break;
+		}
+	}
 	Mapset::Mapset(const TextureMemory& memory, const Game::Beatmap::Beatmap& beatmap)
 	{
-		//TODO: Chuyển sang dùng Playing::Action để vẽ
+		//TODO: Chuyển sang dùng Playing::ActionInfo để vẽ
 
 		const auto& difficulty = beatmap.calculated_difficulty;
 		const Game::Beatmap::HitObjects::HitObject* current_hit_object = nullptr;

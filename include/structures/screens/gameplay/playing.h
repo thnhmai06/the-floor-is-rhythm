@@ -1,6 +1,6 @@
 ﻿// ♪ https://youtu.be/i0fw1thgnK0 <3
-
 #pragma once
+#include <filesystem>
 #include "config.h"
 #include "structures/screens/screen.h"
 #include "structures/action/event/input.h"
@@ -13,6 +13,7 @@ namespace Structures::Screens::Gameplay
 	using namespace Render::Objects;
 	using Render::Layers::Layer;
 	using Action::Event::Input::KeyboardEventList;
+	using Action::Event::Input::EventList;
 
 	struct PlayingScreen : private Screen
 	{
@@ -23,10 +24,13 @@ namespace Structures::Screens::Gameplay
 		struct Core final
 		{
 		private:
-			const Game::Beatmap::Beatmap* beatmap;
+			const PlayingScreen* playing_screen;
 			Game::Beatmap::Beatmap::FloorActionQueue floor;
 			Game::Beatmap::Beatmap::SliderActionQueue slider;
-
+			Game::Beatmap::TimingPoints::TimingPoints::const_iterator current_inherited_point = playing_screen->beatmap->timing_points.cbegin();
+			Game::Beatmap::TimingPoints::TimingPoints::const_iterator current_uninherited_point = playing_screen->beatmap->timing_points.cbegin();
+			Game::Beatmap::TimingPoints::TimingPoints::const_iterator current_timing_point = playing_screen->beatmap->timing_points.cbegin(); // nói chung
+			int64_t previous_time;
 		public:
 			Action::Time::Timer timer;
 			struct Keystroke
@@ -47,7 +51,6 @@ namespace Structures::Screens::Gameplay
 				struct Direction
 				{
 					Types::Game::Direction::Direction current_direction = Types::Game::Direction::Direction::RIGHT;
-
 					KeyCounter right{ Config::UserConfig::KeyBinding::Direction::right };
 					KeyCounter left{ Config::UserConfig::KeyBinding::Direction::left };
 					KeyCounter up{ Config::UserConfig::KeyBinding::Direction::up };
@@ -63,7 +66,7 @@ namespace Structures::Screens::Gameplay
 
 					void reset();
 
-					[[nodiscard]] uint16_t get_recently_pressed_num() const;
+					[[nodiscard]] uint16_t get_recently_clicked_num() const;
 					[[nodiscard]] bool is_hold() const;
 					void update(const KeyboardEventList& events);
 				} click;
@@ -74,8 +77,13 @@ namespace Structures::Screens::Gameplay
 			struct Score
 			{
 			private:
+				// core
+				const Keystroke* key_stoke;
+
 				// beatmap
-				const Game::Beatmap::Beatmap::Stats* beatmap_stats;
+				const Game::Beatmap::Beatmap* beatmap;
+				Game::Beatmap::Beatmap::FloorActionQueue* floor;
+				Game::Beatmap::Beatmap::SliderActionQueue* slider;
 
 				// gameplay
 				float score = 0;
@@ -86,21 +94,6 @@ namespace Structures::Screens::Gameplay
 				void update_score();
 
 			public:
-				struct SliderScore
-				{
-					std::unordered_set<float> completed_ticks;
-
-				private:
-					std::weak_ptr<const Game::Beatmap::HitObjects::Slider::Action> slider_action;
-					[[nodiscard]] uint16_t get_bonus_score() const;
-
-				public:
-					float check_and_add_slider_tick_score(const int64_t& current_time, bool is_hold, Score& score, const float& current_input_latency = 0);
-					float add_final_bonus_score(const int64_t& current_time, Score& score) const;
-
-					explicit SliderScore(const std::shared_ptr<const Game::Beatmap::HitObjects::Slider::Action>& slider_action);
-				};
-				std::unordered_map<std::shared_ptr<const Game::Beatmap::HitObjects::Slider::Action>, SliderScore> current_slider; //? Tại sạo lại là shared_ptr mà ko phải weak?
 				struct ScoreCounter
 				{
 				private:
@@ -123,14 +116,25 @@ namespace Structures::Screens::Gameplay
 					void add_count(const uint16_t& score, const unsigned long& num = 1);
 					void reset();
 				} counter;
+				struct SliderScore
+				{
+					float last_uncompleted_tick_slider_time = 0;
+					unsigned long completed_ticks_num = 0;
+					std::weak_ptr<const Game::Beatmap::HitObjects::Slider::ActionInfo> action_info;
 
-				float add_floor_score(const uint16_t& score);
+					explicit SliderScore(const std::shared_ptr<const Game::Beatmap::HitObjects::Slider::ActionInfo>& slider_action);
+				};
+				using ActiveSliders = std::unordered_map<std::shared_ptr<const Game::Beatmap::HitObjects::Slider::ActionInfo>, SliderScore>;
+				ActiveSliders active_sliders;
+				float check_and_add_floor_score(const int64_t& current_time, const float& input_latency = 0);
+				float check_and_add_slider_score(const int64_t& current_time, const float& input_latency = 0);
+
 				[[nodiscard]] const float* get_score() const;
 				[[nodiscard]] const unsigned long* get_current_combo() const;
 				[[nodiscard]] const unsigned long* get_max_combo() const;
-				[[nodiscard]] float get_mod_multiplier() const;
+				[[nodiscard]] const float* get_mod_multiplier() const;
 
-				explicit Score(const Game::Beatmap::Beatmap& beatmap, const float& mod_multiplier);
+				explicit Score(Core* core, const float& mod_multiplier);
 			} score;
 			struct Health
 			{
@@ -145,15 +149,16 @@ namespace Structures::Screens::Gameplay
 				bool update(const int16_t& note_score, const unsigned long& current_combo); // -> return: người chơi có fail không?
 
 				explicit Health(const Game::Beatmap::Metadata::CalculatedDifficulty::HealthPoint* diff_hp, bool no_fail = false);
-				explicit Health(const Game::Beatmap::Beatmap& beatmap, bool no_fail = false);
+				explicit Health(const Game::Beatmap::Beatmap* beatmap, bool no_fail = false);
 			} health;
 
 			[[nodiscard]] bool is_paused() const;
 			void pause();
 			void resume();
-			void make_time_step(const KeyboardEventList& events, const float& current_input_latency = 0);
+			void make_time_step(const EventList& events, const float& input_latency = 0);
+
 			explicit Core(
-				const Game::Beatmap::Beatmap* beatmap, 
+				const PlayingScreen* playing_screen, 
 				const int64_t& start_time = 0, 
 				const float& mod_multiplier = 1.0f, 
 				bool no_fail = false);
@@ -168,13 +173,11 @@ namespace Structures::Screens::Gameplay
 				Screen::Render::Item cursor;
 				Screen::Render::Item health_bar;
 				Screen::Render::Item score;
-				Screen::Render::Item combo;
 
 				explicit Components(Storage* storage);
 			} components;
 
 			Render(
-				const Types::Game::Direction::Direction* current_direction,
 				const Game::Beatmap::Beatmap& beatmap,
 				const Core& logic_core);
 		} render;
@@ -182,10 +185,11 @@ namespace Structures::Screens::Gameplay
 		//! Audio
 		struct Audio final
 		{
-			Structures::Audio::Mixer* mixer = nullptr;
+			const Game::Beatmap::Beatmap* beatmap;
 
-		};
+			explicit Audio(const Game::Beatmap::Beatmap& beatmap, const std::filesystem::path& beatmap_root);
+		} audio;
 
-		explicit PlayingScreen(const char* beatmap_path);
+		explicit PlayingScreen(const std::filesystem::path& beatmap);
 	};
 }

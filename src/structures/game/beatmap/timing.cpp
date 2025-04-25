@@ -6,8 +6,8 @@
 #include "format/file.h"
 #include "utilities.hpp"
 
-using namespace Format::File::Beatmap::TimingPoints;
-using Format::File::Beatmap::AND;
+using namespace Format::File::Floor::Mapset::TimingPoints;
+using Format::File::Floor::Mapset::AND;
 
 namespace Structures::Game::Beatmap::TimingPoints
 {

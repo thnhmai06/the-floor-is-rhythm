@@ -11,7 +11,6 @@ namespace Utilities
 {
 	namespace Math
 	{
-		inline bool is_bit_enabled(const std::int32_t& value, const std::int32_t& bitmask) { return (value & bitmask) != 0; }
 		inline bool is_equal(const float& variable, const float& value, const float& epsilon = 0.001f) { return abs(variable - value) <= epsilon; }
 		inline bool is_integer(const float& value, const float& epsilon = 0.001f) { return is_equal(std::floor(value), value, epsilon); }
 		inline float centre(const float& size, const float& window_size) { return (window_size - size) / 2; }
@@ -127,6 +126,14 @@ namespace Utilities
 			ss << std::put_time(&local_time, format);
 			return ss.str();
 		}
+
+		template <typename DurationType>
+		long long get_duration(
+			const std::chrono::time_point<std::chrono::system_clock>& previous,
+			const std::chrono::time_point<std::chrono::system_clock>& current = std::chrono::system_clock::now())
+		{
+			return std::chrono::duration_cast<DurationType>(current - previous).count();
+		}
 	}
 	namespace String
 	{
@@ -181,6 +188,15 @@ namespace Utilities
 		{
 			if (container.empty()) return container.cend();
 			return std::prev(container.cend());
+		}
+		template <typename LeftType, typename RightType, typename Comparator>
+		bool get_front_dual_queue( // đúng thì lấy bên phải (vì bên phải luôn right :>)
+			const std::queue<LeftType>& left, const std::queue<RightType>& right, Comparator comp)
+		{
+			if (left.empty() && right.empty()) return false;
+			if (right.empty()) return false;
+			if (left.empty()) return true;
+			return comp(left.front(), right.front());
 		}
 
 		template <typename Type>

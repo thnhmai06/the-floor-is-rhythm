@@ -1,4 +1,5 @@
 ﻿#include "structures/game/beatmap/hitsound.h" // Header
+#include <bitset>
 #include "format/file.h"
 #include "utilities.hpp"
 
@@ -7,10 +8,12 @@ namespace Structures::Game::Beatmap::Hitsound
 	//! HitSound
 	void HitSound::read(const std::int32_t& hit_sound_int)
 	{
-		normal = Utilities::Math::is_bit_enabled(hit_sound_int, static_cast<std::int32_t>(HitSoundType::NORMAL));
-		whistle = Utilities::Math::is_bit_enabled(hit_sound_int, static_cast<std::int32_t>(HitSoundType::WHISTLE));
-		finish = Utilities::Math::is_bit_enabled(hit_sound_int, static_cast<std::int32_t>(HitSoundType::FINISH));
-		clap = Utilities::Math::is_bit_enabled(hit_sound_int, static_cast<std::int32_t>(HitSoundType::CLAP));
+		const auto bitmap = std::bitset<4>(hit_sound_int);
+
+		normal = bitmap[static_cast<uint8_t>(HitSoundType::NORMAL)];
+		whistle = bitmap[static_cast<uint8_t>(HitSoundType::WHISTLE)];
+		finish = bitmap[static_cast<uint8_t>(HitSoundType::FINISH)];
+		clap = bitmap[static_cast<uint8_t>(HitSoundType::CLAP)];
 	}
 	bool HitSound::is_hit_sound_type_played(const HitSoundType& hit_sound_type) const
 	{
@@ -29,16 +32,14 @@ namespace Structures::Game::Beatmap::Hitsound
 	}
 	std::int32_t HitSound::to_int() const
 	{
-		std::int32_t hitsound = 0;
-		if (normal)
-			hitsound |= static_cast<std::int32_t>(HitSoundType::NORMAL);
-		if (whistle)
-			hitsound |= static_cast<std::int32_t>(HitSoundType::WHISTLE);
-		if (finish)
-			hitsound |= static_cast<std::int32_t>(HitSoundType::FINISH);
-		if (clap)
-			hitsound |= static_cast<std::int32_t>(HitSoundType::CLAP);
-		return hitsound;
+		auto bitmap = std::bitset<4>(0);
+
+		bitmap[static_cast<uint8_t>(HitSoundType::NORMAL)] = normal;
+		bitmap[static_cast<uint8_t>(HitSoundType::WHISTLE)] = whistle;
+		bitmap[static_cast<uint8_t>(HitSoundType::FINISH)] = finish;
+		bitmap[static_cast<uint8_t>(HitSoundType::CLAP)] = clap;
+
+		return bitmap.to_ulong();
 	}
 	size_t HitSound::operator()(const HitSound& hs) const
 	{
@@ -97,13 +98,13 @@ namespace Structures::Game::Beatmap::Hitsound
 	{
 		std::string result;
 		result.append(std::to_string(static_cast<int32_t>(normal_set)));
-		result.push_back(Format::File::Beatmap::HitObjects::HitSample::DELIMITER);
+		result.push_back(Format::File::Floor::Mapset::HitObjects::HitSample::DELIMITER);
 		result.append(std::to_string(static_cast<int32_t>(addition_set)));
-		result.push_back(Format::File::Beatmap::HitObjects::HitSample::DELIMITER);
+		result.push_back(Format::File::Floor::Mapset::HitObjects::HitSample::DELIMITER);
 		result.append(std::to_string(index));
-		result.push_back(Format::File::Beatmap::HitObjects::HitSample::DELIMITER);
+		result.push_back(Format::File::Floor::Mapset::HitObjects::HitSample::DELIMITER);
 		result.append(std::to_string(volume));
-		result.push_back(Format::File::Beatmap::HitObjects::HitSample::DELIMITER);
+		result.push_back(Format::File::Floor::Mapset::HitObjects::HitSample::DELIMITER);
 		if (!file_name.empty()) result.append(file_name);
 		return result;
 	}
@@ -111,7 +112,7 @@ namespace Structures::Game::Beatmap::Hitsound
 	{
 		if (hitsample_str.empty())
 			return; // không được viết -> mặc định
-		const auto list = Utilities::String::split(hitsample_str, Format::File::Beatmap::HitObjects::HitSample::DELIMITER);
+		const auto list = Utilities::String::split(hitsample_str, Format::File::Floor::Mapset::HitObjects::HitSample::DELIMITER);
 		normal_set = static_cast<HitSampleType>(std::stoi(list[0]));
 		addition_set = static_cast<HitSampleType>(std::stoi(list[1]));
 		index = std::stoi(list[2]);
@@ -180,7 +181,6 @@ namespace Structures::Game::Beatmap::Hitsound
 		result.append(to_string(hit_sound_type));
 		if (index != 0 && index != 1)
 			result.append(std::to_string(index));
-		result.append(".wav");
 		return result;
 	}
 	std::string get_hit_sound_filename(const HitSoundType& hit_sound_type, const HitSample& hit_sample,

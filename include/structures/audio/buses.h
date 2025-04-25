@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <SDL3_mixer/SDL_mixer.h>
-#include "structures/audio/memory.h"
+#include "structures/audio/memory.hpp"
 #include "structures/types.h"
 
 namespace Structures::Audio
@@ -36,7 +36,7 @@ namespace Structures::Audio
 	public:
 		[[nodiscard]] float get_volume() const;
 		[[nodiscard]] static float get_volume(const Memory<Effect>::Item& sound);
-		float set_volume(float percent);
+		void set_volume(float percent);
 		static float set_volume(const Memory<Effect>::Item& sound, float percent);
 		static int32_t play(const Memory<Effect>::Item& sound);
 

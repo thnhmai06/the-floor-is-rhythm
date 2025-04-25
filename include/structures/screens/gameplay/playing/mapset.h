@@ -57,6 +57,7 @@ namespace Structures::Screens::Gameplay::Playing::Mapset
 
 	struct Mapset : Collection
 	{
+		void move(const float& distance, const Types::Game::Direction::Direction& direction);
 		Mapset(const TextureMemory& memory, const Game::Beatmap::Beatmap& beatmap);
 	};
 }

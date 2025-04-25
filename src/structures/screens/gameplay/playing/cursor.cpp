@@ -8,21 +8,21 @@ namespace Structures::Screens::Gameplay::Playing::Cursor
 		// ::Body
 		Body::Body(const TextureMemory& memory) :
 			Object{
-				memory.find(Format::Skin::Cursor::body),
+				memory.find(Format::Skin::Image::Cursor::body),
 				Types::Render::OriginType::CENTRE } {
 		}
 
 		// ::Trail
 		Trail::Trail(const TextureMemory& memory)
 		{
-			data.emplace_back(memory.find(Format::Skin::Cursor::trail), Types::Render::OriginType::CENTRE);
+			data.emplace_back(memory.find(Format::Skin::Image::Cursor::trail), Types::Render::OriginType::CENTRE);
 		}
 
 		// ::Direction
 		void Direction::update_src()
 		{
 			if (current_direction)
-				src.item = src.memory->find(Format::Skin::Cursor::direction_skin[*current_direction]).item;
+				src.item = src.memory->find(Format::Skin::Image::Cursor::direction_skin[*current_direction]).item;
 		}
 		void Direction::change_current_direction_target(const Types::Game::Direction::Direction* new_target)
 		{
@@ -33,7 +33,7 @@ namespace Structures::Screens::Gameplay::Playing::Cursor
 			const TextureMemory& memory,
 			const Types::Game::Direction::Direction* current_direction)
 			: Object{
-				  memory.find(Format::Skin::Cursor::direction_skin[current_direction
+				  memory.find(Format::Skin::Image::Cursor::direction_skin[current_direction
 																? *current_direction
 																: Types::Game::Direction::Direction::RIGHT]),
 				  Types::Render::OriginType::CENTRE },

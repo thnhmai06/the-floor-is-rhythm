@@ -1,6 +1,6 @@
 {
   "dependencies": [
-    "7zip",
+    "ffmpeg",
     "sdl3",
     {
       "name": "sdl3-image",
@@ -13,6 +13,6 @@
     },
     "sdl3-ttf",
     "spdlog",
-    "ffmpeg"
+    "bit7z"
   ]
 }

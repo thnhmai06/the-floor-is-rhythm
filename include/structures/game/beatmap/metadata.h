@@ -48,13 +48,14 @@ namespace Structures::Game::Beatmap::Metadata
 
 			friend CalculatedDifficulty;
 		public:
-			float perfect = -1, great = -1, bad = -1, miss = Config::GameConfig::Difficulty::OD::Base::MISS;    
+			float perfect = -1, great = -1, bad = -1, miss = Config::GameConfig::Difficulty::OD::Base::MISS;
 
 			void apply(const float& v);
 			void apply() { apply(value); }
-			[[nodiscard]] int16_t get_score(const int64_t& click_moment, const int64_t& hit_object_time,
-			                                const Types::Game::Direction::Direction& required_direction,
-			                                const Types::Game::Direction::Direction& current_direction) const;
+			[[nodiscard]] int16_t get_score(bool is_clicked,
+				const float& click_moment, const int64_t& hit_object_time,
+				const Types::Game::Direction::Direction& required_direction,
+				const Types::Game::Direction::Direction& current_direction) const;
 
 			OverallDifficulty() = default;
 			explicit OverallDifficulty(const float value) { apply(value); }

@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include <cstdint>
 #include <map>
 #include <variant>
 #include <vector>
@@ -24,13 +23,13 @@ namespace Structures::Game::Beatmap::HitObjects
 		Hitsound::HitSound hit_sound;
 		Hitsound::HitSample hit_sample;
 
-		struct Action
+		struct ActionInfo
 		{
 			Types::Game::HitObject::HitObjectType type;
 			Types::Game::Direction::Direction direction;
 			int64_t time;
 
-			explicit Action(const Floor& floor,
+			explicit ActionInfo(const Floor& floor,
 				const Types::Game::Direction::Direction& previous_direction =
 				Types::Game::Direction::Direction::RIGHT);
 		};
@@ -53,7 +52,7 @@ namespace Structures::Game::Beatmap::HitObjects
 		Hitsound::HitSound hit_sound;
 		Hitsound::HitSample hit_sample;
 
-		struct Action
+		struct ActionInfo
 		{
 			Types::Game::HitObject::HitObjectType type;
 			Types::Game::Direction::Direction direction;
@@ -61,7 +60,7 @@ namespace Structures::Game::Beatmap::HitObjects
 			float tick_length = 0;
 			unsigned long tick_num = 0;
 
-			explicit Action(const Slider& slider, const float& timing_velocity, const float& diff_velocity, const float& beat_length,
+			explicit ActionInfo(const Slider& slider, const float& timing_velocity, const float& diff_velocity, const float& beat_length,
 				const Types::Game::Direction::Direction& previous_direction = Types::Game::Direction::Direction::RIGHT);
 		};
 

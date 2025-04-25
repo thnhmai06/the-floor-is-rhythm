@@ -10,7 +10,8 @@ namespace Structures::Screens::Gameplay::Playing::Score
 	{
 		std::weak_ptr<HorizontalNumber<float>> score;
 		std::weak_ptr<HorizontalNumber<float>> accuracy;
+		std::weak_ptr<HorizontalNumber<unsigned long>> combo;
 
-		Score(const TextureMemory& skin, const float* score, const float* accuracy);
+		Score(const TextureMemory& skin, const float* score, const float* accuracy, const unsigned long* combo);
 	};
 }

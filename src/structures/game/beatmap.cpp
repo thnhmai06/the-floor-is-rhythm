@@ -19,7 +19,7 @@ namespace Structures::Game::Beatmap
 		
 		while (std::getline(reader, current_line))
 		{
-			if (current_section == Format::File::Beatmap::Events::HEADER)
+			if (current_section == Format::File::Floor::Mapset::Events::HEADER)
 			{
 				current_line = Utilities::String::trim(current_line, true);
 				const auto current_line_if_trim_all = Utilities::String::trim(current_line);
@@ -50,23 +50,23 @@ namespace Structures::Game::Beatmap
 	{
 		for (auto& [header, contents] : sections)
 		{
-			if (header == Format::File::Beatmap::Variables::HEADER) variables.Parse(contents);
-			else if (header == Format::File::Beatmap::Events::HEADER) events.Parse(contents, variables);
+			if (header == Format::File::Floor::Mapset::Variables::HEADER) variables.Parse(contents);
+			else if (header == Format::File::Floor::Mapset::Events::HEADER) events.Parse(contents, variables);
 		}
 	}
-	Storyboard::Storyboard(const char* file_path)
+	Storyboard::Storyboard(const std::filesystem::path& file)
 	{
-		std::ifstream reader(file_path);
+		std::ifstream reader(file);
 		if (!reader)
-			THROW_ERROR(Logging::Exceptions::FileExceptions::File_Open_Failed(file_path));
+			THROW_ERROR(Logging::Exceptions::FileExceptions::File_Open_Failed(file));
 		auto sections = read_content(reader);
 		reader.close();
 
 		parse(sections);
 	}
 
-	//! Beatmap
-	// Beatmap::Stats
+	//! Mapset
+	// Mapset::Stats
 	unsigned long Beatmap::Stats::get_total_objects_num() const { return count.floor + count.slider; }
 	void Beatmap::Stats::calculate(const Beatmap& beatmap)
 	{
@@ -91,7 +91,7 @@ namespace Structures::Game::Beatmap
 		}
 	}
 
-	// Beatmap
+	// Mapset
 	std::pair<Beatmap::FloorActionQueue, Beatmap::SliderActionQueue> Beatmap::make_action_queue() const
 	{
 		FloorActionQueue floor_queue;
@@ -104,18 +104,18 @@ namespace Structures::Game::Beatmap
 
 		auto if_floor = [&]()
 			{
-				const HitObjects::Floor::Action current_floor_action{ *std::get_if<HitObjects::Floor>(current_hit_object), previous_direction };
-				floor_queue.emplace(std::make_shared<const HitObjects::Floor::Action>(current_floor_action));
+				const HitObjects::Floor::ActionInfo current_floor_action{ *std::get_if<HitObjects::Floor>(current_hit_object), previous_direction };
+				floor_queue.emplace(std::make_shared<const HitObjects::Floor::ActionInfo>(current_floor_action));
 				previous_direction += current_hit_object->get_rotation();
 			};
 
 		auto if_slider = [&]()
 			{
-				const HitObjects::Slider::Action current_slider_action{
+				const HitObjects::Slider::ActionInfo current_slider_action{
 					*std::get_if<HitObjects::Slider>(current_hit_object), current_timing_point_velocity,
 					calculated_difficulty.velocity.speed, current_beat_length
 				};
-				slider_queue.emplace(std::make_shared<const HitObjects::Slider::Action>(current_slider_action));
+				slider_queue.emplace(std::make_shared<const HitObjects::Slider::ActionInfo>(current_slider_action));
 				previous_direction += current_hit_object->get_rotation();
 			};
 
@@ -175,19 +175,19 @@ namespace Structures::Game::Beatmap
 	{
 		for (auto& [header, contents] : sections)
 		{
-			if (header == Format::File::Beatmap::General::HEADER) general.read(contents);
-			else if (header == Format::File::Beatmap::Metadata::HEADER) metadata.read(contents);
-			else if (header == Format::File::Beatmap::Difficulty::HEADER) calculated_difficulty.apply(Metadata::Difficulty(contents));
-			else if (header == Format::File::Beatmap::HitObjects::HEADER) hit_objects.read(contents);
-			else if (header == Format::File::Beatmap::TimingPoints::HEADER) timing_points.read(contents);
-			else if (header == Format::File::Beatmap::Events::HEADER) events.Parse(contents);
+			if (header == Format::File::Floor::Mapset::General::HEADER) general.read(contents);
+			else if (header == Format::File::Floor::Mapset::Metadata::HEADER) metadata.read(contents);
+			else if (header == Format::File::Floor::Mapset::Difficulty::HEADER) calculated_difficulty.apply(Metadata::Difficulty(contents));
+			else if (header == Format::File::Floor::Mapset::HitObjects::HEADER) hit_objects.read(contents);
+			else if (header == Format::File::Floor::Mapset::TimingPoints::HEADER) timing_points.read(contents);
+			else if (header == Format::File::Floor::Mapset::Events::HEADER) events.Parse(contents);
 		}
 	}
-	Beatmap::Beatmap(const char* file_path)
+	Beatmap::Beatmap(const std::filesystem::path& path)
 	{
-		std::ifstream reader(file_path);
+		std::ifstream reader(path);
 		if (!reader)
-			THROW_ERROR(Logging::Exceptions::FileExceptions::File_Open_Failed(file_path));
+			THROW_ERROR(Logging::Exceptions::FileExceptions::File_Open_Failed(path));
 
 		auto sections = read_content(reader);
 		reader.close();

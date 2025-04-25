@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <functional>
+#include <filesystem>
 #include <osu!parser/Parser/Structures/Beatmap/Objects/Event.hpp>
 #include "structures/game/beatmap/metadata.h"
 #include "structures/game/beatmap/hitobject.h"
@@ -16,7 +17,7 @@ namespace Structures::Game::Beatmap
 		OsuParser::Beatmap::Sections::Variable::VariableSection variables;
 		OsuParser::Beatmap::Objects::Event::Events events;
 
-		explicit Storyboard(const char* file_path);
+		explicit Storyboard(const std::filesystem::path& file);
 	};
 
 	struct Beatmap
@@ -54,8 +55,8 @@ namespace Structures::Game::Beatmap
 			explicit Stats(const Beatmap& completed_beatmap) { calculate(completed_beatmap); }
 		} stats;
 
-		using FloorActionQueue = std::queue<std::shared_ptr<const HitObjects::Floor::Action>>;
-		using SliderActionQueue = std::queue<std::shared_ptr<const HitObjects::Slider::Action>>;
+		using FloorActionQueue = std::queue<std::shared_ptr<const HitObjects::Floor::ActionInfo>>;
+		using SliderActionQueue = std::queue<std::shared_ptr<const HitObjects::Slider::ActionInfo>>;
 		[[nodiscard]] std::pair<FloorActionQueue, SliderActionQueue> make_action_queue() const;
 
 		using HitObjectStepFunction = std::function<void()>;
@@ -65,6 +66,6 @@ namespace Structures::Game::Beatmap
 			const HitObjects::HitObject*& current_hit_object_ptr,
 			float& current_timing_point_velocity, float& current_beat_length) const;
 
-		explicit Beatmap(const char* file_path);
+		explicit Beatmap(const std::filesystem::path& path);
 	};
 }

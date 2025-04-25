@@ -9,12 +9,12 @@ namespace Structures::Render::Textures
 {
 	//! TextureMemory
 	// ::
-	TextureMemory::Item TextureMemory::load_texture(const char* file_path, const std::string& name, const bool override)
+	TextureMemory::Item TextureMemory::load_texture(const std::filesystem::path& file, const std::string& name, const bool override)
 	{
 		if (!override && contains(name)) return {};
-		SDL_Texture* texture = IMG_LoadTexture(this->renderer, file_path);
+		SDL_Texture* texture = IMG_LoadTexture(this->renderer, file.string().c_str());
 		if (!texture)
-			THROW_ERROR(Logging::Exceptions::SDLExceptions::Texture::SDL_Texture_Load_Failed(file_path));
+			THROW_ERROR(Logging::Exceptions::SDLExceptions::Texture::SDL_Texture_Load_Failed(file));
 
 		// Nếu dùng STB_Image
 		/*if (!texture)
