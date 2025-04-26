@@ -1,12 +1,12 @@
 ﻿#include "work/convert/osu/mapset.h" // Header
 #include <osu!parser/Parser/Beatmap.hpp>
 #include "format/file.h"
-#include "structures/game/beatmap/metadata.h"
-#include "structures/game/beatmap/hitobject.h"
-#include "structures/game/beatmap/timing.h"
+#include "structures/game/mapset/metadata.h"
+#include "structures/game/mapset/hitobject.h"
+#include "structures/game/mapset/timing.h"
 #include "logging/exceptions.h"
 #include "logging/logger.h"
-#include "structures/types.h"
+#include "structures/type.hpp"
 #include "utilities.hpp"
 
 namespace Work::Convert::osu
@@ -14,19 +14,31 @@ namespace Work::Convert::osu
 	using namespace Structures::Game::Beatmap::Metadata;
 	using namespace OsuParser::Beatmap;
 
-	static uint8_t get_current_combo_colour(const uint8_t& previous_colour, const bool new_combo, const uint8_t& colour_hax)
-	{
-		return (previous_colour + new_combo + colour_hax) % Structures::Game::Beatmap::HitObjects::COLOURS_NUM;
-	}
-
 	//! Metadata
 	static General convert_general(const Sections::General::GeneralSection& general)
 	{
 		General result;
-		if (!general.AudioFilename.empty()) result.audio_file = general.AudioFilename;
-		if (!general.AudioLeadIn.empty()) result.start_music_delay = std::stoi(general.AudioLeadIn);
-		if (!general.PreviewTime.empty()) result.preview_timestamp = std::stoi(general.PreviewTime);
-		if (!general.EpilepsyWarning.empty()) result.epilepsy_warning = (std::stoi(general.EpilepsyWarning) == 1);
+		result.audio_file = general.AudioFilename;
+		result.start_music_delay = general.AudioLeadIn;
+		result.preview_timestamp = general.PreviewTime;
+		result.epilepsy_warning = general.EpilepsyWarning;
+		result.widescreen_storyboard = general.WidescreenStoryboard;
+		switch (general.SampleSet)
+		{
+		case Objects::TimingPoint::HitSampleType::NO_CUSTOM:
+			result.sample_set = Structures::Types::Game::HitSound::HitSampleType::NoCustom;
+			break;
+		case Objects::TimingPoint::HitSampleType::NORMAL:
+			result.sample_set = Structures::Types::Game::HitSound::HitSampleType::Normal;
+			break;
+		case Objects::TimingPoint::HitSampleType::SOFT:
+			result.sample_set = Structures::Types::Game::HitSound::HitSampleType::Soft;
+			break;
+		case Objects::TimingPoint::HitSampleType::DRUM:
+			result.sample_set = Structures::Types::Game::HitSound::HitSampleType::Drum;
+			break;
+		}
+
 		return result;
 	}
 	static Difficulty convert_difficulty(const Sections::Difficulty::DifficultySection& difficulty)
@@ -34,7 +46,6 @@ namespace Work::Convert::osu
 		Difficulty result;
 		if (!difficulty.OverallDifficulty.empty()) result.od = std::stof(difficulty.OverallDifficulty);
 		if (!difficulty.HPDrainRate.empty()) result.hp = std::stof(difficulty.HPDrainRate);
-		if (!difficulty.SliderMultiplier.empty()) result.vl = std::stof(difficulty.SliderMultiplier);
 		return result;
 	}
 	static Metadata convert_metadata(const Sections::Metadata::MetadataSection& metadata)
@@ -57,16 +68,16 @@ namespace Work::Convert::osu
 		TimingPoint result;
 		result.time = timing_point.Time;
 		result.beat_length = static_cast<float>(timing_point.BeatLength);
-		result.sample_set = static_cast<HitSampleType>(timing_point.SampleSet);
-		result.sample_index = timing_point.SampleIndex;
-		result.volume = timing_point.Volume;
+		result.sample.set = static_cast<HitSampleType>(timing_point.SampleSet);
+		result.sample.index = timing_point.SampleIndex;
+		result.sample.volume = std::round(Utilities::Math::to_value(static_cast<float>(timing_point.Volume) / 100.0f, 0, MIX_MAX_VOLUME));
 		result.kiai = timing_point.Effects.kiai;
 		return result;
 	}
 	static TimingPoints convert_timing_points(const std::vector<Objects::TimingPoint::TimingPoint>& timing_points)
 	{
 		TimingPoints result;
-		for (const auto timing_point : timing_points)
+		for (const auto& timing_point : timing_points)
 		{
 			const auto back_itr = Utilities::Container::get_last_element_iterator(result.data);
 			result.data.emplace_hint(back_itr, timing_point.Time, convert_timing_point(timing_point));
@@ -75,49 +86,63 @@ namespace Work::Convert::osu
 	}
 	//! HitObjects
 	using namespace Structures::Game::Beatmap::HitObjects;
-	static Floor convert_hit_object_floor(const Objects::HitObject::HitObject& object, const uint8_t& previous_combo_colour)
+	static std::vector<Floor> convert_hit_object(
+		const Objects::HitObject::HitObject& object,
+		bool& current_from_right)
 	{
-		Floor floor;
-		floor.time = object.Time;
-		floor.type_data.combo_colour = get_current_combo_colour(previous_combo_colour, object.Type.IsNewCombo, object.Type.ColourHax);
-		floor.hit_sound = object.Hitsound;
-		floor.hit_sample = object.Hitsample;
-		return floor;
-	}
-	static Slider convert_hit_object_slider(const Objects::HitObject::HitObject& object, const uint8_t& previous_combo_colour)
-	{
-		Slider slider;
-		slider.end_time = slider.time = object.Time;
-		if (object.EndTime.has_value()) 
-			slider.end_time = object.EndTime.value();
-		slider.type_data.combo_colour = get_current_combo_colour(previous_combo_colour, object.Type.IsNewCombo, object.Type.ColourHax);
-		slider.hit_sound = object.Hitsound;
-		slider.hit_sample = object.Hitsample;
-		for (const auto& [sound, sample] : object.SliderParameters->edgeHitsounds)
+		std::vector<Floor> res{};
+		if (!object.Type.Slider && !object.Type.HitCircle) return res;
+
+		if (object.Type.HitCircle)
 		{
-			slider.edge_sounds.emplace_back(sound.ToInt());
-			slider.edge_sets.emplace_back(sample);
+			Floor floor;
+			floor.time = object.Time;
+			if (object.Type.IsNewCombo)
+				current_from_right = !current_from_right;
+			floor.is_kat = current_from_right;
+			floor.hit_sound = object.Hitsound;
+			floor.hit_sample = object.Hitsample;
+			res.push_back(std::move(floor));
+
+			return res;
 		}
-		return slider;
+		if (object.Type.Slider)
+		{
+			const double one_slide_time = (object.EndTime.value() - object.Time) / object.SliderParameters.value().Slides;
+			double current_time = object.Time;
+			for (int32_t slide = 1; slide <= object.SliderParameters.value().Slides; ++slide, current_time += one_slide_time)
+			{
+				Floor floor;
+				floor.time = std::round(current_time);
+				if ((slide == 1 && object.Type.IsNewCombo) || slide > 1)
+					current_from_right = !current_from_right;
+				floor.is_kat = current_from_right;
+				if (slide == 1)
+				{
+					floor.hit_sound = object.Hitsound;
+					floor.hit_sample = object.Hitsample;
+				} else
+				{
+					floor.hit_sound = object.SliderParameters.value().edgeHitsounds[slide - 1].Sound;
+					floor.hit_sample = object.SliderParameters.value().edgeHitsounds[slide - 1].Sample;
+				}
+				res.push_back(std::move(floor));
+			}
+		}
+		return res;
 	}
 	static HitObjects convert_hit_objects(const std::vector<Objects::HitObject::HitObject>& objects)
 	{
+		bool current_from_right = true;
 		HitObjects result;
-		uint8_t previous_combo_colour = 0;
 		for (const auto& osu_object : objects)
 		{
-			const auto last_itr = Utilities::Container::get_last_element_iterator(result.data);
-			if (osu_object.Type.HitCircle)
+			const auto objects = convert_hit_object(osu_object, current_from_right);
+			for (const auto& object : objects)
 			{
-				result.data.emplace_hint(last_itr, osu_object.Time, 
-					std::make_shared<Floor>(convert_hit_object_floor(osu_object, previous_combo_colour)));
-				previous_combo_colour = result.data.rbegin()->second->type_data.combo_colour;
-			}
-			else // slider, spinner...
-			{
-				result.data.emplace_hint(last_itr, osu_object.Time,
-					std::make_shared<Slider>(convert_hit_object_slider(osu_object, previous_combo_colour)));
-				previous_combo_colour = result.data.rbegin()->second->type_data.combo_colour;
+				result.data.emplace_hint(
+					Utilities::Container::get_last_element_iterator(result.data),
+					object.time, object);
 			}
 		}
 		return result;

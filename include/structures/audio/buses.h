@@ -1,23 +1,24 @@
 ﻿#pragma once
 #include <SDL3_mixer/SDL_mixer.h>
-#include "structures/audio/memory.hpp"
-#include "structures/types.h"
+#include "structures/audio/memory.h"
+#include "structures/type.hpp"
 
 namespace Structures::Audio
 {
 	template <AudioPtrType AudioPtr>
 	struct Bus;
 
+	//! CHỈ CÓ DUY NHẤT 1 BUS MUSIC TỒN TẠI!
 	template<>
 	struct Bus<Music>
 	{
-	private:
+	protected:
 		float volume;
 
 	public:
 		[[nodiscard]] float get_volume() const;
 		float set_volume(float percent);
-		static void play(const Memory<Music>::Item& music);
+		static void play(const MusicMemory::Item& music);
 		static bool has_song_playing();
 		static bool is_playing();
 		static void pause();
@@ -30,16 +31,32 @@ namespace Structures::Audio
 	template<>
 	struct Bus<Effect>
 	{
-	private:
+	protected:
 		float volume;
 
 	public:
 		[[nodiscard]] float get_volume() const;
-		[[nodiscard]] static float get_volume(const Memory<Effect>::Item& sound);
-		void set_volume(float percent);
-		static float set_volume(const Memory<Effect>::Item& sound, float percent);
-		static int32_t play(const Memory<Effect>::Item& sound);
+		[[nodiscard]] float get_volume(const EffectMemory::Item& sound) const;
+		[[nodiscard]] float get_volume(const int& channel) const;
+		float set_volume(const float& percent);
+		float set_volume(const EffectMemory::Item& sound, float percent) const;
+		float set_volume(const int& channel, float percent) const;
+		int play(const EffectMemory::Item& sound, const std::optional<float>& volume = std::nullopt) const;
 
 		explicit Bus(const float& volume);
 	};
+
+	/*struct EffectManager
+	{
+	protected:
+		float volume;
+
+	public:
+		using CONTAINER = std::vector<Bus<Effect>*>;
+		CONTAINER buses;
+		[[nodiscard]] const float& get_volume() const;
+		float set_volume(const float& percent);
+
+		explicit EffectManager(const float& volume, CONTAINER buses = {});
+	};*/
 }

@@ -14,6 +14,7 @@ namespace Work::Core
 		void system(const bool debug)
 		{
 			Logging::Logger::init("root", debug ? spdlog::level::debug : spdlog::level::info);
+			if (debug) LOG_INFO("Game is running on Debug mode!");
 			if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS))
 				THROW_CRITICAL(Logging::Exceptions::SDLExceptions::Video::SDL_Video_InitSDL_Failed());
 		}
@@ -36,11 +37,11 @@ namespace Work::Core
 			SPDLOG_INFO("GPU Driver: {}", SDL_GetCurrentVideoDriver());
 			SPDLOG_INFO("Renderer: {}", SDL_GetRendererName(renderer));
 
-			SDL_SetRenderLogicalPresentation(
+			/*SDL_SetRenderLogicalPresentation(
 				renderer,
-				Config::GameConfig::Video::LOGICAL_WIDTH,
-				Config::GameConfig::Video::LOGICAL_HEIGHT,
-				SDL_LOGICAL_PRESENTATION_STRETCH);
+				Config::GameConfig::Render::LOGICAL_WIDTH,
+				Config::GameConfig::Render::LOGICAL_HEIGHT,
+				SDL_LOGICAL_PRESENTATION_STRETCH);*/
 		}
 	}
 

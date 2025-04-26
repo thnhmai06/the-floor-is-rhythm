@@ -1,4 +1,4 @@
-﻿#include "structures/audio/memory.hpp" // Header
+﻿#include "structures/audio/memory.h" // Header
 #include <SDL3_mixer/SDL_mixer.h>
 #include <ranges>
 #include "logging/exceptions.h"
@@ -6,8 +6,30 @@
 
 namespace Structures::Audio
 {
-	// Memory<Music>
-	void Memory<Music>::free(const std::string& name)
+	//! MusicMemory
+	// ::Item
+	void MusicMemory::Item::free()
+	{
+		if (item != parent->items.end() && parent)
+		{
+			item = parent->items.end();
+			parent->free(item->first);
+		}
+	}
+	MusicMemory::Item::Item(MusicMemory* parent, CONTAINER::const_iterator item) : parent(parent), item(std::move(item))
+	{
+	}
+
+	// ::
+	MusicMemory::Item MusicMemory::get(const std::string& name)
+	{
+		if (const auto& it = items.find(name); it != items.end())
+		{
+			return Item{ this, it };
+		}
+		return Item{ nullptr, items.end() };
+	}
+	void MusicMemory::free(const std::string& name)
 	{
 		if (const auto it = items.find(name); it != items.end())
 		{
@@ -15,42 +37,101 @@ namespace Structures::Audio
 			items.erase(it);
 		}
 	}
-	void Memory<Music>::free_all()
+	void MusicMemory::free_all()
 	{
 		for (const auto& val : items | std::views::values)
 			Mix_FreeMusic(val);
 		items.clear();
 	}
-	Memory<Music>::Item Memory<Music>::load(const std::filesystem::path& file_path, const std::string& name)
+
+	MusicMemory::Item MusicMemory::load(const std::filesystem::path& file_path, const std::string& name)
 	{
 		Mix_Music* audio = Mix_LoadMUS(file_path.string().c_str());
 		if (!audio)
 			THROW_ERROR(Logging::Exceptions::SDLExceptions::Audio::SDL_Audio_LoadMusic_Failed(file_path));
 
-		return { .parent = this, .item = items.insert_or_assign(name, audio).first };
+		return { this, items.insert_or_assign(name, audio).first };
 	}
 
-	// Memory<Effects>
-	void Memory<Effect>::free(const std::string& name)
+	//! EffectMemory
+	// ::Item
+	EffectMemory::Item::Item(EffectMemory* parent, CONTAINER::const_iterator item) : parent(parent), item(std::move(item))
 	{
-		if (const auto it = items.find(name); it != items.end())
+	}
+	void EffectMemory::Item::free()
+	{
+		if (item != parent->data.end() && parent)
 		{
-			Mix_FreeChunk(it->second);
-			items.erase(it);
+			item = parent->data.end();
+			parent->free(item->first);
 		}
 	}
-	void Memory<Effect>::free_all()
+	bool EffectMemory::Item::is_valid() const
 	{
-		for (const auto& val : items | std::views::values)
-			Mix_FreeChunk(val);
-		items.clear();
+		return (parent && item != parent->data.end() && item->second);
 	}
-	Memory<Effect>::Item Memory<Effect>::load(const std::filesystem::path& file_path, const std::string& name)
+
+	//::
+	EffectMemory::Item EffectMemory::get(const std::string& name)
 	{
+		if (const auto& it = data.find(name); it != data.end())
+		{
+			return Item{ this, it };
+		}
+		return Item{ nullptr, data.end() };
+	}
+	void EffectMemory::free(const std::string& name)
+	{
+		if (const auto it = data.find(name); it != data.end())
+		{
+			Mix_FreeChunk(it->second);
+			data.erase(it);
+		}
+	}
+	void EffectMemory::free_all()
+	{
+		for (const auto& val : data | std::views::values)
+			Mix_FreeChunk(val);
+		data.clear();
+	}
+	EffectMemory::Item EffectMemory::load(const std::filesystem::path& file_path, const std::string& name, const bool override)
+	{
+		if (!override && data.contains(name))
+			return {};
+
 		Mix_Chunk* audio = Mix_LoadWAV(file_path.string().c_str());
 		if (!audio)
 			THROW_ERROR(Logging::Exceptions::SDLExceptions::Audio::SDL_Audio_LoadEffect_Failed(file_path));
 
-		return { .parent = this, .item = items.insert_or_assign(name, audio).first };
+		return { this, data.insert_or_assign(name, audio).first };
+	}
+	void EffectMemory::load(
+		const std::filesystem::path& folder_path,
+		const std::filesystem::path& root_folder,
+		const bool recursive, const bool name_include_extension, const bool relative_path_name, const bool override,
+		const std::unordered_set<std::filesystem::path>& blacklist)
+	{
+		if (std::filesystem::exists(folder_path) && std::filesystem::is_directory(folder_path))
+			for (const auto& entry : std::filesystem::recursive_directory_iterator(folder_path))
+			{
+				if (recursive && std::filesystem::is_directory(entry))
+					load(entry, root_folder, recursive, name_include_extension, relative_path_name, override, blacklist);
+				else if (std::filesystem::is_regular_file(entry))
+				{
+					const auto extension = entry.path().extension().string();
+					if (!Format::Skin::Sound::SUPPORT_EXTENSIONS.contains(extension)) continue;
+
+					std::filesystem::path path_name = entry.path().lexically_relative(root_folder);
+					if (!relative_path_name)
+						path_name = path_name.filename();
+					if (!name_include_extension)
+						path_name.replace_extension();
+					const auto name = path_name.generic_string();
+
+					if (blacklist.contains(name)) continue;
+					if (!override && data.contains(name)) continue;
+					load(entry, name);
+				}
+			}
 	}
 }

@@ -2,7 +2,7 @@
 
 namespace Format::File
 {
-	namespace osu
+	namespace Osu
 	{
 		constexpr auto BEATMAP_EXTENSION = ".osz";
 		constexpr auto MAPSET_EXTENSION = ".osu";
@@ -17,8 +17,8 @@ namespace Format::File
 			{
 				namespace osu
 				{
-					constexpr std::string_view VERSION = "//convert from osu file format v";
-					constexpr std::string_view SOURCE = "(from osu!)";
+					constexpr std::string_view VERSION = "//convert from Osu file format v";
+					constexpr std::string_view SOURCE = "(from Osu!)";
 				}
 			}
 			constexpr auto EXTENSION = ".tfd";
@@ -33,6 +33,8 @@ namespace Format::File
 				constexpr std::string_view MUSIC_DELAY = "AudioLeadIn";
 				constexpr std::string_view PREVIEW_TIMESTAMP = "PreviewTime";
 				constexpr std::string_view EPILEPSY_WARNING = "EpilepsyWarning";
+				constexpr std::string_view WIDESCREEN_STORYBOARD = "WidescreenStoryboard";
+				constexpr std::string_view SAMPLE_SET = "SampleSet";
 			}
 			namespace Metadata
 			{
@@ -49,18 +51,13 @@ namespace Format::File
 				constexpr std::string_view HEADER = "[Difficulty]";
 				constexpr std::string_view HP = "HPDrainRate";
 				constexpr std::string_view OD = "OverallDifficulty";
-				constexpr std::string_view VELOCITY = "Velocity";
 			}
 			namespace HitObjects
 			{
 				constexpr std::string_view HEADER = "[HitObjects]";
-				namespace Slider
-				{
-					constexpr char AND = '|';
-				}
 				namespace HitSample
 				{
-					constexpr char DELIMITER = ':';
+					constexpr char AND = ':';
 				}
 			}
 			namespace TimingPoints

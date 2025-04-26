@@ -30,6 +30,10 @@ namespace Logging::Exceptions::SDLExceptions
 	}
 	namespace Texture
 	{
+		struct SDL_Texture_Create_Failed : SDL_Exception
+		{
+			explicit SDL_Texture_Create_Failed(const std::string& name) : SDL_Exception(format("Couldn't create texture: {}", name)) {}
+		};
 		struct SDL_Texture_Load_Failed : SDL_Exception
 		{
 			explicit SDL_Texture_Load_Failed(const std::filesystem::path& file_path) : SDL_Exception(format("Couldn't load texture: {}", file_path.string())) {}

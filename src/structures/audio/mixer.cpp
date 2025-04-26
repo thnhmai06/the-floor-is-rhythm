@@ -6,15 +6,13 @@
 namespace Structures::Audio
 {
 	float Mixer::get_volume() const { return volume; }
-	float Mixer::set_volume(float percent)
+	float Mixer::set_volume(const float& percent)
 	{
-		if (percent < 0) percent = 0;
-		else if (percent > 1) percent = 1;
-		volume = percent;
+		volume = std::clamp(percent, 0.0f, 1.0f);
 
 		return Utilities::Math::to_percent(
 			Mix_MasterVolume(
-				Utilities::Math::to_value(percent, 0, MIX_MAX_VOLUME)),
+				Utilities::Math::to_value(volume, 0, MIX_MAX_VOLUME)),
 			0, MIX_MAX_VOLUME);
 	}
 	// ::Mixer
@@ -22,7 +20,7 @@ namespace Structures::Audio
 	Mixer::Mixer(const SDL_AudioSpec& spec, const float& master_volume, const float& music_volume,
 		const float& effects_volume, const int32_t& max_channels) : spec(spec), music(music_volume), effect(effects_volume)
 	{
-		Mix_Init(0xff);
+		Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG | MIX_INIT_WAVPACK);
 		Mix_AllocateChannels(max_channels);
 
 		if (!Mix_OpenAudio(0, &spec))

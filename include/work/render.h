@@ -1,11 +1,11 @@
 ﻿#pragma once
-#include "work/render/textures.h"
-#include "work/render/layers.h"
-#include "work/screens.h"
+#include <SDL3/SDL_render.h>
 
 namespace Work::Render
 {
-	// ...
+	inline SDL_Renderer* renderer = nullptr;
 
-	int32_t render(SDL_Window* window);
+	void init(SDL_Window* window);
+	void clean();
+	int32_t work(SDL_Window* window);
 }

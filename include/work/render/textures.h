@@ -4,13 +4,13 @@
 
 namespace Work::Render::Textures
 {
-	using Structures::Render::Textures::TextureMemory;
+	using Structures::Render::Texture::Memory;
 
-	inline std::unique_ptr<TextureMemory> skin;
+	inline std::unique_ptr<Memory> skin;
 
 	static void init_all(SDL_Renderer* renderer)
 	{
-		if (!skin) skin = std::make_unique<TextureMemory>(renderer);
+		if (!skin) skin = std::make_unique<Memory>(renderer);
 	}
 	static void clear_all()
 	{

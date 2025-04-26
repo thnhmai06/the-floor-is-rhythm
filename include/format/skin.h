@@ -3,7 +3,7 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
-#include "structures/types.h"
+#include "structures/type.hpp"
 
 namespace Format::Skin
 {
@@ -14,16 +14,18 @@ namespace Format::Skin
 		namespace Cursor
 		{
 			inline const std::string body = "cursor";
-			inline const std::string trail = "cursortrail";
-			inline const std::string focus = "cursorfocus";
 		}
 		namespace HitObject
 		{
 			inline const std::string floor = "floor";
-			inline const std::string slider_line = "sliderline";
-			inline const std::string slider_point = "sliderpoint";
-			inline const std::string slider_end = "sliderend";
-			inline const std::string slider_reverse = "sliderreverse";
+			inline const std::string floor_overlay = "floor-overlay";
+			inline const std::unordered_map<Structures::Types::Game::Gameplay::NoteScore, std::string> hit = 
+			{
+				{Structures::Types::Game::Gameplay::NoteScore::Miss, "hit0" },
+				{Structures::Types::Game::Gameplay::NoteScore::Bad, "hit50" },
+				{Structures::Types::Game::Gameplay::NoteScore::Good, "hit100" },
+				{Structures::Types::Game::Gameplay::NoteScore::Perfect, "hit300"}
+			};
 		}
 		namespace HealthBar
 		{
@@ -59,7 +61,8 @@ namespace Format::Skin
 			std::unordered_set<std::string> data;
 
 			Namespace();
-		} const namespace_;
+		};
+		inline const Namespace namespace_;
 	}
 
 	namespace Sound
@@ -69,8 +72,9 @@ namespace Format::Skin
 
 	struct FolderNamespace
 	{
-		std::unordered_set<std::string> data;
+		std::unordered_set<std::string> data {};
 
 		FolderNamespace();
-	} inline const folder_namespace;
+	};
+	const FolderNamespace folder_namespace;
 }

@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <SDL3/SDL_audio.h>
 #include "structures/audio/buses.h"
-#include "structures/types.h"
+#include "structures/type.hpp"
 
 namespace Structures::Audio
 {
@@ -16,7 +16,7 @@ namespace Structures::Audio
 		Bus<Effect> effect;
 
 		[[nodiscard]] float get_volume() const;
-		float set_volume(float percent);
+		float set_volume(const float& percent);
 		static void quit();
 
 		Mixer(const SDL_AudioSpec& spec, const float& master_volume, const float& music_volume,

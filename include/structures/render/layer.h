@@ -1,73 +1,74 @@
 ﻿// ReSharper disable CppClangTidyCppcoreguidelinesAvoidConstOrRefDataMembers
 #pragma once
-#include "structures/render/collection.h"
+#include "structures/render/object.h"
 #include "utilities.hpp"
 
-namespace Structures::Render::Layers
+namespace Structures::Render::Layer
 {
-	using namespace Structures::Render::Textures;
+	using namespace Render::Texture;
 
-	/**
-	 * Trong SDL3, thật buồn là ta ko có một cấu trúc nào để biểu diễn một Layer :(((\n
-	 * Vì vậy, ý tưởng của mình là tạo một cấu trúc quản lý các render_buffer giống như Layer,
-	 * và render trực tiếp lên màn hình.
-	 * Cấu trúc này sẽ có config chung để có thể đồng loạt thay đổi các render_buffer. \n
-	 *
-	 * Tại sao không dùng SDL_Texture* đại diện cho Layer? \n
-	 * Vì nó sẽ render texture ra Layer đó, rồi mới render Layer ra
-	 * màn hình chính. Như vậy giống như việc ta render 2 lần vậy.
-	 * (Vấn đề về Hiệu suất và Overhead)
-	 */
 	struct Layer
 	{
-		// buffer
-		struct RenderBuffer : std::list<const Objects::Collection*>
+		struct Buffer
 		{
-		protected:
-			using BASE = std::list<Objects::Collection*>;
+			using CONTAINER = std::list<std::weak_ptr<Object::Collection>>;
 
-		public:
 			const Layer* parent;
+			CONTAINER data;
+
 			struct Item
 			{
-				RenderBuffer* render_buffer;
-				iterator item;
+				Buffer* parent;
+				CONTAINER::iterator item;
 
-				void remove();
+				void destroy();
 
-				explicit Item(RenderBuffer* render_buffer);
-				Item(RenderBuffer* render_buffer, iterator item);
+				explicit Item(Buffer* render_buffer);
+				Item(Buffer* render_buffer, CONTAINER::iterator item);
 			};
 
-			Item add_collection(const Objects::Collection* collection);
-			static void remove_collection(Item& item);
+			Item add(const std::weak_ptr<Object::Collection>& collection);
+			static void destroy(Item& item);
 
-			RenderBuffer(const Layer* layer) : parent(layer) {}
+			explicit Buffer(const Layer* layer) : parent(layer) {}
+		};
+		struct Camera : private Object::Object::Config
+		{
+		protected:
+			using BASE = Object::Object::Config;
+
+		public:
+			[[nodiscard]] SDL_FPoint get_camera_object_offset() const;
+			[[nodiscard]] const SDL_FPoint& get_camera_origin() const;
+			[[nodiscard]] SDL_FPoint& get_camera_origin();
+			[[nodiscard]] SDL_FPoint& get_camera_pos();
+			[[nodiscard]] const SDL_FPoint& get_camera_pos() const;
+			[[nodiscard]] static SDL_FPoint get_camera_size();
+
+			explicit Camera(const OriginPoint& origin = { 0, 0 }); // {0, 0} là góc trái màn hình
 		};
 
 		// attributes
-		RenderBuffer render_buffer;
-		struct Camera : private Objects::Object::Config
-		{
-		protected:
-			using BASE = Objects::Object::Config;
-
-		public:
-			SDL_FPoint get_camera_object_offset() const;
-			[[nodiscard]] uint8_t get_alpha() const;
-			[[nodiscard]] SDL_FPoint get_camera_pos() const;
-			[[nodiscard]] SDL_FPoint get_camera_size(bool after_scale = true) const;
-			void set_alpha(const uint8_t& value);
-			void move_x(const float& dx);
-			void move_y(const float& dy);
-
-			Camera(const OriginPoint& origin = {0, 0}); // {0, 0} là góc trái màn hình
-		} camera;
+		Buffer render_buffer;
+		Camera camera;
 		bool visible = true;
 
+		virtual void render();
+		virtual void reset(bool reset_camera = false);
+
+		explicit Layer(const SDL_FPoint& camera_origin_in_percent = { 0, 0 });
 		virtual ~Layer() = default;
-		explicit Layer(const SDL_FPoint& origin_pos_in_percent = {0, 0});
-		void render() const;
-		void reset(bool to_initial_state = false);
+	};
+
+	struct TextureLayer : Layer
+	{
+		Memory::Item target_texture;
+
+		void render_no_change_back_target(bool clear = false);
+		void render() override;
+		void reset(bool reset_camera = false) override;
+
+		explicit TextureLayer(Memory::Item texture,
+			const SDL_FPoint& camera_origin_in_percent = { 0, 0 });
 	};
 }

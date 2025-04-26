@@ -4,83 +4,123 @@
 
 using namespace Utilities::Math::FPoint;
 
-namespace Structures::Render::Layers
+namespace Structures::Render::Layer
 {
 	//! Layer
 	// ::Camera
-	uint8_t Layer::Camera::get_alpha() const { return color.a; }
-	void Layer::Camera::set_alpha(const uint8_t& value) { color.a = value; }
-	void Layer::Camera::move_x(const float& dx) { render_pos.x += dx; }
-	void Layer::Camera::move_y(const float& dy) { render_pos.y += dy; }
 	Layer::Camera::Camera(const OriginPoint& origin)
 	{
-		origin_point = origin; // góc trái
-		render_pos = { .x = ::Config::GameConfig::Video::Camera::DEFAULT_POS_X, .y = ::Config::GameConfig::Video::Camera::DEFAULT_POS_Y };
+		origin_point = origin;
+		render_pos = { .x = ::Config::GameConfig::Render::Camera::DEFAULT_POS_X, .y = ::Config::GameConfig::Render::Camera::DEFAULT_POS_Y };
 	}
 
-	SDL_FPoint Layer::Camera::get_camera_pos() const { return render_pos; }
-	SDL_FPoint Layer::Camera::get_camera_size(const bool after_scale) const
+	const SDL_FPoint& Layer::Camera::get_camera_origin() const
 	{
-		return after_scale
-			? SDL_FPoint{
-				::Config::GameConfig::Video::Camera::DEFAULT_SIZE_WIDTH * scale.x,
-				::Config::GameConfig::Video::Camera::DEFAULT_SIZE_HEIGHT * scale.y
-		}
-		: SDL_FPoint{ ::Config::GameConfig::Video::Camera::DEFAULT_SIZE_WIDTH, ::Config::GameConfig::Video::Camera::DEFAULT_SIZE_HEIGHT };
+		return origin_point;
+	}
+	SDL_FPoint& Layer::Camera::get_camera_origin()
+	{
+		return origin_point;
+	}
+
+	SDL_FPoint& Layer::Camera::get_camera_pos() { return render_pos; }
+	const SDL_FPoint& Layer::Camera::get_camera_pos() const { return render_pos; }
+	SDL_FPoint Layer::Camera::get_camera_size()
+	{
+		return SDL_FPoint{ ::Config::GameConfig::Render::Camera::DEFAULT_SIZE_WIDTH, ::Config::GameConfig::Render::Camera::DEFAULT_SIZE_HEIGHT };
 	}
 	SDL_FPoint Layer::Camera::get_camera_object_offset() const
 	{
 		return -origin_point.convert_pos_to_origin(render_pos, { 0, 0 });
 	}
-	// ::RenderBuffer
-	void Layer::RenderBuffer::remove_collection(Item& item)
+	// ::Buffer
+	Layer::Buffer::Item Layer::Buffer::add(const std::weak_ptr<Object::Collection>& collection)
 	{
-		item.remove();
+		return { this, data.insert(data.end(), collection) };
 	}
-	// ::RenderBuffer::Item
-	Layer::RenderBuffer::Item Layer::RenderBuffer::add_collection(const Objects::Collection* collection)
+	void Layer::Buffer::destroy(Item& item)
 	{
-		return { this, insert(end(), collection) };
+		item.destroy();
 	}
-	void Layer::RenderBuffer::Item::remove()
+	// ::Buffer::Item
+	void Layer::Buffer::Item::destroy()
 	{
-		if (render_buffer && item != render_buffer->end())
+		if (parent && item != parent->data.end())
 		{
-			render_buffer->erase(item);
-			item = render_buffer->end();
+			parent->data.erase(item);
+			item = parent->data.end();
 		}
 	}
-	Layer::RenderBuffer::Item::Item(RenderBuffer* render_buffer) :
-		render_buffer(render_buffer), item(render_buffer->end())
+	Layer::Buffer::Item::Item(Buffer* render_buffer) :
+		parent(render_buffer), item(render_buffer->data.end())
 	{
 	}
-	Layer::RenderBuffer::Item::Item(RenderBuffer* render_buffer, iterator item) :
-		render_buffer(render_buffer), item(std::move(item))
+	Layer::Buffer::Item::Item(Buffer* render_buffer, CONTAINER::iterator item) :
+		parent(render_buffer), item(std::move(item))
 	{
 	}
+
 	// ::
-	void Layer::render() const
+	void Layer::render()
 	{
-		if (!visible || render_buffer.empty()) return;
-		for (const auto& collection_ptr : render_buffer)
-			collection_ptr->render(camera.get_camera_object_offset());
-	}
-	Layer::Layer(const SDL_FPoint& origin_pos_in_percent)
-		: render_buffer(this),
-		  camera({
-			  origin_pos_in_percent * SDL_FPoint{
-				  Config::GameConfig::Video::LOGICAL_WIDTH, Config::GameConfig::Video::LOGICAL_HEIGHT
-			  }
-		  })
-	{
-		
-	}
-	void Layer::reset(const bool to_initial_state)
-	{
-		render_buffer.clear();
-		if (to_initial_state)
+		if (!visible || render_buffer.data.empty()) return;
+		auto itr = render_buffer.data.begin();
+		while (itr != render_buffer.data.end())
 		{
-			camera = Camera();
+			if (itr->expired())
+			{
+				itr = render_buffer.data.erase(itr);
+				continue;
+			}
+
+			const auto camera_offset = camera.get_camera_object_offset();
+			const auto& collection = itr->lock();
+			collection->render(camera_offset);
+			++itr;
 		}
+	}
+	Layer::Layer(const SDL_FPoint& camera_origin_in_percent)
+		: render_buffer(this),
+		camera({
+			camera_origin_in_percent * SDL_FPoint{
+				Config::GameConfig::Render::LOGICAL_WIDTH,
+			  Config::GameConfig::Render::LOGICAL_HEIGHT
+			}
+			})
+	{
+	}
+	void Layer::reset(const bool reset_camera)
+	{
+		render_buffer.data.clear();
+		if (reset_camera)
+			camera = Camera();
+	}
+
+	//! TextureLayer
+	void TextureLayer::render_no_change_back_target(const bool clear)
+	{
+		if (!visible || render_buffer.data.empty()) return;
+
+		SDL_SetRenderTarget(target_texture.memory->renderer, target_texture.item->second);
+		if (clear) SDL_RenderClear(target_texture.memory->renderer);
+		Layer::render();
+	}
+	void TextureLayer::render()
+	{
+		if (!visible || render_buffer.data.empty()) return;
+
+		SDL_Texture* const current_target = SDL_GetRenderTarget(target_texture.memory->renderer);
+		render_no_change_back_target();
+		SDL_SetRenderTarget(target_texture.memory->renderer, current_target);
+	}
+	void TextureLayer::reset(const bool reset_camera)
+	{
+		Layer::reset(reset_camera);
+		target_texture.clear();
+	}
+	TextureLayer::TextureLayer(Memory::Item texture,
+		const SDL_FPoint& camera_origin_in_percent)
+		: Layer(camera_origin_in_percent), target_texture(std::move(texture))
+	{
 	}
 }

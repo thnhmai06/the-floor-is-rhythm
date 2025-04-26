@@ -1,11 +1,12 @@
 ﻿#pragma once
 #include <memory>
+#include <variant>
 #include "structures/render/texture.h"
-#include "structures/types.h"
+#include "structures/type.hpp"
 
-namespace Structures::Render::Objects
+namespace Structures::Render::Object
 {
-	using namespace Structures::Render::Textures;
+	using namespace Structures::Render::Texture;
 	constexpr uint8_t SDL_MAX_ALPHA = 255;
 
 	struct Object
@@ -50,7 +51,7 @@ namespace Structures::Render::Objects
 			explicit Config(const SDL_FPoint& render_pos, const OriginPoint& origin_pos);
 		};
 
-		TextureMemory::Item src;
+		Memory::Item src;
 		SDL_FRect src_rect_in_percent = { 0, 0, 1, 1 }; // cũng là sdl src_rect, nhưng ở % so với gốc
 		Config config;
 		bool visible = true;
@@ -68,25 +69,31 @@ namespace Structures::Render::Objects
 
 		Object() = default;
 		explicit Object(
-			TextureMemory::Item texture,
-			const Types::Render::OriginType& origin_type = Types::Render::OriginType::CENTRE,
+			Memory::Item texture,
+			const Types::Render::OriginType& origin_type = Types::Render::OriginType::Centre,
 			const SDL_FPoint& render_pos = { 0, 0 });
 		explicit Object(
-			TextureMemory::Item texture,
+			Memory::Item texture,
 			const Config::OriginPoint& custom_origin,
 			const SDL_FPoint& render_pos = { 0, 0 });
 		virtual ~Object() = default;
 	};
-	struct PolyObject
+
+	struct Collection
 	{
-		// TODO: Thêm Config vào đây -> Các object trong data sẽ set render_pos theo hệ quy chiếu của PolyObject
-		std::vector<Object> data;
+	private:
+		void render_single(const unsigned long& index, const SDL_FPoint& total_offset) const;
+		void render_in_range(const int64_t& from, const int64_t& to, const SDL_FPoint& total_offset) const;
+
+	public:
+		std::vector<std::variant<std::shared_ptr<Object>, std::shared_ptr<Collection>>> data;
+		std::vector<std::pair<int64_t, int64_t>> render_range; // Phần tử đầu tiên là 0
+		SDL_FPoint offset = { 0, 0 };
 		bool visible = true;
-		virtual void render(const SDL_FPoint& offset = { 0, 0 });
 
-		virtual ~PolyObject() = default;
+		virtual void render(const SDL_FPoint& offset);
+
+		Collection() = default;
+		virtual ~Collection() = default;
 	};
-
-	using ObjectShared = std::shared_ptr<Object>;
-	using PolyObjectShared = std::shared_ptr<PolyObject>;
 }

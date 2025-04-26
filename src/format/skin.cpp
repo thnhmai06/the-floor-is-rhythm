@@ -10,14 +10,12 @@ namespace Format::Skin
 		{
 			// Cursor
 			data.insert(Cursor::body);
-			data.insert(Cursor::trail);
 
 			// HitObject
 			data.insert(HitObject::floor);
-			data.insert(HitObject::slider_focus);
-			data.insert(HitObject::slider_line);
-			data.insert(HitObject::slider_point);
-			
+			data.insert(HitObject::floor_overlay);
+			for (const auto& val : HitObject::hit | std::views::values)
+				data.insert(val);
 
 			// HealthBar
 			data.insert(HealthBar::background);
@@ -31,7 +29,6 @@ namespace Format::Skin
 
 	FolderNamespace::FolderNamespace()
 	{
-		// Image
 		for (const auto& val : Image::namespace_.data)
 		{
 			if (const auto first_slash = val.find('/');

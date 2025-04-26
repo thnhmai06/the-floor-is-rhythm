@@ -2,10 +2,10 @@
 #include <chrono>
 #include <cmath>
 #include <iomanip>
+#include <map>
 #include <numbers>
 #include <queue>
-#include "structures/types.h"
-#define USE_MATH_DEFINES
+#include "structures/type.hpp"
 
 namespace Utilities
 {
@@ -18,8 +18,8 @@ namespace Utilities
 		inline float radian_to_degree(const float& radian) { return radian * 180.0f / std::numbers::pi_v<float>; }
 		inline double round(const double& value, const uint8_t& precision_num = 0)
 		{
-			const double factor = std::pow(10, precision_num);
-			return std::round(value / factor) * factor;
+			const double factor = std::pow(10.0, precision_num);
+			return std::round(value * factor) / factor;
 		}
 		inline std::pair<double, double> decimal_separate(const double& value)
 		{
@@ -31,6 +31,12 @@ namespace Utilities
 		{
 			if (value < 1) return 1;
 			return static_cast<size_t>(std::log10(value)) + 1;
+		}
+		template <typename IntegerType>
+		IntegerType circle_mod(const IntegerType& value, const IntegerType& mod)
+		{
+			if (mod == 0) return value;
+			return (value % mod + mod) % mod;
 		}
 
 		namespace FPoint
@@ -68,7 +74,7 @@ namespace Utilities
 		NumberType to_value(const float& percent, const NumberType& from, const NumberType& to)
 		{
 			if (from == to) return from;
-			return from + static_cast<NumberType>(static_cast<float>(to - from) * ((from < to) ? percent : (1.0f - percent)));
+			return from + static_cast<NumberType>(std::round(static_cast<float>(to - from) * ((from < to) ? percent : (1.0f - percent))));
 		}
 
 		template <typename ComparableType>
@@ -174,6 +180,7 @@ namespace Utilities
 			if (container.empty()) return container.cend();
 			return std::prev(container.cend());
 		}
+
 		template <typename LeftType, typename RightType, typename Comparator>
 		bool get_front_dual_queue( // đúng thì lấy bên phải (vì bên phải luôn right :>)
 			const std::queue<LeftType>& left, const std::queue<RightType>& right, Comparator comp)
@@ -191,32 +198,21 @@ namespace Utilities
 			queue.pop();
 			return front;
 		}
-	}
-	namespace Game
-	{
-		namespace Beatmap
+		template <typename Type>
+		std::priority_queue<Type> get_front_and_pop(std::priority_queue<Type>& queue)
 		{
-			template <typename TimeBasedObject>
-			const TimeBasedObject* get_front_pair_queue(
-				std::queue<const TimeBasedObject*>& q1,
-				std::queue<const TimeBasedObject*>& q2
-			)
-			{
-				if (q1.empty() && q2.empty()) return nullptr;
+			Type front = queue.top();
+			queue.pop();
+			return front;
+		}
 
-				const TimeBasedObject* hit_object;
-				if (q1.empty() || q2.front()->get_time() < q1.front()->get_time())
-				{
-					hit_object = q2.front();
-					q2.pop();
-				}
-				else
-				{
-					hit_object = q1.front();
-					q1.pop();
-				}
-				return hit_object;
-			}
+		template <typename KeyType, typename ValueType>
+		std::queue<typename std::multimap<KeyType, ValueType>::value_type> multimap_to_queue(const std::multimap<KeyType, ValueType>& map)
+		{
+			std::queue<typename std::multimap<KeyType, ValueType>::value_type> res;
+			for (const auto& item : map)
+				res.push(item);
+			return res;
 		}
 	}
 }

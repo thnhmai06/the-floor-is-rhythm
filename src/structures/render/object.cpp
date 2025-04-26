@@ -3,7 +3,7 @@
 #include "logging/logger.h"
 #include "utilities.hpp"
 
-namespace Structures::Render::Objects
+namespace Structures::Render::Object
 {
 	//! Object
 	// ::OriginPoint
@@ -28,33 +28,33 @@ namespace Structures::Render::Objects
 	Object::Config::OriginPoint Object::Config::OriginPoint::translate_origin_type_to_point(
 		const Types::Render::OriginType& origin_type, const SDL_FPoint& size)
 	{
-		const auto [w, h] = size;
+		const auto& [w, h] = size;
 		switch (origin_type)
 		{
-		case Types::Render::OriginType::TOP_LEFT:
+		case Types::Render::OriginType::TopLeft:
 			return { 0, 0 };
-		case Types::Render::OriginType::BOTTOM_LEFT:
+		case Types::Render::OriginType::BottomLeft:
 			return { 0, h };
-		case Types::Render::OriginType::BOTTOM_RIGHT:
+		case Types::Render::OriginType::BottomRight:
 			return { w, h };
-		case Types::Render::OriginType::TOP_RIGHT:
+		case Types::Render::OriginType::TopRight:
 			return { w, 0 };
-		case Types::Render::OriginType::TOP_CENTRE:
+		case Types::Render::OriginType::TopCentre:
 			return { w / 2, 0 };
-		case Types::Render::OriginType::BOTTOM_CENTRE:
+		case Types::Render::OriginType::BottomCentre:
 			return { w / 2, h };
-		case Types::Render::OriginType::CENTRE_LEFT:
+		case Types::Render::OriginType::CentreLeft:
 			return { 0, h / 2 };
-		case Types::Render::OriginType::CENTRE_RIGHT:
+		case Types::Render::OriginType::CentreRight:
 			return { w, h / 2 };
-		case Types::Render::OriginType::CENTRE:
+		case Types::Render::OriginType::Centre:
 			return { w / 2, h / 2 };
 		}
 		return { 0, 0 };
 	}
 	Object::Config::OriginPoint::OriginPoint(
 		const Types::Render::OriginType& origin_type, const SDL_FPoint& size)
-			: OriginPoint(translate_origin_type_to_point(origin_type, size))
+		: OriginPoint(translate_origin_type_to_point(origin_type, size))
 	{
 	}
 
@@ -76,12 +76,12 @@ namespace Structures::Render::Objects
 	}
 	void Object::Config::set_scale(const SDL_FPoint& value)
 	{
-		const auto old_render_origin = get_origin_point(true);
+		//const auto old_render_origin = get_origin_point(true);
 		scale = value;
-		const auto new_render_origin = get_origin_point(true);
+		//const auto new_render_origin = get_origin_point(true);
 
-		render_pos.x += old_render_origin.x - new_render_origin.x;
-		render_pos.y += old_render_origin.y - new_render_origin.y;
+		//render_pos.x += old_render_origin.x - new_render_origin.x;
+		//render_pos.y += old_render_origin.y - new_render_origin.y;
 	}
 	void Object::Config::set_scale(const float& value) { set_scale({ value, value }); }
 	void Object::Config::set_render_size(const SDL_FPoint& size, const SDL_FPoint& src_size)
@@ -148,7 +148,7 @@ namespace Structures::Render::Objects
 	}
 	void Object::render(const SDL_FPoint& offset)
 	{
-		if (!visible) return;
+		if (!visible || config.color.a == 0) return;
 
 		const auto& sdl_texture = src.item->second;
 		const auto src_rect = get_sdl_src_rect();
@@ -158,14 +158,14 @@ namespace Structures::Render::Objects
 		// https://stackoverflow.com/questions/24969783/is-it-safe-acceptable-to-call-sdl-settexturecolormod-every-frame-multiple-times
 		SDL_SetTextureBlendMode(sdl_texture, config.blend_mode);
 		SDL_SetTextureAlphaMod(sdl_texture, config.color.a);
-		SDL_SetTextureColorMod(sdl_texture, config.color.r, config.color.g, config.color.b); 
+		SDL_SetTextureColorMod(sdl_texture, config.color.r, config.color.g, config.color.b);
 
-		if (!SDL_RenderTextureRotated(src.memory->renderer, sdl_texture, &src_rect, 
+		if (!SDL_RenderTextureRotated(src.memory->renderer, sdl_texture, &src_rect,
 			&dst_rect, config.angle, &render_origin_point, config.flip_mode))
-			THROW_ERROR(Logging::Exceptions::SDLExceptions::Texture::SDL_Texture_Render_Failed(src.get_name()));
+			LOG_ERROR(Logging::Exceptions::SDLExceptions::Texture::SDL_Texture_Render_Failed(src.get_name()));
 	}
 	Object::Object(
-		TextureMemory::Item texture,
+		Memory::Item texture,
 		const Types::Render::OriginType& origin_type,
 		const SDL_FPoint& render_pos) :
 		src(std::move(texture))
@@ -174,20 +174,49 @@ namespace Structures::Render::Objects
 		config.render_pos = render_pos;
 	}
 	Object::Object(
-		TextureMemory::Item texture,
+		Memory::Item texture,
 		const Config::OriginPoint& custom_origin,
 		const SDL_FPoint& render_pos) :
 		src(std::move(texture)), config(render_pos, custom_origin)
 	{
 	}
 
-	//! PolyObject
-	void PolyObject::render(const SDL_FPoint& offset)
+	//! Collection
+	void Collection::render_single(const unsigned long& index, const SDL_FPoint& total_offset) const
+	{
+		if (!visible) return;
+		if (const auto& object = data[index];
+			std::holds_alternative<std::shared_ptr<Object>>(object))
+		{
+			const auto& it = std::get<std::shared_ptr<Object>>(object);
+			if (!it) return;
+			it->render(total_offset);
+		}
+		else if (std::holds_alternative<std::shared_ptr<Collection>>(object))
+		{
+			const auto& it = std::get<std::shared_ptr<Collection>>(object);
+			if (!it) return;
+			it->render(total_offset);
+		}
+	}
+
+	void Collection::render_in_range(const int64_t& from, const int64_t& to, const SDL_FPoint& total_offset) const
+	{
+		if (!visible) return;
+		const int64_t size = data.size();
+		for (auto index = std::max(from, 0LL); index <= std::min(size - 1, to); ++index)
+			render_single(index, total_offset);
+	}
+
+	void Collection::render(const SDL_FPoint& offset)
 	{
 		using Utilities::Math::FPoint::operator+;
 
-		if (!visible || data.empty()) return;
-		for (auto& object : data)
-			object.render(offset);
+		if (!visible) return;
+		const auto total_offset = offset + this->offset;
+		if (render_range.empty())
+			render_in_range(0, data.size() - 1, total_offset);
+		else for (const auto& [from, to] : render_range)
+			render_in_range(from, to, total_offset);
 	}
 }

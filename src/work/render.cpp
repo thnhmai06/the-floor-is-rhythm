@@ -4,30 +4,41 @@
 #include "work/core.h"
 #include "main.h"
 #include "logging/logger.h"
-#include "structures/screens/gameplay/playing.h"
-#include "structures/action/event/input.h"
-#include "work/skin.h"
+#include "structures/screen/gameplay.h"
+#include "structures/events/event/input.h"
+#include "work/screen.h"
+#include "work/render/layer.h"
+#include "work/render/textures.h"
 
-using namespace Work::Render;
-
-int32_t Work::Render::render(SDL_Window* window)
+namespace Work::Render
 {
-	const std::filesystem::path skin_path = "./assets";
-	int32_t result = EXIT_SUCCESS;
+	void init(SDL_Window* window)
+	{
+		Core::Init::renderer(window, renderer);
+		Textures::init_all(renderer);
+		Layers::init_all(renderer);
+	}
 
-	SDL_Renderer* renderer = nullptr;
-	Core::Init::renderer(window, renderer);
-	Textures::init_all(renderer);
-	Layers::init_all();
+	void clean()
+	{
+		Layers::reset_all(true);
+		Core::CleanUp::renderer(renderer);
+	}
 
-	//try
-	//{
-		Skin::load_image(skin_path, *Textures::skin, skin_path);
-		Screens::playing_screen = std::make_unique<Screens::Gameplay::PlayingScreen>
-	("D:\\2258410 Kagetora - UNPR3C3D3NT3D TRAV3L3R\\Kagetora. - UNPR3C3D3NT3D TRAV3L3R (Ducky-) [F1N4L D3ST1N4T10N].osu.tfd");
+	int32_t work(SDL_Window* window)
+	{
+		const std::filesystem::path skin_path = "./assets";
+		int32_t result = EXIT_SUCCESS;
+
+		//try
+		//{
+		Textures::skin->load(skin_path, skin_path, true, false);
+		Screen::playing_screen = std::make_unique<Screen::Gameplay::PlayingScreen>
+			(R"(D:\1378089 Sound piercer feat DAZBEE - Hanatachi ni Kibou o (2020 Remaster)\Sound piercer feat. DAZBEE - Hanatachi ni Kibou o (2020 Remaster) (Log Off Now) [Kowari's Hard].tfd)", 
+				1, true, true);
 
 		SDL_Event event;
-		while (is_running) 
+		while (is_running)
 		{
 			const auto previous_update_time = std::chrono::system_clock::now();
 			const auto previous_render_time = std::chrono::system_clock::now();
@@ -39,9 +50,9 @@ int32_t Work::Render::render(SDL_Window* window)
 
 			// input
 			const auto previous_input_time = std::chrono::system_clock::now();
-			static Structures::Action::Event::Input::EventList events;
+			static Structures::Events::Event::Input::SdlEvents events;
 			events.clear();
-			while (SDL_PollEvent(&event)) 
+			while (SDL_PollEvent(&event))
 			{
 				if (event.type == SDL_EVENT_QUIT)
 				{
@@ -50,22 +61,21 @@ int32_t Work::Render::render(SDL_Window* window)
 				}
 				events.push_back(event);
 			}
-			const auto input_latency = Utilities::Time::get_duration<std::chrono::milliseconds>(previous_input_time);
+			//const auto input_latency = Utilities::Time::get_duration<std::chrono::milliseconds>(previous_input_time);
 			//SPDLOG_DEBUG("Input Latency: {}ms", input_latency);
-			Screens::playing_screen->logic_core.make_time_step(events, static_cast<float>(input_latency));
+			Screen::playing_screen->logic.make_time_step(events);
 
-			const auto render_latency = Utilities::Time::get_duration<std::chrono::milliseconds>(previous_render_time);
+			//const auto render_latency = Utilities::Time::get_duration<std::chrono::milliseconds>(previous_render_time);
 			//SPDLOG_DEBUG("Render Latency: {}ms", render_latency);
 
 			const auto update_latency = Utilities::Time::get_duration<std::chrono::milliseconds>(previous_update_time);
-			//SPDLOG_DEBUG("Update Latency: {}ms", update_latency);
+			SPDLOG_DEBUG("Update Latency: {}ms", update_latency);
 		}
-	//} catch (...) {
-	//	is_running = false;
-	//	result = EXIT_FAILURE;
-	//}
-	Layers::reset_all(true);
-	Core::CleanUp::renderer(renderer);
+		//} catch (...) {
+		//	is_running = false;
+		//	result = EXIT_FAILURE;
+		//}
 
-	return result;
+		return result;
+	}
 }

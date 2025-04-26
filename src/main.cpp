@@ -1,30 +1,30 @@
 ﻿#include "main.h" // Header
-#include <SDL3/SDL_init.h>
-#include "logging/logger.h"
-#include "logging/exceptions.h"
 #include "work/render.h"
 #include "work/core.h"
-
-#include "structures/game/beatmap.h"
 #include "work/audio.h"
 #include "work/convert/osu/beatmap.h"
-#include "work/convert/osu/mapset.h"
-
-constexpr bool DEBUG_MODE = true;
 
 int32_t main(int32_t argc, char* argv[])
 {
-	int32_t result = EXIT_SUCCESS;
-	SDL_Window* window = nullptr;
+	bool DEBUG_MODE = false;
+	for (int32_t i = 0; i < argc; ++i)
+	{
+		if (strcmp(argv[i], "--debug") == 0)
+			DEBUG_MODE = true;
+	}
+
 	Work::Core::Init::system(DEBUG_MODE);
 	Work::Core::Init::window(window);
 	Work::Audio::init();
+	Work::Render::init(window);
 
-	// Render
-	Work::Convert::osu::convert_beatmap("D:\\PROGRAM\\osu!\\Songs\\2258410 Kagetora - UNPR3C3D3NT3D TRAV3L3R", "D:\\");
-	result = Work::Render::render(window);
+	//Work::Convert::osu::convert_beatmap(R"(D:\PROGRAM\osu!\Songs\1378089 Sound piercer feat DAZBEE - Hanatachi ni Kibou o (2020 Remaster))", "D:\\");
+	int32_t result = Work::Render::work(window);
 
+	Work::Render::clean();
 	Work::Audio::quit();
 	Work::Core::CleanUp::window(window);
 	Work::Core::CleanUp::system();
+
+	return result;
 }

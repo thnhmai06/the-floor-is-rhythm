@@ -2,52 +2,64 @@
 #include <string>
 #include <filesystem>
 #include <unordered_map>
+#include <unordered_set>
 #include <SDL3/SDL_render.h>
 
-namespace Structures::Render::Objects
+namespace Structures::Render::Object
 {
 	struct Object;
 }
 
-namespace Structures::Render::Textures
+namespace Structures::Render::Texture
 {
-	struct TextureMemory : std::unordered_map<std::string, SDL_Texture*>
+	struct Memory
 	{
 	protected:
-		using BASE = std::unordered_map<std::string, SDL_Texture*>;
+		using CONTAINER = std::unordered_map<std::string, SDL_Texture*>;
 
+		CONTAINER data;
 	public:
+		SDL_Renderer* renderer;
+
 		struct Item
 		{
-			const TextureMemory* memory = nullptr;
-			const_iterator item;
+			const Memory* memory = nullptr;
+			CONTAINER::const_iterator item;
 
 		private:
 			[[nodiscard]] SDL_FPoint get_size() const;
 
-			friend Objects::Object;
+			friend Object::Object;
 		public:
 			[[nodiscard]] const std::string& get_name() const;
-			void change_target(const std::string& new_target = {}, const TextureMemory* new_memory = nullptr);
+			void change_target(const std::string& new_target = {}, const Memory* new_memory = nullptr);
+			[[nodiscard]] bool is_valid() const;
+			void render(const SDL_FRect* src_rect, const SDL_FRect* dst_rect) const;
+			void clear() const;
 
 			Item() = default;
-			Item(const std::string& name, const TextureMemory* memory);
-			Item(const_iterator item_in_memory, const TextureMemory* memory);
+			Item(const std::string& name, const Memory* memory);
+			Item(CONTAINER::const_iterator item_in_memory, const Memory* memory);
 		};
 
-		SDL_Renderer* renderer;
-		Item load_texture(const std::filesystem::path& file, const std::string& name, bool override = true);
-		Item load_texture(SDL_Texture* texture, const std::string& name, bool override = true);
-		[[nodiscard]] static SDL_FPoint get_texture_size(const const_iterator& texture);
+		[[nodiscard]] const CONTAINER* get_data() const;
+		Item load(const std::filesystem::path& file_path, const std::string& name, bool override = true);
+		Item load(SDL_Texture* texture, const std::string& name, bool override = true);
+		std::unordered_set<std::string> load(
+			const std::filesystem::path& folder_path, const std::filesystem::path& root_folder, 
+			bool recursive = true, bool name_include_extension = false, bool relative_path_name = true, bool override = true,
+			const std::unordered_set<std::string>& only_in = {});
+		[[nodiscard]] static SDL_FPoint get_texture_size(const CONTAINER::const_iterator& texture);
 		[[nodiscard]] SDL_FPoint get_texture_size(const std::string& name) const;
 		[[nodiscard]] Item find(const std::string& name) const;
-		iterator rename_texture(const std::string& old_name, const std::string& new_name);
-		iterator move_texture(const std::string& name, TextureMemory* to_memory);
+		Item create_new(const std::string& name, const SDL_Point& size, bool override = true);
+		CONTAINER::iterator rename_texture(const std::string& old_name, const std::string& new_name);
+		CONTAINER::iterator move_texture(const std::string& name, Memory& to_memory);
 		void free_texture(const std::string& name);
 		void free_all();
-		void clear() { free_all(); } // Tránh gọi nhầm hàm reset() của std::unordered_map
+		void clear();
 
-		explicit TextureMemory(SDL_Renderer* renderer) : renderer(renderer) {}
-		~TextureMemory() { free_all(); }
+		explicit Memory(SDL_Renderer* renderer);
+		~Memory();
 	};
 }

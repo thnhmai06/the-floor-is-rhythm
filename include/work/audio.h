@@ -9,21 +9,21 @@ namespace Work::Audio
 	using namespace Config::GameConfig::Audio;
 	using namespace Config::UserConfig::Audio;
 
-	inline std::unique_ptr<Mixer> mixer;
-
 	namespace Memory
 	{
 		namespace Beatmap
 		{
-			inline Structures::Audio::Memory<Music> music;
-			inline Structures::Audio::Memory<Effect> effect;
+			inline MusicMemory music;
+			inline EffectMemory effect;
 		}
 		namespace Skin
 		{
-			inline Structures::Audio::Memory<Music> music;
-			inline Structures::Audio::Memory<Effect> effect;
+			inline MusicMemory music;
+			inline EffectMemory effect;
 		}
 	}
+
+	inline std::unique_ptr<Mixer> mixer;
 
 	inline void init()
 	{
@@ -35,7 +35,6 @@ namespace Work::Audio
 		mixer = std::make_unique<Mixer>(spec,
 			Volume::master, Volume::music, Volume::effects, MAX_CHANNELS);
 	}
-
 	inline void quit()
 	{
 		if (mixer)
