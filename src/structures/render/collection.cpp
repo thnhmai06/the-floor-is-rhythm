@@ -3,9 +3,10 @@
 
 namespace Structures::Render::Objects
 {
-	void Collection::render_in_range(const size_t& from, const size_t& to, const SDL_FPoint& total_offset) const
+	void Collection::render_in_range(const int64_t& from, const int64_t& to, const SDL_FPoint& total_offset) const
 	{
-		for (auto i = std::max(from, static_cast<size_t>(0)); i <= std::min(data.size()-1, to); ++i)
+		const int64_t size = data.size();
+		for (auto i = std::max(from, static_cast<int64_t>(0)); i <= std::min(size - 1, to); ++i)
 		{
 			if (const auto& object = data[i]; 
 				std::holds_alternative<ObjectShared>(object))

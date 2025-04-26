@@ -27,9 +27,9 @@ namespace Structures::Screens::Gameplay
 			const PlayingScreen* playing_screen;
 			Game::Beatmap::Beatmap::FloorActionQueue floor;
 			Game::Beatmap::Beatmap::SliderActionQueue slider;
-			Game::Beatmap::TimingPoints::TimingPoints::const_iterator current_inherited_point = playing_screen->beatmap->timing_points.cbegin();
-			Game::Beatmap::TimingPoints::TimingPoints::const_iterator current_uninherited_point = playing_screen->beatmap->timing_points.cbegin();
-			Game::Beatmap::TimingPoints::TimingPoints::const_iterator current_timing_point = playing_screen->beatmap->timing_points.cbegin(); // nói chung
+			std::queue<const Game::Beatmap::TimingPoints::TimingPoint*> inherited, uninherited;
+			float current_timing_velocity, current_beat_length;
+
 			int64_t previous_time;
 		public:
 			Action::Time::Timer timer;

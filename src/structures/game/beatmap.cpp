@@ -102,6 +102,7 @@ namespace Structures::Game::Beatmap
 		float current_timing_point_velocity;
 		float current_beat_length;
 
+		// thi ra bug la do minh de rotation sau cung a
 		auto if_floor = [&]()
 			{
 				const HitObjects::Floor::ActionInfo current_floor_action{ *std::get_if<HitObjects::Floor>(current_hit_object), previous_direction };

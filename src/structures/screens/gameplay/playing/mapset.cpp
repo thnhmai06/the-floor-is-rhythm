@@ -135,8 +135,10 @@ namespace Structures::Screens::Gameplay::Playing::Mapset
 	Object Slider::create_slider_point(
 		const TextureMemory& memory,
 		const Object& previous)
-	{
+	{// Passesd
 		const auto texture = memory.find(hit_objects_skin[current_direction][HitObjectType::SLIDER_POINT]);
+
+		// previous chinh la slider line! => Lien ke
 		const auto previous_sdl_render_pos = Utilities::Render::get_pos_from_rect(previous.get_sdl_dst_rect());
 		const auto previous_render_size = Utilities::Render::get_size_from_rect(previous.get_sdl_dst_rect());
 
@@ -183,7 +185,7 @@ namespace Structures::Screens::Gameplay::Playing::Mapset
 		const Game::Beatmap::Metadata::CalculatedDifficulty& diff,
 		const float& current_timing_velocity,
 		const HitObject* previous)
-	{
+	{ // Passed
 		const auto texture = memory.find(hit_objects_skin[current_direction][HitObjectType::SLIDER_POINT]);
 		const auto speed = diff.velocity.speed * current_timing_velocity;
 
@@ -294,6 +296,8 @@ namespace Structures::Screens::Gameplay::Playing::Mapset
 
 		// slider end
 		data.push_back(create_slider_point(memory, data.back()));
+
+		// where?
 	}
 
 	// ::Mapset

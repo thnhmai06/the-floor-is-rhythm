@@ -8,7 +8,7 @@ namespace Structures::Render::Objects
 	struct Collection
 	{
 	private:
-		void render_in_range(const size_t& from, const size_t& to, const SDL_FPoint& total_offset) const;
+		void render_in_range(const int64_t& from, const int64_t& to, const SDL_FPoint& total_offset) const;
 
 	public:
 		std::vector<std::variant<ObjectShared, PolyObjectShared>> data;

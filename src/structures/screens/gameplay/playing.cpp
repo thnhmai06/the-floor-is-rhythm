@@ -290,6 +290,7 @@ namespace Structures::Screens::Gameplay
 	}
 	void PlayingScreen::Core::make_time_step(const EventList& events, const float& input_latency)
 	{
+		//! Nhan Event
 		KeyboardEventList keyboard_events{};
 		for (const auto& event : events)
 		{
@@ -305,22 +306,16 @@ namespace Structures::Screens::Gameplay
 		score.check_and_add_slider_score(current_time, input_latency);
 
 		//! Cập nhật current object
-		while (current_timing_point != playing_screen->beatmap->timing_points.end() && current_timing_point->first < current_time)
-		{
-			const auto next_itr = std::next(current_timing_point, 1);
-			if (next_itr == playing_screen->beatmap->timing_points.end()) break;
-			if (next_itr->first > current_time) break;
-			++current_timing_point;
-			if (current_timing_point->second.inherited)
-				current_inherited_point = current_timing_point;
-			else current_uninherited_point = current_timing_point;
-		}
-		//SPDLOG_INFO("Current: {}", std::min(floor.front()->time, slider.front()->time));
-		//SPDLOG_INFO("Current time: {}", current_time);
+		// update timing point
+		while (!inherited.empty() && current_time >= inherited.front()->get_time())
+			current_timing_velocity = Utilities::Container::get_front_and_pop(inherited)->get_velocity();
+		while (!uninherited.empty() && current_time >= uninherited.front()->get_time())
+			current_beat_length = Utilities::Container::get_front_and_pop(uninherited)->beat_length;
+		// what should i do...
 
 		//! Cập nhật hướng đi & di chuyển
 		const auto time_delta = static_cast<float>(current_time - previous_time);
-		const auto distance = time_delta * playing_screen->beatmap->calculated_difficulty.velocity.speed * current_inherited_point->second.get_velocity();
+		const auto distance = time_delta * playing_screen->beatmap->calculated_difficulty.velocity.speed * current_timing_velocity;
 
 		const Types::Game::Direction::Direction current_direction =
 			Utilities::Container::get_front_dual_queue(floor, slider,
@@ -332,14 +327,17 @@ namespace Structures::Screens::Gameplay
 				}) ? slider.front()->direction : floor.front()->direction;
 		//SPDLOG_INFO("Current Direction: {}", static_cast<uint8_t>(current_direction));
 		const auto mapset = dynamic_cast<Playing::Mapset::Mapset*>(playing_screen->render.components.map.collection->get());
-		//mapset->move(distance, current_direction);
-		SPDLOG_INFO("Add Distance: {}", distance);
+		mapset->move(distance, current_direction);
+
+		// cho nay da moving duoc, nhung van de la
+		// render khong duoc dung
+		// so may be check render
 
 		// TODO: make it relative
 		const auto left = floor.size() + slider.size();
 		const auto total = playing_screen->beatmap->stats.get_total_objects_num();
 		const int64_t current_hit_object_num = total - left;
-		mapset->render_range.front() = { current_hit_object_num - 100, current_hit_object_num + 100 };
+		mapset->render_range.front() = { current_hit_object_num - 5, current_hit_object_num + 5 };
 
 		previous_time = current_time;
 	}
@@ -353,8 +351,13 @@ namespace Structures::Screens::Gameplay
 		const auto& beatmap = playing_screen->beatmap;
 
 		auto [floor, slider] = beatmap->make_action_queue();
+		auto [inherited, uninherited] = playing_screen->beatmap->timing_points.split_to_queue();
 		this->floor = std::move(floor);
 		this->slider = std::move(slider);
+		this->inherited = std::move(inherited);
+		this->uninherited = std::move(uninherited);
+		current_timing_velocity = (this->inherited.empty()) ? 1 : this->inherited.front()->get_velocity();
+		current_beat_length = this->uninherited.front()->beat_length;
 
 		constexpr int64_t START_TIME_OFFSET = 0;
 		previous_time = timer.start_time = beatmap->stats.time.start_time - START_TIME_OFFSET;
@@ -379,7 +382,7 @@ namespace Structures::Screens::Gameplay
 			std::make_shared<Playing::Mapset::Mapset>(*Work::Render::Textures::skin, beatmap)
 		);
 		components.map.render_item = Work::Render::Layers::playground->render_buffer.add_collection(components.map.collection->get()); // Thêm vào render_buffer ở đây nè :D
-		components.map.collection->get()->render_range = { {-10, 10} };
+		components.map.collection->get()->render_range = { {-5, 5} };
 
 		//! Cursor
 		components.cursor.collection = storage.insert(
