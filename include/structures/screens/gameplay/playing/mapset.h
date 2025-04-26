@@ -1,7 +1,7 @@
 ﻿#pragma once
+#include <array>
 #include "structures/game/beatmap.h"
 #include "structures/game/beatmap/hitobject.h"
-#include "structures/game/beatmap/metadata.h"
 #include "structures/render/collection.h"
 #include "structures/render/texture.h"
 
@@ -13,51 +13,66 @@ namespace Structures::Screens::Gameplay::Playing::Mapset
 	{
 		struct HitObject : PolyObject
 		{
-			const Game::Beatmap::HitObjects::HitObject* hit_object = nullptr;
+			const Game::Beatmap::HitObjects::Floor* hit_object;
+
+			explicit HitObject(const Game::Beatmap::HitObjects::Floor* hit_object);
+			explicit HitObject(const std::weak_ptr<const Game::Beatmap::HitObjects::Floor>& hit_object);
 		};
 		struct Floor final : HitObject
 		{
 			Floor(
-				const Game::Beatmap::HitObjects::HitObject& floor,
+				const Game::Beatmap::HitObjects::Floor* floor,
 				const TextureMemory& memory,
-				const Game::Beatmap::Metadata::CalculatedDifficulty& diff,
-				const float& current_timing_velocity = 1,
-				bool no_rotation = false,
-				const HitObject* previous = nullptr);
+				const SDL_FPoint& centre_pos,
+				const SDL_FPoint& size);
 		};
 		struct Slider final : HitObject
 		{
 		private:
-			static Object create_slider_line(
+			float add_slider_line(
+				const TextureMemory& memory,
+				const SDL_FPoint& centre_width_edge_pos,
+				const float& full_width,
+				const float& percent);
+			void add_slider_point(
+				const TextureMemory& memory,
+				const SDL_FPoint& centre_pos,
+				const SDL_FPoint& size);
+			void add_slider_begin(
+				const TextureMemory& memory,
+				const SDL_FPoint& centre_pos,
+				const SDL_FPoint& size);
+			void add_slider_end(
+				const TextureMemory& memory,
+				const SDL_FPoint& centre_pos,
+				const SDL_FPoint& size);
+			void add_slider_reverse_arrow(
 				const TextureMemory& memory,
 				const SDL_FPoint& size,
-				const Object& previous,
-				float src_width_in_percent = 1,
-				bool from_centre_of_previous = false);
-			static Object create_slider_point(
-				const TextureMemory& memory,
-				const Object& previous);
-			static Object create_slider_begin(
-				const Game::Beatmap::HitObjects::HitObject& slider,
-				const TextureMemory& memory,
-				const Game::Beatmap::Metadata::CalculatedDifficulty& diff,
-				const float& current_timing_velocity = 1,
-				const HitObject* previous = nullptr);
+				bool back_to_left = false
+			);
+
 		public:
+			bool to_right;
+			SDL_FPoint left_pos, right_pos;
+			std::vector<uint32_t> slider_line_index;
+			std::vector<uint32_t> slider_point_index;
+			uint32_t begin_index, end_index;
+			std::array<uint32_t, 2> slider_reverse_arrow_index;
+
 			Slider(
-				const Game::Beatmap::HitObjects::HitObject& slider,
+				const Game::Beatmap::HitObjects::Slider* slider,
 				const TextureMemory& memory,
-				const Game::Beatmap::Metadata::CalculatedDifficulty& diff,
+				const float& diff_pixel_speed,
 				const float& current_beat_length,
 				const float& current_timing_velocity,
-				bool no_rotation = false,
-				const HitObject* previous = nullptr);
+				const SDL_FPoint& centre_pos,
+				bool to_right = true);
 		};
 	}
 
 	struct Mapset : Collection
 	{
-		void move(const float& distance, const Types::Game::Direction::Direction& direction);
-		Mapset(const TextureMemory& memory, const Game::Beatmap::Beatmap& beatmap);
+		Mapset(const TextureMemory& memory, const Game::Beatmap::Mapset& beatmap);
 	};
 }

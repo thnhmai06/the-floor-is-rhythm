@@ -30,4 +30,24 @@ namespace Structures::Render::Objects
 			bool vertical = false,
 			const SDL_FPoint& render_pos = { 0, 0 });
 	};
+
+	struct StaticPercentObject : PercentObject
+	{
+		float percent = 1;
+
+		explicit StaticPercentObject(
+			const TextureMemory::Item& texture,
+			const SDL_FPoint& render_size_when_full,
+			bool horizontal = true,
+			bool vertical = false,
+			const Types::Render::OriginType& origin_type = Types::Render::OriginType::CENTRE,
+			const SDL_FPoint& render_pos = { 0, 0 });
+		explicit StaticPercentObject(
+			const TextureMemory::Item& texture,
+			const SDL_FPoint& render_size_when_full,
+			const Config::OriginPoint& custom_origin,
+			bool horizontal = true,
+			bool vertical = false,
+			const SDL_FPoint& render_pos = { 0, 0 });
+	};
 }

@@ -1,6 +1,5 @@
 ﻿// ReSharper disable StringLiteralTypo
 #pragma once
-#include <array>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -16,50 +15,15 @@ namespace Format::Skin
 		{
 			inline const std::string body = "cursor";
 			inline const std::string trail = "cursortrail";
-			inline std::unordered_map<Structures::Types::Game::Direction::Direction, const std::string> direction_skin =
-			{
-				{Structures::Types::Game::Direction::Direction::RIGHT, "right/direction"},
-				{Structures::Types::Game::Direction::Direction::UP, "up/direction"},
-				{Structures::Types::Game::Direction::Direction::DOWN, "down/direction"},
-				{Structures::Types::Game::Direction::Direction::LEFT, "left/direction"}
-			};
+			inline const std::string focus = "cursorfocus";
 		}
 		namespace HitObject
 		{
-			enum class HitObjectType : uint8_t
-			{
-				FLOOR, SLIDER_FOCUS, SLIDER_LINE, SLIDER_POINT
-			};
-			constexpr uint8_t HitObjectType_NUM = 4;
-
-			struct HitObjectsInDirection : std::array<std::string, HitObjectType_NUM>
-			{
-			protected:
-				using VALUE = std::string;
-				using BASE = std::array<VALUE, HitObjectType_NUM>;
-
-			private:
-				VALUE direction_folder;
-				static std::string get_direction_folder(const Structures::Types::Game::Direction::Direction& direction);
-
-			public:
-				reference operator[] (const HitObjectType& type);
-				const_reference operator[] (const HitObjectType& type) const;
-				explicit HitObjectsInDirection(const Structures::Types::Game::Direction::Direction& direction);
-			};
-			struct HitObjectSkins : std::array<HitObjectsInDirection, Structures::Types::Game::Direction::NUM_DIRECTIONS>
-			{
-			protected:
-				using VALUE = HitObjectsInDirection;
-				using BASE = std::array<VALUE, Structures::Types::Game::Direction::NUM_DIRECTIONS>;
-
-			public:
-				reference operator[] (const Structures::Types::Game::Direction::Direction& direction);
-				const_reference operator[] (const Structures::Types::Game::Direction::Direction& direction) const;
-				explicit HitObjectSkins();
-			};
-
-			inline const HitObjectSkins hit_objects_skin;
+			inline const std::string floor = "floor";
+			inline const std::string slider_line = "sliderline";
+			inline const std::string slider_point = "sliderpoint";
+			inline const std::string slider_end = "sliderend";
+			inline const std::string slider_reverse = "sliderreverse";
 		}
 		namespace HealthBar
 		{
@@ -89,6 +53,13 @@ namespace Format::Skin
 				{'%', prefix + "percent"}
 			};
 		}
+
+		struct Namespace
+		{
+			std::unordered_set<std::string> data;
+
+			Namespace();
+		} const namespace_;
 	}
 
 	namespace Sound
@@ -96,6 +67,10 @@ namespace Format::Skin
 		inline const std::unordered_set<std::string_view> SUPPORT_EXTENSIONS = { ".wav", ".mp3", ".ogg" };
 	}
 
-	struct ImageNamespace : std::unordered_set<std::string> { ImageNamespace(); } inline const image_namespace;
-	struct FolderNamespace : std::unordered_set<std::string> { FolderNamespace(); } inline const folder_namespace;
+	struct FolderNamespace
+	{
+		std::unordered_set<std::string> data;
+
+		FolderNamespace();
+	} inline const folder_namespace;
 }

@@ -6,103 +6,37 @@ namespace Format::Skin
 {
 	namespace Image
 	{
-		namespace HitObject
+		Namespace::Namespace()
 		{
-			//! HitObjectsInDirection
-			std::string HitObjectsInDirection::get_direction_folder(
-				const Structures::Types::Game::Direction::Direction& direction)
-			{
-				switch (direction)
-				{
-				case Structures::Types::Game::Direction::Direction::RIGHT:
-					return "right/";
-				case Structures::Types::Game::Direction::Direction::UP:
-					return "up/";
-				case Structures::Types::Game::Direction::Direction::DOWN:
-					return "down/";
-				case Structures::Types::Game::Direction::Direction::LEFT:
-					return "left/";
-				}
-				return "right/";
-			}
-			HitObjectsInDirection::reference HitObjectsInDirection::operator[](const HitObjectType& type)
-			{
-				return BASE::operator[](static_cast<uint8_t>(type));
-			}
-			HitObjectsInDirection::const_reference HitObjectsInDirection::operator[](const HitObjectType& type) const
-			{
-				return BASE::operator[](static_cast<uint8_t>(type));
-			}
-			HitObjectsInDirection::HitObjectsInDirection(const Structures::Types::Game::Direction::Direction& direction) :
-				BASE{},
-				direction_folder(get_direction_folder(direction))
-			{
-				(*this)[HitObjectType::FLOOR] = direction_folder + "floor";
-				(*this)[HitObjectType::SLIDER_FOCUS] = direction_folder + "sliderfocus";
-				(*this)[HitObjectType::SLIDER_LINE] = direction_folder + "sliderline";
-				(*this)[HitObjectType::SLIDER_POINT] = direction_folder + "sliderpoint";
-			}
+			// Cursor
+			data.insert(Cursor::body);
+			data.insert(Cursor::trail);
 
-			//! HitObjectSkins
-			HitObjectSkins::reference HitObjectSkins::operator[](
-				const Structures::Types::Game::Direction::Direction& direction)
-			{
-				return BASE::operator[](static_cast<Structures::Types::Game::Direction::DirectionBase>(direction));
-			}
-			HitObjectSkins::const_reference HitObjectSkins::operator[](
-				const Structures::Types::Game::Direction::Direction& direction) const
-			{
-				return BASE::operator[](static_cast<Structures::Types::Game::Direction::DirectionBase>(direction));
-			}
-			HitObjectSkins::HitObjectSkins() : BASE{
-					HitObjectsInDirection(Structures::Types::Game::Direction::Direction::RIGHT),
-					HitObjectsInDirection(Structures::Types::Game::Direction::Direction::UP),
-					HitObjectsInDirection(Structures::Types::Game::Direction::Direction::DOWN),
-					HitObjectsInDirection(Structures::Types::Game::Direction::Direction::LEFT) }
-			{
-			}
+			// HitObject
+			data.insert(HitObject::floor);
+			data.insert(HitObject::slider_focus);
+			data.insert(HitObject::slider_line);
+			data.insert(HitObject::slider_point);
+			
+
+			// HealthBar
+			data.insert(HealthBar::background);
+			data.insert(HealthBar::colour);
+
+			// Score
+			for (const auto& ch : Score::alphabet | std::views::values)
+				data.insert(ch);
 		}
 	}
-	// !Namespace
-		ImageNamespace::ImageNamespace()
-	{
-		//! Image::Cursor
-		insert(Image::Cursor::body);
-		insert(Image::Cursor::trail);
-		for (const auto& val : Image::Cursor::direction_skin | std::views::values)
-		{
-			insert(val);
-		}
 
-		//! Image::HealthBar
-		insert(Image::HealthBar::background);
-		insert(Image::HealthBar::colour);
-
-		//! HitObjects
-		for (const auto& direction_skin : Image::HitObject::hit_objects_skin)
-			for (const auto& skin : direction_skin)
-				insert(skin);
-
-		//! Score
-		for (const auto& score_skin_filename : Image::Score::alphabet | std::views::values)
-			insert(score_skin_filename);
-	}
 	FolderNamespace::FolderNamespace()
 	{
-		//! Image::Cursor
-		for (const auto& val : Image::Cursor::direction_skin | std::views::values)
+		// Image
+		for (const auto& val : Image::namespace_.data)
 		{
 			if (const auto first_slash = val.find('/');
 				first_slash != std::string_view::npos)
-				insert(val.substr(0, first_slash));
-		}
-
-		//! HitObjects
-		for (const auto& val : image_namespace)
-		{
-			if (const auto first_slash = val.find('/');
-				first_slash != std::string_view::npos)
-				insert(val.substr(0, first_slash));
+				data.insert(val.substr(0, first_slash));
 		}
 	}
 }

@@ -20,7 +20,7 @@ namespace Work::Skin
 			{
 				const auto& path = entry.path();
 				if (const auto name = path.lexically_relative(root_folder).replace_extension().generic_string();
-					entry.is_directory() && Format::Skin::folder_namespace.contains(name))
+					entry.is_directory() && Format::Skin::folder_namespace.data.contains(name))
 				{
 					try
 					{
@@ -32,7 +32,7 @@ namespace Work::Skin
 					catch (...) {} // TODO: Catch Exception in directory
 				}
 				else if (Format::Skin::Image::SUPPORT_EXTENSIONS.contains(path.extension().string())
-					&& Format::Skin::image_namespace.contains(name))
+					&& Format::Skin::Image::namespace_.data.contains(name))
 				{
 					if (!only_in.empty() && !only_in.contains(name)) continue;
 					try

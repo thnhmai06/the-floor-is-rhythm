@@ -2,6 +2,7 @@
 #pragma once
 #include <filesystem>
 #include "config.h"
+#include "playing/mapset.h"
 #include "structures/screens/screen.h"
 #include "structures/action/event/input.h"
 #include "structures/audio/mixer.h"
@@ -17,17 +18,17 @@ namespace Structures::Screens::Gameplay
 
 	struct PlayingScreen : private Screen
 	{
-		std::unique_ptr<const Game::Beatmap::Beatmap> beatmap;
+		std::unique_ptr<const Game::Beatmap::Mapset> beatmap;
 		float mod_multiplier = 1.0f;
 
 		//! Core
 		struct Core final
 		{
+		protected:
+			bool is_started = false;
+
 		private:
 			const PlayingScreen* playing_screen;
-			Game::Beatmap::Beatmap::FloorActionQueue floor;
-			Game::Beatmap::Beatmap::SliderActionQueue slider;
-			std::queue<const Game::Beatmap::TimingPoints::TimingPoint*> inherited, uninherited;
 			float current_timing_velocity, current_beat_length;
 
 			int64_t previous_time;
@@ -47,22 +48,10 @@ namespace Structures::Screens::Gameplay
 
 					explicit KeyCounter(const SDL_Scancode& target);
 				};
-
-				struct Direction
-				{
-					Types::Game::Direction::Direction current_direction = Types::Game::Direction::Direction::RIGHT;
-					KeyCounter right{ Config::UserConfig::KeyBinding::Direction::right };
-					KeyCounter left{ Config::UserConfig::KeyBinding::Direction::left };
-					KeyCounter up{ Config::UserConfig::KeyBinding::Direction::up };
-					KeyCounter down{ Config::UserConfig::KeyBinding::Direction::down };
-
-					void update(const KeyboardEventList& events);
-					void reset();
-				} direction;
 				struct Click
 				{
-					KeyCounter k1{ Config::UserConfig::KeyBinding::Click::k1 };
-					KeyCounter k2{ Config::UserConfig::KeyBinding::Click::k2 };
+					KeyCounter k1{ Config::UserConfig::KeyBinding::k1 };
+					KeyCounter k2{ Config::UserConfig::KeyBinding::k2 };
 
 					void reset();
 
@@ -81,9 +70,7 @@ namespace Structures::Screens::Gameplay
 				const Keystroke* key_stoke;
 
 				// beatmap
-				const Game::Beatmap::Beatmap* beatmap;
-				Game::Beatmap::Beatmap::FloorActionQueue* floor;
-				Game::Beatmap::Beatmap::SliderActionQueue* slider;
+				const Game::Beatmap::Mapset* beatmap;
 
 				// gameplay
 				float score = 0;
@@ -139,7 +126,7 @@ namespace Structures::Screens::Gameplay
 			struct Health
 			{
 			private:
-				const Game::Beatmap::Metadata::CalculatedDifficulty::HealthPoint* diff_hp;
+				const Game::Beatmap::Metadata::CalculatedDifficulty::HPDrainRate* diff_hp;
 				bool no_fail = false;
 
 			public:
@@ -148,8 +135,8 @@ namespace Structures::Screens::Gameplay
 
 				bool update(const int16_t& note_score, const unsigned long& current_combo); // -> return: người chơi có fail không?
 
-				explicit Health(const Game::Beatmap::Metadata::CalculatedDifficulty::HealthPoint* diff_hp, bool no_fail = false);
-				explicit Health(const Game::Beatmap::Beatmap* beatmap, bool no_fail = false);
+				explicit Health(const Game::Beatmap::Metadata::CalculatedDifficulty::HPDrainRate* diff_hp, bool no_fail = false);
+				explicit Health(const Game::Beatmap::Mapset* beatmap, bool no_fail = false);
 			} health;
 
 			[[nodiscard]] bool is_paused() const;
@@ -169,7 +156,7 @@ namespace Structures::Screens::Gameplay
 		{
 			struct Components
 			{
-				Screen::Render::Item map;
+				Screen::Render::Item mapset;
 				Screen::Render::Item cursor;
 				Screen::Render::Item health_bar;
 				Screen::Render::Item score;
@@ -177,17 +164,20 @@ namespace Structures::Screens::Gameplay
 				explicit Components(Storage* storage);
 			} components;
 
+			Playing::Mapset::Mapset::MovingPosMap moving_pos;
+			void move(const int64_t& current_time, const float& distance) const;
+
 			Render(
-				const Game::Beatmap::Beatmap& beatmap,
+				const Game::Beatmap::Mapset& beatmap,
 				const Core& logic_core);
 		} render;
 
 		//! Audio
 		struct Audio final
 		{
-			const Game::Beatmap::Beatmap* beatmap;
+			const Game::Beatmap::Mapset* beatmap;
 
-			explicit Audio(const Game::Beatmap::Beatmap& beatmap, const std::filesystem::path& beatmap_root);
+			explicit Audio(const Game::Beatmap::Mapset& beatmap, const std::filesystem::path& beatmap_root);
 		} audio;
 
 		explicit PlayingScreen(const std::filesystem::path& beatmap);

@@ -14,21 +14,6 @@ namespace Utilities
 		inline bool is_equal(const float& variable, const float& value, const float& epsilon = 0.001f) { return abs(variable - value) <= epsilon; }
 		inline bool is_integer(const float& value, const float& epsilon = 0.001f) { return is_equal(std::floor(value), value, epsilon); }
 		inline float centre(const float& size, const float& window_size) { return (window_size - size) / 2; }
-		inline float get_rotation_degree(const Structures::Types::Game::Direction::Direction& rotation, const bool clockwise = true)
-		{
-			switch (rotation)
-			{
-			case Structures::Types::Game::Direction::Direction::RIGHT:
-				return 0.0f;
-			case Structures::Types::Game::Direction::Direction::LEFT:
-				return 180.0f;
-			case Structures::Types::Game::Direction::Direction::UP:
-				return clockwise ? -90.0f : 90.0f;
-			case Structures::Types::Game::Direction::Direction::DOWN:
-				return clockwise ? 90.0f : -90.0f;
-			}
-			return 0.0f;
-		}
 		inline float degree_to_radian(const float& degree) { return degree * std::numbers::pi_v<float> / 180.0f; }
 		inline float radian_to_degree(const float& radian) { return radian * 180.0f / std::numbers::pi_v<float>; }
 		inline double round(const double& value, const uint8_t& precision_num = 0)

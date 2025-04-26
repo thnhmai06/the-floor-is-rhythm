@@ -13,90 +13,83 @@ namespace Structures::Game::Beatmap::Metadata
 		int32_t preview_timestamp = 0;
 		bool epilepsy_warning = false;
 		void read(const std::vector<std::string>& contents);
-		void write(std::ofstream& writer) const;
+		std::string to_string() const;
 
 		General() = default;
 		explicit General(const std::vector<std::string>& contents) { read(contents); }
+		friend std::ostream& operator<<(std::ostream& os, const General& general);
 	};
 	struct Metadata
 	{
 		std::string title, artist, creator, difficulty_name, source;
 		std::vector<std::string> tags;
 		void read(const std::vector<std::string>& contents);
-		void write(std::ofstream& writer) const;
+		std::string to_string() const;
 
 		Metadata() = default;
 		explicit Metadata(const std::vector<std::string>& contents) { read(contents); }
-
+		friend std::ostream& operator<<(std::ostream& os, const Metadata& metadata);
 	};
+
+	struct CalculatedDifficulty;
 	struct Difficulty
 	{
-		float od = -1, hp = -1, velocity = 1.4f;
+		float od = -1, hp = -1, vl = 1.4f;
 		void read(const std::vector<std::string>& contents);
-		void write(std::ofstream& writer) const;
+		[[nodiscard]] std::string to_string() const;
+		CalculatedDifficulty calculate() const;
 
 		Difficulty() = default;
 		explicit Difficulty(const std::vector<std::string>& contents) { read(contents); }
+		friend std::ostream& operator<<(std::ostream& os, const Difficulty& difficulty);
 	};
 
-	struct CalculatedDifficulty
+	struct CalculatedDifficulty : Difficulty
 	{
 		struct OverallDifficulty
 		{
-		private:
-			float value = 5;
+		protected:
+			const float* value = nullptr;
+			static void link(const float* od);
 
 			friend CalculatedDifficulty;
 		public:
-			float perfect = -1, great = -1, bad = -1, miss = Config::GameConfig::Difficulty::OD::Base::MISS;
+			float get_perfect() const;
+			float get_good() const;
+			float get_bad() const;
+			static float get_miss();
+			[[nodiscard]] int16_t get_score(bool is_clicked, const float& click_moment, const int64_t& hit_object_time) const;
 
-			void apply(const float& v);
-			void apply() { apply(value); }
-			[[nodiscard]] int16_t get_score(bool is_clicked,
-				const float& click_moment, const int64_t& hit_object_time,
-				const Types::Game::Direction::Direction& required_direction,
-				const Types::Game::Direction::Direction& current_direction) const;
-
-			OverallDifficulty() = default;
-			explicit OverallDifficulty(const float value) { apply(value); }
-		} od;
-		struct HealthPoint
+			explicit OverallDifficulty(const float* value);
+		} overall_difficulty;
+		struct HPDrainRate
 		{
 		protected:
-			float drain;
+			const float* value = nullptr;
 
-		private:
-			float value = 5;
-
+			static void link(const float* hp);
 			friend CalculatedDifficulty;
-
 		public:
-			void apply(const float& v);
-			void apply() { apply(value); }
-			[[nodiscard]] float get_note_hp(const int16_t& note_score, const unsigned long& current_combo) const;
+			float get_drain_rate() const;
+			[[nodiscard]] float get_gained_health(const int16_t& note_score, const unsigned long& current_combo) const;
 
-			HealthPoint() = default;
-			explicit HealthPoint(const float value) { apply(value); }
-		} hp;
+			explicit HPDrainRate(const float* value) { link(value); }
+		} hp_drain_rate;
 		struct Velocity
 		{
-		private:
-			float value = 1.4f;
+		protected:
+			const float* value = nullptr;
 
+			static void link(const float* vl);
 			friend CalculatedDifficulty;
 		public:
-			float speed;
-			void apply(const float& v);
-			void apply() { apply(value); }
-
-			Velocity() { apply(value); }
-			explicit Velocity(const float value) { apply(value); }
+			float get_pixel_speed() const;
+			explicit Velocity(const float* value) { link(value); }
 		} velocity;
 
-		void apply(const Difficulty& basic);
-		void write(std::ofstream& writer) const;
-
-		CalculatedDifficulty() = default;
-		explicit CalculatedDifficulty(const Difficulty& basic) { apply(basic); }
+		explicit CalculatedDifficulty(const Difficulty& basic)
+			: Difficulty(basic), overall_difficulty(&od), hp_drain_rate(&hp), velocity(&vl)
+		{
+		}
 	};
 }

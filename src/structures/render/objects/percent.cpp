@@ -45,4 +45,17 @@ namespace Structures::Render::Objects
 	{
 		update();
 	}
+
+	StaticPercentObject::StaticPercentObject(const TextureMemory::Item& texture,
+		const SDL_FPoint& render_size_when_full, const bool horizontal, const bool vertical,
+		const Types::Render::OriginType& origin_type, const SDL_FPoint& render_pos)
+	: PercentObject(texture, render_size_when_full, &percent, horizontal, vertical, origin_type, render_pos)
+	{
+	}
+	StaticPercentObject::StaticPercentObject(const TextureMemory::Item& texture, 
+		const SDL_FPoint& render_size_when_full, const Config::OriginPoint& custom_origin,
+		const bool horizontal, const bool vertical, const SDL_FPoint& render_pos)
+	: PercentObject(texture, render_size_when_full, &percent, custom_origin, horizontal, vertical, render_pos)
+	{
+	}
 }

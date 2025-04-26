@@ -1,98 +1,82 @@
 ﻿#pragma once
 #include <map>
-#include <variant>
 #include <vector>
-#include <queue>
 #include "structures/types.h"
 #include "structures/game/beatmap/hitsound.h"
 #include "utilities.hpp"
 
 namespace Structures::Game::Beatmap::HitObjects
 {
-	constexpr uint8_t NUM_COMBOS = 8;
-	inline Types::Game::Direction::Direction get_next_direction(const Types::Game::Direction::Direction& prev_direction, const uint8_t& rotation);
+	constexpr uint8_t COLOURS_NUM = 8;
+	// type_dat lấy 4 bit - bit 1 là kiểu (1 - Slider, 0 - Floor), bit 2 + 3 + 4 biểu diễn colour
+	struct TypeData final
+	{
+		Types::Game::HitObject::HitObjectType type;
+		uint8_t combo_colour;
+
+		void read(const uint8_t& data);
+		void read(const int32_t& data);
+		uint8_t to_int() const;
+		TypeData() = default;
+		explicit TypeData(const uint8_t& data) { read(data); }
+		explicit TypeData(const int32_t& data) { read(data); }
+	};
 
 	struct Floor
 	{
-		static constexpr int32_t MINIMUM_NUM_CONTENT = 6;
+		static constexpr int32_t MINIMUM_NUM_CONTENT = 4;
 
-		int64_t time;
-		const Types::Game::HitObject::HitObjectType type = Types::Game::HitObject::HitObjectType::FLOOR;
-		Types::Game::Direction::Rotation rotation;
-		uint8_t combo_colour;
+		int64_t time = 0;
+		int64_t end_time = 0;
+		TypeData type_data;
 		Hitsound::HitSound hit_sound;
 		Hitsound::HitSample hit_sample;
 
-		struct ActionInfo
-		{
-			Types::Game::HitObject::HitObjectType type;
-			Types::Game::Direction::Direction direction;
-			int64_t time;
+		virtual void read(const std::vector<std::string>& content);
+		[[nodiscard]] virtual std::string to_string() const;
 
-			explicit ActionInfo(const Floor& floor,
-				const Types::Game::Direction::Direction& previous_direction =
-				Types::Game::Direction::Direction::RIGHT);
+		Floor();
+		explicit Floor(const std::vector<std::string>& content);
+		virtual ~Floor() = default;
+	};
+	struct Slider final : Floor
+	{
+		struct Sample
+		{
+			Hitsound::HitSampleType normal_set = Hitsound::HitSampleType::NO_CUSTOM;
+			Hitsound::HitSampleType addition_set = Hitsound::HitSampleType::NO_CUSTOM;
+
+			Sample(const OsuParser::Beatmap::Objects::HitObject::HitObject::SliderParams::EdgeHitsound::SampleSet& osu_slider_sample)
+				: normal_set(static_cast<Hitsound::HitSampleType>(static_cast<std::int32_t>(osu_slider_sample.NormalSet))),
+				addition_set(static_cast<Hitsound::HitSampleType>(static_cast<std::int32_t>(osu_slider_sample.AdditionSet)))
+			{
+			}
+
+			std::string to_string() const;
 		};
 
-		void read(const std::vector<std::string>& content);
-		void write(std::ofstream& writer) const;
+		static constexpr int32_t MINIMUM_NUM_CONTENT = 8;
+		uint32_t slides = 1;
+		std::vector<Hitsound::HitSound> edge_sounds;
+		std::vector<Sample> edge_sets;
 
-		Floor() = default;
-		explicit Floor(const std::vector<std::string>& content) : Floor() { read(content); }
-	};
-	struct Slider
-	{
-		static constexpr int32_t MINIMUM_NUM_CONTENT = 7;
+		void read(const std::vector<std::string>& content) override;
+		[[nodiscard]] std::string to_string() const override;
 
-		int64_t time;
-		int64_t end_time;
-		const Types::Game::HitObject::HitObjectType type = Types::Game::HitObject::HitObjectType::SLIDER;
-		Types::Game::Direction::Rotation rotation;
-		uint8_t combo_colour;
-		Hitsound::HitSound hit_sound;
-		Hitsound::HitSample hit_sample;
-
-		struct ActionInfo
-		{
-			Types::Game::HitObject::HitObjectType type;
-			Types::Game::Direction::Direction direction;
-			int64_t time, end_time;
-			float tick_length = 0;
-			unsigned long tick_num = 0;
-
-			explicit ActionInfo(const Slider& slider, const float& timing_velocity, const float& diff_velocity, const float& beat_length,
-				const Types::Game::Direction::Direction& previous_direction = Types::Game::Direction::Direction::RIGHT);
-		};
-
-		void read(const std::vector<std::string>& content);
-		void write(std::ofstream& writer) const;
-
-		Slider() = default;
-		explicit Slider(const std::vector<std::string>& content) { read(content); }
-	};
-	struct HitObject : std::variant<Floor, Slider>
-	{
-		static constexpr int32_t MINIMUM_NUM_CONTENT = 6;
-
-		void write(std::ofstream& writer) const;
-		[[nodiscard]] int64_t get_time() const;
-		[[nodiscard]] int64_t get_end_time() const;
-		[[nodiscard]] Types::Game::HitObject::HitObjectType get_type() const;
-		[[nodiscard]] Types::Game::Direction::Rotation get_rotation() const;
-		[[nodiscard]] uint8_t get_combo_colour() const;
-		[[nodiscard]] Hitsound::HitSound get_hitsound() const;
-		[[nodiscard]] Hitsound::HitSample get_hitsample() const;
+		Slider();
+		explicit Slider(const std::vector<std::string>& content);
 	};
 
-	struct HitObjects : std::multimap<int32_t, HitObject>
+	struct HitObjects
 	{
-		// [Floor, Slider]
-		[[nodiscard]] std::pair<std::queue<const Floor*>, std::queue<const Slider*>> split_to_queue() const;
+		std::multimap<int32_t, std::shared_ptr<Floor>> data;
 
-		void read(const std::vector<std::string>& contents);
-		void write(std::ofstream& writer) const;
+		std::queue<std::weak_ptr<const Floor>> make_queue() const;
+		void read(const std::vector<std::string>& lines);
+		std::string to_string() const;
 
 		HitObjects() = default;
 		explicit HitObjects(const std::vector<std::string>& contents) { read(contents); }
+		friend std::ostream& operator<<(std::ostream& os, const HitObjects& hit_objects);
 	};
 }

@@ -18,30 +18,12 @@ namespace Config::UserConfig
 	namespace Cursor
 	{
 		inline int32_t size = 48;
-		inline int32_t direction_size = 32;
 	}
 	namespace KeyBinding
 	{
-		namespace Direction
-		{
-			inline SDL_Scancode up = SDL_SCANCODE_UP;
-			inline SDL_Scancode down = SDL_SCANCODE_DOWN;
-			inline SDL_Scancode left = SDL_SCANCODE_LEFT;
-			inline SDL_Scancode right = SDL_SCANCODE_RIGHT;
-			inline bool is_direction(const SDL_Scancode& key)
-			{
-				return key == up || key == down || key == left || key == right;
-			}
-		}
-		namespace Click
-		{
-			inline SDL_Scancode k1 = SDL_SCANCODE_Z;
-			inline SDL_Scancode k2 = SDL_SCANCODE_X;
-			inline bool is_click(const SDL_Scancode& key)
-			{
-				return key == k1 || key == k2;
-			}
-		}
+		inline SDL_Scancode k1 = SDL_SCANCODE_S;
+		inline SDL_Scancode k2 = SDL_SCANCODE_D;
+		inline bool is_click_key(const SDL_Scancode& key) { return key == k1 || key == k2; }
 	}
 }
 
@@ -76,8 +58,8 @@ namespace Config::GameConfig
 	{
 		constexpr int32_t DEFAULT_POS_X = Video::Camera::DEFAULT_POS_X;
 		constexpr int32_t DEFAULT_POS_Y = Video::Camera::DEFAULT_POS_Y;
-		constexpr int32_t SIZE = 64; // pixel
-		constexpr int32_t SLIDER_POINT_SIZE_WIDTH = SIZE / 4; // pixel
+		constexpr int32_t HIT_OBJECT_SIZE = 64; // pixel
+		constexpr int32_t SLIDER_POINT_SIZE = HIT_OBJECT_SIZE / 4; // pixel
 	}
 	namespace Difficulty
 	{
@@ -106,7 +88,7 @@ namespace Config::GameConfig
 		}
 		namespace Velocity
 		{
-			constexpr float BASE_SPEED = static_cast<float>(HitObject::SIZE) * 10 / 1000; // pixel/ms
+			constexpr float BASE_PIXEL_SPEED = static_cast<float>(HitObject::HIT_OBJECT_SIZE) * 10 / 1000; // pixel/ms
 		}
 	}
 }

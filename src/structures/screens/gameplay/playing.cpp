@@ -83,10 +83,10 @@ namespace Structures::Screens::Gameplay
 		const float click_moment = static_cast<float>(current_time) - input_latency;
 		auto click_num = key_stoke->click.get_recently_clicked_num();
 
-		while (!floor->empty() && static_cast<float>(floor->front()->time) <= click_moment + beatmap->calculated_difficulty.od.miss)
+		while (!floor->empty() && static_cast<float>(floor->front()->time) <= click_moment + beatmap->calculated_difficulty.overall_difficulty.miss)
 		{
 			const auto current_floor = floor->front();
-			const int16_t floor_score = beatmap->calculated_difficulty.od.get_score(
+			const int16_t floor_score = beatmap->calculated_difficulty.overall_difficulty.get_score(
 				click_num > 0, click_moment,
 				current_floor->time, current_floor->direction,
 				key_stoke->direction.current_direction);
@@ -264,15 +264,15 @@ namespace Structures::Screens::Gameplay
 	bool PlayingScreen::Core::Health::update(const int16_t& note_score, const unsigned long& current_combo)
 	{
 		if (is_pause) return true;
-		value = std::clamp(value + diff_hp->get_note_hp(note_score, current_combo), 0.0f, 1.0f);
+		value = std::clamp(value + diff_hp->get_gained_health(note_score, current_combo), 0.0f, 1.0f);
 		return no_fail || !(value <= 0 && note_score == 0);
 	}
 	PlayingScreen::Core::Health::Health(
-		const Game::Beatmap::Metadata::CalculatedDifficulty::HealthPoint* diff_hp,
+		const Game::Beatmap::Metadata::CalculatedDifficulty::HPDrainRate* diff_hp,
 		const bool no_fail) : diff_hp(diff_hp), no_fail(no_fail)
 	{
 	}
-	PlayingScreen::Core::Health::Health(const Game::Beatmap::Beatmap* beatmap, const bool no_fail) : Health(&beatmap->calculated_difficulty.hp, no_fail)
+	PlayingScreen::Core::Health::Health(const Game::Beatmap::Mapset* beatmap, const bool no_fail) : Health(&beatmap->calculated_difficulty.hp_drain_rate, no_fail)
 	{
 	}
 
@@ -290,7 +290,13 @@ namespace Structures::Screens::Gameplay
 	}
 	void PlayingScreen::Core::make_time_step(const EventList& events, const float& input_latency)
 	{
-		//! Nhan Event
+		if (!is_started)
+		{
+			is_started = true;
+			resume();
+		}
+
+		//! Nhận Event
 		KeyboardEventList keyboard_events{};
 		for (const auto& event : events)
 		{
@@ -307,37 +313,21 @@ namespace Structures::Screens::Gameplay
 
 		//! Cập nhật current object
 		// update timing point
-		while (!inherited.empty() && current_time >= inherited.front()->get_time())
-			current_timing_velocity = Utilities::Container::get_front_and_pop(inherited)->get_velocity();
-		while (!uninherited.empty() && current_time >= uninherited.front()->get_time())
-			current_beat_length = Utilities::Container::get_front_and_pop(uninherited)->beat_length;
+		while (!inherited_left.empty() && current_time >= inherited_left.front()->get_time())
+			current_timing_velocity = Utilities::Container::get_front_and_pop(inherited_left)->get_velocity();
+		while (!uninherited_left.empty() && current_time >= uninherited_left.front()->get_time())
+			current_beat_length = Utilities::Container::get_front_and_pop(uninherited_left)->beat_length;
 		// what should i do...
 
 		//! Cập nhật hướng đi & di chuyển
 		const auto time_delta = static_cast<float>(current_time - previous_time);
 		const auto distance = time_delta * playing_screen->beatmap->calculated_difficulty.velocity.speed * current_timing_velocity;
-
-		const Types::Game::Direction::Direction current_direction =
-			Utilities::Container::get_front_dual_queue(floor, slider,
-				[](
-					const std::weak_ptr<const Game::Beatmap::HitObjects::Floor::ActionInfo>& left, 
-					const std::weak_ptr<const Game::Beatmap::HitObjects::Slider::ActionInfo>& right)
-				{
-					return right.lock()->time < left.lock()->time;
-				}) ? slider.front()->direction : floor.front()->direction;
-		//SPDLOG_INFO("Current Direction: {}", static_cast<uint8_t>(current_direction));
-		const auto mapset = dynamic_cast<Playing::Mapset::Mapset*>(playing_screen->render.components.map.collection->get());
-		mapset->move(distance, current_direction);
-
-		// cho nay da moving duoc, nhung van de la
-		// render khong duoc dung
-		// so may be check render
-
+		playing_screen->render.move(current_time, distance);
 		// TODO: make it relative
-		const auto left = floor.size() + slider.size();
-		const auto total = playing_screen->beatmap->stats.get_total_objects_num();
-		const int64_t current_hit_object_num = total - left;
-		mapset->render_range.front() = { current_hit_object_num - 5, current_hit_object_num + 5 };
+		const auto obj_num_left = floor.size() + slider.size();
+		const int64_t obj_total = playing_screen->beatmap->stats.get_total_objects_num();
+		const int64_t current_hit_object_num = obj_total - obj_num_left;
+		playing_screen->render.components.mapset.collection->get()->render_range.front() = { current_hit_object_num - 5, current_hit_object_num + 5 };
 
 		previous_time = current_time;
 	}
@@ -354,10 +344,10 @@ namespace Structures::Screens::Gameplay
 		auto [inherited, uninherited] = playing_screen->beatmap->timing_points.split_to_queue();
 		this->floor = std::move(floor);
 		this->slider = std::move(slider);
-		this->inherited = std::move(inherited);
-		this->uninherited = std::move(uninherited);
-		current_timing_velocity = (this->inherited.empty()) ? 1 : this->inherited.front()->get_velocity();
-		current_beat_length = this->uninherited.front()->beat_length;
+		this->inherited_left = std::move(inherited);
+		this->uninherited_left = std::move(uninherited);
+		current_timing_velocity = (this->inherited_left.empty()) ? 1 : this->inherited_left.front()->get_velocity();
+		current_beat_length = this->uninherited_left.front()->beat_length;
 
 		constexpr int64_t START_TIME_OFFSET = 0;
 		previous_time = timer.start_time = beatmap->stats.time.start_time - START_TIME_OFFSET;
@@ -365,24 +355,55 @@ namespace Structures::Screens::Gameplay
 
 	// ::Render
 	PlayingScreen::Render::Components::Components(Storage* storage) :
-		map(storage, &Work::Render::Layers::playground->render_buffer),
+		mapset(storage, &Work::Render::Layers::playground->render_buffer),
 		cursor(storage, &Work::Render::Layers::cursor->render_buffer),
 		health_bar(storage, &Work::Render::Layers::hud->render_buffer),
 		score(storage, &Work::Render::Layers::hud->render_buffer)
 	{
 	}
+	void PlayingScreen::Render::move(const int64_t& current_time, const float& distance) const
+	{
+		const auto current_moving_pos = moving_pos.lower_bound(current_time);
+		if (current_moving_pos == moving_pos.end()) return;
+
+		switch (Utilities::Render::get_direction_by_pos(current_moving_pos->second.first, current_moving_pos->second.second))
+		{
+		case Types::Game::Direction::Direction::RIGHT:
+			components.mapset.collection->get()->offset.x =
+				std::clamp(components.mapset.collection->get()->offset.x - distance,
+					-current_moving_pos->second.second.x, -current_moving_pos->second.first.x);
+			break;
+		case Types::Game::Direction::Direction::LEFT:
+			components.mapset.collection->get()->offset.x =
+				std::clamp(components.mapset.collection->get()->offset.x + distance,
+					-current_moving_pos->second.first.x, -current_moving_pos->second.second.x);
+			break;
+		case Types::Game::Direction::Direction::UP:
+			components.mapset.collection->get()->offset.y =
+				std::clamp(components.mapset.collection->get()->offset.y + distance,
+					-current_moving_pos->second.first.y, -current_moving_pos->second.second.y);
+			break;
+		case Types::Game::Direction::Direction::DOWN:
+			components.mapset.collection->get()->offset.y =
+				std::clamp(components.mapset.collection->get()->offset.y - distance,
+					-current_moving_pos->second.second.y, -current_moving_pos->second.first.y);
+			break;
+		}
+	}
 	PlayingScreen::Render::Render(
-		const Game::Beatmap::Beatmap& beatmap,
+		const Game::Beatmap::Mapset& beatmap,
 		const Core& logic_core) :
 		components(&storage)
 	{
 		//! Map
-		components.map.collection = storage.insert(
+		auto c_mapset = std::make_shared<Playing::Mapset::Mapset>(*Work::Render::Textures::skin, beatmap);
+		c_mapset->render_range = { {-5, 5} };
+		moving_pos = c_mapset->get_moving_pos();
+		components.mapset.collection = storage.insert(
 			Utilities::Container::get_last_element_iterator(storage),
-			std::make_shared<Playing::Mapset::Mapset>(*Work::Render::Textures::skin, beatmap)
+			std::move(c_mapset)
 		);
-		components.map.render_item = Work::Render::Layers::playground->render_buffer.add_collection(components.map.collection->get()); // Thêm vào render_buffer ở đây nè :D
-		components.map.collection->get()->render_range = { {-5, 5} };
+		components.mapset.render_item = Work::Render::Layers::playground->render_buffer.add_collection(components.mapset.collection->get()); // Thêm vào render_buffer ở đây nè :D
 
 		//! Cursor
 		components.cursor.collection = storage.insert(
@@ -410,7 +431,7 @@ namespace Structures::Screens::Gameplay
 	}
 
 	// ::Audio
-	PlayingScreen::Audio::Audio(const Game::Beatmap::Beatmap& beatmap, const std::filesystem::path& beatmap_root)
+	PlayingScreen::Audio::Audio(const Game::Beatmap::Mapset& beatmap, const std::filesystem::path& beatmap_root)
 		: beatmap(&beatmap)
 	{
 		/*const auto beatmap_audio_file = beatmap_root / beatmap.general.audio_file;
@@ -420,11 +441,10 @@ namespace Structures::Screens::Gameplay
 
 	// ::
 	PlayingScreen::PlayingScreen(const std::filesystem::path& beatmap) :
-		beatmap(std::make_unique<const Game::Beatmap::Beatmap>(beatmap)),
+		beatmap(std::make_unique<const Game::Beatmap::Mapset>(beatmap)),
 		logic_core(this),
 		render(*this->beatmap, logic_core),
 		audio(*this->beatmap, beatmap.parent_path())
 	{
-		logic_core.timer.resume();
 	}
 }

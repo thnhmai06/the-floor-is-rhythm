@@ -56,3 +56,21 @@ namespace Logging
 			spdlog::log(spdlog::source_loc{ __FILE__, __LINE__, SPDLOG_FUNCTION }, spdlog::level::warn, (exception).what()); \
 		} catch (...) {}\
 	} while (false)
+
+#define LOG_INFO(format, ...) \
+    do {\
+        try {\
+            spdlog::log(spdlog::source_loc{__FILE__, __LINE__, SPDLOG_FUNCTION}, \
+                        spdlog::level::info, \
+                        format, __VA_ARGS__); \
+        } catch (...) {}\
+    } while (false)
+
+#define LOG_DEBUG(format, ...) \
+    do {\
+        try {\
+            spdlog::log(spdlog::source_loc{__FILE__, __LINE__, SPDLOG_FUNCTION}, \
+                        spdlog::level::debug, \
+                        format, __VA_ARGS__); \
+        } catch (...) {}\
+    } while (false)

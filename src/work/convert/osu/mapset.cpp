@@ -14,25 +14,9 @@ namespace Work::Convert::osu
 	using namespace Structures::Game::Beatmap::Metadata;
 	using namespace OsuParser::Beatmap;
 
-	static uint8_t get_combo_colour(const uint8_t& previous_colour, const uint8_t& colour_hax)
+	static uint8_t get_current_combo_colour(const uint8_t& previous_colour, const bool new_combo, const uint8_t& colour_hax)
 	{
-		return (previous_colour + colour_hax) % Structures::Game::Beatmap::HitObjects::NUM_COMBOS;
-	}
-	static Structures::Types::Game::Direction::Rotation get_rotation(const bool new_combo, const uint8_t colour_hax, const unsigned long& total_note_of_current_rotation)
-	{
-		// Loại bỏ hai hướng là cùng phương là hướng hiện tại và hướng ngược với nó,
-		// ta còn lại hai hướng phương vuông góc, colour_hax sẽ quyết định là hướng nào (vì còn 2 hướng nên quyết định bằng tính chẵn lẻ)
-
-		// Ngoài ra, để tránh 1 combo (osu) chỉ có mỗi một note làm cho việc rotate quá nhanh,
-		// nếu total_note_of_current_rotation <= 1 thì không xoay
-
-		const uint16_t combo_hax = get_combo_colour(new_combo, colour_hax);
-
-		if (total_note_of_current_rotation <= 1 || combo_hax == 0)
-			return Structures::Types::Game::Direction::Rotation::NO_ROTATE;
-		return (combo_hax & 1) == 1
-			? Structures::Types::Game::Direction::Rotation::ROTATE_90
-			: Structures::Types::Game::Direction::Rotation::ROTATE_270;
+		return (previous_colour + new_combo + colour_hax) % Structures::Game::Beatmap::HitObjects::COLOURS_NUM;
 	}
 
 	//! Metadata
@@ -50,7 +34,7 @@ namespace Work::Convert::osu
 		Difficulty result;
 		if (!difficulty.OverallDifficulty.empty()) result.od = std::stof(difficulty.OverallDifficulty);
 		if (!difficulty.HPDrainRate.empty()) result.hp = std::stof(difficulty.HPDrainRate);
-		if (!difficulty.SliderMultiplier.empty()) result.velocity = std::stof(difficulty.SliderMultiplier);
+		if (!difficulty.SliderMultiplier.empty()) result.vl = std::stof(difficulty.SliderMultiplier);
 		return result;
 	}
 	static Metadata convert_metadata(const Sections::Metadata::MetadataSection& metadata)
@@ -84,83 +68,56 @@ namespace Work::Convert::osu
 		TimingPoints result;
 		for (const auto timing_point : timing_points)
 		{
-			const auto back_itr = Utilities::Container::get_last_element_iterator(result);
-			result.emplace_hint(back_itr, timing_point.Time, convert_timing_point(timing_point));
+			const auto back_itr = Utilities::Container::get_last_element_iterator(result.data);
+			result.data.emplace_hint(back_itr, timing_point.Time, convert_timing_point(timing_point));
 		}
 		return result;
 	}
 	//! HitObjects
 	using namespace Structures::Game::Beatmap::HitObjects;
-	static Floor convert_hit_object_floor(const Objects::HitObject::HitObject& object, uint8_t& current_combo_colour, unsigned long& total_note_of_current_rotation)
+	static Floor convert_hit_object_floor(const Objects::HitObject::HitObject& object, const uint8_t& previous_combo_colour)
 	{
 		Floor floor;
 		floor.time = object.Time;
-		floor.rotation = get_rotation(object.Type.IsNewCombo, static_cast<uint8_t>(object.Type.ColourHax), total_note_of_current_rotation);
-		if (floor.rotation != Structures::Types::Game::Direction::Rotation::NO_ROTATE) total_note_of_current_rotation = 0;
-		floor.combo_colour = current_combo_colour = 
-			get_combo_colour(current_combo_colour, object.Type.ColourHax + object.Type.IsNewCombo);
+		floor.type_data.combo_colour = get_current_combo_colour(previous_combo_colour, object.Type.IsNewCombo, object.Type.ColourHax);
 		floor.hit_sound = object.Hitsound;
 		floor.hit_sample = object.Hitsample;
 		return floor;
 	}
-	static Slider convert_hit_object_slider(const Objects::HitObject::HitObject& object, const uint8_t& current_combo_colour)
+	static Slider convert_hit_object_slider(const Objects::HitObject::HitObject& object, const uint8_t& previous_combo_colour)
 	{
 		Slider slider;
-		slider.time = object.Time;
-		slider.end_time = slider.time;
-		if (object.EndTime.has_value())
+		slider.end_time = slider.time = object.Time;
+		if (object.EndTime.has_value()) 
 			slider.end_time = object.EndTime.value();
-		// không cần thay đổi rotation và combo_colour, vì trước đó đã xét ở floor rồi
-		slider.rotation = Structures::Types::Game::Direction::Rotation::NO_ROTATE;
-		slider.combo_colour = current_combo_colour;
-
-		// Bên dưới là thêm slider curve dựa trên số lần lặp.
-		// Nah slides trong osu! nhiều khi nó lặp nhanh quá, nên mình không muốn thêm curve
-		// dựa trên nó. So... bỏ slider curve nhé :D
-		/*
-		if (object.SliderParameters.has_value())
-		{
-			const float add_time_unit =
-				static_cast<float>(slider.end_time - slider.time) / object.SliderParameters.value().Slides;
-			for (auto i = 1; i < object.SliderParameters.value().Slides - 1; ++i)
-			{
-				Slider::SliderCurve curve;
-				curve.after = static_cast<int32_t>(add_time_unit * static_cast<float>(i));
-				curve.rotation = (current_curve_rotation ?
-					Structures::Types::Game::Direction::Rotation::ROTATE_270 :
-					Structures::Types::Game::Direction::Rotation::ROTATE_90);
-				current_curve_rotation = !current_curve_rotation;
-				slider.curves.push_back(curve);
-			}
-		}
-		*/
-
+		slider.type_data.combo_colour = get_current_combo_colour(previous_combo_colour, object.Type.IsNewCombo, object.Type.ColourHax);
 		slider.hit_sound = object.Hitsound;
 		slider.hit_sample = object.Hitsample;
+		for (const auto& [sound, sample] : object.SliderParameters->edgeHitsounds)
+		{
+			slider.edge_sounds.emplace_back(sound.ToInt());
+			slider.edge_sets.emplace_back(sample);
+		}
 		return slider;
 	}
-	static HitObjects convert_hit_objects(const std::vector<Objects::HitObject::HitObject>& objects,
-		uint8_t& current_combo_colour, unsigned long& total_note_of_current_rotation)
+	static HitObjects convert_hit_objects(const std::vector<Objects::HitObject::HitObject>& objects)
 	{
 		HitObjects result;
+		uint8_t previous_combo_colour = 0;
 		for (const auto& osu_object : objects)
 		{
-			const auto back_itr = Utilities::Container::get_last_element_iterator(result);
+			const auto last_itr = Utilities::Container::get_last_element_iterator(result.data);
 			if (osu_object.Type.HitCircle)
 			{
-				result.emplace_hint(back_itr, osu_object.Time, convert_hit_object_floor(osu_object, current_combo_colour, total_note_of_current_rotation));
-				total_note_of_current_rotation++;
+				result.data.emplace_hint(last_itr, osu_object.Time, 
+					std::make_shared<Floor>(convert_hit_object_floor(osu_object, previous_combo_colour)));
+				previous_combo_colour = result.data.rbegin()->second->type_data.combo_colour;
 			}
-			else if (osu_object.Type.Spinner)
+			else // slider, spinner...
 			{
-				result.emplace_hint(back_itr, osu_object.Time, convert_hit_object_slider(osu_object, current_combo_colour));
-				total_note_of_current_rotation += 2; // spinner sẽ là ngoại lệ
-			}
-			else // slider
-			{
-				result.emplace_hint(back_itr, osu_object.Time, convert_hit_object_floor(osu_object, current_combo_colour, total_note_of_current_rotation));
-				result.emplace_hint(back_itr, osu_object.Time, convert_hit_object_slider(osu_object, current_combo_colour));
-				total_note_of_current_rotation += 2; // vẫn tính là 2 cho slider => slider sẽ là ngoại lệ
+				result.data.emplace_hint(last_itr, osu_object.Time,
+					std::make_shared<Slider>(convert_hit_object_slider(osu_object, previous_combo_colour)));
+				previous_combo_colour = result.data.rbegin()->second->type_data.combo_colour;
 			}
 		}
 		return result;
@@ -172,22 +129,16 @@ namespace Work::Convert::osu
 		std::ofstream writer(output);
 		if (!writer)
 			THROW_ERROR(Logging::Exceptions::FileExceptions::File_Open_Failed(output));
-		// Version
-		writer << Format::File::Floor::Mapset::FORMAT_VERSION << '\n';
-		writer << Format::File::Floor::Mapset::ConvertInformation::osu::VERSION << beatmap.Version << '\n';
-		writer << '\n';
-		// Contents
-		convert_general(beatmap.General).write(writer);
-		convert_difficulty(beatmap.Difficulty).write(writer);
-		convert_metadata(beatmap.Metadata).write(writer);
-		convert_timing_points(beatmap.TimingPoints).write(writer);
-		// HitObjects
-		uint8_t current_combo_colour = 0;
-		unsigned long total_note_of_current_rotation = 0;
-		convert_hit_objects(beatmap.HitObjects, current_combo_colour, total_note_of_current_rotation).write(writer);
-		// Events
-		writer << beatmap.Events.to_string();
 
+		writer << Format::File::Floor::Mapset::FORMAT_VERSION << '\n';
+		writer << Format::File::Floor::Mapset::ConvertInformation::osu::VERSION << beatmap.Version << "\n\n";
+
+		writer << convert_general(beatmap.General) << "\n\n";
+		writer << convert_difficulty(beatmap.Difficulty) << "\n\n";
+		writer << convert_metadata(beatmap.Metadata) << "\n\n";
+		writer << convert_timing_points(beatmap.TimingPoints) << "\n\n";
+		writer << convert_hit_objects(beatmap.HitObjects) << "\n\n";
+		writer << beatmap.Events << '\n';
 		writer.close();
 	}
 }

@@ -22,14 +22,20 @@ namespace Structures::Game::Beatmap::TimingPoints
 		inherited = (beat_length < 0);
 		kiai = std::stoi(content[5]);
 	}
-	void TimingPoint::write(std::ofstream& writer) const
-	{
-		writer << time << AND << beat_length << AND << static_cast<int32_t>(sample_set) << AND <<
-			sample_index << AND << volume << AND << kiai << '\n';
-	}
-
 	int64_t TimingPoint::get_time() const { return time; }
 	float TimingPoint::get_velocity() const { return (inherited) ? 100 / (-beat_length) : 1; }
+	std::string TimingPoint::to_string() const
+	{
+		std::stringstream writer;
+		writer << time << AND << beat_length << AND << static_cast<int32_t>(sample_set) << AND <<
+			sample_index << AND << volume << AND << kiai;
+		return writer.str();
+	}
+	std::ostream& operator<<(std::ostream& os, const TimingPoint& point)
+	{
+		os << point.to_string();
+		return os;
+	}
 
 	//! TimingPoints
 	void TimingPoints::read(const std::vector<std::string>& contents)
@@ -43,28 +49,50 @@ namespace Structures::Game::Beatmap::TimingPoints
 				continue;
 			}
 
-			const auto back_itr = Utilities::Container::get_last_element_iterator(*this);
+			const auto back_itr = Utilities::Container::get_last_element_iterator(data);
 			TimingPoint point(content);
-			emplace_hint(back_itr, point.time, point);
+			data.emplace_hint(back_itr, point.time, std::move(point));
 		}
 	}
 	std::pair<std::queue<const TimingPoint*>, std::queue<const TimingPoint*>> TimingPoints::split_to_queue() const
 	{
 		std::queue<const TimingPoint*> inherited, uninherited;
-		for (const auto& point : *this | std::views::values)
+		for (const auto& point : data | std::views::values)
 		{
-			if (point.inherited)
-				inherited.push(&point);
-			else
-				uninherited.push(&point);
+			if (point.inherited) inherited.push(&point);
+			else uninherited.push(&point);
 		}
 		return { inherited, uninherited };
 	}
-	void TimingPoints::write(std::ofstream& writer) const
+	std::pair<std::multimap<int64_t, const TimingPoint*>, std::multimap<int64_t, const TimingPoint*>> TimingPoints::split_to_map() const
 	{
+		std::multimap<int64_t, const TimingPoint*> inherited, uninherited;
+		for (const auto& point : data | std::views::values)
+		{
+			if (point.inherited)
+				inherited.emplace_hint(Utilities::Container::get_last_element_iterator(inherited), point.time, &point);
+			else
+				uninherited.emplace_hint(Utilities::Container::get_last_element_iterator(uninherited), point.time, &point);
+		}
+		return { inherited, uninherited };
+	}
+	std::queue<const TimingPoint*> TimingPoints::to_queue() const
+	{
+		std::queue<const TimingPoint*> res;
+		for (const auto& point : data | std::views::values)
+			res.push(&point);
+		return res;
+	}
+	std::string TimingPoints::to_string() const
+	{
+		std::stringstream writer;
 		writer << HEADER << '\n';
-		for (const auto& point : *this | std::views::values)
-			point.write(writer);
-		writer << '\n';
+		for (const auto& point : data | std::views::values) 
+			writer << point << '\n';
+		return writer.str();
+	}
+	std::ostream& operator<<(std::ostream& os, const TimingPoints& points)
+	{
+		return os << points.to_string();
 	}
 }

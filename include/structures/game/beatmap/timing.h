@@ -19,22 +19,28 @@ namespace Structures::Game::Beatmap::TimingPoints
 		bool kiai = false;
 
 		void read(const std::vector<std::string>& content);
-		void write(std::ofstream& writer) const;
+		std::string to_string() const;
 
 		[[nodiscard]] int64_t get_time() const;
 		[[nodiscard]] float get_velocity() const;
 
 		TimingPoint() = default;
 		explicit TimingPoint(const std::vector<std::string>& content) { read(content); }
+		friend std::ostream& operator<<(std::ostream& os, const TimingPoint& point);
 	};
 
-	struct TimingPoints : std::multimap<int32_t, TimingPoint>
+	struct TimingPoints
 	{
+		std::multimap<int32_t, TimingPoint> data;
+
 		// [inherited, uninherited]
-		[[nodiscard]] std::pair<std::queue<const TimingPoint*>, std::queue<const TimingPoint*>> split_to_queue() const; 
+		[[nodiscard]] std::pair<std::queue<const TimingPoint*>, std::queue<const TimingPoint*>> split_to_queue() const;
+		[[nodiscard]] std::pair<std::multimap<int64_t, const TimingPoint*>, std::multimap<int64_t, const TimingPoint*>> split_to_map() const;
+		std::queue<const TimingPoint*> to_queue() const;
 
 		void read(const std::vector<std::string>& contents);
-		void write(std::ofstream& writer) const;
+		std::string to_string() const;
+		friend std::ostream& operator<<(std::ostream& os, const TimingPoints& points);
 
 		TimingPoints() = default;
 		explicit TimingPoints(const std::vector<std::string>& contents) { read(contents); }

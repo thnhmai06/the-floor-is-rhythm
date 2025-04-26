@@ -57,7 +57,6 @@ namespace Format::File
 				namespace Slider
 				{
 					constexpr char AND = '|';
-					constexpr char CURVE_AND = ':';
 				}
 				namespace HitSample
 				{

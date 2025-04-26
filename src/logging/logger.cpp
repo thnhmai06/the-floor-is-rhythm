@@ -1,15 +1,21 @@
 ﻿#include "logging/logger.h" // Header
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/ansicolor_sink.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <vector>
 #include "utilities.hpp"
 
 void Logging::Logger::init(const std::string& name, const spdlog::level::level_enum level, const uint32_t num_backtrace)
 {
-	constexpr std::string_view PATTERN = "[%d/%m/%Y %X] %n (thread %t) %s:%# (%!) %^[%l] %v%$";
+	constexpr uint16_t GRAY = 8;
+	constexpr uint16_t BLUE = 1;
+
+	constexpr std::string_view PATTERN = "(thread %t) %s:%# (%!) %^[%l] %v%$";
 	const std::string log_dir = std::format("{}/{}/", PATH, Utilities::Time::get_current_time());
 
 	const auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+	console_sink->set_color(spdlog::level::debug, GRAY);
+	console_sink->set_color(spdlog::level::info, BLUE);
 	const auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(log_dir + "main.log", true);
 	const auto error_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(log_dir + "error.log", true);
 
