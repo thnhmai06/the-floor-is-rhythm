@@ -101,7 +101,10 @@ namespace Structures::Audio
 
 		Mix_Chunk* audio = Mix_LoadWAV(file_path.string().c_str());
 		if (!audio)
-			THROW_ERROR(Logging::Exceptions::SDLExceptions::Audio::SDL_Audio_LoadEffect_Failed(file_path));
+		{
+			LOG_ERROR(Logging::Exceptions::SDLExceptions::Audio::SDL_Audio_LoadEffect_Failed(file_path));
+			return {};
+		}
 
 		return { this, data.insert_or_assign(name, audio).first };
 	}

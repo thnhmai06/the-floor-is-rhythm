@@ -20,7 +20,7 @@ namespace Structures::Audio
 	Mixer::Mixer(const SDL_AudioSpec& spec, const float& master_volume, const float& music_volume,
 		const float& effects_volume, const int32_t& max_channels) : spec(spec), music(music_volume), effect(effects_volume)
 	{
-		Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG | MIX_INIT_WAVPACK);
+		Mix_Init(0xff);
 		Mix_AllocateChannels(max_channels);
 
 		if (!Mix_OpenAudio(0, &spec))

@@ -1,6 +1,7 @@
 ﻿#include "structures/events/action/action.h" // Header
 #include <ranges>
 #include "utilities.hpp"
+#include "structures/events/action/render.hpp"
 
 namespace Structures::Events::Action
 {

@@ -1,12 +1,13 @@
 ﻿﻿# The Floor is Rhythm (The "Floor" Project)
-**The Floor is Rhythm** là game hành động nhịp điệu, trong đó người chơi sẽ tương tác với những vật thể đang di chuyển vào giữa tương ứng với vị trí (trái, phải) mà nó đi vào.
+
+**The Floor is Rhythm** là game hành động nhịp điệu, trong đó người chơi sẽ tương tác với những vật thể đang di chuyển vào chính giữa tương ứng với vị trí (trái, phải) mà nó đi vào.
 
 ## Video Demo:
 https://streamable.com/chce9o
 
 ## Screenshot:
 <img src="https://i.ibb.co/Kcyz1Fx5/image.png">
-<img src="https://i.ibb.co/p6BD0Gp1/image.png">
+<img src="https://i.ibb.co/mVK1kQQp/image.png">
 
 ## Cách chơi:
 Tương ứng với mỗi note từ bên trái/phải sang, bạn sẽ ấn phím tương ứng ở phía bên trái (`D`, `F`) hoặc bên phải (`J`, `K`) vào đúng lúc note ở chính giữa màn hình.
@@ -42,9 +43,9 @@ Trong đó `structures` gồm:
 
 Tổ chức theo hướng module hóa, mô hình dựa trên namespace. Lập trình theo hướng đối tượng hóa.
 
-## Tiến trình
-- Đã hoàn thành các hệ thống chính/engine, Gameplay, Logic tính điểm, Nhập dữ liệu từ osu!
-- Chưa có phần Pause, phần Điểm cuối cùng, Storyboard đang bị lỗi.
+## Tiến độ
+- Đã hoàn thành các hệ thống chính/engine, Gameplay, Logic tính điểm, Nhập dữ liệu từ osu!, Storyboard (phần lớn hoàn thiện)
+- Chưa có phần Pause, phần Điểm cuối cùng.
 - Hiện tại `main.cpp` vẫn đang ở trạng thái phát triển.
  
 ## Tham khảo

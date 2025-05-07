@@ -7,6 +7,10 @@ namespace Structures::Events::Action::Render
 	// FadeAction
 	void FadeAction::update(const float& value_percent, const uint8_t& from, const uint8_t& to)
 	{
+		if (target_object->src.get_name() == std::string("sb/TitleBlock.jpg"))
+		{
+			int a = 2;
+		}
 		target_object->config.color.a = Utilities::Math::to_value(value_percent, from, to);
 	}
 	FadeAction::FadeAction(Structures::Render::Object::Object* target_object, const OsuParser::Beatmap::Objects::Event::Commands::FadeCommand& osu_fade)

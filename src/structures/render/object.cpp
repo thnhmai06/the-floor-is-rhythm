@@ -149,6 +149,7 @@ namespace Structures::Render::Object
 	void Object::render(const SDL_FPoint& offset)
 	{
 		if (!visible || config.color.a == 0) return;
+		if (!src.is_valid()) return;
 
 		const auto& sdl_texture = src.item->second;
 		const auto src_rect = get_sdl_src_rect();

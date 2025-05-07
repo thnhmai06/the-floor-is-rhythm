@@ -64,17 +64,17 @@ namespace Utilities
 
 		template <typename NumberType>
 		//! HÀM NÀY KHÔNG PHÙ HỢP CHO CẶP 2 SỐ
-		float to_percent(const NumberType& value, const NumberType& from, const NumberType& to)
+		double to_percent(const NumberType& value, const NumberType& from, const NumberType& to)
 		{
-			if (from == to) return 0.0f;
-			return static_cast<float>((from < to) ? (value - from) / (to - from) : (to - value) / (to - from));
+			if (from == to) return 1.0f;
+			return static_cast<double>(value - from) / static_cast<double>(to - from);
 		}
 		template <typename NumberType>
 		//! HÀM NÀY KHÔNG PHÙ HỢP CHO CẶP 2 SỐ
-		NumberType to_value(const float& percent, const NumberType& from, const NumberType& to)
+		NumberType to_value(const double& percent, const NumberType& from, const NumberType& to)
 		{
-			if (from == to) return from;
-			return from + static_cast<NumberType>(std::round(static_cast<float>(to - from) * ((from < to) ? percent : (1.0f - percent))));
+			if (from == to) return to;
+			return static_cast<NumberType>(from + (to - from) * percent);
 		}
 
 		template <typename ComparableType>

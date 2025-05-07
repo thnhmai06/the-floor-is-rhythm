@@ -18,7 +18,7 @@ int32_t main(int32_t argc, char* argv[])
 	Work::Audio::init();
 	Work::Render::init(window);
 
-	//Work::Convert::osu::convert_beatmap(R"(D:\PROGRAM\osu!\Songs\1378089 Sound piercer feat DAZBEE - Hanatachi ni Kibou o (2020 Remaster))", "D:\\");
+	//Work::Convert::osu::convert_beatmap(R"(D:\PROGRAM\osu!\Songs\2287992 Camellia - Operation_ Zenithfall)", "D:\\");
 	int32_t result = Work::Render::work(window);
 
 	Work::Render::clean();

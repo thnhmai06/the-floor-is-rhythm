@@ -16,7 +16,7 @@ namespace Structures::Render::Texture
 		if (!override && data.contains(name)) return {};
 		SDL_Texture* texture = IMG_LoadTexture(this->renderer, file_path.string().c_str());
 		if (!texture)
-			THROW_ERROR(Logging::Exceptions::SDLExceptions::Texture::SDL_Texture_Load_Failed(file_path));
+			LOG_ERROR(Logging::Exceptions::SDLExceptions::Texture::SDL_Texture_Load_Failed(file_path));
 
 		// Nếu dùng STB_Image
 		/*if (!texture)
@@ -93,7 +93,7 @@ namespace Structures::Render::Texture
 	{
 		const auto texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, size.x, size.y);
 		if (!texture)
-			THROW_ERROR(Logging::Exceptions::SDLExceptions::Texture::SDL_Texture_Load_Failed(name));
+			LOG_ERROR(Logging::Exceptions::SDLExceptions::Texture::SDL_Texture_Load_Failed(name));
 
 		return load(texture, name, override);
 	}

@@ -140,6 +140,11 @@ namespace Structures::Game::Beatmap
 			return actions;
 		}
 
+		static Structures::Events::Action::Render::FadeAction made_hide_command(Render::Object::Object* target_object, const int64_t& time)
+		{
+			return {time, time, Structures::Events::Time::Easing::EasingFunctionType::Linear, target_object, 0, 0 };
+		}
+
 		//! EventObjects
 		std::shared_ptr<Render::Object::Collection>& EventObjects::pick_layer(const Type::Objects::Args::Layer::ImageLayer& layer)
 		{
@@ -211,10 +216,20 @@ namespace Structures::Game::Beatmap
 
 			//! Action
 			auto cmd = load_commands(sprite.get(), *object.commands, action_buffer, event_buffer);
+			int64_t end_time = (cmd.empty() ? 0 : cmd.begin()->second->end_time);
 			//? Làm vậy để tránh copy
 			//action_buffer.data.insert(cmd.begin(), cmd.end());
 			for (auto& [time, action] : cmd)
+			{
+				end_time = std::max(end_time, action->end_time);
 				action_buffer.data.emplace(time, std::move(action));
+			}
+
+			// Đến cuối luôn có một action để biến mất
+			if (!cmd.empty())
+				action_buffer.data.emplace(end_time,
+					std::make_shared<Structures::Events::Action::Render::FadeAction>(
+						made_hide_command(sprite.get(), end_time)));
 		}
 		void EventObjects::load_animation_object(
 			const fs::path& beatmap_root,
@@ -230,12 +245,14 @@ namespace Structures::Game::Beatmap
 
 			//! Object
 			const auto parent = file.parent_path();
-			const std::string stem = file.stem().string();
-			const std::string extension = file.extension().string();
+			// Trường hợp ".jpg" không hợp lệ trong đây nên phải check has extension
+			const std::string stem = (file.has_extension()) ? file.stem().string() : "";
+			const std::string extension = (file.has_extension()) ? file.extension().string() : file.stem().string();
 			std::vector<Render::Texture::Memory::Item> frames;
+			
 			for (long long frame = 0; frame < object.frameCount; ++frame)
 			{
-				auto suffix = object.frameCount >= 1 ? std::to_string(frame) : "" + extension;
+				auto suffix = (object.frameCount >= 1 ? std::to_string(frame) : "") + extension;
 				const auto frame_file = parent / (stem + suffix);
 				const auto frame_name = frame_file.lexically_relative(beatmap_root).generic_string();
 				memory.load(frame_file, frame_name, false);
@@ -252,8 +269,19 @@ namespace Structures::Game::Beatmap
 			//! Action
 			auto cmd = load_commands(animation.get(), *object.commands, action_buffer, event_buffer);
 			//actions.insert(cmd.begin(), cmd.end());
+			int64_t end_time = (cmd.empty() ? 0 : cmd.begin()->second->end_time);
 			for (auto& [time, action] : cmd)
+			{
+				end_time = std::max(end_time, action->end_time);
 				action_buffer.data.emplace(time, std::move(action));
+			}
+
+			// Đến cuối luôn có một action để biến mất
+			if (!cmd.empty())
+				action_buffer.data.emplace(end_time,
+					std::make_shared<Structures::Events::Action::Render::FadeAction>(
+						made_hide_command(animation.get(), end_time)));
+			
 		}
 		EventObjects::EventObjects(
 			const OsuParser::Beatmap::Objects::Event::Events& events,
@@ -268,7 +296,7 @@ namespace Structures::Game::Beatmap
 				switch (object->type)
 				{
 				case Type::Objects::EventObjectType::Background:
-					load_background_object(beatmap_root, renderer, action_buffer, *std::dynamic_pointer_cast<Objects::BackgroundObject>(object));
+					//load_background_object(beatmap_root, renderer, action_buffer, *std::dynamic_pointer_cast<Objects::BackgroundObject>(object));
 					break;
 				case Type::Objects::EventObjectType::Video:
 					//TODO: Giải mã Video
