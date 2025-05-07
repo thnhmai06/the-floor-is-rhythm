@@ -1,9 +1,9 @@
-﻿﻿# The Floor is Rhythm (The "Floor" Project)
+# The Floor is Rhythm (The "Floor" Project)
 
 **The Floor is Rhythm** là game hành động nhịp điệu, trong đó người chơi sẽ tương tác với những vật thể đang di chuyển vào chính giữa tương ứng với vị trí (trái, phải) mà nó đi vào.
 
 ## Video Demo:
-https://streamable.com/chce9o
+https://streamable.com/clfb9r
 
 ## Screenshot:
 <img src="https://i.ibb.co/Kcyz1Fx5/image.png">
@@ -17,7 +17,7 @@ Tùy vào độ chính xác mà sẽ ảnh hưởng đến điểm tương ứng
 | Ảnh | Tên | Mô tả |
 |-------|-------|-------|
 | <img src="assets/floor.png" height="80px" width="80px"/> | Floor | Object này yêu cầu bạn bấm phím tương ứng đúng lúc. |
-| <img src="assets/healthbar-colour.png" width="400px"/> | HP | Lượng máu hiện tại, bạn sẽ luôn bị mất máu, nhưng thao tác object đúng sẽ giúp bạn bù lại lượng máu đã mất. |
+| <img src="assets/healthbar-colour.png" width="600px"/> | HP | Lượng máu hiện tại, bạn sẽ luôn bị mất máu, nhưng thao tác object đúng sẽ giúp bạn bù lại lượng máu đã mất. |
 | <img src="assets/score-0.png" height="60px" width="35px"/><img src="assets/score-0.png" height="60px" width="35px"/><img src="assets/score-6.png" height="60px" width="35px"/><img src="assets/score-9.png" height="60px" width="35px"/><img src="assets/score-4.png" height="60px" width="35px"/><img src="assets/score-2.png" height="60px" width="35px"/><img src="assets/score-0.png" height="60px" width="35px"/> | Score | Điểm hiện tại của bạn, phụ thuộc vào Combo tối đa và Accuracy hiện tại. Tối đa 1,000,000 điểm. |
 | <img src="assets/score-8.png" height="60px" width="35px"/><img src="assets/score-2.png" height="60px" width="35px"/><img src="assets/score-dot.png" height="60px" width="35px"/><img src="assets/score-1.png" height="60px" width="35px"/><img src="assets/score-5.png" height="60px" width="35px"/><img src="assets/score-percent.png" height="60px" width="35px"/> | Accuracy | Độ chính xác của bạn, accuracy càng cao, điểm càng cao. |
 | <img src="assets/score-7.png" height="60px" width="35px"/><img src="assets/score-2.png" height="60px" width="35px"/><img src="assets/score-7.png" height="60px" width="35px"/><img src="assets/score-x.png" height="60px" width="35px"/> | Combo | Combo hiện tại của bạn, combo tối đa càng cao, điểm càng cao. |
