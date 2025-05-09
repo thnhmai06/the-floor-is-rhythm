@@ -17,7 +17,7 @@ namespace Structures::Render::Object
 		int64_t frame_delay;
 		Types::Render::LoopType loop_type;
 
-		void render(const SDL_FPoint& offset) override;
+		void on_before_render() override;
 
 		explicit AnimationObject(
 			Events::Time::Timer* timer,

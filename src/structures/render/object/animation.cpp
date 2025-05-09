@@ -19,10 +19,9 @@ namespace Structures::Render::Object
 		last_frame_time = current_time;
 		src = frames.at(current_frame);
 	}
-	void AnimationObject::render(const SDL_FPoint& offset)
+	void AnimationObject::on_before_render()
 	{
 		update(timer->get_time());
-		Object::render(offset);
 	}
 	AnimationObject::AnimationObject(
 		Events::Time::Timer* timer,

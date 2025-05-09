@@ -1,5 +1,4 @@
 ﻿#include "structures/render/object.h" // Header
-#include "logging/exceptions.h"
 #include "logging/logger.h"
 #include "utilities.hpp"
 
@@ -32,6 +31,7 @@ namespace Structures::Render::Object
 		switch (origin_type)
 		{
 		case Types::Render::OriginType::TopLeft:
+		case Types::Render::OriginType::Custom:
 			return { 0, 0 };
 		case Types::Render::OriginType::BottomLeft:
 			return { 0, h };
@@ -74,16 +74,6 @@ namespace Structures::Render::Object
 		else
 			origin_point = { pos.x, pos.y };
 	}
-	void Object::Config::set_scale(const SDL_FPoint& value)
-	{
-		//const auto old_render_origin = get_origin_point(true);
-		scale = value;
-		//const auto new_render_origin = get_origin_point(true);
-
-		//render_pos.x += old_render_origin.x - new_render_origin.x;
-		//render_pos.y += old_render_origin.y - new_render_origin.y;
-	}
-	void Object::Config::set_scale(const float& value) { set_scale({ value, value }); }
 	void Object::Config::set_render_size(const SDL_FPoint& size, const SDL_FPoint& src_size)
 	{
 		if (src_size.x > 0) scale.x = size.x / src_size.x;
@@ -146,25 +136,6 @@ namespace Structures::Render::Object
 	{
 		update_origin_point(translate_origin_type_to_point(origin_type, false), move_render_pos, false);
 	}
-	void Object::render(const SDL_FPoint& offset)
-	{
-		if (!visible || config.color.a == 0) return;
-		if (!src.is_valid()) return;
-
-		const auto& sdl_texture = src.item->second;
-		const auto src_rect = get_sdl_src_rect();
-		auto dst_rect = get_sdl_dst_rect();
-		dst_rect.x += offset.x; dst_rect.y += offset.y;
-		const SDL_FPoint render_origin_point = config.get_origin_point(true);
-		// https://stackoverflow.com/questions/24969783/is-it-safe-acceptable-to-call-sdl-settexturecolormod-every-frame-multiple-times
-		SDL_SetTextureBlendMode(sdl_texture, config.blend_mode);
-		SDL_SetTextureAlphaMod(sdl_texture, config.color.a);
-		SDL_SetTextureColorMod(sdl_texture, config.color.r, config.color.g, config.color.b);
-
-		if (!SDL_RenderTextureRotated(src.memory->renderer, sdl_texture, &src_rect,
-			&dst_rect, config.angle, &render_origin_point, config.flip_mode))
-			LOG_ERROR(Logging::Exceptions::SDLExceptions::Texture::SDL_Texture_Render_Failed(src.get_name()));
-	}
 	Object::Object(
 		Memory::Item texture,
 		const Types::Render::OriginType& origin_type,
@@ -181,43 +152,25 @@ namespace Structures::Render::Object
 		src(std::move(texture)), config(render_pos, custom_origin)
 	{
 	}
-
-	//! Collection
-	void Collection::render_single(const unsigned long& index, const SDL_FPoint& total_offset) const
+	void Collection::for_each_item(const std::function<void(const size_t& index)>& function, const bool no_duplicate)
 	{
-		if (!visible) return;
-		if (const auto& object = data[index];
-			std::holds_alternative<std::shared_ptr<Object>>(object))
-		{
-			const auto& it = std::get<std::shared_ptr<Object>>(object);
-			if (!it) return;
-			it->render(total_offset);
-		}
-		else if (std::holds_alternative<std::shared_ptr<Collection>>(object))
-		{
-			const auto& it = std::get<std::shared_ptr<Collection>>(object);
-			if (!it) return;
-			it->render(total_offset);
-		}
-	}
+		std::unordered_set<size_t> completed_index{};
 
-	void Collection::render_in_range(const int64_t& from, const int64_t& to, const SDL_FPoint& total_offset) const
-	{
-		if (!visible) return;
-		const int64_t size = data.size();
-		for (auto index = std::max(from, 0LL); index <= std::min(size - 1, to); ++index)
-			render_single(index, total_offset);
-	}
-
-	void Collection::render(const SDL_FPoint& offset)
-	{
-		using Utilities::Math::FPoint::operator+;
-
-		if (!visible) return;
-		const auto total_offset = offset + this->offset;
 		if (render_range.empty())
-			render_in_range(0, data.size() - 1, total_offset);
-		else for (const auto& [from, to] : render_range)
-			render_in_range(from, to, total_offset);
+			for (size_t index = 0; index < data.size(); ++index)
+				function(index);
+		else for (auto& [from, to] : render_range)
+		{
+			if (from > to) std::swap(from, to);
+			const auto size = static_cast<int64_t>(data.size());
+			const size_t from_ = std::clamp(from, 0LL, size);
+			const size_t to_ = std::clamp(to, 0LL, size - 1);
+			for (auto index = from_; index <= to_; ++index)
+			{
+				if (no_duplicate && completed_index.contains(index)) continue;
+				function(index);
+				completed_index.insert(index);
+			}
+		}
 	}
 }

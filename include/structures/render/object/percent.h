@@ -11,7 +11,7 @@ namespace Structures::Render::Object
 		bool vertical = false;
 
 		void update();
-		void render(const SDL_FPoint& offset) override;
+		void on_before_render() override;
 
 		explicit PercentObject(
 			const Memory::Item& texture,

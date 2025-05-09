@@ -24,10 +24,6 @@ namespace Structures::Screen::Gameplay::Mapset
 
 		struct Mapset : Collection
 		{
-		protected:
-			const Game::Beatmap::TimingPoints::TimingPoints* timing_points;
-
-		public:
 			struct RenderScript
 			{
 				std::weak_ptr<Collection> r_obj;
@@ -37,13 +33,17 @@ namespace Structures::Screen::Gameplay::Mapset
 
 			using RenderScripts = std::multimap<int64_t, RenderScript>;
 
-		private:
+		protected:
+			const Game::Beatmap::TimingPoints::TimingPoints* timing_points;
 			RenderScripts render_script;
-			Collection left, right;
+			std::shared_ptr<Collection> left, right;
+
+			// offset trong này sẽ chỉ tính cho left, right cần ngược lại
+			void on_before_render() override;
 
 		public:
 			[[nodiscard]] const RenderScripts* get_render_scripts() const;
-			void render(const SDL_FPoint& offset) override;
+			
 			void set_render_range(const int64_t& current_time);
 			void set_current_pos(const int64_t& current_time);
 

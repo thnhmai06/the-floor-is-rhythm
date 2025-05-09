@@ -2,13 +2,13 @@
 #include <SDL3/SDL_audio.h>
 #include <SDL3/SDL_scancode.h>
 #include "structures/type.hpp"
+#include "utilities.hpp"
 
 namespace Config::UserConfig
 {
 	namespace Video
 	{
-		constexpr int32_t width = 1366;
-		constexpr int32_t height = 768;
+		constexpr SDL_Point WINDOW_SIZE = { 1366, 768 };
 	}
 	namespace Audio::Volume
 	{
@@ -48,15 +48,14 @@ namespace Config::GameConfig
 	}
 	namespace Render
 	{
-		constexpr float LOGICAL_WIDTH = UserConfig::Video::width;
-		constexpr float LOGICAL_HEIGHT = UserConfig::Video::height;
+		constexpr float LOGICAL_WIDTH = UserConfig::Video::WINDOW_SIZE.x;
+		constexpr float LOGICAL_HEIGHT = UserConfig::Video::WINDOW_SIZE.y;
 
-		constexpr int STORYBOARD_GRID_WIDTH = 640;
-		constexpr int STORYBOARD_GRID_HEIGHT = 480;
-		constexpr int STORYBOARD_GRID_WIDESCREEN_WIDTH = 854;
-		constexpr int STORYBOARD_GRID_WIDESCREEN_HEIGHT = STORYBOARD_GRID_HEIGHT;
-		constexpr SDL_FPoint STORYBOARD_GRID_CENTRE = { STORYBOARD_GRID_WIDTH / 2, STORYBOARD_GRID_HEIGHT / 2 };
-		constexpr SDL_FPoint STORYBOARD_GRID_WIDESCREEN_CENTRE = { STORYBOARD_GRID_WIDESCREEN_WIDTH / 2, STORYBOARD_GRID_WIDESCREEN_HEIGHT / 2 };
+		constexpr SDL_FPoint STORYBOARD_GRID_SIZE = { 640, 480 };
+		constexpr SDL_FPoint STORYBOARD_GRID_WIDESCREEN_SIZE = { 854, STORYBOARD_GRID_SIZE.y };
+		using Utilities::Math::FPoint::operator/;
+		const SDL_FPoint STORYBOARD_GRID_CENTRE = STORYBOARD_GRID_SIZE / 2;
+		const SDL_FPoint STORYBOARD_GRID_WIDESCREEN_CENTRE = STORYBOARD_GRID_WIDESCREEN_SIZE / 2;
 
 		namespace Camera
 		{

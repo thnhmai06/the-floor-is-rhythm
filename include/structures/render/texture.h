@@ -10,6 +10,11 @@ namespace Structures::Render::Object
 	struct Object;
 }
 
+namespace Structures::Render::Layer
+{
+	struct TextureLayer;
+}
+
 namespace Structures::Render::Texture
 {
 	struct Memory
@@ -26,12 +31,8 @@ namespace Structures::Render::Texture
 			const Memory* memory = nullptr;
 			CONTAINER::const_iterator item;
 
-		private:
-			[[nodiscard]] SDL_FPoint get_size() const;
-
-			friend Object::Object;
-		public:
 			[[nodiscard]] const std::string& get_name() const;
+			[[nodiscard]] SDL_FPoint get_size() const;
 			void change_target(const std::string& new_target = {}, const Memory* new_memory = nullptr);
 			[[nodiscard]] bool is_valid() const;
 			void render(const SDL_FRect* src_rect, const SDL_FRect* dst_rect) const;

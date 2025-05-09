@@ -20,10 +20,9 @@ namespace Structures::Render::Object
 		set_render_size(render_size);
 	}
 
-	void PercentObject::render(const SDL_FPoint& offset)
+	void PercentObject::on_before_render()
 	{
 		update();
-		Object::render(offset);
 	}
 
 	PercentObject::PercentObject(

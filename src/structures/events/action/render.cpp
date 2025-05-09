@@ -71,12 +71,12 @@ namespace Structures::Events::Action::Render
 	//! Scale
 	void ScaleAction::update(const float& value_percent, const SDL_FPoint& from, const SDL_FPoint& to)
 	{
-		target_object->config.set_scale({
+		target_object->config.scale = {
 			Utilities::Math::to_value(value_percent, from.x, to.x),
-			Utilities::Math::to_value(value_percent, from.y, to.y) });
+			Utilities::Math::to_value(value_percent, from.y, to.y) };
 	}
 	ScaleAction::ScaleAction(const int64_t& start_time, const int64_t& end_time,
-		const Time::Easing::EasingFunctionType& easing, 
+		const Time::Easing::EasingFunctionType& easing,
 		Structures::Render::Object::Object* target_object,
 		const float& from, const float& to, const std::vector<float>& sequence)
 		: RenderAction{ start_time, end_time, easing, target_object, {.x = from, .y = from }, {.x = to, .y = to } }
@@ -173,7 +173,7 @@ namespace Structures::Events::Action::Render
 	ParameterAction::ParameterAction(Structures::Render::Object::Object* target_object, const OsuParser::Beatmap::Objects::Event::Commands::ParameterCommand& osu_parameter)
 		: ParameterAction(
 			osu_parameter.startTime, osu_parameter.endTime, osu_parameter.easing, target_object,
-			static_cast<Parameter>(osu_parameter.parameter), static_cast<Parameter>(osu_parameter.parameter), 
+			static_cast<Parameter>(osu_parameter.parameter), static_cast<Parameter>(osu_parameter.parameter),
 			osu_parameter.sequence)
 	{
 	}

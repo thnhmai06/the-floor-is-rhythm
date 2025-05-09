@@ -29,6 +29,7 @@ namespace Structures::Render::Layer
 
 			Item add(const std::weak_ptr<Object::Collection>& collection);
 			static void destroy(Item& item);
+			void for_each_item(const std::function<void(std::shared_ptr<Object::Collection>& item)>& function);
 
 			explicit Buffer(const Layer* layer) : parent(layer) {}
 		};
@@ -53,6 +54,13 @@ namespace Structures::Render::Layer
 		Camera camera;
 		bool visible = true;
 
+	protected:
+		virtual void put_object_into_layer(std::shared_ptr<Object::Object>& object) {}
+		virtual void put_object_out_layer(std::shared_ptr<Object::Object>& object) {}
+
+	public:
+		virtual void render_object(std::shared_ptr<Object::Object>& object, const SDL_FPoint& offset = {0, 0});
+		virtual void render_collection(std::shared_ptr<Object::Collection>& collection, const SDL_FPoint& bonus_offset = {0, 0});
 		virtual void render();
 		virtual void reset(bool reset_camera = false);
 
@@ -63,7 +71,15 @@ namespace Structures::Render::Layer
 	struct TextureLayer : Layer
 	{
 		Memory::Item target_texture;
+		// Grid sẽ mô phỏng việc đặt một lưới grid_size đều nhau lên texture, khi
+		// đó tọa độ vị trí on_before_render sẽ tương ứng đặt lên tọa độ trên lưới đó
+		std::optional<SDL_FPoint> grid_size = std::nullopt;
 
+	protected:
+		void put_object_into_layer(std::shared_ptr<Object::Object>& object) override;
+		void put_object_out_layer(std::shared_ptr<Object::Object>& object) override;
+
+	public:
 		void render_no_change_back_target(bool clear = false);
 		void render() override;
 		void reset(bool reset_camera = false) override;

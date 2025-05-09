@@ -18,7 +18,8 @@ namespace Structures::Render::Object
 		std::string header = {}, footer = {};
 
 		virtual void update();
-		void render(const SDL_FPoint& offset = { 0, 0 }) override;
+		void on_before_render() override;
+		void on_after_render() override;
 
 		HorizontalString(
 			const std::string* string,

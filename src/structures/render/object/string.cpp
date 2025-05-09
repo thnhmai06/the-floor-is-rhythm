@@ -23,7 +23,7 @@ namespace Structures::Render::Object
 			if (it->src.get_name() != character->second)
 				it->src.change_target(character->second);
 
-			// Set render character_render_size & pos
+			// Set on_before_render character_render_size & pos
 			it->set_render_size(character_render_size);
 			if (chr == 0)
 				it->config.render_pos = { .x = 0, .y = 0 };
@@ -40,14 +40,22 @@ namespace Structures::Render::Object
 		}
 		while (data.size() > string->size()) data.pop_back();
 	}
-	void HorizontalString::render(const SDL_FPoint& offset)
+	void HorizontalString::on_before_render()
 	{
 		using namespace Utilities::Math::FPoint;
 		if (!string || !alphabet) return;
 		this->update();
 
 		const SDL_FPoint total_size = { character_render_size.x * static_cast<float>(data.size()), character_render_size.y };
-		Collection::render(offset + render_pos - total_size * origin_point_in_percent);
+		offset += render_pos - total_size * origin_point_in_percent;
+	}
+	void HorizontalString::on_after_render()
+	{
+		using namespace Utilities::Math::FPoint;
+		if (!string || !alphabet) return;
+
+		const SDL_FPoint total_size = { character_render_size.x * static_cast<float>(data.size()), character_render_size.y };
+		offset -= render_pos - total_size * origin_point_in_percent;
 	}
 	HorizontalString::HorizontalString(
 		const std::string* string,

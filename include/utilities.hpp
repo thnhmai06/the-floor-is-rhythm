@@ -5,7 +5,7 @@
 #include <map>
 #include <numbers>
 #include <queue>
-#include "structures/type.hpp"
+#include <SDL3/SDL_rect.h>
 
 namespace Utilities
 {
@@ -14,6 +14,7 @@ namespace Utilities
 		inline bool is_equal(const float& variable, const float& value, const float& epsilon = 0.001f) { return abs(variable - value) <= epsilon; }
 		inline bool is_integer(const float& value, const float& epsilon = 0.001f) { return is_equal(std::floor(value), value, epsilon); }
 		inline float centre(const float& size, const float& window_size) { return (window_size - size) / 2; }
+		inline SDL_FPoint centre(const SDL_FPoint& size, const SDL_FPoint& window_size) { return { centre(size.x, window_size.x), centre(size.y, window_size.y) }; }
 		inline float degree_to_radian(const float& degree) { return degree * std::numbers::pi_v<float> / 180.0f; }
 		inline float radian_to_degree(const float& radian) { return radian * 180.0f / std::numbers::pi_v<float>; }
 		inline double round(const double& value, const uint8_t& precision_num = 0)
@@ -60,6 +61,15 @@ namespace Utilities
 
 			inline bool operator==(const SDL_FPoint& a, const SDL_FPoint& b) { return  is_equal(a.x, b.x) && is_equal(a.y, b.y); }
 			inline bool operator!=(const SDL_FPoint& a, const SDL_FPoint& b) { return !operator==(a, b); }
+
+			inline SDL_Point to_integer_point(const SDL_FPoint& point)
+			{
+				return SDL_Point{ static_cast<int>(std::round(point.x)), static_cast<int>(std::round(point.y)) };
+			}
+			inline SDL_FPoint to_float_point(const SDL_Point& point)
+			{
+				return SDL_FPoint{ static_cast<float>(point.x), static_cast<float>(point.y) };
+			}
 		}
 
 		template <typename NumberType>

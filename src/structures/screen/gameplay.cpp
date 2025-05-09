@@ -152,7 +152,7 @@ namespace Structures::Screen::Gameplay
 				&Work::Render::Layers::storyboard->foreground);
 		}
 
-		// Submit lên render buffer của layers
+		// Submit lên on_before_render buffer của layers
 		Work::Render::Layers::playground->render_buffer.add(this->mapset);
 		Work::Render::Layers::static_hud->render_buffer.add(this->cursor);
 		Work::Render::Layers::hud->render_buffer.add(this->health);

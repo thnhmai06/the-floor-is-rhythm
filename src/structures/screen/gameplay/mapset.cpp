@@ -37,7 +37,14 @@ namespace Structures::Screen::Gameplay::Mapset
 			}
 		}
 
+
 		//! Mapset
+		void Mapset::on_before_render()
+		{
+			using Utilities::Math::FPoint::operator*;
+			using Utilities::Math::FPoint::operator-;
+			right->offset = - offset * 2; // trừ bù
+		}
 		const Mapset::RenderScripts* Mapset::get_render_scripts() const
 		{
 			return &render_script;
@@ -55,25 +62,23 @@ namespace Structures::Screen::Gameplay::Mapset
 			if (end_item != render_script.begin()) --end_item;
 			const auto& end_script = end_item->second;
 
-			left.render_range.clear();
-			right.render_range.clear();
-			left.render_range.emplace_back(begin_script.left_index, end_script.left_index);
-			right.render_range.emplace_back(begin_script.right_index, end_script.right_index);
+			left->render_range.clear();
+			right->render_range.clear();
+			left->render_range.emplace_back(begin_script.left_index, end_script.left_index);
+			right->render_range.emplace_back(begin_script.right_index, end_script.right_index);
 		}
 		void Mapset::set_current_pos(const int64_t& current_time)
 		{
 			offset.x = timing_points->get_object_pos(static_cast<float>(current_time));
 		}
-		void Mapset::render(const SDL_FPoint& offset)
-		{
-			using Utilities::Math::FPoint::operator+, Utilities::Math::FPoint::operator-;
-
-			left.render(offset + this->offset);
-			right.render(offset - this->offset);
-		}
 		Mapset::Mapset(const Memory& memory, const Game::Beatmap::Mapset& mapset)
 			: timing_points(&mapset.timing_points)
 		{
+			left = std::make_shared<Collection>();
+			data.emplace_back(left);
+			right = std::make_shared<Collection>();
+			data.emplace_back(right);
+
 			for (const auto& obj : mapset.hit_objects.data | std::views::values)
 			{
 				SDL_FPoint pos = { timing_points->get_object_pos(obj.time), 0};
@@ -82,20 +87,22 @@ namespace Structures::Screen::Gameplay::Mapset
 
 				if (obj.is_kat)
 				{
-					const auto left_index = left.data.empty() ? 0 : left.data.size() - 1;
-					right.data.emplace_back(r_obj);
+					const auto left_index = left->data.empty() ? 0 : left->data.size() - 1;
+					right->data.emplace_back(r_obj);
 					render_script.emplace_hint(
 						Utilities::Container::get_last_element_iterator(render_script),
-						obj.time, RenderScript{.r_obj = r_obj, .is_kat = obj.is_kat, .left_index = left_index,
-							.right_index = right.data.size() - 1 });
+						obj.time, RenderScript{.r_obj = r_obj, .is_kat = obj.is_kat,
+							.left_index = left_index,
+							.right_index = right->data.size() - 1 });
 				}
 				else
 				{
-					const auto right_index = right.data.empty() ? 0 : right.data.size() - 1;
-					left.data.emplace_back(r_obj);
+					const auto right_index = right->data.empty() ? 0 : right->data.size() - 1;
+					left->data.emplace_back(r_obj);
 					render_script.emplace_hint(
 						Utilities::Container::get_last_element_iterator(render_script),
-						obj.time, RenderScript{.r_obj = r_obj, .is_kat = obj.is_kat, .left_index = left.data.size() - 1,
+						obj.time, RenderScript{.r_obj = r_obj, .is_kat = obj.is_kat,
+							.left_index = left->data.size() - 1,
 							.right_index = right_index });
 				}
 			}

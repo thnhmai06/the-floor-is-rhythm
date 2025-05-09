@@ -22,8 +22,8 @@ namespace Work::Core
 		{
 			window = SDL_CreateWindow(
 				Config::GameConfig::General::NAME,
-				Config::UserConfig::Video::width,
-				Config::UserConfig::Video::height,
+				Config::UserConfig::Video::WINDOW_SIZE.x,
+				Config::UserConfig::Video::WINDOW_SIZE.y,
 				SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_HIGH_PIXEL_DENSITY);
 			if (!window)
 				THROW_CRITICAL(Logging::Exceptions::SDLExceptions::Video::SDL_Video_CreateWindow_Failed());
