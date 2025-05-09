@@ -73,12 +73,12 @@ namespace Structures::Render::Layer
 		pass.target_texture.clear();
 		foreground.target_texture.clear();
 	}
-	void StoryboardLayer::reset()
+	void StoryboardLayer::clear()
 	{
-		background.reset(false);
-		fail.reset(false);
-		pass.reset(false);
-		foreground.reset(false);
+		background.clear();
+		fail.clear();
+		pass.clear();
+		foreground.clear();
 	}
 	StoryboardLayer::StoryboardLayer(SDL_Renderer* renderer)
 		: memory(renderer),

@@ -10,7 +10,7 @@ namespace Structures::Game::Beatmap
 	namespace Event
 	{
 		static Structures::Events::Action::Buffer::CONTAINER load_commands(
-			Render::Object::Object* target_object,
+			const std::weak_ptr<Render::Object::Object>& target_object,
 			const Commands::Commands& commands,
 			Structures::Events::Action::Buffer& action_buffer,
 			Structures::Events::Event::Buffer* event_buffer)
@@ -140,9 +140,9 @@ namespace Structures::Game::Beatmap
 			return actions;
 		}
 
-		static Structures::Events::Action::Render::FadeAction made_hide_command(Render::Object::Object* target_object, const int64_t& time)
+		static Structures::Events::Action::Render::FadeAction made_hide_command(std::weak_ptr<Render::Object::Object> target_object, const int64_t& time)
 		{
-			return {time, time, Structures::Events::Time::Easing::EasingFunctionType::Linear, target_object, 0, 0 };
+			return {time, time, Structures::Events::Time::Easing::EasingFunctionType::Linear, std::move(target_object), 0, 0 };
 		}
 
 		//! EventObjects
@@ -189,8 +189,7 @@ namespace Structures::Game::Beatmap
 
 			//! Action
 			auto action = std::make_shared<Structures::Events::Action::Render::FadeAction>(
-				object.startTime, object.startTime, Structures::Events::Time::Easing::EasingFunctionType::Linear,
-				background.get(),
+				object.startTime, object.startTime, EasingFunctionType::Linear, background,
 				Render::Object::SDL_MAX_ALPHA, Render::Object::SDL_MAX_ALPHA);
 			action_buffer.data.emplace(object.startTime, std::move(action));
 		}
@@ -215,7 +214,7 @@ namespace Structures::Game::Beatmap
 			collection->data.emplace_back(sprite);
 
 			//! Action
-			auto cmd = load_commands(sprite.get(), *object.commands, action_buffer, event_buffer);
+			auto cmd = load_commands(sprite, *object.commands, action_buffer, event_buffer);
 			int64_t end_time = (cmd.empty() ? 0 : cmd.begin()->second->end_time);
 			//? Làm vậy để tránh copy
 			//action_buffer.data.insert(cmd.begin(), cmd.end());
@@ -229,7 +228,7 @@ namespace Structures::Game::Beatmap
 			if (!cmd.empty())
 				action_buffer.data.emplace(end_time,
 					std::make_shared<Structures::Events::Action::Render::FadeAction>(
-						made_hide_command(sprite.get(), end_time)));
+						made_hide_command(sprite, end_time)));
 		}
 		void EventObjects::load_animation_object(
 			const fs::path& beatmap_root,
@@ -267,7 +266,7 @@ namespace Structures::Game::Beatmap
 			collection->data.emplace_back(animation);
 
 			//! Action
-			auto cmd = load_commands(animation.get(), *object.commands, action_buffer, event_buffer);
+			auto cmd = load_commands(animation, *object.commands, action_buffer, event_buffer);
 			//actions.insert(cmd.begin(), cmd.end());
 			int64_t end_time = (cmd.empty() ? 0 : cmd.begin()->second->end_time);
 			for (auto& [time, action] : cmd)
@@ -280,7 +279,7 @@ namespace Structures::Game::Beatmap
 			if (!cmd.empty())
 				action_buffer.data.emplace(end_time,
 					std::make_shared<Structures::Events::Action::Render::FadeAction>(
-						made_hide_command(animation.get(), end_time)));
+						made_hide_command(animation, end_time)));
 			
 		}
 		EventObjects::EventObjects(

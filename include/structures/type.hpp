@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <concepts>
+#include <easing.h>
 #include <SDL3_mixer/SDL_mixer.h>
 #include <unordered_map>
 #include <string>
@@ -29,6 +30,8 @@ namespace Structures::Types
 			BottomCentre = 4, TopCentre = 5, Custom = 6,
 			CentreRight = 7, BottomLeft = 8, BottomRight = 9
 		};
+		using EasingFunctionType = OsuParser::Beatmap::Objects::Event::Type::Commands::Args::Easing::Easing;
+		using EasingFunction = easingFunction;
 
 		struct Color { uint8_t r, g, b; }; // giống SDL_Color nhưng bỏ alpha
 	}
@@ -40,6 +43,7 @@ namespace Structures::Types
 			Hitsound,
 			Passing,
 			Failing,
+			Scoring
 		};
 	}
 	namespace Game

@@ -1,12 +1,11 @@
 ﻿#pragma once
 #include <numbers>
-#include <osu!parser/Parser/Structures/Beatmap/Objects/Event.hpp>
-#include <easing.h>
+#include "structures/type.hpp"
 
 namespace Structures::Events::Time::Easing
 {
-	using EasingFunctionType = OsuParser::Beatmap::Objects::Event::Type::Commands::Args::Easing::Easing;
-	using EasingFunction = easingFunction;
+	using Types::Render::EasingFunctionType;
+	using Types::Render::EasingFunction;
 
 	namespace Functions
 	{

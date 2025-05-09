@@ -25,5 +25,14 @@ namespace Structures::Events::Event
 		{
 			Types::Event::EventID get_id() noexcept override;
 		};
+		struct Scoring : Event
+		{
+			const Game::Beatmap::HitObjects::Floor* floor;
+			Types::Game::Gameplay::NoteScore score;
+
+			Types::Event::EventID get_id() noexcept override;
+
+			explicit Scoring(const Game::Beatmap::HitObjects::Floor* floor, const Types::Game::Gameplay::NoteScore& score);
+		};
 	}
 }

@@ -53,7 +53,7 @@ namespace Structures::Events::Action::Render
 		static constexpr long DEFAULT_SEQUENCE = -1;
 
 		ValueType from, to;
-		Structures::Render::Object::Object* target_object = nullptr;
+		std::weak_ptr<Structures::Render::Object::Object> target_object;
 		Time::Easing::EasingFunctionType easing;
 		std::vector<ValueType> sequence;
 		long current_sequence = DEFAULT_SEQUENCE;
@@ -61,11 +61,11 @@ namespace Structures::Events::Action::Render
 		RenderAction(const int64_t& start_time,
 			const int64_t& end_time,
 			const Time::Easing::EasingFunctionType& easing,
-			Structures::Render::Object::Object* target_object,
+			std::weak_ptr<Structures::Render::Object::Object> target_object,
 			const ValueType& from,
 			const ValueType& to,
 			const std::vector<ValueType>& sequence = {})
-			: from(from), to(to), target_object(target_object), easing(easing), sequence(sequence)
+			: from(from), to(to), target_object(std::move(target_object)), easing(easing), sequence(sequence)
 		{
 			this->start_time = start_time;
 			const auto base_end = end_time;
@@ -96,11 +96,13 @@ namespace Structures::Events::Action::Render
 			}
 		}
 
-		[[nodiscard]] bool is_valid(const int64_t& current_time) const override {
-			return !finished && target_object && get_time_in_this_sequence(start_time) <= current_time;
+		[[nodiscard]] bool is_valid(const int64_t& current_time) const override
+		{
+			return !finished && !target_object.expired() && target_object.lock() && (get_time_in_this_sequence(start_time) <= current_time);
 		}
 
-		[[nodiscard]] int64_t get_time_in_this_sequence(const int64_t& time) const {
+		[[nodiscard]] int64_t get_time_in_this_sequence(const int64_t& time) const
+		{
 			const auto segment_duration = end_time - start_time;
 			const auto max_segment = static_cast<long>(sequence.size());
 			const auto seg_index = std::clamp(current_sequence + 1, 0L, max_segment);
@@ -126,7 +128,7 @@ namespace Structures::Events::Action::Render
 		void update(const float& value_percent, const uint8_t& from, const uint8_t& to) override;
 
 		using RenderAction::RenderAction;
-		FadeAction(Structures::Render::Object::Object* target_object, const OsuParser::Beatmap::Objects::Event::Commands::FadeCommand& osu_fade);
+		FadeAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::FadeCommand& osu_fade);
 	};
 
 	//! Move
@@ -135,21 +137,21 @@ namespace Structures::Events::Action::Render
 		void update(const float& value_percent, const SDL_FPoint& from, const SDL_FPoint& to) override;
 
 		using RenderAction::RenderAction;
-		MoveAction(Structures::Render::Object::Object* target_object, const OsuParser::Beatmap::Objects::Event::Commands::MoveCommand& osu_move);
+		MoveAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::MoveCommand& osu_move);
 	};
 	struct MoveXAction : RenderAction<float>
 	{
 		void update(const float& value_percent, const float& from, const float& to) override;
 
 		using RenderAction::RenderAction;
-		MoveXAction(Structures::Render::Object::Object* target_object, const OsuParser::Beatmap::Objects::Event::Commands::MoveXCommand& osu_move_x);
+		MoveXAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::MoveXCommand& osu_move_x);
 	};
 	struct MoveYAction : RenderAction<float>
 	{
 		void update(const float& value_percent, const float& from, const float& to) override;
 
 		using RenderAction::RenderAction;
-		MoveYAction(Structures::Render::Object::Object* target_object, const OsuParser::Beatmap::Objects::Event::Commands::MoveYCommand& osu_move_y);
+		MoveYAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::MoveYCommand& osu_move_y);
 	};
 
 	//! Scale
@@ -160,13 +162,13 @@ namespace Structures::Events::Action::Render
 		// Normal Scale
 		ScaleAction(const int64_t& start_time, const int64_t& end_time,
 			const Time::Easing::EasingFunctionType& easing,
-			Structures::Render::Object::Object* target_object,
+			std::weak_ptr<Structures::Render::Object::Object> target_object,
 			const float& from, const float& to,
 			const std::vector<float>& sequence = {});
-		ScaleAction(Structures::Render::Object::Object* target_object, const OsuParser::Beatmap::Objects::Event::Commands::ScaleCommand& osu_scale);
+		ScaleAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::ScaleCommand& osu_scale);
 		// Vector Scale
 		using RenderAction::RenderAction;
-		ScaleAction(Structures::Render::Object::Object* target_object, const OsuParser::Beatmap::Objects::Event::Commands::VectorScaleCommand& osu_vector_scale);
+		ScaleAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::VectorScaleCommand& osu_vector_scale);
 	};
 
 	//! Rotate
@@ -175,7 +177,7 @@ namespace Structures::Events::Action::Render
 		void update(const float& value_percent, const float& from, const float& to) override;
 
 		using RenderAction::RenderAction;
-		RotateAction(Structures::Render::Object::Object* target_object, const OsuParser::Beatmap::Objects::Event::Commands::RotateCommand& osu_rotate);
+		RotateAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::RotateCommand& osu_rotate);
 	};
 
 	//! Color
@@ -185,7 +187,7 @@ namespace Structures::Events::Action::Render
 		void update(const float& value_percent, const Color& from, const Color& to) override;
 
 		using RenderAction::RenderAction;
-		ColorAction(Structures::Render::Object::Object* target_object, const OsuParser::Beatmap::Objects::Event::Commands::ColorCommand& osu_color);
+		ColorAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::ColorCommand& osu_color);
 	};
 
 	//! Parameter
@@ -209,6 +211,6 @@ namespace Structures::Events::Action::Render
 		void on_started() override;
 
 		using RenderAction::RenderAction;
-		ParameterAction(Structures::Render::Object::Object* target_object, const OsuParser::Beatmap::Objects::Event::Commands::ParameterCommand& osu_parameter);
+		ParameterAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::ParameterCommand& osu_parameter);
 	};
 }

@@ -21,7 +21,7 @@ namespace Work::Render
 
 	void clean()
 	{
-		Layers::reset_all(true);
+		Layers::clear_all();
 		Core::CleanUp::renderer(renderer);
 	}
 

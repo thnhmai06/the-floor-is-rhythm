@@ -72,18 +72,27 @@ namespace Structures::Screen::Gameplay
 			//? Cập nhật
 			is_alive = update_score_and_health(floor_score);
 			r_object->visible = false;
-			playing_screen->render.cursor->note_score.lock()->set_display_score(floor_score);
-			playing_screen->audio.play_sound(current_time, floor, floor_score, current.timing_sample, *current.beatmap_sample);
+			playing_screen->event_buffer.add(current_time, std::make_shared<Events::Event::Playing::Scoring>(&floor, floor_score));
+			playing_screen->audio.check_and_play_sound(current_time, floor, floor_score, current.timing_sample, *current.beatmap_sample);
 			++current.object_script;
 		}
 		return is_alive;
 	}
 	void PlayingScreen::Logic::update_render(const int64_t& current_time) const
 	{
-		playing_screen->action_buffer.execute(current_time);
 		playing_screen->render.mapset->set_current_pos(current_time);
 		playing_screen->render.mapset->set_render_range(current_time);
 	}
+	void PlayingScreen::Logic::update_event_and_action(const int64_t& current_time) const
+	{
+		//! Event
+		playing_screen->render.cursor->check_and_add_score_shown(playing_screen->event_buffer, playing_screen->action_buffer, current_time);
+		// event Hitsound đã được thực thi ở hàm Audio::check_and_play_sound
+
+		//! Action
+		playing_screen->action_buffer.execute(current_time);
+	}
+
 	void PlayingScreen::Logic::make_time_step(const Events::Event::Input::SdlEvents& events)
 	{
 		// bắt đầu timer (nếu chưa start)
@@ -107,6 +116,7 @@ namespace Structures::Screen::Gameplay
 		update_timing(current_time);
 		update_object(current_time, click_left, click_right); //TODO: Xử lý fail ở đây
 		update_render(current_time);
+		update_event_and_action(current_time);
 	}
 	PlayingScreen::Logic::Logic(
 		PlayingScreen* playing_screen,
@@ -160,7 +170,7 @@ namespace Structures::Screen::Gameplay
 	}
 
 	//! Audio
-	void PlayingScreen::Audio::play_sound(
+	void PlayingScreen::Audio::check_and_play_sound(
 		const int64_t& current_time,
 		const Game::Beatmap::HitObjects::Floor& floor,
 		const Types::Game::Gameplay::NoteScore& score,

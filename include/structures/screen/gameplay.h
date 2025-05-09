@@ -36,6 +36,7 @@ namespace Structures::Screen::Gameplay
 			void update_timing(const int64_t& current_time);
 			bool update_score_and_health(const Types::Game::Gameplay::NoteScore& obj_score);
 			bool update_object(const int64_t& current_time, uint16_t& click_left, uint16_t& click_right);
+			void update_event_and_action(const int64_t& current_time) const;
 
 		public:
 			struct Current
@@ -92,7 +93,7 @@ namespace Structures::Screen::Gameplay
 			Structures::Audio::MusicMemory* memory_music;
 			Structures::Audio::EffectMemory* memory_effect;
 
-			void play_sound(
+			void check_and_play_sound(
 				const int64_t& current_time,
 				const Game::Beatmap::HitObjects::Floor& floor,
 				const Types::Game::Gameplay::NoteScore& score,

@@ -28,7 +28,7 @@ namespace Structures::Render::Layer
 		void resize(bool widescreen, bool force = false);
 		void render();
 		void clear() const;
-		void reset();
+		void clear();
 
 		explicit StoryboardLayer(SDL_Renderer* renderer);
 	};

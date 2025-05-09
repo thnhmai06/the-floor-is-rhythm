@@ -70,17 +70,25 @@ namespace Config::GameConfig
 
 		namespace HitObject
 		{
-			constexpr float SIZE = 64; // pixel
+			constexpr float SIZE = 64; // pixel TODO: làm nó relative
 			constexpr auto ORIGIN = Structures::Types::Render::OriginType::Centre;
 			constexpr SDL_Color DON = {235, 69, 44, 255};
 			constexpr SDL_Color KAT = {67, 142, 172, 255};
 		}
 		namespace Cursor
 		{
-			constexpr float SIZE = HitObject::SIZE; // pixel
+			constexpr float CURSOR_SIZE = HitObject::SIZE; // pixel
 			constexpr auto ORIGIN = Structures::Types::Render::OriginType::Centre;
-			constexpr float POS_X = LOGICAL_WIDTH / 2;
-			constexpr float POS_Y = LOGICAL_HEIGHT / 2;
+			constexpr SDL_FPoint CURSOR_POS = { LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2 };
+
+			constexpr float SCORE_SIZE = CURSOR_SIZE * 1.5f;
+			constexpr int64_t SCORE_TIME_FADE_IN = 150; // ms
+			constexpr SDL_FPoint SCORE_POS_START = { CURSOR_POS.x, CURSOR_POS.y - CURSOR_SIZE };
+			constexpr auto SCORE_EASING_IN = Structures::Types::Render::EasingFunctionType::QuintOut;
+			constexpr int64_t SCORE_TIME_STAY = 300; // ms
+			constexpr int64_t SCORE_TIME_FADE_OUT = SCORE_TIME_FADE_IN; // ms
+			constexpr SDL_FPoint SCORE_POS_END = { CURSOR_POS.x, CURSOR_POS.y - (CURSOR_SIZE + SCORE_SIZE * 0.25f) };
+			constexpr auto SCORE_EASING_OUT = SCORE_EASING_IN;
 		}
 		namespace Health
 		{

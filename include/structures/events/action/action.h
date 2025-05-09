@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <functional>
 #include <map>
 #include "structures/events/condition/condition.h"
 
@@ -28,8 +29,14 @@ namespace Structures::Events::Action
 		void execute(const int64_t& current_time);
 	};
 
+	struct CallbackAction : Action
+	{
+		std::function<void(const int64_t& current_time)> callback = nullptr;
+
+		void execute(const int64_t& current_time) override;
+	};
 	//! Chú ý: Các lệnh bên dưới không nên lồng nhau
-	//! (Loop trong loop hoặc Loop trong condition và ngược lại)
+	//! (Loop trong loop hoặc Loop trong Condition và ngược lại)
 	struct LoopAction final : Action
 	{
 	protected:

@@ -11,7 +11,7 @@ namespace Structures::Render::Layer
 	{
 		struct Buffer
 		{
-			using CONTAINER = std::list<std::weak_ptr<Object::Collection>>;
+			using CONTAINER = std::list<std::variant<std::weak_ptr<Object::Object>, std::weak_ptr<Object::Collection>>>;
 
 			const Layer* parent;
 			CONTAINER data;
@@ -22,14 +22,18 @@ namespace Structures::Render::Layer
 				CONTAINER::iterator item;
 
 				void destroy();
+				bool is_valid() const;
 
 				explicit Item(Buffer* render_buffer);
 				Item(Buffer* render_buffer, CONTAINER::iterator item);
 			};
 
+			Item add(const std::weak_ptr<Object::Object>& object);
 			Item add(const std::weak_ptr<Object::Collection>& collection);
-			static void destroy(Item& item);
-			void for_each_item(const std::function<void(std::shared_ptr<Object::Collection>& item)>& function);
+			static void remove(Item& item);
+			void for_each_item(
+				const std::function<void(std::shared_ptr<Object::Object>& object)>& object_function,
+				const std::function<void(std::shared_ptr<Object::Collection>& collection)>& collection_function);
 
 			explicit Buffer(const Layer* layer) : parent(layer) {}
 		};
@@ -62,7 +66,7 @@ namespace Structures::Render::Layer
 		virtual void render_object(std::shared_ptr<Object::Object>& object, const SDL_FPoint& offset = {0, 0});
 		virtual void render_collection(std::shared_ptr<Object::Collection>& collection, const SDL_FPoint& bonus_offset = {0, 0});
 		virtual void render();
-		virtual void reset(bool reset_camera = false);
+		virtual void clear();
 
 		explicit Layer(const SDL_FPoint& camera_origin_in_percent = { 0, 0 });
 		virtual ~Layer() = default;
@@ -82,7 +86,7 @@ namespace Structures::Render::Layer
 	public:
 		void render_no_change_back_target(bool clear = false);
 		void render() override;
-		void reset(bool reset_camera = false) override;
+		void clear() override;
 
 		explicit TextureLayer(Memory::Item texture,
 			const SDL_FPoint& camera_origin_in_percent = { 0, 0 });

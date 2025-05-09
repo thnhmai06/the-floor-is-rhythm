@@ -29,12 +29,12 @@ namespace Work::Render::Layers
 		if (static_hud) static_hud->render();
 		if (hud) hud->render();
 	}
-	inline void reset_all(const bool to_initial_state = false)
+	inline void clear_all()
 	{
-		if (normal) normal->reset(to_initial_state);
-		if (storyboard) storyboard->reset();
-		if (playground) playground->reset(to_initial_state);
-		if (static_hud) static_hud->reset(to_initial_state);
-		if (hud) hud->reset(to_initial_state);
+		if (normal) normal->clear();
+		if (storyboard) storyboard->clear();
+		if (playground) playground->clear();
+		if (static_hud) static_hud->clear();
+		if (hud) hud->clear();
 	}
 }

@@ -1,5 +1,6 @@
 ﻿#include "structures/events/action/render.hpp" // Header
 #include <utilities.hpp>
+#include <utility>
 
 namespace Structures::Events::Action::Render
 {
@@ -7,15 +8,12 @@ namespace Structures::Events::Action::Render
 	// FadeAction
 	void FadeAction::update(const float& value_percent, const uint8_t& from, const uint8_t& to)
 	{
-		if (target_object->src.get_name() == std::string("sb/TitleBlock.jpg"))
-		{
-			int a = 2;
-		}
-		target_object->config.color.a = Utilities::Math::to_value(value_percent, from, to);
+		const auto it = target_object.lock();
+		it->config.color.a = Utilities::Math::to_value(value_percent, from, to);
 	}
-	FadeAction::FadeAction(Structures::Render::Object::Object* target_object, const OsuParser::Beatmap::Objects::Event::Commands::FadeCommand& osu_fade)
+	FadeAction::FadeAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::FadeCommand& osu_fade)
 		: FadeAction(
-			osu_fade.startTime, osu_fade.endTime, osu_fade.easing, target_object,
+			osu_fade.startTime, osu_fade.endTime, osu_fade.easing, std::move(target_object),
 			Utilities::Math::to_value(osu_fade.startOpacity, static_cast<uint8_t>(0), Structures::Render::Object::SDL_MAX_ALPHA),
 			Utilities::Math::to_value(osu_fade.endOpacity, static_cast<uint8_t>(0), Structures::Render::Object::SDL_MAX_ALPHA))
 	{
@@ -27,12 +25,13 @@ namespace Structures::Events::Action::Render
 	// MoveAction
 	void MoveAction::update(const float& value_percent, const SDL_FPoint& from, const SDL_FPoint& to)
 	{
-		target_object->config.render_pos.x = Utilities::Math::to_value(value_percent, from.x, to.x);
-		target_object->config.render_pos.y = Utilities::Math::to_value(value_percent, from.y, to.y);
+		const auto it = target_object.lock();
+		it->config.render_pos.x = Utilities::Math::to_value(value_percent, from.x, to.x);
+		it->config.render_pos.y = Utilities::Math::to_value(value_percent, from.y, to.y);
 	}
-	MoveAction::MoveAction(Structures::Render::Object::Object* target_object, const OsuParser::Beatmap::Objects::Event::Commands::MoveCommand& osu_move)
+	MoveAction::MoveAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::MoveCommand& osu_move)
 		: MoveAction(
-			osu_move.startTime, osu_move.endTime, osu_move.easing, target_object,
+			osu_move.startTime, osu_move.endTime, osu_move.easing, std::move(target_object),
 			{ .x = static_cast<float>(osu_move.startX), .y = static_cast<float>(osu_move.startY) },
 			{ .x = static_cast<float>(osu_move.endX), .y = static_cast<float>(osu_move.endY) })
 	{
@@ -43,11 +42,12 @@ namespace Structures::Events::Action::Render
 	// MoveXAction
 	void MoveXAction::update(const float& value_percent, const float& from, const float& to)
 	{
-		target_object->config.render_pos.x = Utilities::Math::to_value(value_percent, from, to);
+		const auto it = target_object.lock();
+		it->config.render_pos.x = Utilities::Math::to_value(value_percent, from, to);
 	}
-	MoveXAction::MoveXAction(Structures::Render::Object::Object* target_object, const OsuParser::Beatmap::Objects::Event::Commands::MoveXCommand& osu_move_x)
+	MoveXAction::MoveXAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::MoveXCommand& osu_move_x)
 		: MoveXAction(
-			osu_move_x.startTime, osu_move_x.endTime, osu_move_x.easing, target_object,
+			osu_move_x.startTime, osu_move_x.endTime, osu_move_x.easing, std::move(target_object),
 			static_cast<float>(osu_move_x.startX), static_cast<float>(osu_move_x.endX))
 	{
 		for (const auto& x : osu_move_x.sequence)
@@ -57,11 +57,12 @@ namespace Structures::Events::Action::Render
 	// MoveYAction
 	void MoveYAction::update(const float& value_percent, const float& from, const float& to)
 	{
-		target_object->config.render_pos.y = Utilities::Math::to_value(value_percent, from, to);
+		const auto it = target_object.lock();
+		it->config.render_pos.y = Utilities::Math::to_value(value_percent, from, to);
 	}
-	MoveYAction::MoveYAction(Structures::Render::Object::Object* target_object, const OsuParser::Beatmap::Objects::Event::Commands::MoveYCommand& osu_move_y)
+	MoveYAction::MoveYAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::MoveYCommand& osu_move_y)
 		: MoveYAction(
-			osu_move_y.startTime, osu_move_y.endTime, osu_move_y.easing, target_object,
+			osu_move_y.startTime, osu_move_y.endTime, osu_move_y.easing, std::move(target_object),
 			static_cast<float>(osu_move_y.startY), static_cast<float>(osu_move_y.endY))
 	{
 		for (const auto& y : osu_move_y.sequence)
@@ -71,22 +72,23 @@ namespace Structures::Events::Action::Render
 	//! Scale
 	void ScaleAction::update(const float& value_percent, const SDL_FPoint& from, const SDL_FPoint& to)
 	{
-		target_object->config.scale = {
+		const auto it = target_object.lock();
+		it->config.scale = {
 			Utilities::Math::to_value(value_percent, from.x, to.x),
 			Utilities::Math::to_value(value_percent, from.y, to.y) };
 	}
 	ScaleAction::ScaleAction(const int64_t& start_time, const int64_t& end_time,
 		const Time::Easing::EasingFunctionType& easing,
-		Structures::Render::Object::Object* target_object,
+		std::weak_ptr<Structures::Render::Object::Object> target_object,
 		const float& from, const float& to, const std::vector<float>& sequence)
-		: RenderAction{ start_time, end_time, easing, target_object, {.x = from, .y = from }, {.x = to, .y = to } }
-	{
+		: RenderAction{ start_time, end_time, easing, std::move(target_object), {.x = from, .y = from }, {.x = to, .y = to } }
+	{const auto it = target_object.lock();
 		for (const auto& value : sequence)
 			this->sequence.push_back({ .x = value, .y = value });
 	}
-	ScaleAction::ScaleAction(Structures::Render::Object::Object* target_object, const OsuParser::Beatmap::Objects::Event::Commands::ScaleCommand& osu_scale)
+	ScaleAction::ScaleAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::ScaleCommand& osu_scale)
 		: ScaleAction(
-			osu_scale.startTime, osu_scale.endTime, osu_scale.easing, target_object,
+			osu_scale.startTime, osu_scale.endTime, osu_scale.easing, std::move(target_object),
 			{ .x = static_cast<float>(osu_scale.startScale), .y = static_cast<float>(osu_scale.startScale) },
 			{ .x = static_cast<float>(osu_scale.endScale), .y = static_cast<float>(osu_scale.endScale) })
 	{
@@ -94,9 +96,9 @@ namespace Structures::Events::Action::Render
 			sequence.push_back({ .x = static_cast<float>(value), .y = static_cast<float>(value) });
 	}
 
-	ScaleAction::ScaleAction(Structures::Render::Object::Object* target_object, const OsuParser::Beatmap::Objects::Event::Commands::VectorScaleCommand& osu_vector_scale)
+	ScaleAction::ScaleAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::VectorScaleCommand& osu_vector_scale)
 		: ScaleAction(
-			osu_vector_scale.startTime, osu_vector_scale.endTime, osu_vector_scale.easing, target_object,
+			osu_vector_scale.startTime, osu_vector_scale.endTime, osu_vector_scale.easing, std::move(target_object),
 			{ .x = static_cast<float>(osu_vector_scale.startXScale), .y = static_cast<float>(osu_vector_scale.startYScale) },
 			{ .x = static_cast<float>(osu_vector_scale.endXScale), .y = static_cast<float>(osu_vector_scale.endYScale) })
 	{
@@ -107,12 +109,13 @@ namespace Structures::Events::Action::Render
 	//! Rotation
 	void RotateAction::update(const float& value_percent, const float& from, const float& to)
 	{
-		target_object->config.angle = Utilities::Math::to_value(value_percent, from, to);
+		const auto it = target_object.lock();
+		it->config.angle = Utilities::Math::to_value(value_percent, from, to);
 	}
 
-	RotateAction::RotateAction(Structures::Render::Object::Object* target_object, const OsuParser::Beatmap::Objects::Event::Commands::RotateCommand& osu_rotate)
+	RotateAction::RotateAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::RotateCommand& osu_rotate)
 		: RotateAction(
-			osu_rotate.startTime, osu_rotate.endTime, osu_rotate.easing, target_object,
+			osu_rotate.startTime, osu_rotate.endTime, osu_rotate.easing, std::move(target_object),
 			Utilities::Math::radian_to_degree(osu_rotate.startRotate),
 			Utilities::Math::radian_to_degree(osu_rotate.endRotate))
 	{
@@ -123,14 +126,15 @@ namespace Structures::Events::Action::Render
 	//! Color
 	void ColorAction::update(const float& value_percent, const Color& from, const Color& to)
 	{
-		target_object->config.color.r = Utilities::Math::to_value(value_percent, from.r, to.r);
-		target_object->config.color.g = Utilities::Math::to_value(value_percent, from.g, to.g);
-		target_object->config.color.b = Utilities::Math::to_value(value_percent, from.b, to.b);
+		const auto it = target_object.lock();
+		it->config.color.r = Utilities::Math::to_value(value_percent, from.r, to.r);
+		it->config.color.g = Utilities::Math::to_value(value_percent, from.g, to.g);
+		it->config.color.b = Utilities::Math::to_value(value_percent, from.b, to.b);
 	}
 
-	ColorAction::ColorAction(Structures::Render::Object::Object* target_object, const OsuParser::Beatmap::Objects::Event::Commands::ColorCommand& osu_color)
+	ColorAction::ColorAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::ColorCommand& osu_color)
 		: ColorAction(
-			osu_color.startTime, osu_color.endTime, osu_color.easing, target_object,
+			osu_color.startTime, osu_color.endTime, osu_color.easing, std::move(target_object),
 			{ .r = static_cast<uint8_t>(osu_color.startR), .g = static_cast<uint8_t>(osu_color.startG), .b = static_cast<uint8_t>(osu_color.startB) },
 			{ .r = static_cast<uint8_t>(osu_color.endR), .g = static_cast<uint8_t>(osu_color.endG), .b = static_cast<uint8_t>(osu_color.endB) })
 	{
@@ -142,37 +146,44 @@ namespace Structures::Events::Action::Render
 	//! Parameter
 	void ParameterAction::save_previous()
 	{
-		previous.blend_mode = target_object->config.blend_mode;
-		previous.flip_mode = target_object->config.flip_mode;
+		if (target_object.expired()) return;
+		const auto it = target_object.lock();
+		if (!it) return;
+		
+		previous.blend_mode = it->config.blend_mode;
+		previous.flip_mode = it->config.flip_mode;
 	}
 	void ParameterAction::reset_to_previous() const
 	{
-		if (!target_object) return;
+		if (target_object.expired()) return;
+		const auto it = target_object.lock();
+		if (!it) return;
 
-		target_object->config.blend_mode = previous.blend_mode;
-		target_object->config.flip_mode = previous.flip_mode;
+		it->config.blend_mode = previous.blend_mode;
+		it->config.flip_mode = previous.flip_mode;
 	}
 	void ParameterAction::update(const float& value_percent, const Parameter& from, const Parameter& to)
 	{
+		const auto it = target_object.lock();
 		switch (to)
 		{
 		case Parameter::AdditiveColour:
-			target_object->config.blend_mode = SDL_BLENDMODE_ADD;
+			it->config.blend_mode = SDL_BLENDMODE_ADD;
 			break;
 		case Parameter::Horizontal:
-			target_object->config.flip_mode = SDL_FLIP_HORIZONTAL;
+			it->config.flip_mode = SDL_FLIP_HORIZONTAL;
 			break;
 		case Parameter::Vertical:
-			target_object->config.flip_mode = SDL_FLIP_VERTICAL;
+			it->config.flip_mode = SDL_FLIP_VERTICAL;
 			break;
 		}
 	}
 	void ParameterAction::on_next_sequence() { reset_to_previous(); }
 	void ParameterAction::on_finished() { reset_to_previous(); }
 	void ParameterAction::on_started() { save_previous(); }
-	ParameterAction::ParameterAction(Structures::Render::Object::Object* target_object, const OsuParser::Beatmap::Objects::Event::Commands::ParameterCommand& osu_parameter)
+	ParameterAction::ParameterAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::ParameterCommand& osu_parameter)
 		: ParameterAction(
-			osu_parameter.startTime, osu_parameter.endTime, osu_parameter.easing, target_object,
+			osu_parameter.startTime, osu_parameter.endTime, osu_parameter.easing, std::move(target_object),
 			static_cast<Parameter>(osu_parameter.parameter), static_cast<Parameter>(osu_parameter.parameter),
 			osu_parameter.sequence)
 	{

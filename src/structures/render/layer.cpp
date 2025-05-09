@@ -29,30 +29,60 @@ namespace Structures::Render::Layer
 		return -origin_point.convert_pos_to_origin(render_pos, { 0, 0 });
 	}
 	// ::Buffer
+	Layer::Buffer::Item Layer::Buffer::add(const std::weak_ptr<Object::Object>& object)
+	{
+		return { this, data.insert(data.end(), object) };
+	}
 	Layer::Buffer::Item Layer::Buffer::add(const std::weak_ptr<Object::Collection>& collection)
 	{
 		return { this, data.insert(data.end(), collection) };
 	}
-	void Layer::Buffer::destroy(Item& item)
-	{
-		item.destroy();
-	}
-	void Layer::Buffer::for_each_item(const std::function<void(std::shared_ptr<Object::Collection>& item)>& function)
+
+
+	void Layer::Buffer::remove(Item& item) { item.destroy(); }
+	void Layer::Buffer::for_each_item(
+		const std::function<void(std::shared_ptr<Object::Object>& object)>& object_function,
+		const std::function<void(std::shared_ptr<Object::Collection>& collection)>& collection_function)
 	{
 		if (data.empty()) return;
 
 		auto itr = data.begin();
 		while (itr != data.end())
 		{
-			if (itr->expired())
+			if (std::holds_alternative<std::weak_ptr<Object::Object>>(*itr))
 			{
-				itr = data.erase(itr);
-				continue;
+				auto& weak = std::get<std::weak_ptr<Object::Object>>(*itr);
+				if (weak.expired())
+				{
+					itr = data.erase(itr);
+					continue;
+				}
+				auto shared = weak.lock();
+				if (!shared)
+				{
+					itr = data.erase(itr);
+					continue;
+				}
+				object_function(shared);
+				++itr;
 			}
-
-			auto it = itr->lock();
-			function(it);
-			++itr;
+			else if (std::holds_alternative<std::weak_ptr<Object::Collection>>(*itr))
+			{
+				auto& weak = std::get<std::weak_ptr<Object::Collection>>(*itr);
+				if (weak.expired())
+				{
+					itr = data.erase(itr);
+					continue;
+				}
+				auto shared = weak.lock();
+				if (!shared)
+				{
+					itr = data.erase(itr);
+					continue;
+				}
+				collection_function(shared);
+				++itr;
+			}
 		}
 	}
 	// ::Buffer::Item
@@ -63,6 +93,21 @@ namespace Structures::Render::Layer
 			parent->data.erase(item);
 			item = parent->data.end();
 		}
+	}
+	bool Layer::Buffer::Item::is_valid() const
+	{
+		if (!(parent && item != parent->data.end())) return false;
+		if (std::holds_alternative<std::weak_ptr<Object::Object>>(*item))
+		{
+			if (const auto& weak = std::get<std::weak_ptr<Object::Object>>(*item);
+				weak.expired() || !weak.lock()) return false;
+		}
+		else if (std::holds_alternative<std::weak_ptr<Object::Collection>>(*item))
+		{
+			if (const auto& weak = std::get<std::weak_ptr<Object::Collection>>(*item);
+				weak.expired() || !weak.lock()) return false;
+		}
+		return true;
 	}
 	Layer::Buffer::Item::Item(Buffer* render_buffer) :
 		parent(render_buffer), item(render_buffer->data.end())
@@ -124,7 +169,9 @@ namespace Structures::Render::Layer
 	void Layer::render()
 	{
 		if (!visible) return;
-		render_buffer.for_each_item([&](std::shared_ptr<Object::Collection>& item) {	render_collection(item); });
+		render_buffer.for_each_item(
+			[&](std::shared_ptr<Object::Object>& item) { render_object(item); },
+			[&](std::shared_ptr<Object::Collection>& item) { render_collection(item); });
 	}
 	Layer::Layer(const SDL_FPoint& camera_origin_in_percent)
 		: render_buffer(this),
@@ -136,11 +183,9 @@ namespace Structures::Render::Layer
 			})
 	{
 	}
-	void Layer::reset(const bool reset_camera)
+	void Layer::clear()
 	{
 		render_buffer.data.clear();
-		if (reset_camera)
-			camera = Camera();
 	}
 
 	//! TextureLayer
@@ -174,9 +219,9 @@ namespace Structures::Render::Layer
 		render_no_change_back_target();
 		SDL_SetRenderTarget(target_texture.memory->renderer, current_target);
 	}
-	void TextureLayer::reset(const bool reset_camera)
+	void TextureLayer::clear()
 	{
-		Layer::reset(reset_camera);
+		Layer::clear();
 		target_texture.clear();
 	}
 	TextureLayer::TextureLayer(Memory::Item texture,

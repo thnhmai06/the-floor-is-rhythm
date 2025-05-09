@@ -26,6 +26,15 @@ namespace Structures::Events::Action
 		}
 	}
 
+	//! CallbackAction
+	void CallbackAction::execute(const int64_t& current_time)
+	{
+		if (!is_valid(current_time)) return;
+		if (!started) started = true;
+		if (callback) callback(current_time);
+		if (current_time >= end_time) finished = true;
+	}
+
 	//! LoopAction
 	const Buffer::CONTAINER& LoopAction::get_callbacks() const { return callbacks; }
 	Buffer::CONTAINER::iterator LoopAction::add(std::shared_ptr<Action> callback)
