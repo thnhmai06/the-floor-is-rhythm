@@ -10,13 +10,19 @@ namespace Structures::Screen::Gameplay::KeyStroke
 
 		struct KeyCounter
 		{
+		protected:
 			SDL_Scancode target;
 			unsigned long count = 0;
 			uint8_t recently_pressed_num = 0;
 			bool is_hold = false;
 
+		public:
+			void make_virtual_event(bool count = true, bool is_hold = false);
 			void update(const KeyboardEvents& events);
-			void reset();
+			[[nodiscard]] const uint8_t& get_recently_pressed_num() const;
+			[[nodiscard]] const unsigned long& get_count() const;
+			[[nodiscard]] const bool& get_is_hold() const;
+			void reset(bool only_recently_pressed_num = false);
 
 			explicit KeyCounter(const SDL_Scancode& target);
 		};
@@ -28,7 +34,7 @@ namespace Structures::Screen::Gameplay::KeyStroke
 			KeyCounter r1{ Config::UserConfig::KeyBinding::r1 };
 			KeyCounter r2{ Config::UserConfig::KeyBinding::r2 };
 
-			void reset();
+			void reset(bool only_recently_pressed_num = false);
 			void update(const KeyboardEvents& events);
 
 			[[nodiscard]] uint16_t get_recently_pressed_left() const;

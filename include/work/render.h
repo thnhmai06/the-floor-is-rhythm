@@ -7,5 +7,5 @@ namespace Work::Render
 
 	void init(SDL_Window* window);
 	void clean();
-	int32_t work(SDL_Window* window);
+	int32_t work();
 }

@@ -24,16 +24,35 @@ namespace Structures::Screen::Gameplay
 		Structures::Audio::Bus<Types::Audio::Music>::resume();
 		system.timer.resume();
 	}
-	void PlayingScreen::Logic::update_input(const Events::Event::Input::SdlEvents& events)
+	void PlayingScreen::Logic::update_input(const int64_t& current_time, const Events::Event::Input::SdlEvents& events)
 	{
 		// Keystroke
 		Events::Event::Input::KeyboardEvents keyboard_events{};
-		for (const auto& event : events)
+		if (playing_screen->auto_play)
 		{
-			if (event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_KEY_UP)
-				keyboard_events.push_back(event.key);
+			system.key_stroke.reset(true);
+			if (const auto& r_scripts = *playing_screen->render.mapset->get_render_scripts(); 
+				current.object_script != r_scripts.end())
+			{
+				if (const auto& [time, object] = *current.object_script; 
+					time <= current_time)
+				{
+					if (object.is_kat)
+						system.key_stroke.r1.make_virtual_event(true);
+					else
+						system.key_stroke.l1.make_virtual_event(true);
+				}
+			}
 		}
-		system.key_stroke.update(keyboard_events);
+		else
+		{
+			for (const auto& event : events)
+			{
+				if (event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_KEY_UP)
+					keyboard_events.push_back(event.key);
+			}
+			system.key_stroke.update(keyboard_events);
+		}
 
 		playing_screen->event_buffer.clear();
 	}
@@ -109,7 +128,7 @@ namespace Structures::Screen::Gameplay
 
 		const auto current_time = system.timer.get_time();
 
-		update_input(events);
+		update_input(current_time, events);
 		auto click_left = system.key_stroke.get_recently_pressed_left();
 		auto click_right = system.key_stroke.get_recently_pressed_right();
 
@@ -207,9 +226,9 @@ namespace Structures::Screen::Gameplay
 		const std::filesystem::path& mapset_path,
 		const float& mod_multiplier,
 		const bool load_storyboard,
-		const bool no_fail)
+		const bool no_fail, const bool auto_play)
 		: mapset(std::make_unique<const Game::Beatmap::Mapset>(mapset_path, load_storyboard)),
-		mod_multiplier(mod_multiplier), no_fail(no_fail),
+		mod_multiplier(mod_multiplier), no_fail(no_fail), auto_play(auto_play),
 		logic(this, &this->mod_multiplier, &this->no_fail),
 		render(this, *Work::Render::Textures::skin, load_storyboard),
 		audio(this, mapset_path.parent_path(),

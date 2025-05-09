@@ -19,6 +19,7 @@ namespace Structures::Screen::Gameplay
 		std::unique_ptr<const Game::Beatmap::Mapset> mapset;
 		float mod_multiplier = 1.0f;
 		bool no_fail = false;
+		bool auto_play = false;
 		Events::Event::Buffer event_buffer;
 		Events::Action::Buffer action_buffer;
 
@@ -31,7 +32,7 @@ namespace Structures::Screen::Gameplay
 			bool is_started = false;
 
 		private:
-			void update_input(const Events::Event::Input::SdlEvents& events);
+			void update_input(const int64_t& current_time, const Events::Event::Input::SdlEvents& events);
 			void update_render(const int64_t& current_time) const;
 			void update_timing(const int64_t& current_time);
 			bool update_score_and_health(const Types::Game::Gameplay::NoteScore& obj_score);
@@ -107,6 +108,6 @@ namespace Structures::Screen::Gameplay
 				Structures::Audio::EffectMemory* memory_effect);
 		} audio;
 
-		explicit PlayingScreen(const std::filesystem::path& mapset_path, const float& mod_multiplier, bool load_storyboard, bool no_fail);
+		explicit PlayingScreen(const std::filesystem::path& mapset_path, const float& mod_multiplier, bool load_storyboard, bool no_fail, bool auto_play = false);
 	};
 }

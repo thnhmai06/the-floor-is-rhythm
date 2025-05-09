@@ -25,7 +25,7 @@ namespace Work::Render
 		Core::CleanUp::renderer(renderer);
 	}
 
-	int32_t work(SDL_Window* window)
+	int32_t work()
 	{
 		const std::filesystem::path skin_path = "./assets";
 		int32_t result = EXIT_SUCCESS;
@@ -35,7 +35,7 @@ namespace Work::Render
 		Textures::skin->load(skin_path, skin_path, true, false);
 		Screen::playing_screen = std::make_unique<Screen::Gameplay::PlayingScreen>
 			(R"(D:\1511778 Camellia - Body F10ating in the Zero Gravity Space\Camellia - Body F10ating in the Zero Gravity Space (Orange_) [Nonsubmersible].tfd)", 
-				1, true, true);
+				1, true, true, true);
 
 		SDL_Event event;
 		while (is_running)
