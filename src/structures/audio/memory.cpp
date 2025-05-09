@@ -72,12 +72,13 @@ namespace Structures::Audio
 	}
 
 	//::
-	EffectMemory::Item EffectMemory::get(const std::string& name)
+	EffectMemory::Item EffectMemory::find(const std::string& name, const bool no_log_not_found)
 	{
 		if (const auto& it = data.find(name); it != data.end())
 		{
 			return Item{ this, it };
 		}
+		if (!no_log_not_found) LOG_ERROR(Logging::Exceptions::SDLExceptions::Audio::SDL_Audio_NotFound(name));
 		return Item{ nullptr, data.end() };
 	}
 	void EffectMemory::free(const std::string& name)

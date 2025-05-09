@@ -7,8 +7,9 @@ namespace Structures::Events::Time
 {
 	struct Timer
 	{
-	protected:
 		std::function<Uint64()> get_current_tick;
+
+	protected:
 		Uint64 start_tick = 0;
 		Uint64 total_paused_ticks = 0;
 		Uint64 paused_tick = 0;

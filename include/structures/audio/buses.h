@@ -13,26 +13,28 @@ namespace Structures::Audio
 	struct Bus<Music>
 	{
 	protected:
-		float volume;
+		float volume = 1.0f;
+		MusicMemory::Item current;
 
 	public:
 		[[nodiscard]] float get_volume() const;
 		float set_volume(float percent);
-		static void play(const MusicMemory::Item& music);
+		void play(const MusicMemory::Item& music);
+		const MusicMemory::Item& get_current() const;
+		int64_t get_position() const;
+		static void seek(const int64_t& new_pos);
 		static bool has_song_playing();
 		static bool is_playing();
 		static void pause();
 		static void resume();
-		static void stop();
-
-		explicit Bus(const float& volume);
+		void stop();
 	};
 
 	template<>
 	struct Bus<Effect>
 	{
 	protected:
-		float volume;
+		float volume = 1.0f;
 
 	public:
 		[[nodiscard]] float get_volume() const;
@@ -42,8 +44,6 @@ namespace Structures::Audio
 		float set_volume(const EffectMemory::Item& sound, float percent) const;
 		float set_volume(const int& channel, float percent) const;
 		int play(const EffectMemory::Item& sound, const std::optional<float>& volume = std::nullopt) const;
-
-		explicit Bus(const float& volume);
 	};
 
 	/*struct EffectManager

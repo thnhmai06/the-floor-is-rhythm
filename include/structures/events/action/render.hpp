@@ -13,18 +13,17 @@ namespace Structures::Events::Action::Render
 	template <typename ValueType>
 	struct RenderAction : Action {
 	private:
-		[[nodiscard]] double get_current_value_percent(const int64_t& current_time) const {
-			return Time::Easing::get_easing_function(easing)(
-				Utilities::Math::to_percent(
-					current_time,
-					get_time_in_this_sequence(start_time),
-					get_time_in_this_sequence(end_time)));
-		}
+		[[nodiscard]] double get_current_value_percent(const int64_t& current_time) const
+		{
+			const auto [start, end] = get_sequence_time();
 
+			return Time::Easing::get_easing_function(easing)(
+				Utilities::Math::to_percent(current_time, start, end));
+		}
 		bool next_sequence()
 		{
-			if (current_sequence >= static_cast<long>(sequence.size()) - 1)
-				return false;
+			if (current_sequence >= static_cast<long>(sequence.size()) - 1) return false;
+
 			++current_sequence;
 			on_next_sequence();
 			return true;
@@ -45,7 +44,7 @@ namespace Structures::Events::Action::Render
 				on_started();
 			}
 			const auto value_percent = get_current_value_percent(current_time);
-			const auto [crr_from, crr_to] = get_value_in_this_sequence();
+			const auto [crr_from, crr_to] = get_current_value();
 			update(value_percent, crr_from, crr_to);
 		}
 
@@ -70,56 +69,66 @@ namespace Structures::Events::Action::Render
 			this->start_time = start_time;
 			const auto base_end = end_time;
 			const auto base_duration = base_end - start_time;
-			const auto segments = static_cast<int64_t>(sequence.size()) + 1;
-			this->end_time = start_time + base_duration * segments;
+			const auto n = static_cast<int64_t>(sequence.size());
+			this->end_time = start_time + base_duration * (n + 1);
 		}
 
 		RenderAction() = default;
 
-		void execute(const int64_t& current_time) final {
-			if (current_time <= get_time_in_this_sequence(end_time)) 
-			{
+		void execute(const int64_t& current_time) final
+		{
+			if (auto sequence_time = get_sequence_time(); 
+				current_time <= sequence_time.second)
 				work(current_time);
-			}
 			else {
-				while (get_time_in_this_sequence(end_time) < current_time) 
+				while (sequence_time.second < current_time)
 				{
-					if (!next_sequence()) 
+					if (next_sequence()) 
 					{
-						work(get_time_in_this_sequence(end_time));
+						sequence_time = get_sequence_time();
+						work(current_time);
+					} else
+					{
+						work(current_time);
 						finished = true;
 						on_finished();
 						return;
 					}
-					work(current_time);
+					
 				}
 			}
 		}
 
 		[[nodiscard]] bool is_valid(const int64_t& current_time) const override
 		{
-			return !finished && !target_object.expired() && target_object.lock() && (get_time_in_this_sequence(start_time) <= current_time);
+			return !finished && !target_object.expired() && target_object.lock() && (start_time <= current_time);
 		}
 
-		[[nodiscard]] int64_t get_time_in_this_sequence(const int64_t& time) const
+		[[nodiscard]] std::pair<int64_t, int64_t> get_sequence_time() const
 		{
-			const auto segment_duration = end_time - start_time;
-			const auto max_segment = static_cast<long>(sequence.size());
-			const auto seg_index = std::clamp(current_sequence + 1, 0L, max_segment);
-			return time + segment_duration * seg_index;
+			const auto n = static_cast<long>(sequence.size());
+			if (n == 0) return { start_time, end_time };
+
+			const auto one_sequence_duration = (end_time - start_time) / (n + 1);
+			const auto seg_index = std::clamp(current_sequence + 1, 0L, n);
+			return { start_time + one_sequence_duration * seg_index, start_time + one_sequence_duration * (seg_index + 1) };
 		}
 
-		[[nodiscard]] std::pair<ValueType, ValueType> get_value_in_this_sequence() {
-			if (sequence.empty() || current_sequence < 0)
-				return { from, to };
-
+		[[nodiscard]] std::pair<ValueType, ValueType> get_current_value()
+		{
 			const auto n = static_cast<long>(sequence.size());
-			if (current_sequence < 1)
+
+			if (current_sequence < 0)
+				return { from, to };
+			if (current_sequence == 0)
 				return { to, sequence[0] };
+			if (current_sequence == 1)
+				return { sequence[0], sequence[1] };
 			if (current_sequence >= n)
 				return { sequence[n - 2], sequence[n - 1] };
 			return { sequence[current_sequence - 1], sequence[current_sequence] };
 		}
+
 	};
 
 	//! Fade

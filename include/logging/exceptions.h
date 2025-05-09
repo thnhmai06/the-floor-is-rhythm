@@ -42,6 +42,10 @@ namespace Logging::Exceptions::SDLExceptions
 		{
 			explicit SDL_Texture_Render_Failed(const std::string& name) : SDL_Exception(format("Couldn't render texture: {}", name)) {}
 		};
+		struct SDL_Texture_NotFound : SDL_Exception
+		{
+			explicit SDL_Texture_NotFound(const std::string& name) : SDL_Exception(format("Texture not found: {}", name)) {}
+		};
 	}
 	namespace Audio
 	{
@@ -64,6 +68,14 @@ namespace Logging::Exceptions::SDLExceptions
 		struct SDL_Audio_PlayEffect_Failed : SDL_Exception
 		{
 			explicit SDL_Audio_PlayEffect_Failed(const std::string& name) : SDL_Exception(format("Couldn't play Effect: {}", name)) {}
+		};
+		struct SDL_Audio_NotFound : std::runtime_error
+		{
+			explicit SDL_Audio_NotFound(const std::string& name) : std::runtime_error(format("Audio not found: {}", name)) {}
+		};
+		struct SDL_Audio_SetMusicPosition_Failed : SDL_Exception
+		{
+			explicit SDL_Audio_SetMusicPosition_Failed(double new_pos_sec) : SDL_Exception(format("Couldn't set music to position: {}", new_pos_sec)) {}
 		};
 	}
 }

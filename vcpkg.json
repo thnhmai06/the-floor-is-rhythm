@@ -1,6 +1,5 @@
 {
   "dependencies": [
-    "ffmpeg",
     "sdl3",
     {
       "name": "sdl3-image",
@@ -11,7 +10,6 @@
         "webp"
       ]
     },
-    "sdl3-ttf",
     "spdlog",
     "bit7z"
   ]

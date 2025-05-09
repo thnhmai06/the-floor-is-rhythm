@@ -52,7 +52,7 @@ namespace Structures::Render::Texture
 			const std::unordered_set<std::string>& only_in = {});
 		[[nodiscard]] static SDL_FPoint get_texture_size(const CONTAINER::const_iterator& texture);
 		[[nodiscard]] SDL_FPoint get_texture_size(const std::string& name) const;
-		[[nodiscard]] Item find(const std::string& name) const;
+		[[nodiscard]] Item find(const std::string& name, bool no_log_not_found = false) const;
 		Item create_new(const std::string& name, const SDL_Point& size, bool override = true);
 		CONTAINER::iterator rename_texture(const std::string& old_name, const std::string& new_name);
 		CONTAINER::iterator move_texture(const std::string& name, Memory& to_memory);

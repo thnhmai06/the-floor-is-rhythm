@@ -6,4 +6,4 @@
 	url = https://github.com/thnhmai06/SDL_mixer-build.git
 [submodule "dependencies/easing"]
 	path = dependencies/easing
-	url = https://github.com/nicolausYes/easing-functions.git
+	url = https://github.com/thnhmai06/easing-functions.git

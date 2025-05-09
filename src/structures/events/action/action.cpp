@@ -18,9 +18,10 @@ namespace Structures::Events::Action
 		auto it = data.begin();
 		while (it != first_not_execute_item)
 		{
-			const auto& callback = it->second;
-			callback->execute(current_time);
-			if (callback->finished)
+			const auto& action = it->second;
+
+			action->execute(current_time);
+			if (action->finished)
 				it = data.erase(it);
 			else ++it;
 		}
@@ -39,7 +40,7 @@ namespace Structures::Events::Action
 	const Buffer::CONTAINER& LoopAction::get_callbacks() const { return callbacks; }
 	Buffer::CONTAINER::iterator LoopAction::add(std::shared_ptr<Action> callback)
 	{
-		end_time = std::max(end_time, callback->end_time);
+		end_time = std::max(end_time,  start_time + (callback->end_time) * loop_count);
 		return callbacks.emplace(callback->start_time, std::move(callback));
 	}
 	void LoopAction::add(const Buffer::CONTAINER& callbacks)
@@ -56,14 +57,14 @@ namespace Structures::Events::Action
 		if (finished || current_time < start_time) return;
 
 		started = true;
-		const auto duration = end_time - start_time;
+		const auto duration = (end_time - start_time) / loop_count;
 		for (uint32_t count = 1; count <= loop_count; ++count)
 		{
 			for (const auto& callback : callbacks | std::views::values)
 			{
 				auto new_callback = std::make_shared<Action>(*callback);
-				new_callback->start_time += start_time + (count - 1) * duration;
-				new_callback->end_time += start_time + (count - 1) * duration;
+				new_callback->start_time = start_time + callback->start_time + duration * (count - 1);
+				new_callback->end_time = start_time + callback->end_time + duration * (count - 1);
 
 				target->emplace(new_callback->start_time, std::move(new_callback));
 			}

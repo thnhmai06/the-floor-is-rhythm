@@ -178,7 +178,7 @@ namespace Structures::Events::Action::Render
 			break;
 		}
 	}
-	void ParameterAction::on_next_sequence() { reset_to_previous(); }
+	void ParameterAction::on_next_sequence() { }
 	void ParameterAction::on_finished() { reset_to_previous(); }
 	void ParameterAction::on_started() { save_previous(); }
 	ParameterAction::ParameterAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::ParameterCommand& osu_parameter)

@@ -6,6 +6,7 @@
 #include "logging/logger.h"
 #include "structures/screen/gameplay.h"
 #include "structures/events/event/input.h"
+#include "work/audio.h"
 #include "work/screen.h"
 #include "work/render/layer.h"
 #include "work/render/textures.h"
@@ -33,6 +34,7 @@ namespace Work::Render
 		//try
 		//{
 		Textures::skin->load(skin_path, skin_path, true, false);
+		Audio::Memory::Skin::effect.load(skin_path, skin_path, false);
 		Screen::playing_screen = std::make_unique<Screen::Gameplay::PlayingScreen>
 			(R"(D:\1511778 Camellia - Body F10ating in the Zero Gravity Space\Camellia - Body F10ating in the Zero Gravity Space (Orange_) [Nonsubmersible].tfd)", 
 				1, true, true, true);
@@ -69,7 +71,7 @@ namespace Work::Render
 			//SPDLOG_DEBUG("Render Latency: {}ms", render_latency);
 
 			const auto update_latency = Utilities::Time::get_duration<std::chrono::milliseconds>(previous_update_time);
-			SPDLOG_DEBUG("Update Latency: {}ms", update_latency);
+			if (update_latency > 20) SPDLOG_WARN("Update Latency: {}ms is very high!", update_latency);
 		}
 		//} catch (...) {
 		//	is_running = false;

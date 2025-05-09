@@ -110,21 +110,32 @@ namespace Work::Convert::osu
 		{
 			const double one_slide_time = (object.EndTime.value() - object.Time) / object.SliderParameters.value().Slides;
 			double current_time = object.Time;
-			for (int32_t slide = 1; slide <= object.SliderParameters.value().Slides; ++slide, current_time += one_slide_time)
+			for (int32_t slide = 0; slide <= object.SliderParameters.value().Slides; ++slide, current_time += one_slide_time)
 			{
+				using Objects::TimingPoint::HitSampleType;
+
 				Floor floor;
 				floor.time = std::round(current_time);
-				if ((slide == 1 && object.Type.IsNewCombo) || slide > 1)
+				if ((slide == 0 && object.Type.IsNewCombo) || slide >= 1)
 					current_from_right = !current_from_right;
 				floor.is_kat = current_from_right;
-				if (slide == 1)
+				if (slide == 0)
 				{
 					floor.hit_sound = object.Hitsound;
 					floor.hit_sample = object.Hitsample;
-				} else
+
+					const auto& custom = object.SliderParameters.value().edgeHitsounds[slide];
+					// is custom
+					if (custom.Sound.ToInt() != 0 || custom.Sample.NormalSet != HitSampleType::NO_CUSTOM || custom.Sample.AdditionSet != HitSampleType::NO_CUSTOM)
+					{
+						floor.second_hit_sound.emplace() = object.SliderParameters.value().edgeHitsounds[slide].Sound;
+						floor.second_hit_sample.emplace() = Structures::Game::Beatmap::Hitsound::HitSample{ object.SliderParameters.value().edgeHitsounds[slide].Sample, object.Hitsample };
+					}
+				}
+				else
 				{
-					floor.hit_sound = object.SliderParameters.value().edgeHitsounds[slide - 1].Sound;
-					floor.hit_sample = object.SliderParameters.value().edgeHitsounds[slide - 1].Sample;
+					floor.hit_sound = object.SliderParameters.value().edgeHitsounds[slide].Sound;
+					floor.hit_sample = Structures::Game::Beatmap::Hitsound::HitSample{ object.SliderParameters.value().edgeHitsounds[slide].Sample, object.Hitsample };
 				}
 				res.push_back(std::move(floor));
 			}

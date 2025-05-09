@@ -18,15 +18,16 @@ namespace Structures::Audio
 	// ::Mixer
 	void Mixer::quit() { Mix_Quit(); }
 	Mixer::Mixer(const SDL_AudioSpec& spec, const float& master_volume, const float& music_volume,
-		const float& effects_volume, const int32_t& max_channels) : spec(spec), music(music_volume), effect(effects_volume)
+		const float& effects_volume, const int32_t& max_channels) : spec(spec)
 	{
 		Mix_Init(0xff);
-		Mix_AllocateChannels(max_channels);
-
 		if (!Mix_OpenAudio(0, &spec))
 			THROW_CRITICAL(Logging::Exceptions::SDLExceptions::Audio::SDL_Audio_CreateMixer_Failed());
 
+		Mix_AllocateChannels(max_channels);
 		set_volume(master_volume);
+		music.set_volume(music_volume);
+		effect.set_volume(effects_volume);
 	}
 	Mixer::~Mixer() { quit(); }
 }

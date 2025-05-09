@@ -43,7 +43,7 @@ namespace Structures::Screen::Gameplay::Mapset
 		{
 			using Utilities::Math::FPoint::operator*;
 			using Utilities::Math::FPoint::operator-;
-			right->offset = - offset * 2; // trừ bù
+			right->offset = -offset * 2; // trừ bù
 		}
 		const Mapset::RenderScripts* Mapset::get_render_scripts() const
 		{
@@ -57,13 +57,18 @@ namespace Structures::Screen::Gameplay::Mapset
 
 			if (render_script.empty()) return;
 
-			const auto& begin_script = render_script.lower_bound(begin_time)->second;
+			auto begin_item = render_script.lower_bound(begin_time);
 			auto end_item = render_script.upper_bound(end_time);
-			if (end_item != render_script.begin()) --end_item;
-			const auto& end_script = end_item->second;
+			if (end_item == render_script.end()) end_item = Utilities::Container::get_last_element_iterator(render_script);
+			else if (end_item != render_script.begin()) --end_item;
 
 			left->render_range.clear();
 			right->render_range.clear();
+
+			if (begin_item == render_script.end()) return;
+			const auto& begin_script = begin_item->second;
+			const auto& end_script = end_item->second;
+
 			left->render_range.emplace_back(begin_script.left_index, end_script.left_index);
 			right->render_range.emplace_back(begin_script.right_index, end_script.right_index);
 		}
@@ -81,7 +86,7 @@ namespace Structures::Screen::Gameplay::Mapset
 
 			for (const auto& obj : mapset.hit_objects.data | std::views::values)
 			{
-				SDL_FPoint pos = { timing_points->get_object_pos(obj.time), 0};
+				SDL_FPoint pos = { timing_points->get_object_pos(obj.time), 0 };
 				if (!obj.is_kat) pos.x *= -1;
 				auto r_obj = std::make_shared<Components::Floor>(&obj, memory, pos);
 
@@ -91,7 +96,7 @@ namespace Structures::Screen::Gameplay::Mapset
 					right->data.emplace_back(r_obj);
 					render_script.emplace_hint(
 						Utilities::Container::get_last_element_iterator(render_script),
-						obj.time, RenderScript{.r_obj = r_obj, .is_kat = obj.is_kat,
+						obj.time, RenderScript{ .r_obj = r_obj, .is_kat = obj.is_kat,
 							.left_index = left_index,
 							.right_index = right->data.size() - 1 });
 				}
@@ -101,7 +106,7 @@ namespace Structures::Screen::Gameplay::Mapset
 					left->data.emplace_back(r_obj);
 					render_script.emplace_hint(
 						Utilities::Container::get_last_element_iterator(render_script),
-						obj.time, RenderScript{.r_obj = r_obj, .is_kat = obj.is_kat,
+						obj.time, RenderScript{ .r_obj = r_obj, .is_kat = obj.is_kat,
 							.left_index = left->data.size() - 1,
 							.right_index = right_index });
 				}

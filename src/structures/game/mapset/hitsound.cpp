@@ -69,15 +69,9 @@ namespace Structures::Game::Beatmap::Hitsound
 		file_name = hs.Filename;
 		return *this;
 	}
-	HitSample& HitSample::operator=(const OsuParser::Beatmap::Objects::HitObject::HitObject::SliderParams::EdgeHitsound::SampleSet& hs)
-	{
-		normal_set = to_floor_hit_sample(hs.NormalSet);
-		addition_set = to_floor_hit_sample(hs.AdditionSet);
-		return *this;
-	}
 	std::pair<SampleSetType, HitSampleType>
 		HitSample::get_used_sample_set(
-			const HitSoundType& hit_sound_type, 
+			const HitSoundType& hit_sound_type,
 			const HitSampleType& timing_sample_type,
 			const HitSampleType& mapset_sample_type) const
 	{
@@ -162,6 +156,18 @@ namespace Structures::Game::Beatmap::Hitsound
 		if (list.size() > 4) file_name = list[4];
 	}
 
+	HitSample::HitSample(
+		const OsuParser::Beatmap::Objects::HitObject::HitObject::SliderParams::EdgeHitsound::SampleSet& slide_hs, 
+		const OsuParser::Beatmap::Objects::HitObject::HitSample& slider_hs)
+	{
+		using OsuParser::Beatmap::Objects::TimingPoint::HitSampleType;
+
+		if (slide_hs.NormalSet == HitSampleType::NO_CUSTOM && slide_hs.AdditionSet == HitSampleType::NO_CUSTOM) 
+			*this = slider_hs;
+		normal_set = to_floor_hit_sample(slide_hs.NormalSet);
+		addition_set = to_floor_hit_sample(slide_hs.AdditionSet);
+	}
+
 	/*size_t HitSample::operator()(const HitSample& hs) const
 	{
 		const auto normal_hash = std::hash<uint8_t>()(static_cast<uint8_t>(normal_set));
@@ -186,7 +192,8 @@ namespace Structures::Game::Beatmap::Hitsound
 	}
 	std::string get_hit_sound_filename(
 		const HitSoundType& hit_sound_type, const HitSample& hit_sample,
-		const TimingSample& timing_sample, const HitSampleType& mapset_sample)
+		const TimingSample& timing_sample, const HitSampleType& mapset_sample,
+		const Audio::EffectMemory& beatmap_effect)
 	{
 		if (!hit_sample.file_name.empty())
 		{
@@ -199,21 +206,37 @@ namespace Structures::Game::Beatmap::Hitsound
 		const auto [used_sample_set, used_hit_sample] = 
 			hit_sample.get_used_sample_set(
 				hit_sound_type, timing_sample.set, mapset_sample);
-		return get_hit_sound_filename(hit_sound_type, used_hit_sample, hit_sample.index);
+
+		std::string res{};
+		if (hit_sample.index == 0)
+		{
+			res = get_hit_sound_filename(hit_sound_type, used_hit_sample, timing_sample.index);
+			if (beatmap_effect.data.contains(res))
+				return res;
+		}
+		res = get_hit_sound_filename(hit_sound_type, used_hit_sample, hit_sample.index);
+		return res;
 	}
 	std::vector<std::string> get_hit_sound_filename(
 		const HitSound& hit_sound, const HitSample& hit_sample, 
-		const TimingSample& timing_sample, const HitSampleType& mapset_sample)
+		const TimingSample& timing_sample, const HitSampleType& mapset_sample,
+		const Audio::EffectMemory& beatmap_effect)
 	{
 		std::vector<std::string> result;
 		if (hit_sound.normal)
-			result.push_back(get_hit_sound_filename(HitSoundType::Normal, hit_sample, timing_sample, mapset_sample));
+			result.push_back(get_hit_sound_filename(HitSoundType::Normal, hit_sample, timing_sample, mapset_sample, beatmap_effect));
 		if (hit_sound.whistle)
-			result.push_back(get_hit_sound_filename(HitSoundType::Whistle, hit_sample, timing_sample, mapset_sample));
+			result.push_back(get_hit_sound_filename(HitSoundType::Whistle, hit_sample, timing_sample, mapset_sample, beatmap_effect));
 		if (hit_sound.finish)
-			result.push_back(get_hit_sound_filename(HitSoundType::Finish, hit_sample, timing_sample, mapset_sample));
+			result.push_back(get_hit_sound_filename(HitSoundType::Finish, hit_sample, timing_sample, mapset_sample, beatmap_effect));
 		if (hit_sound.clap)
-			result.push_back(get_hit_sound_filename(HitSoundType::Clap, hit_sample, timing_sample, mapset_sample));
+			result.push_back(get_hit_sound_filename(HitSoundType::Clap, hit_sample, timing_sample, mapset_sample, beatmap_effect));
 		return result;
+	}
+	uint8_t get_hit_sample_volume(const HitSample& hit_sample, const TimingSample& timing_sample)
+	{
+		if (hit_sample.volume == 0)
+			return timing_sample.volume;
+		return hit_sample.volume;
 	}
 }

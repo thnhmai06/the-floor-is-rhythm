@@ -91,8 +91,9 @@ namespace Structures::Screen::Gameplay
 		{
 			PlayingScreen* playing_screen;
 			Structures::Audio::Mixer* mixer;
-			Structures::Audio::MusicMemory* memory_music;
-			Structures::Audio::EffectMemory* memory_effect;
+			Structures::Audio::MusicMemory* beatmap_music;
+			Structures::Audio::EffectMemory* beatmap_effect;
+			Structures::Audio::EffectMemory* skin_effect;
 
 			void check_and_play_sound(
 				const int64_t& current_time,
@@ -104,8 +105,9 @@ namespace Structures::Screen::Gameplay
 			explicit Audio(PlayingScreen* playing_screen,
 				const std::filesystem::path& mapset_root,
 				Structures::Audio::Mixer* mixer,
-				Structures::Audio::MusicMemory* memory_music,
-				Structures::Audio::EffectMemory* memory_effect);
+				Structures::Audio::MusicMemory* beatmap_music,
+				Structures::Audio::EffectMemory* beatmap_effect,
+				Structures::Audio::EffectMemory* skin_effect);
 		} audio;
 
 		explicit PlayingScreen(const std::filesystem::path& mapset_path, const float& mod_multiplier, bool load_storyboard, bool no_fail, bool auto_play = false);

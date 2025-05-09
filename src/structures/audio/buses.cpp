@@ -11,10 +11,11 @@ namespace Structures::Audio
 	float Bus<Music>::get_volume() const { return volume; }
 	float Bus<Music>::set_volume(float percent)
 	{
-		if (percent < 0) percent = 0;
-		else if (percent > 1) percent = 1;
+		percent = std::clamp(percent, 0.0f, 1.0f);
 
 		volume = percent;
+
+		// Hiện tại set volume music của SDL đang bị lỗi
 		return Utilities::Math::to_percent(
 			Mix_VolumeMusic(
 				Utilities::Math::to_value(percent, 0, MIX_MAX_VOLUME)),
@@ -25,15 +26,36 @@ namespace Structures::Audio
 		if (!music.parent || music.item == music.parent->items.end()) return;
 
 		if (has_song_playing()) stop();
-		if (!Mix_PlayMusic(music.item->second, -1))
+		if (!Mix_PlayMusic(music.item->second, 0))
+		{
 			LOG_ERROR(Logging::Exceptions::SDLExceptions::Audio::SDL_Audio_PlayMusic_Failed(music.item->first));
+			return;
+		}
+		current = music;
+	}
+	const MusicMemory::Item& Bus<Music>::get_current() const
+	{
+		return current;
+	}
+	int64_t Bus<Music>::get_position() const
+	{
+		return static_cast<int64_t>(std::round(Mix_GetMusicPosition(current.item->second) * 1000.0));
+	}
+	void Bus<Music>::seek(const int64_t& new_pos)
+	{
+		if (double new_pos_sec = static_cast<double>(new_pos) / 1000.0; 
+			!Mix_SetMusicPosition(new_pos_sec))
+			LOG_ERROR(Logging::Exceptions::SDLExceptions::Audio::SDL_Audio_SetMusicPosition_Failed(new_pos_sec));
 	}
 	bool Bus<Music>::has_song_playing() { return (Mix_PlayingMusic() != 0); }
 	bool Bus<Music>::is_playing() { return has_song_playing() && (Mix_PausedMusic() == 1); }
 	void Bus<Music>::pause() { Mix_PauseMusic(); }
 	void Bus<Music>::resume() { Mix_ResumeMusic(); }
-	void Bus<Music>::stop() { return Mix_HaltMusic(); }
-	Bus<Music>::Bus(const float& volume) { set_volume(volume); }
+	void Bus<Music>::stop()
+	{
+		current = MusicMemory::Item();
+		return Mix_HaltMusic();
+	}
 
 	//! Bus<Effects>
 	float Bus<Effect>::get_volume() const { return volume; }
@@ -93,7 +115,6 @@ namespace Structures::Audio
 		else if (volume.has_value()) set_volume(channel, volume.value());
 		return channel;
 	}
-	Bus<Mix_Chunk*>::Bus(const float& volume) { set_volume(volume); }
 
 	//! EffectManager
 	/*const float& EffectManager::get_volume() const { return volume; }

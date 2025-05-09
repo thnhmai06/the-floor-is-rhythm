@@ -12,9 +12,9 @@ namespace Config::UserConfig
 	}
 	namespace Audio::Volume
 	{
-		inline float master = 0.7f;
-		inline float music = 0.4f;
-		inline float effects = 0.8f;
+		inline float master = 1.0f;
+		inline float music = 0.6f;
+		inline float effects = 0.4f;
 	}
 	namespace Cursor
 	{
@@ -40,7 +40,7 @@ namespace Config::GameConfig
 	}
 	namespace Audio
 	{
-		constexpr uint32_t MAX_CHANNELS = 512;
+		constexpr uint32_t MAX_CHANNELS = 64;
 		constexpr uint32_t SAMPLE_FREQUENCY = 48000;
 		constexpr SDL_AudioFormat AUDIO_FORMAT = SDL_AUDIO_F32LE;
 		constexpr uint8_t CHANNELS_MONO = 1, CHANNELS_STEREO = 2;

@@ -1,9 +1,7 @@
 ﻿#pragma once
 #include <map>
 #include <vector>
-#include "structures/type.hpp"
 #include "structures/game/mapset/hitsound.h"
-#include "utilities.hpp"
 
 namespace Structures::Game::Beatmap::HitObjects
 {
@@ -15,6 +13,8 @@ namespace Structures::Game::Beatmap::HitObjects
 		bool is_kat;
 		Hitsound::HitSound hit_sound{};
 		Hitsound::HitSample hit_sample{};
+		std::optional<Hitsound::HitSound> second_hit_sound;
+		std::optional<Hitsound::HitSample> second_hit_sample;
 
 		void read(const std::vector<std::string>& contents);
 		[[nodiscard]] std::string to_string() const;

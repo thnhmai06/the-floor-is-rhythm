@@ -15,7 +15,7 @@ namespace Structures::Events::Event
 
 			Types::Event::EventID get_id() noexcept override;
 
-			explicit Hitsound(const Game::Beatmap::HitObjects::Floor& floor, const Game::Beatmap::Mapset& mapset);
+			explicit Hitsound(const Game::Beatmap::HitObjects::Floor& floor, const Game::Beatmap::Mapset& mapset, const Audio::EffectMemory& beatmap_effect);
 		};
 		struct Passing : Event
 		{

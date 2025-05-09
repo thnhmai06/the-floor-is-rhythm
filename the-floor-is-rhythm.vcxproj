@@ -220,12 +220,24 @@
     <ClCompile Include="dependencies\easing\src\easing.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\events\event\event.cpp" />
-    <ClCompile Include="src\structures\game\event.cpp" />
-    <ClCompile Include="src\structures\render\object\animation.cpp" />
-    <ClCompile Include="src\structures\render\layer\storyboard.cpp" />
-    <ClCompile Include="src\structures\events\action\audio.cpp" />
-    <ClCompile Include="src\structures\events\event\playing.cpp" />
+    <ClCompile Include="src\structures\events\event\event.cpp">
+          <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\structures\game\event.cpp">
+          <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\structures\render\object\animation.cpp">
+          <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\structures\render\layer\storyboard.cpp">
+          <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\structures\events\action\audio.cpp">
+          <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\structures\events\event\playing.cpp">
+          <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="src\structures\screen\gameplay\keystroke.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>

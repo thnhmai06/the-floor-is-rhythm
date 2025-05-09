@@ -17,11 +17,12 @@ namespace Structures::Audio
 
 		struct Item
 		{
-			MusicMemory* parent;
+			MusicMemory* parent = nullptr;
 			CONTAINER::const_iterator item;
 
 			void free();
 
+			Item() = default;
 			Item(MusicMemory* parent, CONTAINER::const_iterator item);
 		};
 
@@ -49,7 +50,7 @@ namespace Structures::Audio
 			Item(EffectMemory* parent, CONTAINER::const_iterator item);
 		};
 
-		[[nodiscard]] Item get(const std::string& name);
+		[[nodiscard]] Item find(const std::string& name, bool no_log_not_found = false);
 		Item load(const std::filesystem::path& file_path, const std::string& name, bool override = true);
 		void load(
 			const std::filesystem::path& folder_path,

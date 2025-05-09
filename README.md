@@ -7,7 +7,7 @@ https://streamable.com/clfb9r
 
 ## Screenshot:
 <img src="https://i.ibb.co/Kcyz1Fx5/image.png">
-<img src="https://i.ibb.co/mVK1kQQp/image.png">
+<img src="https://i.ibb.co/JjxS4MfJ/image.png">
 
 ## Cách chơi:
 Tương ứng với mỗi note từ bên trái/phải sang, bạn sẽ ấn phím tương ứng ở phía bên trái (`D`, `F`) hoặc bên phải (`J`, `K`) vào đúng lúc note ở chính giữa màn hình.

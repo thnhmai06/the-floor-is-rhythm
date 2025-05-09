@@ -17,12 +17,15 @@ namespace Structures::Game::Beatmap::HitObjects
 		is_kat = contents[1] == "1";
 		hit_sound = Hitsound::HitSound{ std::stoi(contents[2]) };
 		hit_sample = Hitsound::HitSample{ contents[3] };
+		if (contents.size() > 4 && !contents[4].empty()) second_hit_sound = Hitsound::HitSound{std::stoi(contents[4])};
+		if (contents.size() > 5 && !contents[5].empty()) second_hit_sample = Hitsound::HitSample{contents[5]};
 	}
 	std::string Floor::to_string() const
 	{
 		std::stringstream ss;
-		ss << time << AND << is_kat
-			<< AND << hit_sound.to_int() << AND << hit_sample.to_string();
+		ss << time << AND << is_kat << AND << hit_sound.to_int() << AND << hit_sample.to_string();
+		if (second_hit_sound.has_value()) ss << AND << second_hit_sound->to_int();
+		if (second_hit_sample.has_value()) ss << AND << second_hit_sample->to_string();
 		return ss.str();
 	}
 	Floor::Floor(const std::vector<std::string>& content) { read(content); }

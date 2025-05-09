@@ -45,7 +45,7 @@ namespace Structures::Render::Texture
 
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 		SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
-		const auto item = data.insert_or_assign(name, texture).first;
+		const auto& item = data.insert_or_assign(name, texture).first;
 		return { item, this };
 	}
 	std::unordered_set<std::string> Memory::load(
@@ -83,10 +83,11 @@ namespace Structures::Render::Texture
 			}
 		return changed_skin;
 	}
-	Memory::Item Memory::find(const std::string& name) const
+	Memory::Item Memory::find(const std::string& name, const bool no_log_not_found) const
 	{
 		if (const auto it = data.find(name); it != data.end())
 			return { it, this };
+		if (!no_log_not_found) LOG_ERROR(Logging::Exceptions::SDLExceptions::Texture::SDL_Texture_NotFound(name));
 		return {};
 	}
 	Memory::Item Memory::create_new(const std::string& name, const SDL_Point& size, const bool override)

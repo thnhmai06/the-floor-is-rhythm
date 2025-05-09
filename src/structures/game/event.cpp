@@ -140,9 +140,13 @@ namespace Structures::Game::Beatmap
 			return actions;
 		}
 
+		static Structures::Events::Action::Render::FadeAction made_show_command(std::weak_ptr<Render::Object::Object> target_object, const int64_t& time)
+		{
+			return { time, time, Structures::Events::Time::Easing::EasingFunctionType::Linear, std::move(target_object), 255, 255 };
+		}
 		static Structures::Events::Action::Render::FadeAction made_hide_command(std::weak_ptr<Render::Object::Object> target_object, const int64_t& time)
 		{
-			return {time, time, Structures::Events::Time::Easing::EasingFunctionType::Linear, std::move(target_object), 0, 0 };
+			return { time, time, Structures::Events::Time::Easing::EasingFunctionType::Linear, std::move(target_object), 0, 0 };
 		}
 
 		//! EventObjects
@@ -196,7 +200,7 @@ namespace Structures::Game::Beatmap
 		void EventObjects::load_sprite_object(
 			const fs::path& beatmap_root,
 			Structures::Events::Action::Buffer& action_buffer,
-			Structures::Events::Event::Buffer* event_buffer, 
+			Structures::Events::Event::Buffer* event_buffer,
 			const Objects::SpriteObject& object)
 		{
 			using namespace Structures::Types::Render;
@@ -210,20 +214,28 @@ namespace Structures::Game::Beatmap
 			const auto texture = memory.find(texture_name);
 			const SDL_FPoint pos = { static_cast<float>(object.x), static_cast<float>(object.y) };
 			auto sprite = std::make_shared<Render::Object::Object>(texture, static_cast<OriginType>(object.origin), pos);
-			sprite->config.color.a = 0;
 			collection->data.emplace_back(sprite);
 
 			//! Action
 			auto cmd = load_commands(sprite, *object.commands, action_buffer, event_buffer);
+			int64_t start_time = (cmd.empty() ? 0 : cmd.begin()->first);
 			int64_t end_time = (cmd.empty() ? 0 : cmd.begin()->second->end_time);
-			//? Làm vậy để tránh copy
-			//action_buffer.data.insert(cmd.begin(), cmd.end());
 			for (auto& [time, action] : cmd)
 			{
+				start_time = std::min(start_time, time);
 				end_time = std::max(end_time, action->end_time);
-				action_buffer.data.emplace(time, std::move(action));
 			}
-
+			// Chỉ hiện khi object đến lúc
+ 			sprite->config.color.a = 0;
+			if (!cmd.empty())
+			{
+				action_buffer.data.emplace(start_time,
+					std::make_shared<Structures::Events::Action::Render::FadeAction>(
+						made_show_command(sprite, start_time)));
+			}
+			// Phần Command
+			for (auto& [time, action] : cmd)
+				action_buffer.data.emplace(time, std::move(action));
 			// Đến cuối luôn có một action để biến mất
 			if (!cmd.empty())
 				action_buffer.data.emplace(end_time,
@@ -234,7 +246,7 @@ namespace Structures::Game::Beatmap
 			const fs::path& beatmap_root,
 			Structures::Events::Action::Buffer& action_buffer,
 			Structures::Events::Event::Buffer* event_buffer,
-			Structures::Events::Time::Timer* timer, 
+			Structures::Events::Time::Timer* timer,
 			const Objects::AnimationObject& object)
 		{
 			using namespace Structures::Types::Render;
@@ -248,7 +260,7 @@ namespace Structures::Game::Beatmap
 			const std::string stem = (file.has_extension()) ? file.stem().string() : "";
 			const std::string extension = (file.has_extension()) ? file.extension().string() : file.stem().string();
 			std::vector<Render::Texture::Memory::Item> frames;
-			
+
 			for (long long frame = 0; frame < object.frameCount; ++frame)
 			{
 				auto suffix = (object.frameCount >= 1 ? std::to_string(frame) : "") + extension;
@@ -262,25 +274,34 @@ namespace Structures::Game::Beatmap
 			auto animation = std::make_shared<Render::Object::AnimationObject>(timer, std::move(frames), object.frameDelay,
 				static_cast<LoopType>(object.looptype),
 				static_cast<OriginType>(object.origin), pos);
-			animation->config.color.a = 0;
 			collection->data.emplace_back(animation);
 
 			//! Action
 			auto cmd = load_commands(animation, *object.commands, action_buffer, event_buffer);
-			//actions.insert(cmd.begin(), cmd.end());
+			int64_t start_time = (cmd.empty() ? 0 : cmd.begin()->first);
 			int64_t end_time = (cmd.empty() ? 0 : cmd.begin()->second->end_time);
 			for (auto& [time, action] : cmd)
 			{
+				start_time = std::min(start_time, time);
 				end_time = std::max(end_time, action->end_time);
-				action_buffer.data.emplace(time, std::move(action));
 			}
-
+			// Chỉ hiện khi object đến lúc
+			animation->config.color.a = 0;
+			if (!cmd.empty())
+			{
+				action_buffer.data.emplace(start_time,
+					std::make_shared<Structures::Events::Action::Render::FadeAction>(
+						made_show_command(animation, start_time)));
+			}
+			// Phần Command
+			for (auto& [time, action] : cmd)
+				action_buffer.data.emplace(time, std::move(action));
 			// Đến cuối luôn có một action để biến mất
 			if (!cmd.empty())
 				action_buffer.data.emplace(end_time,
 					std::make_shared<Structures::Events::Action::Render::FadeAction>(
 						made_hide_command(animation, end_time)));
-			
+
 		}
 		EventObjects::EventObjects(
 			const OsuParser::Beatmap::Objects::Event::Events& events,
@@ -288,7 +309,7 @@ namespace Structures::Game::Beatmap
 			Structures::Events::Time::Timer* timer,
 			Structures::Events::Action::Buffer& action_buffer,
 			Structures::Events::Event::Buffer* event_buffer)
-		: memory(renderer)
+			: memory(renderer)
 		{
 			for (const auto& object : events.objects)
 			{
