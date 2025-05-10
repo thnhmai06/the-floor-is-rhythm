@@ -68,6 +68,6 @@ namespace Structures::Events::Condition
 			bool is_satisfied(const Event::Event* event) const override;
 		};
 
-		std::unique_ptr<Condition> make_condition(const std::string& trigger_str);
+		std::shared_ptr<Condition> make_condition(const std::string& trigger_str);
 	}
 }

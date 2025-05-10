@@ -96,14 +96,14 @@ namespace Structures::Events::Condition
 		}
 
 		//! general
-		std::unique_ptr<Condition> make_condition(const std::string& trigger_str)
+		std::shared_ptr<Condition> make_condition(const std::string& trigger_str)
 		{
 			if (std::regex_match(trigger_str, HitSound::pattern))
-				return std::make_unique<HitSound>(trigger_str);
+				return std::make_shared<HitSound>(trigger_str);
 			if (std::regex_match(trigger_str, Passing::pattern))
-				return std::make_unique<Passing>();
+				return std::make_shared<Passing>();
 			if (std::regex_match(trigger_str, Failing::pattern))
-				return std::make_unique<Failing>();
+				return std::make_shared<Failing>();
 			return nullptr;
 		}
 	}
