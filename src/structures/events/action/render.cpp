@@ -102,7 +102,8 @@ namespace Structures::Events::Action::Render
 		std::weak_ptr<Structures::Render::Object::Object> target_object,
 		const float& from, const float& to, const std::vector<float>& sequence)
 		: RenderAction{ start_time, end_time, easing, std::move(target_object), {.x = from, .y = from }, {.x = to, .y = to } }
-	{const auto it = target_object.lock();
+	{
+		const auto it = target_object.lock();
 		for (const auto& value : sequence)
 			this->sequence.push_back({ .x = value, .y = value });
 	}
@@ -181,7 +182,7 @@ namespace Structures::Events::Action::Render
 		if (target_object.expired()) return;
 		const auto it = target_object.lock();
 		if (!it) return;
-		
+
 		previous.blend_mode = it->config.blend_mode;
 		previous.flip_mode = it->config.flip_mode;
 	}
@@ -210,7 +211,7 @@ namespace Structures::Events::Action::Render
 			break;
 		}
 	}
-	void ParameterAction::on_next_sequence() { }
+	void ParameterAction::on_next_sequence() {}
 	void ParameterAction::on_finished() { reset_to_previous(); }
 	void ParameterAction::on_started() { save_previous(); }
 	ParameterAction::ParameterAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::ParameterCommand& osu_parameter)
