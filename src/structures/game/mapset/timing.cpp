@@ -18,7 +18,7 @@ namespace Structures::Game::Beatmap::TimingPoints
 	{
 		time = std::stoi(content[0]);
 		beat_length = std::stof(content[1]);
-		sample.set = static_cast<Hitsound::HitSampleType>(std::stoi(content[2]));
+		sample.set = static_cast<Hitsound::SampleSet>(std::stoi(content[2]));
 		sample.index = std::stoi(content[3]);
 		sample.volume = std::stoi(content[4]);
 		inherited = (beat_length < 0);

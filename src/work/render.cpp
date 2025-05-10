@@ -35,7 +35,7 @@ namespace Work::Render
 		//{
 		Textures::skin->load(skin_path, skin_path, true, false);
 		Audio::Memory::Skin::effect.load(skin_path, skin_path, false);
-		Screen::playing_screen = std::make_unique<Screen::Gameplay::PlayingScreen>
+		Screen::gameplay_screen = std::make_unique<Screen::Gameplay::GameplayScreen>
 			(R"(D:\1511778 Camellia - Body F10ating in the Zero Gravity Space\Camellia - Body F10ating in the Zero Gravity Space (Orange_) [Nonsubmersible].tfd)", 
 				1, true, true, true);
 
@@ -65,7 +65,7 @@ namespace Work::Render
 			}
 			//const auto input_latency = Utilities::Time::get_duration<std::chrono::milliseconds>(previous_input_time);
 			//SPDLOG_DEBUG("Input Latency: {}ms", input_latency);
-			Screen::playing_screen->logic.make_time_step(events);
+			Screen::gameplay_screen->logic.make_time_step(events);
 
 			//const auto render_latency = Utilities::Time::get_duration<std::chrono::milliseconds>(previous_render_time);
 			//SPDLOG_DEBUG("Render Latency: {}ms", render_latency);

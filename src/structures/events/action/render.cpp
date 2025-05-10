@@ -177,43 +177,44 @@ namespace Structures::Events::Action::Render
 	{
 		return std::make_shared<ParameterAction>(*this);
 	}
-	void ParameterAction::save_previous()
-	{
-		if (target_object.expired()) return;
-		const auto it = target_object.lock();
-		if (!it) return;
-
-		previous.blend_mode = it->config.blend_mode;
-		previous.flip_mode = it->config.flip_mode;
-	}
 	void ParameterAction::reset_to_previous() const
 	{
 		if (target_object.expired()) return;
 		const auto it = target_object.lock();
 		if (!it) return;
 
-		it->config.blend_mode = previous.blend_mode;
-		it->config.flip_mode = previous.flip_mode;
+		switch (get_current_value().second)
+		{
+		case Parameter::Horizontal:
+			it->config.flip_mode.horizontal = false;
+			break;
+		case Parameter::Vertical:
+			it->config.flip_mode.vertical = false;
+			break;
+		case Parameter::AdditiveColour:
+			it->config.blend_mode = SDL_BLENDMODE_BLEND;
+			break;
+		}
 	}
 	void ParameterAction::update(const float& value_percent, const Parameter& from, const Parameter& to)
 	{
 		const auto it = target_object.lock();
 		switch (to)
 		{
+		case Parameter::Horizontal:
+			it->config.flip_mode.horizontal = true;
+			break;
+		case Parameter::Vertical:
+			it->config.flip_mode.vertical = true;
+			break;
 		case Parameter::AdditiveColour:
 			it->config.blend_mode = SDL_BLENDMODE_ADD;
 			break;
-		case Parameter::Horizontal:
-			it->config.flip_mode = SDL_FLIP_HORIZONTAL;
-			break;
-		case Parameter::Vertical:
-			it->config.flip_mode = SDL_FLIP_VERTICAL;
-			break;
 		}
 	}
-	void ParameterAction::on_next_sequence() {}
+	void ParameterAction::on_next_sequence() { reset_to_previous(); }
 	void ParameterAction::on_finished() { reset_to_previous(); }
-	void ParameterAction::on_started() { save_previous(); }
+	void ParameterAction::on_started() { }
 	ParameterAction::ParameterAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::ParameterCommand& osu_parameter)
 		: ParameterAction(
 			osu_parameter.startTime, osu_parameter.endTime, osu_parameter.easing, std::move(target_object),

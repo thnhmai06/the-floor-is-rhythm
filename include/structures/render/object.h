@@ -40,7 +40,13 @@ namespace Structures::Render::Object
 			SDL_FPoint render_pos; // chính là dst_rect với character_render_size nguyên gốc (muốn đổi character_render_size hãy ra ngoài Object tìm set_render_size())
 			float angle = 0.0f; // theo chiều kim đồng hồ, tính bằng độ (degree), chỉ xoay hình được on_before_render ra chứ không thay đổi vị trí gốc (hitbox vẫn giữ nguyên)
 			SDL_Color color = { 255, 255, 255, SDL_MAX_ALPHA }; // chỉ ảnh hưởng hình được on_before_render ra (cũng tương tự như angle)
-			SDL_FlipMode flip_mode = SDL_FLIP_NONE; // chỉ ảnh hưởng hình được on_before_render ra (cũng tương tự như angle)
+			struct FlipMode
+			{
+				bool horizontal = false; // ngang
+				bool vertical = false; // dọc
+
+				[[nodiscard]] SDL_FlipMode get_mode() const;
+			} flip_mode; // chỉ ảnh hưởng hình được on_before_render ra (cũng tương tự như angle)
 			SDL_BlendMode blend_mode = SDL_BLENDMODE_BLEND; // chỉ ảnh hưởng hình được on_before_render ra (cũng tương tự như angle)
 
 			[[nodiscard]] OriginPoint get_origin_point(bool based_on_render_size = false) const;

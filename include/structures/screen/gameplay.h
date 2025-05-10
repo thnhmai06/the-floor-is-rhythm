@@ -13,7 +13,7 @@ namespace Structures::Screen::Gameplay
 {
 	using namespace Render::Object;
 
-	struct PlayingScreen final
+	struct GameplayScreen final
 	{
 	protected:
 		std::unique_ptr<const Game::Beatmap::Mapset> mapset;
@@ -28,7 +28,7 @@ namespace Structures::Screen::Gameplay
 		struct Logic final
 		{
 		protected:
-			PlayingScreen* playing_screen;
+			GameplayScreen* gameplay_screen;
 			bool is_started = false;
 
 		private:
@@ -44,7 +44,7 @@ namespace Structures::Screen::Gameplay
 			{
 				Mapset::Render::Mapset::RenderScripts::const_iterator object_script;
 				Game::Beatmap::Hitsound::TimingSample timing_sample;
-				const Game::Beatmap::Hitsound::HitSampleType* beatmap_sample;
+				const Game::Beatmap::Hitsound::SampleSet* beatmap_sample;
 
 				explicit Current(const Game::Beatmap::Mapset& mapset);
 			} current;
@@ -66,7 +66,7 @@ namespace Structures::Screen::Gameplay
 			void make_time_step(const Events::Event::Input::SdlEvents& events);
 
 			explicit Logic(
-				PlayingScreen* playing_screen,
+				GameplayScreen* gameplay_screen,
 				const float* mod_multiplier,
 				const bool* no_fail);
 		} logic;
@@ -74,7 +74,7 @@ namespace Structures::Screen::Gameplay
 		//! Render
 		struct Render final
 		{
-			PlayingScreen* playing_screen;
+			GameplayScreen* gameplay_screen;
 			std::shared_ptr<Cursor::Render::Cursor> cursor;
 			std::shared_ptr<Health::Render::Health> health;
 			std::shared_ptr<Mapset::Render::Mapset> mapset;
@@ -82,14 +82,14 @@ namespace Structures::Screen::Gameplay
 			std::unique_ptr<Game::Beatmap::Event::EventObjects> storyboard;
 
 			explicit Render(
-				PlayingScreen* playing_screen,
+				GameplayScreen* gameplay_screen,
 				const Memory& memory, bool load_storyboard);
 		} render;
 
 		//! Audio
 		struct Audio final
 		{
-			PlayingScreen* playing_screen;
+			GameplayScreen* gameplay_screen;
 			Structures::Audio::Mixer* mixer;
 			Structures::Audio::MusicMemory* beatmap_music;
 			Structures::Audio::EffectMemory* beatmap_effect;
@@ -100,9 +100,9 @@ namespace Structures::Screen::Gameplay
 				const Game::Beatmap::HitObjects::Floor& floor,
 				const Types::Game::Gameplay::NoteScore& score,
 				const Game::Beatmap::Hitsound::TimingSample& timing_sample, 
-				const Game::Beatmap::Hitsound::HitSampleType& beatmap_sample) const;
+				const Game::Beatmap::Hitsound::SampleSet& beatmap_sample) const;
 
-			explicit Audio(PlayingScreen* playing_screen,
+			explicit Audio(GameplayScreen* gameplay_screen,
 				const std::filesystem::path& mapset_root,
 				Structures::Audio::Mixer* mixer,
 				Structures::Audio::MusicMemory* beatmap_music,
@@ -110,6 +110,6 @@ namespace Structures::Screen::Gameplay
 				Structures::Audio::EffectMemory* skin_effect);
 		} audio;
 
-		explicit PlayingScreen(const std::filesystem::path& mapset_path, const float& mod_multiplier, bool load_storyboard, bool no_fail, bool auto_play = false);
+		explicit GameplayScreen(const std::filesystem::path& mapset_path, const float& mod_multiplier, bool load_storyboard, bool no_fail, bool auto_play = false);
 	};
 }

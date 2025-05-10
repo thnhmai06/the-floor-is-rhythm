@@ -24,8 +24,8 @@ namespace Structures::Events::Action::Render
 		{
 			if (current_sequence >= static_cast<long>(sequence.size()) - 1) return false;
 
-			++current_sequence;
 			on_next_sequence();
+			++current_sequence;
 			return true;
 		}
 
@@ -118,7 +118,7 @@ namespace Structures::Events::Action::Render
 			return { start_time + one_sequence_duration * seg_index, start_time + one_sequence_duration * (seg_index + 1) };
 		}
 
-		[[nodiscard]] std::pair<ValueType, ValueType> get_current_value()
+		[[nodiscard]] std::pair<ValueType, ValueType> get_current_value() const
 		{
 			const auto n = static_cast<long>(sequence.size());
 
@@ -216,12 +216,6 @@ namespace Structures::Events::Action::Render
 	struct ParameterAction : RenderAction<Parameter>
 	{
 	protected:
-		struct
-		{
-			SDL_FlipMode flip_mode = SDL_FLIP_NONE;
-			SDL_BlendMode blend_mode = SDL_BLENDMODE_BLEND;
-		} previous;
-		void save_previous();
 		void reset_to_previous() const;
 
 	public:

@@ -4,7 +4,7 @@
 #include <SDL3_mixer/SDL_mixer.h>
 #include <unordered_map>
 #include <string>
-#include <osu!parser/Parser/Structures/Beatmap/Objects/TimingPoint.hpp>
+#include <osu!parser/Parser/Structures/Beatmap/Objects/HitObject.hpp>
 #include <osu!parser/Parser/Structures/Beatmap/Objects/Event.hpp>
 
 namespace Structures::Types
@@ -50,99 +50,84 @@ namespace Structures::Types
 	{
 		namespace HitSound
 		{
-			enum class HitSoundType : std::uint8_t
+			enum class Addition : std::uint8_t
 			{
 				Normal = 0,
 				Whistle = 1,
 				Finish = 2,
 				Clap = 3
 			};
-			enum class HitSampleType : std::uint8_t
+			enum class SampleSet : std::uint8_t
 			{
 				NoCustom = 0,
 				Normal = 1,
 				Soft = 2,
 				Drum = 3
 			};
-			enum class SampleSetType : uint8_t
+			enum class SampleSetType : bool
 			{
 				Normal,
 				Addition
 			};
-			inline HitSampleType to_floor_hit_sample(const OsuParser::Beatmap::Objects::TimingPoint::HitSampleType& osu_hitsample)
-			{
-				switch (osu_hitsample)
-				{
-				case OsuParser::Beatmap::Objects::TimingPoint::HitSampleType::NORMAL:
-					return HitSampleType::Normal;
-				case OsuParser::Beatmap::Objects::TimingPoint::HitSampleType::SOFT:
-					return HitSampleType::Soft;
-				case OsuParser::Beatmap::Objects::TimingPoint::HitSampleType::DRUM:
-					return HitSampleType::Drum;
-				case OsuParser::Beatmap::Objects::TimingPoint::HitSampleType::NO_CUSTOM:
-					return HitSampleType::NoCustom;
-				}
-				return HitSampleType::Normal;
-			}
-			inline HitSampleType string_to_hit_sample(std::string str)
+			inline SampleSet string_to_sample_set(std::string str)
 			{
 				for (auto& c : str)
 					c = std::tolower(c);
 				if (str == "normal")
-					return HitSampleType::Normal;
+					return SampleSet::Normal;
 				if (str == "soft")
-					return HitSampleType::Soft;
+					return SampleSet::Soft;
 				if (str == "drum")
-					return HitSampleType::Drum;
-				return HitSampleType::NoCustom; // CHÚ Ý PHẢI THEO ALL TRONG EVENT CONDITION
+					return SampleSet::Drum;
+				return SampleSet::NoCustom; // CHÚ Ý PHẢI THEO ALL TRONG EVENT CONDITION
 			}
-			inline HitSoundType string_to_hit_sound(std::string str)
+			inline Addition string_to_additions(std::string str)
 			{
 				for (auto& c : str)
 					c = std::tolower(c);
 				if (str == "whistle")
-					return HitSoundType::Whistle;
+					return Addition::Whistle;
 				if (str == "finish")
-					return HitSoundType::Finish;
+					return Addition::Finish;
 				if (str == "clap")
-					return HitSoundType::Clap;
-				return HitSoundType::Normal; // CHÚ Ý PHẢI THEO ALL TRONG EVENT CONDITION
+					return Addition::Clap;
+				return Addition::Normal; // CHÚ Ý PHẢI THEO ALL TRONG EVENT CONDITION
 			}
-			inline std::string to_string(const HitSoundType& hit_sound_type)
+			inline std::string to_string(const Addition& additions)
 			{
 				std::string result;
-				switch (hit_sound_type)
+				switch (additions)
 				{
-				case HitSoundType::Normal:
+				case Addition::Normal:
 					result = "normal";
 					break;
-				case HitSoundType::Whistle:
+				case Addition::Whistle:
 					result = "whistle";
 					break;
-				case HitSoundType::Finish:
+				case Addition::Finish:
 					result = "finish";
 					break;
-				case HitSoundType::Clap:
+				case Addition::Clap:
 					result = "clap";
 					break;
 				}
 				return result;
 			}
-			inline std::string to_string(const HitSampleType& hit_sample_type)
+			inline std::string to_string(const SampleSet& sample_set)
 			{
 				std::string result;
-				switch (hit_sample_type)
+				switch (sample_set)
 				{
-				case HitSampleType::NoCustom:
+				case SampleSet::NoCustom:
 					result = "";
 					break;
-				case HitSampleType::Normal:
+				case SampleSet::Normal:
 					result = "normal";
 					break;
-				case HitSampleType::Soft:
+				case SampleSet::Soft:
 					result = "soft";
 					break;
-				case HitSampleType::Drum:
+				case SampleSet::Drum:
 					result = "drum";
 					break;
 				}

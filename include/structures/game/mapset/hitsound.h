@@ -3,15 +3,15 @@
 #include "structures/type.hpp"
 #include "structures/audio/memory.h"
 
-// lưu trữ HitSound và Hitsample giống như Osu!
+// lưu trữ Additions và Hitsample giống như osu!
 // p/s: code trong Osu!parser/Convert/Structures/Playing/HitObjects.hpp
-// phần HitSound và HitSample là do mình viết :D
+// phần Additions và HitSample là do mình viết :D
 
 namespace Structures::Game::Beatmap::Hitsound
 {
 	using namespace Types::Game::HitSound;
 
-	struct HitSound
+	struct Additions
 	{
 		bool normal = false;
 		bool whistle = false;
@@ -19,61 +19,58 @@ namespace Structures::Game::Beatmap::Hitsound
 		bool clap = false;
 
 		void read(const std::int32_t& hit_sound_int);
-		[[nodiscard]] bool is_hit_sound_type_played(const HitSoundType& hit_sound_type) const;
+		[[nodiscard]] bool has_addition(const Addition& additions) const;
 		[[nodiscard]] std::int32_t to_int() const;
 
-		HitSound() = default;
-		explicit HitSound(const std::int32_t& hit_sound_int);
-		HitSound& operator= (const OsuParser::Beatmap::Objects::HitObject::Hitsound& hs);
-		size_t operator()(const HitSound& hs) const;
+		Additions() = default;
+		explicit Additions(const std::int32_t& hit_sound_int);
+		Additions& operator= (const OsuParser::Beatmap::Objects::HitObject::Additions& hs);
+		size_t operator()(const Additions& hs) const;
 	};
 
 	struct TimingSample
 	{
-		HitSampleType set = HitSampleType::Normal;
+		SampleSet set = SampleSet::Normal;
 		int32_t index = 0;
 		uint8_t volume = MIX_MAX_VOLUME;
 	};
 
 	struct HitSample
 	{
-		HitSampleType normal_set = HitSampleType::NoCustom;
-		HitSampleType addition_set = HitSampleType::NoCustom;
+		SampleSet normal_set = SampleSet::NoCustom;
+		SampleSet addition_set = SampleSet::NoCustom;
 		int32_t index = 0;
 		uint8_t volume = 0;
 		std::string file_name = {};
 
 		[[nodiscard]] std::string to_string() const;
 		// Có thể bạn đang nhầm với get_hit_sound_filename()?
-		[[nodiscard]] std::pair<SampleSetType, HitSampleType>
+		[[nodiscard]] std::pair<SampleSetType, SampleSet>
 			get_used_sample_set(
-				const HitSoundType& hit_sound_type,
-				const HitSampleType& timing_sample_type,
-				const HitSampleType& mapset_sample_type) const;
-		[[nodiscard]] std::vector<std::pair<SampleSetType, HitSampleType>>
+				const Addition& additions,
+				const SampleSet& timing_sample_type,
+				const SampleSet& mapset_sample_type) const;
+		[[nodiscard]] std::vector<std::pair<SampleSetType, SampleSet>>
 			get_used_sample_set(
-				const HitSound& hit_sound,
-				const HitSampleType& timing_sample_type,
-				const HitSampleType& mapset_sample_type) const;
+				const Additions& additions,
+				const SampleSet& timing_sample_type,
+				const SampleSet& mapset_sample_type) const;
+		void read(const std::string& hitsample_str);
 
 		explicit HitSample(
-			const HitSampleType& normal_set = HitSampleType::NoCustom, 
-			const HitSampleType& addition_set = HitSampleType::NoCustom, 
+			const SampleSet& normal_set = SampleSet::NoCustom, 
+			const SampleSet& addition_set = SampleSet::NoCustom, 
 			const int32_t& index = 0, const uint8_t& volume = 0, 
 			std::string file_name = {});
 		explicit HitSample(const std::string& hitsample_str);
-		explicit HitSample(
-			const OsuParser::Beatmap::Objects::HitObject::HitObject::SliderParams::EdgeHitsound::SampleSet& slide_hs,
-			const OsuParser::Beatmap::Objects::HitObject::HitSample& slider_hs);
-		//size_t operator()(const HitSample& hs) const;
-
-		HitSample& operator= (const OsuParser::Beatmap::Objects::HitObject::HitSample& hs);
+		HitSample& operator=(const OsuParser::Beatmap::Objects::HitObject::SliderSample& slide_hs);
+		HitSample& operator=(const OsuParser::Beatmap::Objects::HitObject::HitSample& hs);
 	};
 
-	 std::string get_hit_sound_filename(const HitSoundType& hit_sound_type, const HitSample& hit_sample,
-		const TimingSample& timing_sample, const HitSampleType& mapset_sample, const Audio::EffectMemory& beatmap_effect);
-	 std::vector<std::string> get_hit_sound_filename(const HitSound& hit_sound, const HitSample& hit_sample, 
-		 const TimingSample& timing_sample, const HitSampleType& mapset_sample, const Audio::EffectMemory& beatmap_effect);
+	 std::string get_hit_sound_filename(const Addition& addition, const HitSample& hit_sample,
+		const TimingSample& timing_sample, const SampleSet& mapset_sample, const Audio::EffectMemory& beatmap_effect);
+	 std::vector<std::string> get_hit_sound_filename(const Additions& additions, const HitSample& hit_sample, 
+		 const TimingSample& timing_sample, const SampleSet& mapset_sample, const Audio::EffectMemory& beatmap_effect);
 	 uint8_t get_hit_sample_volume(const HitSample& hit_sample, const TimingSample& timing_sample);
 	
 }

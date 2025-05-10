@@ -11,7 +11,7 @@ namespace Structures::Game::Beatmap::Metadata
 		int32_t preview_timestamp = 0;
 		bool epilepsy_warning = false;
 		bool widescreen_storyboard = false;
-		Types::Game::HitSound::HitSampleType sample_set = Types::Game::HitSound::HitSampleType::Normal;
+		Types::Game::HitSound::SampleSet sample_set = Types::Game::HitSound::SampleSet::Normal;
 
 		void read(const std::vector<std::string>& contents);
 		[[nodiscard]] std::string to_string() const;

@@ -5,14 +5,14 @@ namespace Structures::Events::Condition
 {
 	namespace Playing
 	{
-		//! HitSound (sub-conditions)
-		bool HitSound::HitSoundCondition::is_satisfied(const Game::Beatmap::Hitsound::HitSound& hit_sound) const
+		//! Additions (sub-conditions)
+		bool HitSound::HitSoundCondition::is_satisfied(const Game::Beatmap::Hitsound::Additions& hit_sound) const
 		{
 			if (condition == ALL) return true;
-			return hit_sound.is_hit_sound_type_played(condition);
+			return hit_sound.has_addition(condition);
 		}
 		bool HitSound::HitSampleCondition::is_satisfied(
-			const std::vector<std::pair<Types::Game::HitSound::SampleSetType, Types::Game::HitSound::HitSampleType>>& sample_set_used) const
+			const std::vector<std::pair<Types::Game::HitSound::SampleSetType, Types::Game::HitSound::SampleSet>>& sample_set_used) const
 		{
 			bool normal_satisfied = normal == ALL_CONDITION;
 			bool addition_satisfied = addition == ALL_CONDITION;
@@ -31,16 +31,16 @@ namespace Structures::Events::Condition
 			return index == ALL || index == hit_sample.index;
 		}
 
-		//! HitSound (condition)
-		const std::regex HitSound::pattern{ R"(^HitSound(?:(Normal|Soft|Drum|All))?(?:(Normal|Soft|Drum|All))?(Whistle|Finish|Clap)?(\d+)?$)" };
+		//! Additions (condition)
+		const std::regex HitSound::pattern{ R"(^Additions(?:(Normal|Soft|Drum|All))?(?:(Normal|Soft|Drum|All))?(Whistle|Finish|Clap)?(\d+)?$)" };
 		std::set<Types::Event::EventID> HitSound::get_allowed_event() const
 		{
 			return { Types::Event::EventID::Hitsound };
 		}
 		bool HitSound::is_satisfied(
-			const Game::Beatmap::Hitsound::HitSound& hit_sound,
+			const Game::Beatmap::Hitsound::Additions& hit_sound,
 			const Game::Beatmap::Hitsound::HitSample& hit_sample,
-			const std::vector<std::pair<Types::Game::HitSound::SampleSetType, Types::Game::HitSound::HitSampleType>>& sample_set_used) const
+			const std::vector<std::pair<Types::Game::HitSound::SampleSetType, Types::Game::HitSound::SampleSet>>& sample_set_used) const
 		{
 			return
 				addition.is_satisfied(hit_sound)
@@ -62,11 +62,11 @@ namespace Structures::Events::Condition
 				std::regex_match(trigger_str, matches, pattern))
 			{
 				if (matches.size() > 1 && matches[1].matched)
-					sample_set.normal = Types::Game::HitSound::string_to_hit_sample(matches[1].str());
+					sample_set.normal = Types::Game::HitSound::string_to_sample_set(matches[1].str());
 				if (matches.size() > 2 && matches[2].matched)
-					sample_set.addition = Types::Game::HitSound::string_to_hit_sample(matches[2].str());
+					sample_set.addition = Types::Game::HitSound::string_to_sample_set(matches[2].str());
 				if (matches.size() > 3 && matches[3].matched)
-					addition.condition = Types::Game::HitSound::string_to_hit_sound(matches[3].str());
+					addition.condition = Types::Game::HitSound::string_to_additions(matches[3].str());
 				if (matches.size() > 4 && matches[4].matched)
 					index.index = std::stoi(matches[4].str());
 			}

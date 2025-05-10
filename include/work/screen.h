@@ -5,5 +5,5 @@ namespace Work::Screen
 {
 	using namespace Structures::Screen;
 
-	inline std::unique_ptr<Gameplay::PlayingScreen> playing_screen;
+	inline std::unique_ptr<Gameplay::GameplayScreen> gameplay_screen;
 }

@@ -29,7 +29,7 @@ namespace Structures::Game::Beatmap::Metadata
 			else if (content[0] == Format::File::Floor::Mapset::General::WIDESCREEN_STORYBOARD)
 				widescreen_storyboard = std::stoi(content[1]);
 			else if (content[0] == Format::File::Floor::Mapset::General::SAMPLE_SET)
-				sample_set = static_cast<Types::Game::HitSound::HitSampleType>(std::stoi(content[1]));
+				sample_set = static_cast<Types::Game::HitSound::SampleSet>(std::stoi(content[1]));
 		}
 	}
 	std::string General::to_string() const

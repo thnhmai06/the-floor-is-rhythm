@@ -8,9 +8,9 @@ namespace Structures::Events::Event
 	{
 		struct Hitsound : Event
 		{
-			const Game::Beatmap::Hitsound::HitSound* hit_sound;
+			const Game::Beatmap::Hitsound::Additions* hit_sound;
 			const Game::Beatmap::Hitsound::HitSample* hit_sample;
-			std::vector<std::pair<Types::Game::HitSound::SampleSetType, Types::Game::HitSound::HitSampleType>> used_sample_set;
+			std::vector<std::pair<Types::Game::HitSound::SampleSetType, Types::Game::HitSound::SampleSet>> used_sample_set;
 			std::vector<std::string> used_audio;
 
 			Types::Event::EventID get_id() noexcept override;

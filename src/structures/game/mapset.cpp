@@ -94,7 +94,7 @@ namespace Structures::Game::Beatmap
 			else if (header == Format::File::Floor::Mapset::Events::HEADER) events.Parse(contents);
 		}
 	}
-	void Mapset::load_event_file()
+	void Mapset::load_storyboard_file()
 	{
 		std::filesystem::path osb_path;
 		for (const auto& entry : std::filesystem::directory_iterator(path.parent_path())) 
@@ -108,12 +108,10 @@ namespace Structures::Game::Beatmap
 
 		if (osb_path.empty()) return;
 		OsuParser::Beatmap::Beatmap storyboard{ osb_path.string() };
-		/*events.objects.insert(Utilities::Container::get_last_element_iterator(events.objects), 
-			storyboard.Events.objects.begin(), storyboard.Events.objects.end());*/
 		for (auto& event : storyboard.Events.objects)
-			events.objects.push_back(std::move(event));
+			events.objects.push_back(event);
 	}
-	Mapset::Mapset(const std::filesystem::path& path, const bool load_event_file)
+	Mapset::Mapset(const std::filesystem::path& path, const bool load_storyboard_file)
 	: path(path)
 	{
 		std::ifstream reader(path);
@@ -123,6 +121,6 @@ namespace Structures::Game::Beatmap
 		parse(sections);
 		stats.calculate(*this);
 
-		if (load_event_file) this->load_event_file();
+		if (load_storyboard_file) this->load_storyboard_file();
 	}
 }

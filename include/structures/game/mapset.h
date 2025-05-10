@@ -51,9 +51,9 @@ namespace Structures::Game::Beatmap
 		} stats;
 	private:
 		void parse(std::unordered_map<std::string, std::vector<std::string>>& sections);
-		void load_event_file();
+		void load_storyboard_file();
 
 	public:
-		explicit Mapset(const std::filesystem::path& path, bool load_event_file = false);
+		explicit Mapset(const std::filesystem::path& path, bool load_storyboard_file = false);
 	};
 }

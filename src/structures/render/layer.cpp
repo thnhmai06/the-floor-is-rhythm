@@ -138,7 +138,7 @@ namespace Structures::Render::Layer
 		SDL_SetTextureAlphaMod(sdl_texture, object->config.color.a);
 		SDL_SetTextureColorMod(sdl_texture, object->config.color.r, object->config.color.g, object->config.color.b);
 		if (!SDL_RenderTextureRotated(object->src.memory->renderer, sdl_texture, &src_rect,
-			&dst_rect, object->config.angle, &render_origin_point, object->config.flip_mode))
+			&dst_rect, object->config.angle, &render_origin_point, object->config.flip_mode.get_mode()))
 			LOG_ERROR(Logging::Exceptions::SDLExceptions::Texture::SDL_Texture_Render_Failed(object->src.get_name()));
 		put_object_out_layer(object);
 		object->config.render_pos -= offset;

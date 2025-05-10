@@ -96,6 +96,11 @@ namespace Structures::Render::Object
 		origin_point(origin_pos), render_pos(render_pos)
 	{
 	}
+	//::Config::FlipMode
+	SDL_FlipMode Object::Config::FlipMode::get_mode() const
+	{
+		return static_cast<SDL_FlipMode>((horizontal ? SDL_FLIP_HORIZONTAL : 0) | (vertical ? SDL_FLIP_VERTICAL : 0));
+	}
 
 	// ::
 	SDL_FRect Object::get_sdl_src_rect() const
