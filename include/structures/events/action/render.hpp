@@ -72,8 +72,12 @@ namespace Structures::Events::Action::Render
 			const auto n = static_cast<int64_t>(sequence.size());
 			this->end_time = start_time + base_duration * (n + 1);
 		}
-
 		RenderAction() = default;
+
+		[[nodiscard]] std::shared_ptr<Action> clone() const override
+		{
+			return std::make_shared<RenderAction>(*this);
+		}
 
 		void execute(const int64_t& current_time) final
 		{
@@ -101,7 +105,7 @@ namespace Structures::Events::Action::Render
 
 		[[nodiscard]] bool is_valid(const int64_t& current_time) const override
 		{
-			return !finished && !target_object.expired() && target_object.lock() && (start_time <= current_time);
+			return Action::is_valid(current_time) && !target_object.expired() && target_object.lock();
 		}
 
 		[[nodiscard]] std::pair<int64_t, int64_t> get_sequence_time() const
@@ -135,6 +139,7 @@ namespace Structures::Events::Action::Render
 	struct FadeAction : RenderAction<uint8_t>
 	{
 		void update(const float& value_percent, const uint8_t& from, const uint8_t& to) override;
+		[[nodiscard]] std::shared_ptr<Action> clone() const override;
 
 		using RenderAction::RenderAction;
 		FadeAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::FadeCommand& osu_fade);
@@ -144,6 +149,7 @@ namespace Structures::Events::Action::Render
 	struct MoveAction : RenderAction<SDL_FPoint>
 	{
 		void update(const float& value_percent, const SDL_FPoint& from, const SDL_FPoint& to) override;
+		[[nodiscard]] std::shared_ptr<Action> clone() const override;
 
 		using RenderAction::RenderAction;
 		MoveAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::MoveCommand& osu_move);
@@ -151,6 +157,7 @@ namespace Structures::Events::Action::Render
 	struct MoveXAction : RenderAction<float>
 	{
 		void update(const float& value_percent, const float& from, const float& to) override;
+		[[nodiscard]] std::shared_ptr<Action> clone() const override;
 
 		using RenderAction::RenderAction;
 		MoveXAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::MoveXCommand& osu_move_x);
@@ -158,6 +165,7 @@ namespace Structures::Events::Action::Render
 	struct MoveYAction : RenderAction<float>
 	{
 		void update(const float& value_percent, const float& from, const float& to) override;
+		[[nodiscard]] std::shared_ptr<Action> clone() const override;
 
 		using RenderAction::RenderAction;
 		MoveYAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::MoveYCommand& osu_move_y);
@@ -167,6 +175,7 @@ namespace Structures::Events::Action::Render
 	struct ScaleAction : RenderAction<SDL_FPoint>
 	{
 		void update(const float& value_percent, const SDL_FPoint& from, const SDL_FPoint& to) override;
+		[[nodiscard]] std::shared_ptr<Action> clone() const override;
 
 		// Normal Scale
 		ScaleAction(const int64_t& start_time, const int64_t& end_time,
@@ -184,6 +193,7 @@ namespace Structures::Events::Action::Render
 	struct RotateAction : RenderAction<float> // độ
 	{
 		void update(const float& value_percent, const float& from, const float& to) override;
+		[[nodiscard]] std::shared_ptr<Action> clone() const override;
 
 		using RenderAction::RenderAction;
 		RotateAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::RotateCommand& osu_rotate);
@@ -194,6 +204,7 @@ namespace Structures::Events::Action::Render
 	struct ColorAction : RenderAction<Color>
 	{
 		void update(const float& value_percent, const Color& from, const Color& to) override;
+		[[nodiscard]] std::shared_ptr<Action> clone() const override;
 
 		using RenderAction::RenderAction;
 		ColorAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::ColorCommand& osu_color);
@@ -215,6 +226,7 @@ namespace Structures::Events::Action::Render
 
 	public:
 		void update(const float& value_percent, const Parameter& from, const Parameter& to) override;
+		[[nodiscard]] std::shared_ptr<Action> clone() const override;
 		void on_next_sequence() override;
 		void on_finished() override;
 		void on_started() override;

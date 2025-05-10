@@ -142,7 +142,8 @@ namespace Structures::Game::Beatmap
 
 		static Structures::Events::Action::Render::FadeAction made_show_command(std::weak_ptr<Render::Object::Object> target_object, const int64_t& time)
 		{
-			return { time, time, Structures::Events::Time::Easing::EasingFunctionType::Linear, std::move(target_object), 255, 255 };
+			return { time, time, Structures::Events::Time::Easing::EasingFunctionType::Linear, std::move(target_object),
+				Render::Object::SDL_MAX_ALPHA, Render::Object::SDL_MAX_ALPHA };
 		}
 		static Structures::Events::Action::Render::FadeAction made_hide_command(std::weak_ptr<Render::Object::Object> target_object, const int64_t& time)
 		{

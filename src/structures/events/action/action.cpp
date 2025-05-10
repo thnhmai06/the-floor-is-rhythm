@@ -5,6 +5,10 @@
 
 namespace Structures::Events::Action
 {
+	std::shared_ptr<Action> Action::clone() const
+	{
+		return std::make_shared<Action>(*this);
+	}
 	//! BASE
 	void Action::execute(const int64_t& current_time) { started = true; }
 	bool Action::is_valid(const int64_t& current_time) const { return !finished && start_time <= current_time; }
@@ -13,10 +17,9 @@ namespace Structures::Events::Action
 	void Buffer::execute(const int64_t& current_time)
 	{
 		if (data.empty()) return;
-		const auto first_not_execute_item = data.upper_bound(current_time);
 
 		auto it = data.begin();
-		while (it != first_not_execute_item)
+		while (it != data.end() && it->first <= current_time)
 		{
 			const auto& action = it->second;
 
@@ -28,6 +31,10 @@ namespace Structures::Events::Action
 	}
 
 	//! CallbackAction
+	std::shared_ptr<Action> CallbackAction::clone() const
+	{
+		return std::make_shared<CallbackAction>(*this);
+	}
 	void CallbackAction::execute(const int64_t& current_time)
 	{
 		if (!is_valid(current_time)) return;
@@ -37,6 +44,10 @@ namespace Structures::Events::Action
 	}
 
 	//! LoopAction
+	std::shared_ptr<Action> LoopAction::clone() const
+	{
+		return std::make_shared<LoopAction>(*this);
+	}
 	const Buffer::CONTAINER& LoopAction::get_callbacks() const { return callbacks; }
 	Buffer::CONTAINER::iterator LoopAction::add(std::shared_ptr<Action> callback)
 	{
@@ -54,7 +65,7 @@ namespace Structures::Events::Action
 	}
 	void LoopAction::execute(const int64_t& current_time)
 	{
-		if (finished || current_time < start_time) return;
+		if (!is_valid(current_time)) return;
 
 		started = true;
 		const auto duration = (end_time - start_time) / loop_count;
@@ -62,7 +73,7 @@ namespace Structures::Events::Action
 		{
 			for (const auto& callback : callbacks | std::views::values)
 			{
-				auto new_callback = std::make_shared<Action>(*callback);
+				auto new_callback = callback->clone();
 				new_callback->start_time = start_time + callback->start_time + duration * (count - 1);
 				new_callback->end_time = start_time + callback->end_time + duration * (count - 1);
 
@@ -90,6 +101,10 @@ namespace Structures::Events::Action
 			}
 		}
 		return false;
+	}
+	std::shared_ptr<Action> ConditionalAction::clone() const
+	{
+		return std::make_shared<ConditionalAction>(*this);
 	}
 	const Buffer::CONTAINER& ConditionalAction::get_callbacks() const { return callbacks; }
 	Buffer::CONTAINER::iterator ConditionalAction::add(std::shared_ptr<Action> callback)
@@ -128,7 +143,7 @@ namespace Structures::Events::Action
 	ConditionalAction::ConditionalAction(
 		Buffer::CONTAINER* target, const Event::Buffer* location,
 		const int64_t& start_time, const int64_t& end_time, 
-		std::unique_ptr<Condition::Condition> condition)
+		std::shared_ptr<Condition::Condition> condition)
 		: target(target), events_location(location), condition(std::move(condition))
 	{
 		this->start_time = start_time;

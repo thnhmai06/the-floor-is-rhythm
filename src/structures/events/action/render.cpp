@@ -11,6 +11,10 @@ namespace Structures::Events::Action::Render
 		const auto it = target_object.lock();
 		it->config.color.a = Utilities::Math::to_value(value_percent, from, to);
 	}
+	std::shared_ptr<Action> FadeAction::clone() const
+	{
+		return std::make_shared<FadeAction>(*this);
+	}
 	FadeAction::FadeAction(std::weak_ptr<Structures::Render::Object::Object> target_object, const OsuParser::Beatmap::Objects::Event::Commands::FadeCommand& osu_fade)
 		: FadeAction(
 			osu_fade.startTime, osu_fade.endTime, osu_fade.easing, std::move(target_object),
@@ -23,6 +27,10 @@ namespace Structures::Events::Action::Render
 
 	//! Move
 	// MoveAction
+	std::shared_ptr<Action> MoveAction::clone() const
+	{
+		return std::make_shared<MoveAction>(*this);
+	}
 	void MoveAction::update(const float& value_percent, const SDL_FPoint& from, const SDL_FPoint& to)
 	{
 		const auto it = target_object.lock();
@@ -40,6 +48,10 @@ namespace Structures::Events::Action::Render
 	}
 
 	// MoveXAction
+	std::shared_ptr<Action> MoveXAction::clone() const
+	{
+		return std::make_shared<MoveXAction>(*this);
+	}
 	void MoveXAction::update(const float& value_percent, const float& from, const float& to)
 	{
 		const auto it = target_object.lock();
@@ -55,6 +67,10 @@ namespace Structures::Events::Action::Render
 	}
 
 	// MoveYAction
+	std::shared_ptr<Action> MoveYAction::clone() const
+	{
+		return std::make_shared<MoveYAction>(*this);
+	}
 	void MoveYAction::update(const float& value_percent, const float& from, const float& to)
 	{
 		const auto it = target_object.lock();
@@ -70,6 +86,10 @@ namespace Structures::Events::Action::Render
 	}
 
 	//! Scale
+	std::shared_ptr<Action> ScaleAction::clone() const
+	{
+		return std::make_shared<ScaleAction>(*this);
+	}
 	void ScaleAction::update(const float& value_percent, const SDL_FPoint& from, const SDL_FPoint& to)
 	{
 		const auto it = target_object.lock();
@@ -106,7 +126,11 @@ namespace Structures::Events::Action::Render
 			sequence.push_back({ .x = static_cast<float>(x), .y = static_cast<float>(y) });
 	}
 
-	//! Rotation
+	//! Rotate
+	std::shared_ptr<Action> RotateAction::clone() const
+	{
+		return std::make_shared<RotateAction>(*this);
+	}
 	void RotateAction::update(const float& value_percent, const float& from, const float& to)
 	{
 		const auto it = target_object.lock();
@@ -124,6 +148,10 @@ namespace Structures::Events::Action::Render
 	}
 
 	//! Color
+	std::shared_ptr<Action> ColorAction::clone() const
+	{
+		return std::make_shared<ColorAction>(*this);
+	}
 	void ColorAction::update(const float& value_percent, const Color& from, const Color& to)
 	{
 		const auto it = target_object.lock();
@@ -144,6 +172,10 @@ namespace Structures::Events::Action::Render
 
 
 	//! Parameter
+	std::shared_ptr<Action> ParameterAction::clone() const
+	{
+		return std::make_shared<ParameterAction>(*this);
+	}
 	void ParameterAction::save_previous()
 	{
 		if (target_object.expired()) return;

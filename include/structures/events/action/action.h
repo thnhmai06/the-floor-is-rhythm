@@ -11,10 +11,14 @@ namespace Structures::Events::Action
 		bool finished = false;
 		int64_t start_time, end_time;
 
+		[[nodiscard]] virtual std::shared_ptr<Action> clone() const;
 		virtual void execute(const int64_t& current_time);
 		[[nodiscard]] virtual bool is_valid(const int64_t& current_time) const;
 
+		Action() = default;
 		virtual ~Action() = default;
+		Action(const Action&) = default;
+		Action& operator=(const Action&) = default;
 	};
 
 	// Đây là Buffer, không phải kho chứa Action!
@@ -33,6 +37,7 @@ namespace Structures::Events::Action
 	{
 		std::function<void(const int64_t& current_time)> callback = nullptr;
 
+		[[nodiscard]] std::shared_ptr<Action> clone() const override;
 		void execute(const int64_t& current_time) override;
 	};
 	//! Chú ý: Các lệnh bên dưới không nên lồng nhau
@@ -46,6 +51,7 @@ namespace Structures::Events::Action
 		Buffer::CONTAINER* target;
 		uint32_t loop_count;
 
+		[[nodiscard]] std::shared_ptr<Action> clone() const override;
 		[[nodiscard]] const Buffer::CONTAINER& get_callbacks() const;
 		Buffer::CONTAINER::iterator add(std::shared_ptr<Action> callback);
 		void add(const Buffer::CONTAINER& callbacks);
@@ -64,8 +70,9 @@ namespace Structures::Events::Action
 	public:
 		Buffer::CONTAINER* target;
 		const Event::Buffer* events_location;
-		std::unique_ptr<Condition::Condition> condition;
+		std::shared_ptr<Condition::Condition> condition;
 
+		[[nodiscard]] std::shared_ptr<Action> clone() const override;
 		[[nodiscard]] const Buffer::CONTAINER& get_callbacks() const;
 		Buffer::CONTAINER::iterator add(std::shared_ptr<Action> callback);
 		void add(const Buffer::CONTAINER& callbacks);
@@ -74,6 +81,6 @@ namespace Structures::Events::Action
 		explicit ConditionalAction(
 			Buffer::CONTAINER* target, const Event::Buffer* location,
 			const int64_t& start_time, const int64_t& end_time,
-			std::unique_ptr<Condition::Condition> condition);
+			std::shared_ptr<Condition::Condition> condition);
 	};
 }

@@ -194,14 +194,12 @@ namespace Structures::Render::Layer
 		const auto pixel = target_texture.get_size() / grid_size.value();
 		object->config.render_pos *= pixel;
 		object->config.scale *= pixel;
-		Layer::put_object_into_layer(object);
 	}
 	void TextureLayer::put_object_out_layer(std::shared_ptr<Object::Object>& object)
 	{
 		const auto pixel = target_texture.get_size() / grid_size.value();
 		object->config.render_pos /= pixel;
 		object->config.scale /= pixel;
-		Layer::put_object_out_layer(object);
 	}
 	void TextureLayer::render_no_change_back_target(const bool clear)
 	{
