@@ -127,8 +127,12 @@ namespace Structures::Screen::Gameplay
 		}
 
 		const auto current_time = system.timer.get_time();
-		if (Structures::Audio::Bus<Types::Audio::Music>::is_playing() && current_time > audio.mixer->music.get_position()) 
-			Structures::Audio::Bus<Types::Audio::Music>::seek(current_time);
+		if (Structures::Audio::Bus<Types::Audio::Music>::is_playing())
+		{
+			const auto current_pos = audio.mixer->music.get_position();
+			if (current_time != current_pos) 
+				Structures::Audio::Bus<Types::Audio::Music>::seek(current_time);
+		}
 
 		update_input(current_time, events);
 		auto click_left = system.key_stroke.get_recently_pressed_left();
@@ -223,7 +227,8 @@ namespace Structures::Screen::Gameplay
 		const auto beatmap_audio_file = mapset_root / gameplay_screen->mapset->general.audio_file;
 
 		beatmap_music->load(beatmap_audio_file, beatmap_audio_file.filename().string());
-		beatmap_effect->load(mapset_root, mapset_root);
+		beatmap_effect->load(mapset_root, mapset_root, false, false, 
+			false, false, { beatmap_audio_file.stem() });
 	}
 
 	//! Screen

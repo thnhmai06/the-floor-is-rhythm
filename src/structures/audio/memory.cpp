@@ -132,7 +132,8 @@ namespace Structures::Audio
 						path_name.replace_extension();
 					const auto name = path_name.generic_string();
 
-					if (blacklist.contains(name)) continue;
+					if (blacklist.contains(name)) 
+						continue;
 					if (!override && data.contains(name)) continue;
 					load(entry, name);
 				}

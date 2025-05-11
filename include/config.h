@@ -36,7 +36,7 @@ namespace Config::GameConfig
 {
 	namespace General
 	{
-		constexpr char NAME[] = "The Floor is Rhythm";
+		constexpr char NAME[] = "The Floor is Rhythm!";
 	}
 	namespace Audio
 	{

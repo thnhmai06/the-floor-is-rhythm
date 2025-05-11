@@ -1,7 +1,6 @@
 #include "structures/game/mapset/timing.h" // Header
 #include <fstream>
 #include <ranges>
-
 #include "config.h"
 #include "logging/logger.h"
 #include "logging/exceptions.h"
