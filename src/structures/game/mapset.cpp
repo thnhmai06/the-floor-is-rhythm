@@ -88,7 +88,7 @@ namespace Structures::Game::Beatmap
 			if (header == Format::File::Floor::Mapset::General::HEADER) general.read(contents);
 			else if (header == Format::File::Floor::Mapset::Metadata::HEADER) metadata.read(contents);
 			else if (header == Format::File::Floor::Mapset::Difficulty::HEADER)
-				calculated_difficulty = std::make_unique<Metadata::CalculatedDifficulty>(Metadata::Difficulty(contents));
+				calculated_difficulty = std::make_unique<Metadata::CalculatedDifficulty>(contents);
 			else if (header == Format::File::Floor::Mapset::HitObjects::HEADER) hit_objects.read(contents);
 			else if (header == Format::File::Floor::Mapset::TimingPoints::HEADER) timing_points.read(contents);
 			else if (header == Format::File::Floor::Mapset::Events::HEADER) events.Parse(contents);
@@ -110,6 +110,21 @@ namespace Structures::Game::Beatmap
 		OsuParser::Beatmap::Beatmap storyboard{ osb_path.string() };
 		for (auto& event : storyboard.Events.objects)
 			events.objects.push_back(event);
+	}
+	std::string Mapset::to_string() const
+	{
+		using namespace Format::File::Floor::Mapset;
+		std::stringstream ss;
+
+		ss << FORMAT_VERSION << "\n\n";
+		ss << general << "\n\n";
+		ss << calculated_difficulty << "\n\n";
+		ss << metadata << "\n\n";
+		ss << timing_points << "\n\n";
+		ss << hit_objects << "\n\n";
+		ss << events;
+
+		return ss.str();
 	}
 	Mapset::Mapset(const std::filesystem::path& path, const bool load_storyboard_file)
 	: path(path)

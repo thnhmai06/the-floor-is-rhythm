@@ -8,7 +8,7 @@ namespace Structures::Screen::Gameplay::Cursor
 {
 	namespace Render
 	{
-		using namespace ::Config::GameConfig::Render::Cursor;
+		using namespace ::Config::Game::Render::Cursor;
 		namespace Components
 		{
 			NoteScore::NoteScore(
@@ -17,26 +17,28 @@ namespace Structures::Screen::Gameplay::Cursor
 				: Object(skin.find(Format::Skin::Image::HitObject::hit.at(score)), ORIGIN)
 			{
 				config.color.a = 0;
-				set_render_size(CURSOR_SIZE);
+				set_render_size(::Config::Game::Render::Cursor::NoteScore::get_size());
 			}
 
 			void NoteScore::add_animation(
-				const std::weak_ptr<NoteScore>& object, 
+				const std::weak_ptr<NoteScore>& object,
 				Events::Action::Buffer& action_buffer, const int64_t& time_earned)
 			{
+				using namespace NoteScore;
+
 				const auto it = object.lock();
-				const int64_t full_appear_moment = time_earned + SCORE_TIME_FADE_IN;
-				const int64_t disappear_moment = full_appear_moment + SCORE_TIME_STAY;
-				it->end_time = disappear_moment + SCORE_TIME_FADE_OUT;
+				const int64_t full_appear_moment = time_earned + TIME_FADE_IN;
+				const int64_t disappear_moment = full_appear_moment + TIME_STAY;
+				it->end_time = disappear_moment + TIME_FADE_OUT;
 
 				auto fade_in = std::make_shared<Events::Action::Render::FadeAction>(
-					time_earned, full_appear_moment, SCORE_EASING_IN, object, 0, SDL_MAX_ALPHA);
+					time_earned, full_appear_moment, EASING_IN, object, 0, SDL_MAX_ALPHA);
 				auto move_in = std::make_shared<Events::Action::Render::MoveAction>(
-					time_earned, full_appear_moment, SCORE_EASING_IN, object, SCORE_POS_START, SCORE_POS_END);
+					time_earned, full_appear_moment, EASING_IN, object, get_start_pos(), get_end_pos());
 				auto fade_out = std::make_shared<Events::Action::Render::FadeAction>(
-					disappear_moment, it->end_time, SCORE_EASING_OUT, object, SDL_MAX_ALPHA, 0);
+					disappear_moment, it->end_time, EASING_OUT, object, SDL_MAX_ALPHA, 0);
 				auto move_out = std::make_shared<Events::Action::Render::MoveAction>(
-					disappear_moment, it->end_time, SCORE_EASING_OUT, object, SCORE_POS_END, SCORE_POS_START);
+					disappear_moment, it->end_time, EASING_OUT, object, get_end_pos(), get_start_pos());
 				action_buffer.data.emplace(time_earned, fade_in);
 				action_buffer.data.emplace(time_earned, move_in);
 				action_buffer.data.emplace(disappear_moment, fade_out);
@@ -59,7 +61,7 @@ namespace Structures::Screen::Gameplay::Cursor
 
 			const auto events = event_buffer.search({ Types::Event::EventID::Scoring }, current_time);
 			if (events.empty()) return;
-			for (const auto& [time, event]: events.at(Types::Event::EventID::Scoring))
+			for (const auto& [time, event] : events.at(Types::Event::EventID::Scoring))
 			{
 				if (event.expired()) continue;
 				const auto& event_ptr = event.lock();
@@ -82,10 +84,8 @@ namespace Structures::Screen::Gameplay::Cursor
 			using namespace Components;
 
 			//! Body
-			body = std::make_shared<Object>(
-				skin.find(Format::Skin::Image::Cursor::body),
-				ORIGIN, CURSOR_POS);
-			body->set_render_size(CURSOR_SIZE);
+			body = std::make_shared<Object>(skin.find(Format::Skin::Image::Cursor::body), ORIGIN, get_pos());
+			body->set_render_size(::Config::user_config->gameplay.cursor.get_pixel_size());
 			data.emplace_back(body);
 
 			//! Note Scores

@@ -8,12 +8,11 @@
 namespace Structures::Audio
 {
 	//! Bus<Music>
-	float Bus<Music>::get_volume() const { return volume; }
-	float Bus<Music>::set_volume(float percent)
+	const float& Bus<Music>::get_volume() const { return *volume; }
+	float Bus<Music>::set_volume(float percent) const
 	{
 		percent = std::clamp(percent, 0.0f, 1.0f);
-
-		volume = percent;
+		*volume = percent;
 
 		// Hiện tại set volume music của SDL đang bị lỗi
 		return Utilities::Math::to_percent(
@@ -56,27 +55,28 @@ namespace Structures::Audio
 		current = MusicMemory::Item();
 		return Mix_HaltMusic();
 	}
+	Bus<Music>::Bus(float* volume) : volume(volume) {}
 
 	//! Bus<Effects>
-	float Bus<Effect>::get_volume() const { return volume; }
+	const float& Bus<Effect>::get_volume() const { return *volume; }
 	float Bus<Effect>::get_volume(const EffectMemory::Item& sound) const
 	{
 		if (!sound.is_valid()) return -1;
-		if (Utilities::Math::is_equal(volume, 0.0f)) return 0;
+		if (Utilities::Math::is_equal(*volume, 0.0f)) return 0;
 
-		return Utilities::Math::to_percent(
+		return static_cast<float>(Utilities::Math::to_percent(
 			Mix_VolumeChunk(sound.item->second, -1),
-			0, MIX_MAX_VOLUME) / volume;
+			0, MIX_MAX_VOLUME)) / *volume;
 	}
 	float Bus<Effect>::get_volume(const int& channel) const
 	{
-		if (Utilities::Math::is_equal(volume, 0.0f)) return 0;
+		if (Utilities::Math::is_equal(*volume, 0.0f)) return 0;
 
 		return Utilities::Math::to_percent(
 			Mix_Volume(channel, -1),
-			0, MIX_MAX_VOLUME) / volume;
+			0, MIX_MAX_VOLUME) / *volume;
 	}
-	float Bus<Effect>::set_volume(const float& percent)
+	float Bus<Effect>::set_volume(const float& percent) const
 	{
 		const float previous_volume = get_volume();
 		const int channel_num = Mix_AllocateChannels(-1);
@@ -84,7 +84,7 @@ namespace Structures::Audio
 		for (int channel = 0; channel < channel_num; ++channel)
 			volume_percent[channel] = get_volume(channel);
 
-		volume = std::clamp(percent, 0.0f, 1.0f);
+		*volume = std::clamp(percent, 0.0f, 1.0f);
 		for (int channel = 0; channel < channel_num; ++channel)
 			set_volume(channel, volume_percent[channel]);
 		return previous_volume;
@@ -95,7 +95,7 @@ namespace Structures::Audio
 		percent = std::clamp(percent, 0.0f, 1.0f);
 		const auto old_volume = get_volume(sound);
 
-		Mix_VolumeChunk(sound.item->second, Utilities::Math::to_value(percent * volume, 0, MIX_MAX_VOLUME));
+		Mix_VolumeChunk(sound.item->second, Utilities::Math::to_value(percent * *volume, 0, MIX_MAX_VOLUME));
 		return old_volume;
 	}
 	float Bus<Effect>::set_volume(const int& channel, float percent) const
@@ -103,7 +103,7 @@ namespace Structures::Audio
 		percent = std::clamp(percent, 0.0f, 1.0f);
 		const auto old_volume = get_volume(channel);
 
-		Mix_Volume(channel, Utilities::Math::to_value(percent * volume, 0, MIX_MAX_VOLUME));
+		Mix_Volume(channel, Utilities::Math::to_value(percent * *volume, 0, MIX_MAX_VOLUME));
 		return old_volume;
 	}
 	int Bus<Effect>::play(const EffectMemory::Item& sound, const std::optional<float>& volume) const
@@ -115,23 +115,5 @@ namespace Structures::Audio
 		else if (volume.has_value()) set_volume(channel, volume.value());
 		return channel;
 	}
-
-	//! EffectManager
-	/*const float& EffectManager::get_volume() const { return volume; }
-	float EffectManager::set_volume(const float& percent)
-	{
-		const auto previous_volume = get_volume();
-		std::vector<float> bus_volume(buses.size());
-		for (size_t bus = 0; bus < buses.size(); ++bus)
-			bus_volume[bus] = buses[bus]->get_volume();
-
-		volume = std::clamp(percent, 0.0f, 1.0f);
-		for (size_t bus = 0; bus < buses.size(); ++bus)
-			buses[bus]->set_volume(bus_volume[bus] * volume);
-		return previous_volume;
-	}
-	EffectManager::EffectManager(const float& volume, CONTAINER buses) : buses(std::move(buses))
-	{
-		set_volume(volume);
-	}*/
+	Bus<Effect>::Bus(float* volume) : volume(volume) {}
 }

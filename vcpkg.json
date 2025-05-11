@@ -1,5 +1,6 @@
 {
   "dependencies": [
+    "bit7z",
     "sdl3",
     {
       "name": "sdl3-image",
@@ -11,6 +12,6 @@
       ]
     },
     "spdlog",
-    "bit7z"
+    "inih"
   ]
 }

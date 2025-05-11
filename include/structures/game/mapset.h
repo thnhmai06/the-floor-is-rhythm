@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <functional>
 #include <filesystem>
+#include "structures/config.h"
 #include "structures/game/mapset/metadata.h"
 #include "structures/game/mapset/hitobject.h"
 #include "structures/game/mapset/timing.h"
@@ -20,9 +21,10 @@ namespace Structures::Game::Beatmap
 		explicit Storyboard(const std::filesystem::path& file);
 	};
 
-	struct Mapset
+	struct Mapset : Config::Config
 	{
 		std::filesystem::path path;
+
 		Metadata::General general;
 		Metadata::Metadata metadata;
 		std::unique_ptr<Metadata::CalculatedDifficulty> calculated_difficulty;
@@ -51,6 +53,7 @@ namespace Structures::Game::Beatmap
 		} stats;
 	private:
 		void parse(std::unordered_map<std::string, std::vector<std::string>>& sections);
+		[[nodiscard]] std::string to_string() const override;
 		void load_storyboard_file();
 
 	public:

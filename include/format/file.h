@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿// ReSharper disable StringLiteralTypo
+#pragma once
 
 namespace Format::File
 {
@@ -71,6 +72,48 @@ namespace Format::File
 			namespace Events
 			{
 				constexpr std::string_view HEADER = "[Events]";
+			}
+		}
+		namespace Config
+		{
+			constexpr auto EXTENSION = ".ini";
+			constexpr auto FORMAT_VERSION = "; tfir config format v1";
+
+			namespace Graphic
+			{
+				constexpr auto HEADER = "Graphic";
+
+				constexpr auto FULLSCREEN = "fullscreen";
+				constexpr auto WIDTH = "width";
+				constexpr auto HEIGHT = "height";
+			}
+
+			namespace Audio
+			{
+				constexpr auto HEADER = "Audio";
+
+				namespace Volume
+				{
+					constexpr auto MASTER = "master";
+					constexpr auto MUSIC = "music";
+					constexpr auto EFFECT = "effect";
+				}
+			}
+
+			namespace Gameplay
+			{
+				constexpr auto HEADER = "Gameplay";
+				namespace Cursor
+				{
+					constexpr auto CURSOR_SIZE = "cursorsize";
+				}
+				namespace Binding
+				{
+					constexpr auto L1 = "bindl1";
+					constexpr auto L2 = "bindl2";
+					constexpr auto R1 = "bindr1";
+					constexpr auto R2 = "bindr2";
+				}
 			}
 		}
 	}

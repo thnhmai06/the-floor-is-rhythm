@@ -88,7 +88,15 @@ namespace Logging::Exceptions::FileExceptions
 	};
 	struct File_Open_Failed : File_Exception
 	{
-		explicit File_Open_Failed(const std::filesystem::path& file_path) : File_Exception(file_path, "Couldn't open file") {}
+		explicit File_Open_Failed(const std::filesystem::path& file_path) : File_Exception(file_path, "Couldn't open file: ") {}
+	};
+	struct File_Config_Failed : std::runtime_error
+	{
+		explicit File_Config_Failed(const std::filesystem::path& file_path, const int& line = -1) :
+			std::runtime_error(
+				(line == -1) 
+				? format("Couldn't load config: {} (open failed). Use default config instead.", file_path.string())
+				: format("Couldn't load config: {} (line {}). Use default config instead.", file_path.string(), line)) {}
 	};
 }
 namespace Logging::Exceptions::FormatExceptions

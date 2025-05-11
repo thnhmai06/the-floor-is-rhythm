@@ -3,7 +3,7 @@
 
 namespace Structures::Render::Layer
 {
-	using namespace Config::GameConfig::Render;
+	using namespace ::Config::Game::Render;
 	using namespace Utilities::Math::FPoint;
 
 	const bool& StoryboardLayer::get_widescreen_mode() const { return widescreen; }

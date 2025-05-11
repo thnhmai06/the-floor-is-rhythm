@@ -24,7 +24,11 @@ namespace Structures::Game::Beatmap::HitObjects
 		ss << time << AND << is_kat << AND << hit_sound.to_int() << AND << hit_sample.to_string();
 		return ss.str();
 	}
-	Floor::Floor(const std::vector<std::string>& content) { read(content); }
+
+	Floor::Floor(const std::vector<std::string>& contents)
+	{
+		Floor::read(contents);
+	}
 
 	//! HitObjects
 	void HitObjects::read(const std::vector<std::string>& lines)
@@ -54,9 +58,8 @@ namespace Structures::Game::Beatmap::HitObjects
 			ss << '\n' << hit_object.to_string();
 		return ss.str();
 	}
-	std::ostream& operator<<(std::ostream& os, const HitObjects& hit_objects)
+	HitObjects::HitObjects(const std::vector<std::string>& lines)
 	{
-		os << hit_objects.to_string();
-		return os;
+		HitObjects::read(lines);
 	}
 }

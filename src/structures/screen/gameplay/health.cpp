@@ -11,9 +11,9 @@ namespace Structures::Screen::Gameplay::Health
 				const Memory& skin)
 				: Object(skin.find(
 					Format::Skin::Image::HealthBar::background),
-					::Config::GameConfig::Render::Health::ORIGIN, render_pos)
+					::Config::Game::Render::Health::ORIGIN, ::Config::Game::Render::Health::POS)
 			{
-				set_render_size(render_size);
+				set_render_size(::Config::Game::Render::Health::get_size());
 			}
 
 			Colour::Colour(
@@ -22,8 +22,8 @@ namespace Structures::Screen::Gameplay::Health
 			)
 				: PercentObject(
 					skin.find(Format::Skin::Image::HealthBar::colour),
-					render_size, percent, true, false,
-					::Config::GameConfig::Render::Health::ORIGIN, render_pos)
+					::Config::Game::Render::Health::get_size(), percent, true, false,
+					::Config::Game::Render::Health::ORIGIN, ::Config::Game::Render::Health::POS)
 			{
 			}
 		}

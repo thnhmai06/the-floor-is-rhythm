@@ -5,9 +5,9 @@
 
 namespace Work::Audio
 {
-	using namespace  Structures::Audio;
-	using namespace Config::GameConfig::Audio;
-	using namespace Config::UserConfig::Audio;
+	using namespace Structures::Audio;
+	using namespace Config::Game::Audio;
+	using Config::user_config;
 
 	namespace Memory
 	{
@@ -32,8 +32,7 @@ namespace Work::Audio
 		spec.format = AUDIO_FORMAT;
 		spec.freq = SAMPLE_FREQUENCY;
 
-		mixer = std::make_unique<Mixer>(spec,
-			Volume::master, Volume::music, Volume::effects, MAX_CHANNELS);
+		mixer = std::make_unique<Mixer>(spec, user_config->audio.volume, MAX_CHANNELS);
 	}
 	inline void quit()
 	{

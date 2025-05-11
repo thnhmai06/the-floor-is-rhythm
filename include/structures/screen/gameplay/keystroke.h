@@ -29,10 +29,10 @@ namespace Structures::Screen::Gameplay::KeyStroke
 
 		struct Keystroke
 		{
-			KeyCounter l1{ Config::UserConfig::KeyBinding::l1 };
-			KeyCounter l2{ Config::UserConfig::KeyBinding::l2 };
-			KeyCounter r1{ Config::UserConfig::KeyBinding::r1 };
-			KeyCounter r2{ Config::UserConfig::KeyBinding::r2 };
+			KeyCounter l1{ ::Config::user_config->gameplay.binding.l1 };
+			KeyCounter l2{ ::Config::user_config->gameplay.binding.l2 };
+			KeyCounter r1{ ::Config::user_config->gameplay.binding.r1 };
+			KeyCounter r2{ ::Config::user_config->gameplay.binding.r2 };
 
 			void reset(bool only_recently_pressed_num = false);
 			void update(const KeyboardEvents& events);

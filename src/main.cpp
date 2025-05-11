@@ -14,6 +14,7 @@ int32_t main(int32_t argc, char* argv[])
 	}
 
 	Work::Core::Init::system(DEBUG_MODE);
+	Work::Core::Init::config();
 	Work::Core::Init::window(window);
 	Work::Audio::init();
 	Work::Render::init(window);
@@ -24,6 +25,7 @@ int32_t main(int32_t argc, char* argv[])
 	Work::Render::clean();
 	Work::Audio::quit();
 	Work::Core::CleanUp::window(window);
+	Work::Core::CleanUp::config();
 	Work::Core::CleanUp::system();
 
 	return result;

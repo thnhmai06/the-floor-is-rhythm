@@ -175,6 +175,7 @@
     <ClInclude Include="include\logging\info.h" />
     <ClInclude Include="include\logging\logger.h" />
     <ClInclude Include="include\main.h" />
+    <ClInclude Include="include\structures\config.h" />
     <ClInclude Include="include\structures\events\action\audio.h" />
     <ClInclude Include="include\structures\events\event\playing.h" />
     <ClInclude Include="include\structures\events\time\easing.hpp" />
@@ -221,6 +222,8 @@
     <ClCompile Include="dependencies\easing\src\easing.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
+    <ClCompile Include="src\config.cpp" />
+    <ClCompile Include="src\structures\config.cpp" />
     <ClCompile Include="src\structures\events\event\event.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>

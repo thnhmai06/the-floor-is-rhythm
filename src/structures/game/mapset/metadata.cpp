@@ -47,11 +47,6 @@ namespace Structures::Game::Beatmap::Metadata
 
 		return ss.str();
 	}
-	std::ostream& operator<<(std::ostream& os, const General& general)
-	{
-		os << general.to_string();
-		return os;
-	}
 
 	//! Metadata::Metadata
 	void Metadata::read(const std::vector<std::string>& contents)
@@ -100,11 +95,7 @@ namespace Structures::Game::Beatmap::Metadata
 
 		return writer.str();
 	}
-	std::ostream& operator<<(std::ostream& os, const Metadata& metadata)
-	{
-		os << metadata.to_string();
-		return os;
-	}
+	Metadata::Metadata(const std::vector<std::string>& contents) { Metadata::read(contents); }
 
 	//! Metadata::Difficulty
 	void Difficulty::read(const std::vector<std::string>& contents)
@@ -138,29 +129,25 @@ namespace Structures::Game::Beatmap::Metadata
 	{
 		return CalculatedDifficulty(*this);
 	}
-	std::ostream& operator<<(std::ostream& os, const Difficulty& difficulty)
-	{
-		os << difficulty.to_string();
-		return os;
-	}
+	Difficulty::Difficulty(const std::vector<std::string>& contents) { Difficulty::read(contents); }
 
 	//! Metadata::CalculatedDifficulty
 	// ::OverallDifficulty
 	float CalculatedDifficulty::OverallDifficulty::get_perfect() const
 	{
-		return Config::GameConfig::Difficulty::OD::Base::PERFECT - *value * Config::GameConfig::Difficulty::OD::Multiply::PERFECT;
+		return ::Config::Game::Difficulty::OD::Base::PERFECT - *value * ::Config::Game::Difficulty::OD::Multiply::PERFECT;
 	}
 	float CalculatedDifficulty::OverallDifficulty::get_good() const
 	{
-		return Config::GameConfig::Difficulty::OD::Base::GOOD - *value * Config::GameConfig::Difficulty::OD::Multiply::GOOD;
+		return ::Config::Game::Difficulty::OD::Base::GOOD - *value * ::Config::Game::Difficulty::OD::Multiply::GOOD;
 	}
 	float CalculatedDifficulty::OverallDifficulty::get_bad() const
 	{
-		return Config::GameConfig::Difficulty::OD::Base::BAD - *value * Config::GameConfig::Difficulty::OD::Multiply::BAD;
+		return ::Config::Game::Difficulty::OD::Base::BAD - *value * ::Config::Game::Difficulty::OD::Multiply::BAD;
 	}
 	float CalculatedDifficulty::OverallDifficulty::get_miss()
 	{
-		return Config::GameConfig::Difficulty::OD::Base::MISS;
+		return ::Config::Game::Difficulty::OD::Base::MISS;
 	}
 	Types::Game::Gameplay::NoteScore CalculatedDifficulty::OverallDifficulty::get_score(
 		const bool is_clicked, const int64_t& current_time, const int64_t& hit_object_time) const
@@ -192,7 +179,7 @@ namespace Structures::Game::Beatmap::Metadata
 	// ::HPDrainRate
 	float CalculatedDifficulty::HPDrainRate::get_drain_rate() const
 	{
-		using namespace Config::GameConfig::Difficulty::HP;
+		using namespace ::Config::Game::Difficulty::HP;
 		if (*value < 5)
 			return BASE - EASIER_MULTIPLY * (5 - *value);
 		return BASE + HARDER_MULTIPLY * (*value - 5);
@@ -224,6 +211,10 @@ namespace Structures::Game::Beatmap::Metadata
 	//::
 	CalculatedDifficulty::CalculatedDifficulty(const Difficulty& basic)
 		: Difficulty(basic), overall_difficulty(&od), hp_drain_rate(&hp)
+	{
+	}
+	CalculatedDifficulty::CalculatedDifficulty(const std::vector<std::string>& contents)
+		: Difficulty(contents), overall_difficulty(&od), hp_drain_rate(&hp)
 	{
 	}
 }

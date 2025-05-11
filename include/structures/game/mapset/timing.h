@@ -1,10 +1,11 @@
 ﻿#pragma once
 #include <map>
+#include "structures/config.h"
 #include "structures/game/mapset/hitsound.h"
 
 namespace Structures::Game::Beatmap::TimingPoints
 {
-	struct TimingPoint
+	struct TimingPoint : Config::Section
 	{
 		static constexpr int32_t MINIMUM_NUM_CONTENT = 6;
 
@@ -14,17 +15,15 @@ namespace Structures::Game::Beatmap::TimingPoints
 		bool inherited = false;
 		bool kiai = false;
 
-		void read(const std::vector<std::string>& content);
-		[[nodiscard]] std::string to_string() const;
-
+		void read(const std::vector<std::string>& content) override;
+		[[nodiscard]] std::string to_string() const override;
 		[[nodiscard]] float get_velocity() const;
 
 		TimingPoint() = default;
-		explicit TimingPoint(const std::vector<std::string>& content) { read(content); }
-		friend std::ostream& operator<<(std::ostream& os, const TimingPoint& point);
+		explicit TimingPoint(const std::vector<std::string>& content);
 	};
 
-	struct TimingPoints
+	struct TimingPoints : Config::Section
 	{
 	protected:
 		struct TimingPos
@@ -40,10 +39,9 @@ namespace Structures::Game::Beatmap::TimingPoints
 
 		CONTAINER data;
 
+		void read(const std::vector<std::string>& contents) override;
+		[[nodiscard]] std::string to_string() const override;
 		[[nodiscard]] float get_object_pos(const float& current_time) const;
-		void read(const std::vector<std::string>& contents);
-		[[nodiscard]] std::string to_string() const;
-		friend std::ostream& operator<<(std::ostream& os, const TimingPoints& points);
 
 		TimingPoints() = default;
 		explicit TimingPoints(const std::vector<std::string>& contents);

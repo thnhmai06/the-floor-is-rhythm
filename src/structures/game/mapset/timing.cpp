@@ -31,12 +31,6 @@ namespace Structures::Game::Beatmap::TimingPoints
 			<< AND << sample.index << AND << static_cast<int32_t>(sample.volume) << AND << kiai;
 		return writer.str();
 	}
-	std::ostream& operator<<(std::ostream& os, const TimingPoint& point)
-	{
-		os << point.to_string();
-		return os;
-	}
-
 	float TimingPoints::get_object_pos(const float& current_time) const
 	{
 		auto current_timing = timing_pos.upper_bound(current_time);
@@ -45,7 +39,11 @@ namespace Structures::Game::Beatmap::TimingPoints
 
 		const float time_elapsed = current_time - current_timing->first;
 		const auto& [pos, beat_length, velocity] = current_timing->second;
-		return pos + Config::GameConfig::Difficulty::Velocity::BASE_ONE_BEAT_PIXEL_LENGTH * velocity * time_elapsed / beat_length;
+		return pos + ::Config::Game::Difficulty::Velocity::BASE_ONE_BEAT_PIXEL_LENGTH * velocity * time_elapsed / beat_length;
+	}
+	TimingPoint::TimingPoint(const std::vector<std::string>& content)
+	{
+		TimingPoint::read(content);
 	}
 
 	//! TimingPoints
@@ -74,7 +72,7 @@ namespace Structures::Game::Beatmap::TimingPoints
 		{
 			if (time < 0) continue;
 			current_pos +=
-				Config::GameConfig::Difficulty::Velocity::BASE_ONE_BEAT_PIXEL_LENGTH
+				::Config::Game::Difficulty::Velocity::BASE_ONE_BEAT_PIXEL_LENGTH
 				* current_velocity * (time - current_time) / current_beat_length;
 
 			current_time = time;
@@ -95,11 +93,5 @@ namespace Structures::Game::Beatmap::TimingPoints
 			writer << point << '\n';
 		return writer.str();
 	}
-
-	TimingPoints::TimingPoints(const std::vector<std::string>& contents) { read(contents); }
-
-	std::ostream& operator<<(std::ostream& os, const TimingPoints& points)
-	{
-		return os << points.to_string();
-	}
+	TimingPoints::TimingPoints(const std::vector<std::string>& contents) { TimingPoints::read(contents); }
 }

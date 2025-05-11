@@ -13,12 +13,12 @@ namespace Structures::Audio
 	struct Bus<Music>
 	{
 	protected:
-		float volume = 1.0f;
+		float* volume;
 		MusicMemory::Item current;
 
 	public:
-		[[nodiscard]] float get_volume() const;
-		float set_volume(float percent);
+		[[nodiscard]] const float& get_volume() const;
+		float set_volume(float percent) const;
 		void play(const MusicMemory::Item& music);
 		const MusicMemory::Item& get_current() const;
 		int64_t get_position() const;
@@ -28,35 +28,25 @@ namespace Structures::Audio
 		static void pause();
 		static void resume();
 		void stop();
+
+		explicit Bus(float* volume);
 	};
 
 	template<>
 	struct Bus<Effect>
 	{
 	protected:
-		float volume = 1.0f;
+		float* volume;
 
 	public:
-		[[nodiscard]] float get_volume() const;
+		[[nodiscard]] const float& get_volume() const;
 		[[nodiscard]] float get_volume(const EffectMemory::Item& sound) const;
 		[[nodiscard]] float get_volume(const int& channel) const;
-		float set_volume(const float& percent);
+		float set_volume(const float& percent) const;
 		float set_volume(const EffectMemory::Item& sound, float percent) const;
 		float set_volume(const int& channel, float percent) const;
 		int play(const EffectMemory::Item& sound, const std::optional<float>& volume = std::nullopt) const;
+
+		explicit Bus(float* volume);
 	};
-
-	/*struct EffectManager
-	{
-	protected:
-		float volume;
-
-	public:
-		using CONTAINER = std::vector<Bus<Effect>*>;
-		CONTAINER buses;
-		[[nodiscard]] const float& get_volume() const;
-		float set_volume(const float& percent);
-
-		explicit EffectManager(const float& volume, CONTAINER buses = {});
-	};*/
 }

@@ -2,15 +2,28 @@
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_video.h>
-#include "config.h"
 #include "logging/exceptions.h"
 #include "logging/logger.h"
+#include "config.h"
 
 //! Core
 namespace Work::Core
 {
 	namespace Init
 	{
+		void config()
+		{
+			const fs::path path = SDL_GetBasePath() / fs::path("config.ini");
+
+			if (fs::exists(path))
+			{
+				Config::user_config = std::make_unique<Structures::Config::UserConfig>(path);
+				return;
+			}
+			SPDLOG_WARN("Configuration file not found. A default config file will be generated.");
+			Config::user_config = std::make_unique<Structures::Config::UserConfig>();
+			Config::user_config->write(path);
+		}
 		void system(const bool debug)
 		{
 			Logging::Logger::init("root", debug ? spdlog::level::debug : spdlog::level::info);
@@ -20,11 +33,22 @@ namespace Work::Core
 		}
 		void window(SDL_Window*& window)
 		{
-			window = SDL_CreateWindow(
-				Config::GameConfig::General::NAME,
-				Config::UserConfig::Video::WINDOW_SIZE.x,
-				Config::UserConfig::Video::WINDOW_SIZE.y,
-				SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_HIGH_PIXEL_DENSITY);
+			if (Config::user_config->graphic.fullscreen)
+			{
+				window = SDL_CreateWindow(
+					Config::Game::General::NAME,
+					Config::user_config->graphic.window_size.x,
+					Config::user_config->graphic.window_size.y,
+					SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_FULLSCREEN);
+			}
+			else
+			{
+				window = SDL_CreateWindow(
+					Config::Game::General::NAME,
+					Config::user_config->graphic.window_size.x,
+					Config::user_config->graphic.window_size.y,
+					SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_HIGH_PIXEL_DENSITY);
+			}
 			if (!window)
 				THROW_CRITICAL(Logging::Exceptions::SDLExceptions::Video::SDL_Video_CreateWindow_Failed());
 		}
@@ -39,14 +63,20 @@ namespace Work::Core
 
 			/*SDL_SetRenderLogicalPresentation(
 				renderer,
-				Config::GameConfig::Render::LOGICAL_WIDTH,
-				Config::GameConfig::Render::LOGICAL_HEIGHT,
+				Config::Game::Render::LOGICAL_WIDTH,
+				Config::Game::Render::LOGICAL_HEIGHT,
 				SDL_LOGICAL_PRESENTATION_STRETCH);*/
 		}
 	}
 
 	namespace CleanUp
 	{
+		void config()
+		{
+			const fs::path path = SDL_GetBasePath() / fs::path("config.ini");
+			Config::user_config->write(path);
+			Config::user_config.reset();
+		}
 		void system() { SDL_Quit(); }
 		void window(SDL_Window* window) { SDL_DestroyWindow(window); }
 		void renderer(SDL_Renderer* renderer) { SDL_DestroyRenderer(renderer); }

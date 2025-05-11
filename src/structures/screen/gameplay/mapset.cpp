@@ -23,14 +23,14 @@ namespace Structures::Screen::Gameplay::Mapset
 				// Object
 				const auto texture = memory.find(Format::Skin::Image::HitObject::floor);
 				auto r_floor = std::make_shared<Object>(texture, Types::Render::OriginType::Centre, centre_pos);
-				r_floor->set_render_size(Config::GameConfig::Render::HitObject::SIZE);
-				r_floor->config.color = (floor->is_kat) ? Config::GameConfig::Render::HitObject::KAT : Config::GameConfig::Render::HitObject::DON;
+				r_floor->set_render_size(::Config::Game::Render::HitObject::get_size());
+				r_floor->config.color = (floor->is_kat) ? ::Config::Game::Render::HitObject::KAT : ::Config::Game::Render::HitObject::DON;
 
 				// Overlay
 				auto r_overlay = std::make_shared<Object>(
 					memory.find(Format::Skin::Image::HitObject::floor_overlay),
 					Types::Render::OriginType::Centre, centre_pos);
-				r_overlay->set_render_size(Config::GameConfig::Render::HitObject::SIZE);
+				r_overlay->set_render_size(::Config::Game::Render::HitObject::get_size());
 
 				data.emplace_back(std::move(r_floor));
 				data.emplace_back(std::move(r_overlay));
@@ -84,9 +84,9 @@ namespace Structures::Screen::Gameplay::Mapset
 			right = std::make_shared<Collection>();
 			data.emplace_back(right);
 
-			for (const auto& obj : mapset.hit_objects.data | std::views::values)
+			for (const auto& [time, obj] : mapset.hit_objects.data)
 			{
-				SDL_FPoint pos = { timing_points->get_object_pos(obj.time), 0 };
+				SDL_FPoint pos = {.x = timing_points->get_object_pos(obj.time), .y = 0 };
 				if (!obj.is_kat) pos.x *= -1;
 				auto r_obj = std::make_shared<Components::Floor>(&obj, memory, pos);
 

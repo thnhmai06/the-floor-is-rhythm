@@ -10,52 +10,29 @@ namespace Structures::Screen::Gameplay::Score
 		{
 			data.reserve(3);
 
-			//! Config
-			constexpr float ratio = 44.0f / 68.0f;
-			// Score
-			constexpr SDL_FPoint score_pos = { Config::GameConfig::Render::LOGICAL_WIDTH, 0 }; // góc phải màn hình
-			constexpr auto score_origin_type = Types::Render::OriginType::TopRight;
-			constexpr SDL_FPoint score_character_size = {
-				Config::GameConfig::Render::LOGICAL_WIDTH * 0.025f,
-				Config::GameConfig::Render::LOGICAL_WIDTH * 0.025f / ratio
-			};
-			// Accuracy
-			constexpr SDL_FPoint accuracy_pos = { Config::GameConfig::Render::LOGICAL_WIDTH, score_character_size.y }; // góc phải màn hình, dưới score
-			constexpr auto accuracy_origin_type = Types::Render::OriginType::TopRight;
-			constexpr SDL_FPoint accuracy_character_size = {
-				Config::GameConfig::Render::LOGICAL_WIDTH * 0.015f,
-				Config::GameConfig::Render::LOGICAL_WIDTH * 0.015f / ratio
-			};
-			// Combo
-			constexpr SDL_FPoint combo_pos = { 0, Config::GameConfig::Render::LOGICAL_HEIGHT }; // góc dưới trái màn hình
-			constexpr auto combo_origin_type = Types::Render::OriginType::BottomLeft;
-			constexpr SDL_FPoint combo_character_size = {
-				Config::GameConfig::Render::LOGICAL_WIDTH * 0.025f,
-				Config::GameConfig::Render::LOGICAL_WIDTH * 0.025f / ratio
-			};
+			using namespace ::Config::Game::Render::Score;
 
-			//! Setup
 			// Score
 			auto c_score = std::make_shared<HorizontalNumber<float>>(
-				score, &skin, &Format::Skin::Image::Score::alphabet, score_pos, score_character_size, score_origin_type);
-			c_score->zero_padding = 7; // Max Score = 1m có 7 chữ số
-			c_score->decimal_format = 0;
+				score, &skin, &Format::Skin::Image::Score::alphabet, get_pos(), get_character_size(), ORIGIN);
+			c_score->zero_padding = ZERO_PADDING; // Max Score = 1m có 7 chữ số
+			c_score->decimal_format = DECIMAL_FORMAT;
 			this->score = c_score;
 			data.emplace_back(std::move(c_score));
 
 			// Accuracy
 			auto c_accuracy = std::make_shared<HorizontalNumber<float>>(
-				accuracy, &skin, &Format::Skin::Image::Score::alphabet, accuracy_pos, accuracy_character_size, accuracy_origin_type);
-			c_accuracy->decimal_format = 2; // 2 chữ số thập phân
-			c_accuracy->zero_padding = 2; // thường ở phạm vi xx%
-			c_accuracy->multiply = 100; // từ 0 -> 1 thành 0 -> 100
-			c_accuracy->footer = "%";
+				accuracy, &skin, &Format::Skin::Image::Score::alphabet, Accuracy::get_pos(), Accuracy::get_character_size(), Accuracy::ORIGIN);
+			c_accuracy->decimal_format = Accuracy::ZERO_PADDING;
+			c_accuracy->zero_padding = Accuracy::DECIMAL_FORMAT;
+			c_accuracy->multiply = Accuracy::MULTIPLY;
+			c_accuracy->footer = Accuracy::FOOTER;
 			data.emplace_back(std::move(c_accuracy));
 
 			// Combo
 			auto c_combo = std::make_shared<HorizontalNumber<unsigned long>>(
-				combo, &skin, &Format::Skin::Image::Score::alphabet, combo_pos, combo_character_size, combo_origin_type);
-			c_combo->footer = "x";
+				combo, &skin, &Format::Skin::Image::Score::alphabet, Combo::get_pos(), Combo::get_character_size(), Combo::ORIGIN);
+			c_combo->footer = Combo::FOOTER;
 			this->combo = c_combo;
 			data.emplace_back(std::move(c_combo));
 		}

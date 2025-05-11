@@ -1,11 +1,12 @@
 ﻿#pragma once
 #include <map>
 #include <vector>
+#include "structures/config.h"
 #include "structures/game/mapset/hitsound.h"
 
 namespace Structures::Game::Beatmap::HitObjects
 {
-	struct Floor
+	struct Floor : Config::Section
 	{
 		static constexpr int32_t MINIMUM_NUM_CONTENT = 4;
 
@@ -14,24 +15,23 @@ namespace Structures::Game::Beatmap::HitObjects
 		Hitsound::Additions hit_sound{};
 		Hitsound::HitSample hit_sample{};
 
-		void read(const std::vector<std::string>& contents);
-		[[nodiscard]] std::string to_string() const;
+		void read(const std::vector<std::string>& contents) override;
+		[[nodiscard]] std::string to_string() const override;
 
 		Floor() = default;
-		explicit Floor(const std::vector<std::string>& content);
+		explicit Floor(const std::vector<std::string>& contents);
 	};
 
-	struct HitObjects
+	struct HitObjects : Config::Section
 	{
 		using CONTAINER = std::map<float, Floor>;
 
 		CONTAINER data;
 
-		void read(const std::vector<std::string>& lines);
-		[[nodiscard]] std::string to_string() const;
+		void read(const std::vector<std::string>& lines) override;
+		[[nodiscard]] std::string to_string() const override;
 
 		HitObjects() = default;
-		explicit HitObjects(const std::vector<std::string>& contents) { read(contents); }
-		friend std::ostream& operator<<(std::ostream& os, const HitObjects& hit_objects);
+		explicit HitObjects(const std::vector<std::string>& lines);
 	};
 }

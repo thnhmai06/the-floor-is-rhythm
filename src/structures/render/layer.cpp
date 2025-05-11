@@ -13,7 +13,7 @@ namespace Structures::Render::Layer
 	Layer::Camera::Camera(const OriginPoint& origin)
 	{
 		origin_point = origin;
-		render_pos = { .x = ::Config::GameConfig::Render::Camera::DEFAULT_POS_X, .y = ::Config::GameConfig::Render::Camera::DEFAULT_POS_Y };
+		render_pos = ::Config::Game::Render::Camera::DEFAULT_POS;
 	}
 
 	const SDL_FPoint& Layer::Camera::get_camera_origin() const { return origin_point; }
@@ -22,7 +22,7 @@ namespace Structures::Render::Layer
 	const SDL_FPoint& Layer::Camera::get_camera_pos() const { return render_pos; }
 	SDL_FPoint Layer::Camera::get_camera_size()
 	{
-		return SDL_FPoint{ ::Config::GameConfig::Render::Camera::DEFAULT_SIZE_WIDTH, ::Config::GameConfig::Render::Camera::DEFAULT_SIZE_HEIGHT };
+		return to_float_point(::Config::user_config->graphic.window_size);
 	}
 	SDL_FPoint Layer::Camera::get_camera_object_offset() const
 	{
@@ -177,8 +177,8 @@ namespace Structures::Render::Layer
 		: render_buffer(this),
 		camera({
 			camera_origin_in_percent * SDL_FPoint{
-				Config::GameConfig::Render::LOGICAL_WIDTH,
-			  Config::GameConfig::Render::LOGICAL_HEIGHT
+				static_cast<float>(::Config::user_config->graphic.window_size.x),
+				static_cast<float>(::Config::user_config->graphic.window_size.y)
 			}
 			})
 	{

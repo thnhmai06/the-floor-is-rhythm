@@ -153,7 +153,6 @@ namespace Work::Convert::osu
 
 		writer << Format::File::Floor::Mapset::FORMAT_VERSION << '\n';
 		writer << Format::File::Floor::Mapset::ConvertInformation::osu::VERSION << beatmap.Version << "\n\n";
-
 		writer << convert_general(beatmap.General) << "\n\n";
 		writer << convert_difficulty(beatmap.Difficulty) << "\n\n";
 		writer << convert_metadata(beatmap.Metadata) << "\n\n";

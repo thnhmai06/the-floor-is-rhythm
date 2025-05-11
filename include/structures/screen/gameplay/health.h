@@ -12,22 +12,10 @@ namespace Structures::Screen::Gameplay::Health
 
 		namespace Components
 		{
-			static constexpr SDL_FPoint render_size =
-			{
-				Config::GameConfig::Render::Health::SIZE_W,
-				Config::GameConfig::Render::Health::SIZE_H,
-			};
-			static constexpr SDL_FPoint render_pos = 
-			{
-				::Config::GameConfig::Render::Health::POS_X,
-				::Config::GameConfig::Render::Health::POS_Y
-			};
-
-				struct Background : Object
+			struct Background : Object
 			{
 				explicit Background(const Memory& skin);
 			};
-
 			struct Colour : PercentObject
 			{
 				explicit Colour(const Memory& skin, const float* percent);

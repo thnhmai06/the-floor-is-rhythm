@@ -1,10 +1,11 @@
 ﻿#pragma once
 #include <string>
+#include "structures/config.h"
 #include "structures/type.hpp"
 
 namespace Structures::Game::Beatmap::Metadata
 {
-	struct General
+	struct General : Config::Section
 	{
 		std::string audio_file;
 		int32_t start_music_delay = 0;
@@ -13,36 +14,33 @@ namespace Structures::Game::Beatmap::Metadata
 		bool widescreen_storyboard = false;
 		Types::Game::HitSound::SampleSet sample_set = Types::Game::HitSound::SampleSet::Normal;
 
-		void read(const std::vector<std::string>& contents);
-		[[nodiscard]] std::string to_string() const;
+		void read(const std::vector<std::string>& contents) override;
+		[[nodiscard]] std::string to_string() const override;
 
 		General() = default;
-		explicit General(const std::vector<std::string>& contents) { read(contents); }
-		friend std::ostream& operator<<(std::ostream& os, const General& general);
+		explicit General(const std::vector<std::string>& contents) { General::read(contents); }
 	};
-	struct Metadata
+	struct Metadata : Config::Section
 	{
 		std::string title, artist, creator, difficulty_name, source;
 		std::vector<std::string> tags;
-		void read(const std::vector<std::string>& contents);
-		[[nodiscard]] std::string to_string() const;
+		void read(const std::vector<std::string>& contents) override;
+		[[nodiscard]] std::string to_string() const override;
 
 		Metadata() = default;
-		explicit Metadata(const std::vector<std::string>& contents) { read(contents); }
-		friend std::ostream& operator<<(std::ostream& os, const Metadata& metadata);
+		explicit Metadata(const std::vector<std::string>& contents);
 	};
 
 	struct CalculatedDifficulty;
-	struct Difficulty
+	struct Difficulty : Config::Section
 	{
 		float od = -1, hp = -1;
-		void read(const std::vector<std::string>& contents);
-		[[nodiscard]] std::string to_string() const;
+		void read(const std::vector<std::string>& contents) override;
+		[[nodiscard]] std::string to_string() const override;
 		[[nodiscard]] CalculatedDifficulty calculate() const;
 
 		Difficulty() = default;
-		explicit Difficulty(const std::vector<std::string>& contents) { read(contents); }
-		friend std::ostream& operator<<(std::ostream& os, const Difficulty& difficulty);
+		explicit Difficulty(const std::vector<std::string>& contents);
 	};
 
 	struct CalculatedDifficulty : Difficulty
@@ -73,6 +71,7 @@ namespace Structures::Game::Beatmap::Metadata
 			explicit HPDrainRate(const float* value);
 		} hp_drain_rate;
 
-		explicit CalculatedDifficulty(const Difficulty& basic);
+		CalculatedDifficulty(const Difficulty& basic);
+		explicit CalculatedDifficulty(const std::vector<std::string>& contents);
 	};
 }
