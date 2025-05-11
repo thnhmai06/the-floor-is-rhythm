@@ -13,6 +13,14 @@ namespace Config
 		namespace General
 		{
 			constexpr auto NAME = "The Floor is Rhythm!";
+			constexpr int64_t DELAY_RESUME = 500; // ms
+
+			namespace Path
+			{
+				constexpr auto SKIN = "./assets";
+				constexpr auto CONFIG = "./config.ini";
+				constexpr auto BEATMAP = "./beatmap";
+			}
 		}
 		namespace Audio
 		{
@@ -79,6 +87,9 @@ namespace Config
 				SDL_FPoint get_size();
 				constexpr SDL_FPoint POS = { .x = 0, .y = 0 };
 				constexpr auto ORIGIN = Structures::Types::Render::OriginType::TopLeft;
+
+				constexpr int64_t CHANGE_TIME = 200; // ms
+				constexpr auto EASING = Structures::Types::Render::EasingFunctionType::QuartOut;
 			}
 			namespace Score
 			{
@@ -108,6 +119,26 @@ namespace Config
 					constexpr auto FOOTER = "x";
 
 				}
+			}
+			namespace Pausing
+			{
+				constexpr auto ORIGIN_CONTINUE = Structures::Types::Render::OriginType::Centre;
+				constexpr auto ORIGIN_RETRY = Structures::Types::Render::OriginType::Centre;
+				constexpr auto ORIGIN_BACK = Structures::Types::Render::OriginType::Centre;
+				SDL_FPoint get_button_size();
+				SDL_FPoint get_continue_pos();
+				SDL_FPoint get_retry_pos();
+				SDL_FPoint get_back_pos();
+
+				constexpr int64_t TIME_FADE_IN = 700; // ms
+				constexpr int64_t TIME_FADE_OUT = TIME_FADE_IN; // ms
+			}
+		}
+		namespace KeyBinding
+		{
+			namespace Pausing
+			{
+				constexpr SDL_Scancode KEY_PAUSE = SDL_SCANCODE_ESCAPE;
 			}
 		}
 		namespace Difficulty

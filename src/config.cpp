@@ -75,6 +75,36 @@ namespace Config
 					}
 				}
 			}
+
+			namespace Pausing
+			{
+				SDL_FPoint get_button_size()
+				{
+					using Utilities::Math::FPoint::operator*;
+
+					constexpr SDL_FPoint percent = { .x = 0.07f, .y = 0.12f };
+					return Utilities::Math::FPoint::to_float_point(user_config->graphic.window_size) * percent;
+				}
+				SDL_FPoint get_continue_pos()
+				{
+					using Utilities::Math::FPoint::operator*;
+
+					constexpr SDL_FPoint percent = { .x = 0.5f, .y = 0.3 };
+					return Utilities::Math::FPoint::to_float_point(user_config->graphic.window_size) * percent;
+				}
+				SDL_FPoint get_retry_pos()
+				{
+					using Utilities::Math::FPoint::operator*;
+					constexpr SDL_FPoint percent = { .x = 0.5f, .y = 0.5f };
+					return Utilities::Math::FPoint::to_float_point(user_config->graphic.window_size) * percent;
+				}
+				SDL_FPoint get_back_pos()
+				{
+					using Utilities::Math::FPoint::operator*;
+					constexpr SDL_FPoint percent = { .x = 0.5f, .y = 0.7f };
+					return Utilities::Math::FPoint::to_float_point(user_config->graphic.window_size) * percent;
+				}
+			}
 		}
 	}
 }

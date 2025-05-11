@@ -1,4 +1,4 @@
-﻿#include "work/convert/osu/mapset.h" // Header
+﻿#include "core/work/convert/osu/mapset.h" // Header
 #include <osu!parser/Parser/Beatmap.hpp>
 #include "format/file.h"
 #include "structures/game/mapset/metadata.h"
@@ -9,7 +9,7 @@
 #include "structures/type.hpp"
 #include "utilities.hpp"
 
-namespace Work::Convert::osu
+namespace Core::Work::Convert::Osu
 {
 	using namespace Structures::Game::Beatmap::Metadata;
 	using namespace OsuParser::Beatmap;

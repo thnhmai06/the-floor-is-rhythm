@@ -38,7 +38,7 @@ namespace Structures::Events::Action::Render
 		void work(const int64_t& current_time)
 		{
 			if (!is_valid(current_time)) return;
-			if (!started) 
+			if (!started)
 			{
 				started = true;
 				on_started();
@@ -57,7 +57,9 @@ namespace Structures::Events::Action::Render
 		std::vector<ValueType> sequence;
 		long current_sequence = DEFAULT_SEQUENCE;
 
-		RenderAction(const int64_t& start_time,
+		RenderAction() = default;
+		RenderAction(
+			const int64_t& start_time,
 			const int64_t& end_time,
 			const Time::Easing::EasingFunctionType& easing,
 			std::weak_ptr<Structures::Render::Object::Object> target_object,
@@ -72,7 +74,6 @@ namespace Structures::Events::Action::Render
 			const auto n = static_cast<int64_t>(sequence.size());
 			this->end_time = start_time + base_duration * (n + 1);
 		}
-		RenderAction() = default;
 
 		[[nodiscard]] std::shared_ptr<Action> clone() const override
 		{
@@ -81,24 +82,25 @@ namespace Structures::Events::Action::Render
 
 		void execute(const int64_t& current_time) final
 		{
-			if (auto sequence_time = get_sequence_time(); 
+			if (auto sequence_time = get_sequence_time();
 				current_time <= sequence_time.second)
 				work(current_time);
 			else {
 				while (sequence_time.second < current_time)
 				{
-					if (next_sequence()) 
+					if (next_sequence())
 					{
 						sequence_time = get_sequence_time();
 						work(current_time);
-					} else
+					}
+					else
 					{
 						work(current_time);
 						finished = true;
 						on_finished();
 						return;
 					}
-					
+
 				}
 			}
 		}

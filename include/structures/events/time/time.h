@@ -24,7 +24,7 @@ namespace Structures::Events::Time
 		//! - Nếu có pause nhạc thì cũng cần pause lại timer
 		//! - Khi seek nhạc, cần phải clear timer (autostart = true) và đặt start_time tại lúc seek
 
-		[[nodiscard]] const bool* is_paused() const;
+		[[nodiscard]] const bool& is_paused() const;
 		[[nodiscard]] int64_t get_time(const std::optional<Uint64>& current_tick = std::nullopt) noexcept;
 		void pause(const std::optional<Uint64>& current_tick = std::nullopt);
 		void resume();

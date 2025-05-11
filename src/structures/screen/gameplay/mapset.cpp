@@ -51,7 +51,7 @@ namespace Structures::Screen::Gameplay::Mapset
 		}
 		void Mapset::set_render_range(const int64_t& current_time)
 		{
-			constexpr int64_t render_time_range = 3000; // 3s, tạm thời là vậy
+			constexpr int64_t render_time_range = 5000; // 5s, tạm thời là vậy
 			const auto begin_time = current_time;
 			const auto end_time = current_time + render_time_range;
 
@@ -84,7 +84,7 @@ namespace Structures::Screen::Gameplay::Mapset
 			right = std::make_shared<Collection>();
 			data.emplace_back(right);
 
-			for (const auto& [time, obj] : mapset.hit_objects.data)
+			for (const auto& obj : mapset.hit_objects.data | std::views::values)
 			{
 				SDL_FPoint pos = {.x = timing_points->get_object_pos(obj.time), .y = 0 };
 				if (!obj.is_kat) pos.x *= -1;

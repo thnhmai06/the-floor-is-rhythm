@@ -8,6 +8,7 @@
 #include "structures/screen/gameplay/health.h"
 #include "structures/screen/gameplay/score.h"
 #include "structures/screen/gameplay/mapset.h"
+#include "structures/screen/pausing.h"
 
 namespace Structures::Screen::Gameplay
 {
@@ -22,6 +23,7 @@ namespace Structures::Screen::Gameplay
 		bool auto_play = false;
 		Events::Event::Buffer event_buffer;
 		Events::Action::Buffer action_buffer;
+		Pausing::PauseScreen pause_screen;
 
 	public:
 		//! Logic
@@ -32,7 +34,8 @@ namespace Structures::Screen::Gameplay
 			bool is_started = false;
 
 		private:
-			void update_input(const int64_t& current_time, const Events::Event::Input::SdlEvents& events);
+			void sync_audio(const int64_t& current_time) const;
+			void update_event(const int64_t& current_time, const Events::Event::Input::SdlEvents& events);
 			void update_render(const int64_t& current_time) const;
 			void update_timing(const int64_t& current_time);
 			bool update_score_and_health(const Types::Game::Gameplay::NoteScore& obj_score);
@@ -44,7 +47,7 @@ namespace Structures::Screen::Gameplay
 			{
 				Mapset::Render::Mapset::RenderScripts::const_iterator object_script;
 				Game::Beatmap::Hitsound::TimingSample timing_sample;
-				const Game::Beatmap::Hitsound::SampleSet* beatmap_sample;
+				const Game::Beatmap::Hitsound::SampleSet* beatmap_sample; // tự update qua time_step
 
 				explicit Current(const Game::Beatmap::Mapset& mapset);
 			} current;
@@ -60,9 +63,11 @@ namespace Structures::Screen::Gameplay
 			} system;
 
 
-			[[nodiscard]] const bool* is_paused() const;
+			[[nodiscard]] const bool& is_paused() const;
 			void pause();
 			void resume();
+			void fail(const int64_t& current_time) const;
+			void retry();
 			void make_time_step(const Events::Event::Input::SdlEvents& events);
 
 			explicit Logic(
@@ -71,9 +76,16 @@ namespace Structures::Screen::Gameplay
 				const bool* no_fail);
 		} logic;
 
-		//! Render
+		//! Core
 		struct Render final
 		{
+			struct
+			{
+				Structures::Render::Layer::Layer::Buffer::Item cursor, health, mapset, score;
+			} item;
+
+			const Memory* skin;
+			bool load_storyboard;
 			GameplayScreen* gameplay_screen;
 			std::shared_ptr<Cursor::Render::Cursor> cursor;
 			std::shared_ptr<Health::Render::Health> health;
@@ -81,19 +93,24 @@ namespace Structures::Screen::Gameplay
 			std::shared_ptr<Score::Render::Score> score;
 			std::unique_ptr<Game::Beatmap::Event::EventObjects> storyboard;
 
+			void clean(bool exit = false);
+			void retry();
+
 			explicit Render(
 				GameplayScreen* gameplay_screen,
-				const Memory& memory, bool load_storyboard);
+				const Memory& skin, bool load_storyboard);
+			~Render();
 		} render;
 
 		//! Audio
 		struct Audio final
 		{
+			Structures::Audio::MusicMemory::Item audio_file;
 			GameplayScreen* gameplay_screen;
-			Structures::Audio::Mixer* mixer;
 			Structures::Audio::MusicMemory* beatmap_music;
 			Structures::Audio::EffectMemory* beatmap_effect;
 			Structures::Audio::EffectMemory* skin_effect;
+
 
 			void check_and_play_sound(
 				const int64_t& current_time,
@@ -101,15 +118,23 @@ namespace Structures::Screen::Gameplay
 				const Types::Game::Gameplay::NoteScore& score,
 				const Game::Beatmap::Hitsound::TimingSample& timing_sample, 
 				const Game::Beatmap::Hitsound::SampleSet& beatmap_sample) const;
+			void clean(bool exit = false) const;
+			void retry() const;
 
 			explicit Audio(GameplayScreen* gameplay_screen,
 				const std::filesystem::path& mapset_root,
-				Structures::Audio::Mixer* mixer,
 				Structures::Audio::MusicMemory* beatmap_music,
 				Structures::Audio::EffectMemory* beatmap_effect,
 				Structures::Audio::EffectMemory* skin_effect);
+			~Audio();
 		} audio;
 
-		explicit GameplayScreen(const std::filesystem::path& mapset_path, const float& mod_multiplier, bool load_storyboard, bool no_fail, bool auto_play = false);
+		void retry();
+
+		explicit GameplayScreen(
+			const std::filesystem::path& mapset_path, 
+			const float& mod_multiplier, bool load_storyboard, 
+			bool no_fail = false, bool auto_play = false);
+		~GameplayScreen();
 	};
 }

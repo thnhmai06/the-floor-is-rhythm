@@ -20,7 +20,7 @@ namespace Structures::Audio
 				Utilities::Math::to_value(percent, 0, MIX_MAX_VOLUME)),
 			0, MIX_MAX_VOLUME);
 	}
-	void Bus<Music>::play(const MusicMemory::Item& music)
+	void Bus<Music>::play(const MusicMemory::Item& music, const bool pause)
 	{
 		if (!music.parent || music.item == music.parent->items.end()) return;
 
@@ -29,6 +29,11 @@ namespace Structures::Audio
 		{
 			LOG_ERROR(Logging::Exceptions::SDLExceptions::Audio::SDL_Audio_PlayMusic_Failed(music.item->first));
 			return;
+		}
+		if (pause)
+		{
+			Bus::pause();
+			seek(0);
 		}
 		current = music;
 	}
@@ -52,7 +57,7 @@ namespace Structures::Audio
 	void Bus<Music>::resume() { Mix_ResumeMusic(); }
 	void Bus<Music>::stop()
 	{
-		current = MusicMemory::Item();
+		current.parent = nullptr;
 		return Mix_HaltMusic();
 	}
 	Bus<Music>::Bus(float* volume) : volume(volume) {}
@@ -115,5 +120,10 @@ namespace Structures::Audio
 		else if (volume.has_value()) set_volume(channel, volume.value());
 		return channel;
 	}
+	void Bus<Mix_Chunk*>::stop(const int& channel)
+	{
+		Mix_HaltChannel(channel);
+	}
+
 	Bus<Effect>::Bus(float* volume) : volume(volume) {}
 }

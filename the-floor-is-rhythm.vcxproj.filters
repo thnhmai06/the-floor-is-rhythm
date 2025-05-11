@@ -135,6 +135,9 @@
     <ClCompile Include="src\config.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\structures\screen\pausing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\structures\game\mapset\metadata.h">
@@ -288,6 +291,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\structures\config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structures\screen\pausing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

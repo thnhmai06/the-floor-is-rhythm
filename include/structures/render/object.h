@@ -3,11 +3,12 @@
 #include <memory>
 #include <variant>
 #include "structures/render/texture.h"
+#include "structures/events/event/input.h"
 #include "structures/type.hpp"
 
 namespace Structures::Render::Object
 {
-	//? Bạn đang tìm hàm Render của Object và Collection?
+	//? Bạn đang tìm hàm Core của Object và Collection?
 	// Nó đã được chuyển sang Layer rồi: link:src\structures\render\layer.cpp:void%20Layer::render_object(std::shared_ptr<Object::Object>&%20object)
 
 	using namespace Structures::Render::Texture;
@@ -86,6 +87,25 @@ namespace Structures::Render::Object
 			const Config::OriginPoint& custom_origin,
 			const SDL_FPoint& render_pos = { 0, 0 });
 		virtual ~Object() = default;
+	};
+
+	struct ReactObject : Object
+	{
+		bool allow_hide = false;
+		std::function<void(const SDL_MouseButtonEvent& event)> on_event;
+
+		void check_event(const Events::Event::Input::MouseEvents& events) const;
+
+		explicit ReactObject(
+			Memory::Item texture,
+			const Types::Render::OriginType& origin_type = Types::Render::OriginType::Centre,
+			const SDL_FPoint& render_pos = { 0, 0 }, 
+			std::function<void(const SDL_MouseButtonEvent& event)> on_event = nullptr);
+		explicit ReactObject(
+			Memory::Item texture,
+			const Config::OriginPoint& custom_origin,
+			const SDL_FPoint& render_pos = { 0, 0 },
+			std::function<void(const SDL_MouseButtonEvent& event)> on_event = nullptr);
 	};
 
 	struct Collection

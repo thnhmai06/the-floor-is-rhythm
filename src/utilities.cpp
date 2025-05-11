@@ -24,7 +24,7 @@ namespace Utilities
 
 		SDL_FPoint centre(const SDL_FPoint& size, const SDL_FPoint& window_size)
 		{
-			return {.x = centre(size.x, window_size.x), .y = centre(size.y, window_size.y) };
+			return { .x = centre(size.x, window_size.x), .y = centre(size.y, window_size.y) };
 		}
 
 		float degree_to_radian(const float& degree)
@@ -60,7 +60,7 @@ namespace Utilities
 		{
 			SDL_FPoint operator+(const SDL_FPoint& a, const SDL_FPoint& b)
 			{
-				return SDL_FPoint{.x = a.x + b.x, .y = a.y + b.y };
+				return SDL_FPoint{ .x = a.x + b.x, .y = a.y + b.y };
 			}
 
 			SDL_FPoint& operator+=(SDL_FPoint& a, const SDL_FPoint& b)
@@ -70,7 +70,7 @@ namespace Utilities
 
 			SDL_FPoint operator-(const SDL_FPoint& a)
 			{
-				return SDL_FPoint{.x = -a.x, .y = -a.y };
+				return SDL_FPoint{ .x = -a.x, .y = -a.y };
 			}
 
 			SDL_FPoint operator-(const SDL_FPoint& a, const SDL_FPoint& b)
@@ -85,12 +85,12 @@ namespace Utilities
 
 			SDL_FPoint operator*(const SDL_FPoint& a, const SDL_FPoint& b)
 			{
-				return SDL_FPoint{.x = a.x * b.x, .y = a.y * b.y };
+				return SDL_FPoint{ .x = a.x * b.x, .y = a.y * b.y };
 			}
 
 			SDL_FPoint operator*(const SDL_FPoint& point, const float& value)
 			{
-				return SDL_FPoint{.x = point.x * value, .y = point.y * value };
+				return SDL_FPoint{ .x = point.x * value, .y = point.y * value };
 			}
 
 			SDL_FPoint& operator*=(SDL_FPoint& a, const SDL_FPoint& b)
@@ -105,12 +105,12 @@ namespace Utilities
 
 			SDL_FPoint operator/(const SDL_FPoint& a, const SDL_FPoint& b)
 			{
-				return SDL_FPoint{.x = a.x / b.x, .y = a.y / b.y };
+				return SDL_FPoint{ .x = a.x / b.x, .y = a.y / b.y };
 			}
 
 			SDL_FPoint operator/(const SDL_FPoint& point, const float& value)
 			{
-				return SDL_FPoint{.x = point.x / value, .y = point.y / value };
+				return SDL_FPoint{ .x = point.x / value, .y = point.y / value };
 			}
 
 			SDL_FPoint& operator/=(SDL_FPoint& a, const SDL_FPoint& b)
@@ -140,7 +140,7 @@ namespace Utilities
 
 			SDL_FPoint to_float_point(const SDL_Point& point)
 			{
-				return SDL_FPoint{.x = static_cast<float>(point.x), .y = static_cast<float>(point.y) };
+				return SDL_FPoint{ .x = static_cast<float>(point.x), .y = static_cast<float>(point.y) };
 			}
 		}
 	}
@@ -207,12 +207,17 @@ namespace Utilities
 
 		SDL_FPoint get_pos_from_rect(const SDL_FRect& rect)
 		{
-			return SDL_FPoint{.x = rect.x, .y = rect.y };
+			return SDL_FPoint{ .x = rect.x, .y = rect.y };
 		}
 
 		SDL_FPoint get_size_from_rect(const SDL_FRect& rect)
 		{
-			return SDL_FPoint{.x = rect.w, .y = rect.h };
+			return SDL_FPoint{ .x = rect.w, .y = rect.h };
+		}
+		bool is_point_in_rect(const SDL_FPoint& point, const SDL_FRect& rect)
+		{
+			return Math::in_range(rect.x, rect.x + rect.w, point.x)
+				&& Math::in_range(rect.y, rect.y + rect.h, point.y);
 		}
 	}
 }

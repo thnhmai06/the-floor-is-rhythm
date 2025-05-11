@@ -1,32 +1,28 @@
 ﻿#include "main.h" // Header
-#include "work/render.h"
-#include "work/core.h"
-#include "work/audio.h"
-#include "work/convert/osu/beatmap.h"
+#include "core/manager.h"
+#include "core/work.h"
+#include "core/work/convert/osu/beatmap.h"
 
-int32_t main(int32_t argc, char* argv[])
+static int32_t run()
 {
-	bool DEBUG_MODE = false;
+	using namespace Core::Work;
+
+	//Convert::Osu::convert_beatmap(R"(D:\PROGRAM\osu!\Songs\1511778 Camellia - Body F10ating in the Zero Gravity Space)");
+	int32_t result = work();
+
+	return result;
+}
+
+int32_t main(const int32_t argc, char* argv[])
+{
 	for (int32_t i = 0; i < argc; ++i)
 	{
-		if (strcmp(argv[i], "--debug") == 0)
-			DEBUG_MODE = true;
+		if (strcmp(argv[i], "--debug") == 0) DEBUG = true;
 	}
 
-	Work::Core::Init::system(DEBUG_MODE);
-	Work::Core::Init::config();
-	Work::Core::Init::window(window);
-	Work::Audio::init();
-	Work::Render::init(window);
-
-	//Work::Convert::osu::convert_beatmap(R"(D:\PROGRAM\osu!\Songs\1511778 Camellia - Body F10ating in the Zero Gravity Space)", "D:\\");
-	int32_t result = Work::Render::work();
-
-	Work::Render::clean();
-	Work::Audio::quit();
-	Work::Core::CleanUp::window(window);
-	Work::Core::CleanUp::config();
-	Work::Core::CleanUp::system();
+	Core::Manager::init();
+	const int32_t result = run();
+	Core::Manager::quit();
 
 	return result;
 }

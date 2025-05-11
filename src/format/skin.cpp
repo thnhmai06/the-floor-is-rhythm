@@ -24,6 +24,13 @@ namespace Format::Skin
 			// Score
 			for (const auto& ch : Score::alphabet | std::views::values)
 				data.insert(ch);
+
+			// Pausing
+			data.insert(Pausing::pause_background);
+			data.insert(Pausing::fail_background);
+			data.insert(Pausing::pause_continue);
+			data.insert(Pausing::pause_retry);
+			data.insert(Pausing::pause_back);
 		}
 	}
 

@@ -5,9 +5,9 @@ namespace Structures::Screen::Gameplay::KeyStroke
 	namespace Logic
 	{
 		//! KeyCounter
-		void KeyCounter::make_virtual_event(const bool count, const bool is_hold)
+		void KeyCounter::make_virtual_event(const bool is_pressed, const bool is_hold)
 		{
-			if (count)
+			if (is_pressed)
 			{
 				this->count++;
 				++recently_pressed_num;

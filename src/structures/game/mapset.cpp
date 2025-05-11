@@ -73,7 +73,7 @@ namespace Structures::Game::Beatmap
 	{
 		// tính thời gian
 		time.start_playing_time = mapset.hit_objects.data.begin()->first;
-		time.start_time = time.start_playing_time; // tạm thời là vậy đến khi làm xong storyboard
+		time.start_time = std::min(0LL, time.start_playing_time); // tạm thời là vậy đến khi làm xong storyboard
 		time.length = mapset.hit_objects.data.rbegin()->first - time.start_playing_time;
 
 		// đếm số object

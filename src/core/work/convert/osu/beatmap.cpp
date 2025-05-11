@@ -1,12 +1,13 @@
-﻿#include "work/convert/osu/beatmap.h" // Header
+﻿#include "core/work/convert/osu/beatmap.h" // Header
 #include <bit7z/bitarchivereader.hpp>
 #include <spdlog/spdlog.h>
 #include <filesystem>
 #include "format/file.h"
+#include "core/work/convert/osu/mapset.h"
 
 namespace fs = std::filesystem;
 
-namespace Work::Convert::osu
+namespace Core::Work::Convert::Osu
 {
 	void convert_beatmap(const fs::path& path, const fs::path& output)
 	{
@@ -19,7 +20,7 @@ namespace Work::Convert::osu
 			const auto location = (output / path.stem());
 			archive.extractTo(location.string());
 
-			return convert_beatmap(location, location.parent_path());;
+			return convert_beatmap(location, location.parent_path());
 		}
 
 		if (fs::is_directory(path))

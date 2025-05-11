@@ -39,6 +39,8 @@ namespace Structures::Events::Action
 
 		[[nodiscard]] std::shared_ptr<Action> clone() const override;
 		void execute(const int64_t& current_time) override;
+
+		explicit CallbackAction(const int64_t& start_time, std::function<void(const int64_t& current_time)> callback);
 	};
 	//! Chú ý: Các lệnh bên dưới không nên lồng nhau
 	//! (Loop trong loop hoặc Loop trong Condition và ngược lại)

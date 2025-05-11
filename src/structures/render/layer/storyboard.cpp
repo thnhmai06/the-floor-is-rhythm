@@ -66,13 +66,6 @@ namespace Structures::Render::Layer
 		pass.target_texture.render(nullptr, &dst_rect);
 		foreground.target_texture.render(nullptr, &dst_rect);
 	}
-	void StoryboardLayer::clear() const
-	{
-		background.target_texture.clear();
-		fail.target_texture.clear();
-		pass.target_texture.clear();
-		foreground.target_texture.clear();
-	}
 	void StoryboardLayer::clear()
 	{
 		background.clear();

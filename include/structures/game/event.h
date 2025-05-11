@@ -51,6 +51,7 @@ namespace Structures::Game::Beatmap
 				Structures::Events::Time::Timer* timer,
 				Structures::Events::Action::Buffer& action_buffer,
 				Structures::Events::Event::Buffer* event_buffer);
+			~EventObjects();
 		};
 	}
 }

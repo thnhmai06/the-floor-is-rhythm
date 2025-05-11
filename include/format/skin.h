@@ -55,6 +55,14 @@ namespace Format::Skin
 				{'%', prefix + "percent"}
 			};
 		}
+		namespace Pausing
+		{
+			inline const std::string fail_background = "fail-background";
+			inline const std::string pause_background = "pause-background";
+			inline const std::string pause_continue = "pause-continue";
+			inline const std::string pause_retry = "pause-retry";
+			inline const std::string pause_back = "pause-back";
+		}
 
 		struct Namespace
 		{
@@ -68,6 +76,8 @@ namespace Format::Skin
 	namespace Sound
 	{
 		inline const std::unordered_set<std::string_view> SUPPORT_EXTENSIONS = { ".wav", ".mp3", ".ogg" };
+
+		inline const auto fail_sound = "failsound";
 	}
 
 	struct FolderNamespace

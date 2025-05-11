@@ -46,6 +46,7 @@ namespace Structures::Screen::Gameplay::Health
 		public:
 			[[nodiscard]] const float* get_health() const;
 			bool update(const Types::Game::Gameplay::NoteScore& note_score, const unsigned long& current_combo); // -> return: người chơi có fail không?
+			void reset();
 
 			explicit Health(const Game::Beatmap::Mapset& mapset, const bool* is_paused, const bool* no_fail);
 		};

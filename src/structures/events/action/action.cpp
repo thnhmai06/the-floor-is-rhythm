@@ -42,6 +42,10 @@ namespace Structures::Events::Action
 		if (callback) callback(current_time);
 		if (current_time >= end_time) finished = true;
 	}
+	CallbackAction::CallbackAction(const int64_t& start_time, std::function<void(const int64_t& current_time)> callback)
+		: callback(std::move(callback))
+	{
+	}
 
 	//! LoopAction
 	std::shared_ptr<Action> LoopAction::clone() const

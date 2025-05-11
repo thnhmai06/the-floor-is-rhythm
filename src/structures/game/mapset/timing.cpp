@@ -35,7 +35,8 @@ namespace Structures::Game::Beatmap::TimingPoints
 	{
 		auto current_timing = timing_pos.upper_bound(current_time);
 		if (current_timing == timing_pos.begin()) return 0.0f;
-		--current_timing;
+		if (current_timing == timing_pos.end()) current_timing = Utilities::Container::get_last_element_iterator(timing_pos);
+		else --current_timing;
 
 		const float time_elapsed = current_time - current_timing->first;
 		const auto& [pos, beat_length, velocity] = current_timing->second;

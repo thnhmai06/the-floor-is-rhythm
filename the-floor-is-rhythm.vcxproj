@@ -25,7 +25,7 @@
     <RootNamespace>thefloorisrhythm</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ReplaceWildcardsInProjectItems>true</ReplaceWildcardsInProjectItems>
-    <ProjectName>the-floor-is-rhythm</ProjectName>
+    <ProjectName>floor</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -169,6 +169,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\config.h" />
+    <ClInclude Include="include\core\resources\event.h" />
+    <ClInclude Include="include\core\work\update.h" />
     <ClInclude Include="include\format\file.h" />
     <ClInclude Include="include\format\skin.h" />
     <ClInclude Include="include\logging\exceptions.h" />
@@ -194,9 +196,10 @@
     <ClInclude Include="include\structures\screen\gameplay\health.h" />
     <ClInclude Include="include\structures\screen\gameplay\keystroke.h" />
     <ClInclude Include="include\structures\screen\gameplay\score.h" />
-    <ClInclude Include="include\work\audio.h" />
-    <ClInclude Include="include\work\convert\osu\beatmap.h" />
-    <ClInclude Include="include\work\convert\osu\mapset.h" />
+    <ClInclude Include="include\structures\screen\pausing.h" />
+    <ClInclude Include="include\core\resources\audio.h" />
+    <ClInclude Include="include\core\work\convert\osu\beatmap.h" />
+    <ClInclude Include="include\core\work\convert\osu\mapset.h" />
     <ClInclude Include="include\structures\game\mapset.h" />
     <ClInclude Include="include\structures\events\action\render.hpp" />
     <ClInclude Include="include\structures\audio\buses.h" />
@@ -214,16 +217,23 @@
     <ClInclude Include="include\structures\screen\gameplay.h" />
     <ClInclude Include="include\structures\type.hpp" />
     <ClInclude Include="include\utilities.hpp" />
-    <ClInclude Include="include\work\core.h" />
-    <ClInclude Include="include\work\render.h" />
-    <ClInclude Include="include\work\render\layer.h" />
-    <ClInclude Include="include\work\screen.h" />
-    <ClInclude Include="include\work\render\textures.h" />
+    <ClInclude Include="include\core\manager.h" />
+    <ClInclude Include="include\core\work.h" />
+    <ClInclude Include="include\core\resources\layer.h" />
+    <ClInclude Include="include\core\resources\screen.h" />
+    <ClInclude Include="include\core\resources\textures.h" />
     <ClCompile Include="dependencies\easing\src\easing.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\config.cpp" />
-    <ClCompile Include="src\structures\config.cpp" />
+    <ClCompile Include="src\config.cpp">
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\core\work\update.cpp">
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\structures\config.cpp">
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="src\structures\events\event\event.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
@@ -278,13 +288,16 @@
     <ClCompile Include="src\structures\screen\gameplay\health.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
+    <ClCompile Include="src\structures\screen\pausing.cpp">
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="src\utilities.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\work\convert\osu\beatmap.cpp">
+    <ClCompile Include="src\core\work\convert\osu\beatmap.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\work\convert\osu\mapset.cpp">
+    <ClCompile Include="src\core\work\convert\osu\mapset.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\structures\game\mapset.cpp">
@@ -329,10 +342,10 @@
     <ClCompile Include="src\structures\render\texture.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\work\core.cpp">
+    <ClCompile Include="src\core\manager.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\work\render.cpp">
+    <ClCompile Include="src\core\work.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
   </ItemGroup>

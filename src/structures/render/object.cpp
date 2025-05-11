@@ -157,6 +157,41 @@ namespace Structures::Render::Object
 		src(std::move(texture)), config(render_pos, custom_origin)
 	{
 	}
+
+	//! ReactObject
+	void ReactObject::check_event(const Events::Event::Input::MouseEvents& events) const
+	{
+		if (!on_event) return;
+		if (!allow_hide && (!visible || config.color.a == 0)) return;
+		for (const auto& event : events)
+		{
+			if (const SDL_FPoint pos = { .x = event.x, .y = event.y };
+				Utilities::Render::is_point_in_rect(pos, get_sdl_dst_rect()))
+				on_event(event);
+		}
+	}
+
+	ReactObject::ReactObject(
+		Memory::Item texture, 
+		const Types::Render::OriginType& origin_type,
+		const SDL_FPoint& render_pos,
+		std::function<void(const SDL_MouseButtonEvent& event)> on_event)
+		: Object(std::move(texture), origin_type, render_pos),
+		on_event(std::move(on_event))
+	{
+	}
+
+	ReactObject::ReactObject(
+		Memory::Item texture,
+		const Config::OriginPoint& custom_origin,
+		const SDL_FPoint& render_pos,
+		std::function<void(const SDL_MouseButtonEvent& event)> on_event)
+		: Object(std::move(texture), custom_origin, render_pos),
+		on_event(std::move(on_event))
+	{
+	}
+
+	//! Collection
 	void Collection::for_each_item(const std::function<void(const size_t& index)>& function, const bool no_duplicate)
 	{
 		std::unordered_set<size_t> completed_index{};

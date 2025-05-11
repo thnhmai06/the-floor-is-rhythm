@@ -110,7 +110,7 @@ namespace Structures::Render::Layer
 		return true;
 	}
 	Layer::Buffer::Item::Item(Buffer* render_buffer) :
-		parent(render_buffer), item(render_buffer->data.end())
+		parent(render_buffer)
 	{
 	}
 	Layer::Buffer::Item::Item(Buffer* render_buffer, CONTAINER::iterator item) :

@@ -109,6 +109,7 @@ namespace Utilities
 		SDL_FRect merge_pos_size(const SDL_FPoint& pos, const SDL_FPoint& size);
 		SDL_FPoint get_pos_from_rect(const SDL_FRect& rect);
 		SDL_FPoint get_size_from_rect(const SDL_FRect& rect);
+		bool is_point_in_rect(const SDL_FPoint& point, const SDL_FRect& rect);
 	}
 	namespace Container
 	{

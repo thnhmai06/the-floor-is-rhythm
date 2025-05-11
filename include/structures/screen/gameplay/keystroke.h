@@ -17,7 +17,7 @@ namespace Structures::Screen::Gameplay::KeyStroke
 			bool is_hold = false;
 
 		public:
-			void make_virtual_event(bool count = true, bool is_hold = false);
+			void make_virtual_event(bool is_pressed = true, bool is_hold = false);
 			void update(const KeyboardEvents& events);
 			[[nodiscard]] const uint8_t& get_recently_pressed_num() const;
 			[[nodiscard]] const unsigned long& get_count() const;

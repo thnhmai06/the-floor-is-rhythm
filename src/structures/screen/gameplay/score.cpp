@@ -43,6 +43,7 @@ namespace Structures::Screen::Gameplay::Score
 		// Accuracy
 		void Score::Accuracy::reset()
 		{
+			accuracy = 1;
 			count_perfect = count_good = count_bad = count_miss = 0;
 		}
 		unsigned long Score::Accuracy::get_elapsed_objects_num() const
@@ -109,6 +110,12 @@ namespace Structures::Screen::Gameplay::Score
 			const auto score = mapset->calculated_difficulty->overall_difficulty.get_score(click_num > 0, current_time, floor.time);
 			click_num--;
 			return score;
+		}
+		void Score::reset()
+		{
+			score = 0;
+			combo.reset(true);
+			accuracy.reset();
 		}
 		void Score::update(const Types::Game::Gameplay::NoteScore& note_score, const uint32_t& num)
 		{

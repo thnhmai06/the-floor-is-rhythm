@@ -9,7 +9,7 @@ namespace Structures::Events::Time
 		total_paused_ticks += crr_tick_value - paused_tick;
 		paused_tick = crr_tick_value;
 	}
-	const bool* Timer::is_paused() const { return &paused; }
+	const bool& Timer::is_paused() const { return paused; }
 	int64_t Timer::get_time(const std::optional<Uint64>& current_tick) noexcept
 	{
 		if (paused) create_pause_snapshot(current_tick);

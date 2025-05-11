@@ -3,7 +3,7 @@
 #include "structures/type.hpp"
 #include "structures/audio/memory.h"
 
-// lưu trữ Additions và Hitsample giống như osu!
+// lưu trữ Additions và Hitsample giống như Osu!
 // p/s: code trong Osu!parser/Convert/Structures/Playing/HitObjects.hpp
 // phần Additions và HitSample là do mình viết :D
 

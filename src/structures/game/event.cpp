@@ -337,5 +337,13 @@ namespace Structures::Game::Beatmap
 				}
 			}
 		}
+		EventObjects::~EventObjects()
+		{
+			normal.reset();
+			background.reset();
+			fail.reset();
+			pass.reset();
+			foreground.reset();
+		}
 	}
 }

@@ -1,46 +1,61 @@
 ﻿// ReSharper disable CppClangTidyClangDiagnosticShadow
 #include "structures/screen/gameplay.h" // Header
+#include "main.h"
 #include "structures/screen/gameplay/mapset.h"
 #include "structures/events/event/playing.h"
-#include "work/render/layer.h"
-#include "work/render/textures.h"
+#include "core/resources/layer.h"
+#include "core/resources/textures.h"
 #include "logging/logger.h"
-#include "work/audio.h"
-#include "work/render.h"
+#include "core/resources/audio.h"
 
 namespace Structures::Screen::Gameplay
 {
 	//! Logic
-	const bool* GameplayScreen::Logic::is_paused() const { return system.timer.is_paused(); }
-	void GameplayScreen::Logic::pause()
+	const bool& GameplayScreen::Logic::is_paused() const { return system.timer.is_paused(); }
+	void GameplayScreen::Logic::sync_audio(const int64_t& current_time) const
 	{
-		if (*is_paused()) return;
-		Structures::Audio::Bus<Types::Audio::Music>::pause();
-		system.timer.pause();
+		if (is_paused()) return;
+		const auto& mapset = gameplay_screen->mapset;
+
+		const auto current_pos = mixer->music.get_position();
+		const auto current_music_time = current_time - mapset->general.start_music_delay;
+		if (current_music_time >= 0)
+		{
+			if (!Utilities::Math::in_offset_range(current_music_time, 500LL, current_pos))
+				Structures::Audio::Bus<Types::Audio::Music>::seek(current_music_time);
+			if (!Structures::Audio::Bus<Types::Audio::Music>::is_playing())
+				Structures::Audio::Bus<Types::Audio::Music>::resume();
+		}
 	}
-	void GameplayScreen::Logic::resume()
+	void GameplayScreen::Logic::update_event(const int64_t& current_time, const Events::Event::Input::SdlEvents& events)
 	{
-		if (!*is_paused()) return;
-		Structures::Audio::Bus<Types::Audio::Music>::resume();
-		system.timer.resume();
-	}
-	void GameplayScreen::Logic::update_input(const int64_t& current_time, const Events::Event::Input::SdlEvents& events)
-	{
-		// Keystroke
+		// Chung
 		Events::Event::Input::KeyboardEvents keyboard_events{};
+		Events::Event::Input::MouseEvents mouse_events{};
+		for (const auto& event : events)
+		{
+			if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) mouse_events.push_back(event.button); // chỉ cần thế này là đủ (hiện tại)
+			if (event.type == SDL_EVENT_KEY_DOWN && event.key.scancode == ::Config::Game::KeyBinding::Pausing::KEY_PAUSE)
+			{
+				gameplay_screen->pause_screen.toggle_pause();
+				return;
+			}
+		}
+		gameplay_screen->pause_screen.check_event(mouse_events);
+
+		// Input chơi game
+		if (is_paused()) return;
 		if (gameplay_screen->auto_play)
 		{
 			system.key_stroke.reset(true);
-			if (const auto& r_scripts = *gameplay_screen->render.mapset->get_render_scripts(); 
+			if (const auto& r_scripts = *gameplay_screen->render.mapset->get_render_scripts();
 				current.object_script != r_scripts.end())
 			{
-				if (const auto& [time, object] = *current.object_script; 
+				if (const auto& [time, object] = *current.object_script;
 					time <= current_time)
 				{
-					if (object.is_kat)
-						system.key_stroke.r1.make_virtual_event(true);
-					else
-						system.key_stroke.l1.make_virtual_event(true);
+					if (object.is_kat) system.key_stroke.r1.make_virtual_event(true);
+					else system.key_stroke.l1.make_virtual_event(true);
 				}
 			}
 		}
@@ -48,16 +63,15 @@ namespace Structures::Screen::Gameplay
 		{
 			for (const auto& event : events)
 			{
-				if (event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_KEY_UP)
+				if (Events::Event::Input::key_event_types.contains(event.type))
 					keyboard_events.push_back(event.key);
 			}
 			system.key_stroke.update(keyboard_events);
 		}
-
-		gameplay_screen->event_buffer.clear();
 	}
 	void GameplayScreen::Logic::update_timing(const int64_t& current_time)
 	{
+		if (is_paused()) return;
 		const auto& timing_points = gameplay_screen->mapset->timing_points.data;
 		const auto& crr_timing_point = timing_points.lower_bound(current_time);
 		if (crr_timing_point == timing_points.end()) return;
@@ -67,8 +81,9 @@ namespace Structures::Screen::Gameplay
 	{
 		if (obj_score != Types::Game::Gameplay::NoteScore::Skip)
 		{
+			const auto previous_combo = *system.score.combo.get_current_combo();
 			system.score.update(obj_score);
-			return system.health.update(obj_score, *system.score.combo.get_current_combo());
+			return system.health.update(obj_score, previous_combo);
 		}
 		return true;
 	}
@@ -106,48 +121,97 @@ namespace Structures::Screen::Gameplay
 	{
 		//! Event
 		gameplay_screen->render.cursor->check_and_add_score_shown(gameplay_screen->event_buffer, gameplay_screen->action_buffer, current_time);
-		// event Hitsound đã được thực thi ở hàm Audio::check_and_play_sound
+		// event Hitsound đã được thực thi ở hàm Audio::check_and_play_sound (khi đang update_object)
 
 		//! Action
 		gameplay_screen->action_buffer.execute(current_time);
 	}
+	void GameplayScreen::Logic::pause()
+	{
+		Structures::Audio::Bus<Types::Audio::Music>::pause();
+		system.timer.pause();
+	}
+	void GameplayScreen::Logic::resume()
+	{
+		const auto current_time = system.timer.get_time();
+		const auto& mapset = gameplay_screen->mapset;
+		const auto current_music_time = current_time - mapset->general.start_music_delay;
 
+		if (current_music_time >= 0 && Structures::Audio::Bus<Types::Audio::Music>::has_song_playing())
+			Structures::Audio::Bus<Types::Audio::Music>::resume();
+		system.timer.resume();
+	}
+	void GameplayScreen::Logic::fail(const int64_t& current_time) const
+	{
+		gameplay_screen->pause_screen.make_fail();
+
+		const auto fail_sound = gameplay_screen->audio.skin_effect->find(Format::Skin::Sound::fail_sound);
+		mixer->effect.play(fail_sound);
+	}
 	void GameplayScreen::Logic::make_time_step(const Events::Event::Input::SdlEvents& events)
 	{
 		// bắt đầu timer (nếu chưa start)
-		const auto& audio = gameplay_screen->audio;
 		if (!is_started)
 		{
-			current.object_script = gameplay_screen->render.mapset->get_render_scripts()->begin();
-
-			audio.mixer->music.play(audio.beatmap_music->get(gameplay_screen->mapset->general.audio_file));
 			is_started = true;
 			resume();
-			return;
 		}
-
+		gameplay_screen->event_buffer.clear();
 		const auto current_time = system.timer.get_time();
-		if (Structures::Audio::Bus<Types::Audio::Music>::is_playing())
+
+		sync_audio(current_time);
+		update_event(current_time, events);
+		if (!is_started) return;
+		if (!is_paused())
 		{
-			const auto current_pos = audio.mixer->music.get_position();
-			if (current_time != current_pos) 
-				Structures::Audio::Bus<Types::Audio::Music>::seek(current_time);
+			update_timing(current_time);
+
+			auto click_left = system.key_stroke.get_recently_pressed_left();
+			auto click_right = system.key_stroke.get_recently_pressed_right();
+			if (!update_object(current_time, click_left, click_right))
+				fail(current_time);
 		}
-
-		update_input(current_time, events);
-		auto click_left = system.key_stroke.get_recently_pressed_left();
-		auto click_right = system.key_stroke.get_recently_pressed_right();
-
-		update_timing(current_time);
-		update_object(current_time, click_left, click_right); //TODO: Xử lý fail ở đây
 		update_render(current_time);
 		update_event_and_action(current_time);
+	}
+	void GameplayScreen::Logic::retry()
+	{
+		// Current
+		const auto& mapset = gameplay_screen->mapset;
+		const auto& r_mapset = gameplay_screen->render.mapset;
+		for (auto& direction : r_mapset->data)
+		{
+			if (std::holds_alternative<std::shared_ptr<Collection>>(direction))
+			{
+				auto& it = std::get<std::shared_ptr<Collection>>(direction);
+				for (auto& object : it->data)
+				{
+					if (std::holds_alternative<std::shared_ptr<Collection>>(object))
+					{
+						auto& floor = std::get<std::shared_ptr<Collection>>(object);
+						floor->visible = true;
+					}
+				}
+			}
+		}
+		current.object_script = r_mapset->get_render_scripts()->begin();
+
+		// System
+		system.timer.reset(false, mapset->stats.time.start_time);
+		system.key_stroke.reset();
+		system.score.reset();
+		system.health.reset();
+
+		// out
+		is_started = false;
+		gameplay_screen->pause_screen.clean();
 	}
 	GameplayScreen::Logic::Logic(
 		GameplayScreen* gameplay_screen,
 		const float* mod_multiplier,
 		const bool* no_fail)
-		: gameplay_screen(gameplay_screen), current(*gameplay_screen->mapset), system(*gameplay_screen->mapset, no_fail, mod_multiplier)
+		: gameplay_screen(gameplay_screen),
+		current(*gameplay_screen->mapset), system(*gameplay_screen->mapset, no_fail, mod_multiplier)
 	{
 	}
 	GameplayScreen::Logic::Current::Current(const Game::Beatmap::Mapset& mapset)
@@ -157,42 +221,72 @@ namespace Structures::Screen::Gameplay
 	GameplayScreen::Logic::System::System(
 		const Game::Beatmap::Mapset& mapset,
 		const bool* no_fail, const float* mod_multiplier)
-		: score(mapset, mod_multiplier), health(mapset, timer.is_paused(), no_fail)
+		: score(mapset, mod_multiplier), health(mapset, &timer.is_paused(), no_fail)
 	{
 	}
 
-	//! Render
-	GameplayScreen::Render::Render(
-		GameplayScreen* gameplay_screen,
-		const Memory& memory, const bool load_storyboard)
-		: gameplay_screen(gameplay_screen)
+	//! Core
+	void GameplayScreen::Render::clean(const bool exit)
 	{
-		// Setup
-		this->mapset = std::make_shared<Mapset::Render::Mapset>(memory, *gameplay_screen->mapset);
-		cursor = std::make_shared<Cursor::Render::Cursor>(memory);
-		health = std::make_shared<Health::Render::Health>(memory, gameplay_screen->logic.system.health.get_health());
-		score = std::make_shared<Score::Render::Score>(memory, gameplay_screen->logic.system.score.get_score(),
-			gameplay_screen->logic.system.score.accuracy.get_accuracy(),
-			gameplay_screen->logic.system.score.combo.get_current_combo());
+		Core::Resources::Layers::normal_background->clear();
+		Core::Resources::Layers::storyboard->clear();
+		storyboard.reset();
+
+		// Cần vẽ lại cursor vì còn note score
+		item.cursor.destroy();
+		cursor.reset();
+
+		if (exit)
+		{
+			item.mapset.destroy();
+			item.health.destroy();
+			item.score.destroy();
+
+			mapset.reset();
+			health.reset();
+			score.reset();
+		}
+	}
+	void GameplayScreen::Render::retry()
+	{
+		clean();
+
+		cursor = std::make_shared<Cursor::Render::Cursor>(*skin);
+		item.cursor = Core::Resources::Layers::static_hud->render_buffer.add(this->cursor);
+
 		if (load_storyboard)
 		{
-			Work::Render::Layers::storyboard->resize(gameplay_screen->mapset->general.widescreen_storyboard);
-			this->storyboard = std::make_unique<Game::Beatmap::Event::EventObjects>(
-				gameplay_screen->mapset->events, Work::Render::renderer,
+			Core::Resources::Layers::storyboard->resize(gameplay_screen->mapset->general.widescreen_storyboard);
+			storyboard = std::make_unique<Game::Beatmap::Event::EventObjects>(
+				gameplay_screen->mapset->events, renderer,
 				gameplay_screen->mapset->path.parent_path(), &gameplay_screen->logic.system.timer,
 				gameplay_screen->action_buffer, &gameplay_screen->event_buffer);
-			this->storyboard->submit_to_buffer(
-				Work::Render::Layers::normal.get(), &Work::Render::Layers::storyboard->background,
-				&Work::Render::Layers::storyboard->fail, &Work::Render::Layers::storyboard->pass,
-				&Work::Render::Layers::storyboard->foreground);
+			storyboard->submit_to_buffer(
+				Core::Resources::Layers::normal_background.get(), &Core::Resources::Layers::storyboard->background,
+				&Core::Resources::Layers::storyboard->fail, &Core::Resources::Layers::storyboard->pass,
+				&Core::Resources::Layers::storyboard->foreground);
 		}
+	}
+	GameplayScreen::Render::Render(
+		GameplayScreen* gameplay_screen,
+		const Memory& skin, const bool load_storyboard)
+		: skin(&skin), load_storyboard(load_storyboard), gameplay_screen(gameplay_screen)
+	{
+		// Setup
+		mapset = std::make_shared<Mapset::Render::Mapset>(skin, *gameplay_screen->mapset);
+		health = std::make_shared<Health::Render::Health>(skin, gameplay_screen->logic.system.health.get_health());
+		score = std::make_shared<Score::Render::Score>(skin, gameplay_screen->logic.system.score.get_score(),
+			gameplay_screen->logic.system.score.accuracy.get_accuracy(),
+			gameplay_screen->logic.system.score.combo.get_current_combo());
 
 		// Submit lên on_before_render buffer của layers
-		Work::Render::Layers::playground->render_buffer.add(this->mapset);
-		Work::Render::Layers::static_hud->render_buffer.add(this->cursor);
-		Work::Render::Layers::hud->render_buffer.add(this->health);
-		Work::Render::Layers::hud->render_buffer.add(this->score);
+		item.mapset = Core::Resources::Layers::playground->render_buffer.add(this->mapset);
+		item.health = Core::Resources::Layers::hud->render_buffer.add(this->health);
+		item.score = Core::Resources::Layers::hud->render_buffer.add(this->score);
+
+		retry();
 	}
+	GameplayScreen::Render::~Render() { clean(true); }
 
 	//! Audio
 	void GameplayScreen::Audio::check_and_play_sound(
@@ -215,23 +309,53 @@ namespace Structures::Screen::Gameplay
 			gameplay_screen->event_buffer.add(current_time, std::move(hit_sound_event));
 		}
 	}
+	void GameplayScreen::Audio::clean(const bool exit) const
+	{
+		mixer->music.stop();
+		Structures::Audio::Bus<Mix_Chunk*>::stop();
+		if (exit)
+		{
+			beatmap_music->free_all();
+			beatmap_effect->free_all();
+			skin_effect->free_all();
+		}
+	}
+	void GameplayScreen::Audio::retry() const
+	{
+		clean();
+		mixer->music.play(audio_file, true);
+	}
+
 	GameplayScreen::Audio::Audio(
 		GameplayScreen* gameplay_screen,
 		const std::filesystem::path& mapset_root,
-		Structures::Audio::Mixer* mixer,
 		Structures::Audio::MusicMemory* beatmap_music,
 		Structures::Audio::EffectMemory* beatmap_effect,
 		Structures::Audio::EffectMemory* skin_effect)
-		: gameplay_screen(gameplay_screen), mixer(mixer), beatmap_music(beatmap_music), beatmap_effect(beatmap_effect), skin_effect(skin_effect)
+		: gameplay_screen(gameplay_screen), beatmap_music(beatmap_music), beatmap_effect(beatmap_effect), skin_effect(skin_effect)
 	{
-		const auto beatmap_audio_file = mapset_root / gameplay_screen->mapset->general.audio_file;
+		clean();
 
-		beatmap_music->load(beatmap_audio_file, beatmap_audio_file.filename().string());
-		beatmap_effect->load(mapset_root, mapset_root, false, false, 
+		// load audio
+		const auto beatmap_audio_file = mapset_root / gameplay_screen->mapset->general.audio_file;
+		audio_file = beatmap_music->load(beatmap_audio_file, beatmap_audio_file.filename().string());
+		beatmap_effect->load(mapset_root, mapset_root, false, false,
 			false, false, { beatmap_audio_file.stem() });
+
+		mixer->music.play(audio_file, true);
 	}
+	GameplayScreen::Audio::~Audio() { clean(true); }
 
 	//! Screen
+	void GameplayScreen::retry()
+	{
+		event_buffer.clear();
+		action_buffer.data.clear();
+
+		audio.retry();
+		render.retry();
+		logic.retry();
+	}
 	GameplayScreen::GameplayScreen(
 		const std::filesystem::path& mapset_path,
 		const float& mod_multiplier,
@@ -239,13 +363,18 @@ namespace Structures::Screen::Gameplay
 		const bool no_fail, const bool auto_play)
 		: mapset(std::make_unique<const Game::Beatmap::Mapset>(mapset_path, load_storyboard)),
 		mod_multiplier(mod_multiplier), no_fail(no_fail), auto_play(auto_play),
+		pause_screen(*Core::Resources::Textures::skin, Core::Resources::Layers::foreground.get(),
+			[&] { logic.pause(); }, [&] { logic.resume(); },
+			[&] { pause_screen.make_unpause(); },
+			[&] { retry(); }, [] { is_running = false; /*Tạm vậy*/ }),
 		logic(this, &this->mod_multiplier, &this->no_fail),
-		render(this, *Work::Render::Textures::skin, load_storyboard),
+		render(this, *Core::Resources::Textures::skin, load_storyboard),
 		audio(this, mapset_path.parent_path(),
-			Work::Audio::mixer.get(),
-			&Work::Audio::Memory::Beatmap::music, 
-			&Work::Audio::Memory::Beatmap::effect,
-			&Work::Audio::Memory::Skin::effect)
+			&Core::Resources::Audio::Beatmap::music,
+			&Core::Resources::Audio::Beatmap::effect,
+			&Core::Resources::Audio::Skin::effect)
 	{
+		logic.retry();
 	}
+	GameplayScreen::~GameplayScreen() { mapset.reset(); }
 }

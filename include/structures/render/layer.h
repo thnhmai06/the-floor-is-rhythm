@@ -24,7 +24,7 @@ namespace Structures::Render::Layer
 				void destroy();
 				bool is_valid() const;
 
-				explicit Item(Buffer* render_buffer);
+				explicit Item(Buffer* render_buffer = nullptr);
 				Item(Buffer* render_buffer, CONTAINER::iterator item);
 			};
 

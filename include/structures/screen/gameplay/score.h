@@ -75,6 +75,7 @@ namespace Structures::Screen::Gameplay::Score
 				const Game::Beatmap::HitObjects::Floor& floor,
 				uint16_t& click_num,
 				const int64_t& current_time) const;
+			void reset();
 
 			explicit Score(const Game::Beatmap::Mapset& mapset, const float* mod_multiplier);
 		};

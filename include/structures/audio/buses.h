@@ -19,7 +19,7 @@ namespace Structures::Audio
 	public:
 		[[nodiscard]] const float& get_volume() const;
 		float set_volume(float percent) const;
-		void play(const MusicMemory::Item& music);
+		void play(const MusicMemory::Item& music, bool pause = false);
 		const MusicMemory::Item& get_current() const;
 		int64_t get_position() const;
 		static void seek(const int64_t& new_pos);
@@ -46,6 +46,8 @@ namespace Structures::Audio
 		float set_volume(const EffectMemory::Item& sound, float percent) const;
 		float set_volume(const int& channel, float percent) const;
 		int play(const EffectMemory::Item& sound, const std::optional<float>& volume = std::nullopt) const;
+		static void stop(const int& channel = -1);
+		
 
 		explicit Bus(float* volume);
 	};
