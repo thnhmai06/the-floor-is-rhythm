@@ -52,4 +52,4 @@ Tổ chức theo hướng module hóa, mô hình dựa trên namespace. Lập tr
 - Project có sử dụng tài nguyên skin [JesusOmega『Planets』](https://skins.osuck.net/skins/1489)
 - Game được lấy cảm hứng từ [osu!](https://osu.ppy.sh/)
 - Dự án có sử dụng các modules cũ đã được (mình) cải thiện lại: [easing-functions](https://github.com/thnhmai06/easing-functions), [osu!parser](https://github.com/thnhmai06/osu-parser).
-- Ngoài ra còn sử dụng các modules nguyên gốc: SDL3, SDL3-image, SDL3-mixer, bit7z, spdlog, inih (chi tiết xem tại [vcpkg.json](vcpkg.jspn) và [dependencies](dependencies))
+- Ngoài ra còn sử dụng các modules nguyên gốc: SDL3, SDL3-image, SDL3-mixer, bit7z, spdlog, inih (chi tiết xem tại [vcpkg.json](vcpkg.json) và [dependencies](dependencies))
