@@ -7,7 +7,7 @@ static int32_t run()
 {
 	using namespace Core::Work;
 
-	//Convert::Osu::convert_beatmap(R"(D:\PROGRAM\osu!\Songs\1511778 Camellia - Body F10ating in the Zero Gravity Space)");
+	//Convert::Osu::convert_beatmap(R"(D:\2258410 Kagetora. - UNPR3C3D3NT3D TRAV3L3R.osz)");
 	int32_t result = work();
 
 	return result;

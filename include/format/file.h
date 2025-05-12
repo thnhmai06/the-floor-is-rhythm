@@ -6,7 +6,7 @@ namespace Format::File
 	namespace Osu
 	{
 		constexpr auto BEATMAP_EXTENSION = ".osz";
-		constexpr auto MAPSET_EXTENSION = ".Osu";
+		constexpr auto MAPSET_EXTENSION = ".osu";
 		constexpr auto STORYBOARD_EXTENSION = ".osb";
 	}
 
