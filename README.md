@@ -3,8 +3,8 @@
 **The Floor is Rhythm** là game hành động nhịp điệu, trong đó người chơi sẽ tương tác với những vật thể đang di chuyển vào chính giữa tương ứng với vị trí (trái, phải) mà nó đi vào.
 
 ## Video:
+- [Demo](https://youtu.be/OALa3tWYG-4)
 - [Structures và Demo](https://youtu.be/Sl0ehlfbH6Y)
-- [Demo](https://youtu.be/Csp4eUfbbaY)
 
 ## Screenshot:
 <img src="https://i.ibb.co/Kcyz1Fx5/image.png">
