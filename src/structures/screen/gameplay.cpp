@@ -83,6 +83,8 @@ namespace Structures::Screen::Gameplay
 		{
 			const auto previous_combo = *system.score.combo.get_current_combo();
 			system.score.update(obj_score);
+			if (*system.score.combo.get_current_combo() == 0 && previous_combo >= 10)
+				mixer->effect.play(gameplay_screen->audio.skin_effect->find(Format::Skin::Sound::combo_break));
 			return system.health.update(obj_score, previous_combo);
 		}
 		return true;
@@ -114,8 +116,15 @@ namespace Structures::Screen::Gameplay
 	}
 	void GameplayScreen::Logic::update_render(const int64_t& current_time) const
 	{
+		const auto& mapset = gameplay_screen->mapset;
+
 		gameplay_screen->render.mapset->set_current_pos(current_time);
 		gameplay_screen->render.mapset->set_render_range(current_time);
+		gameplay_screen->render.progress->percent = std::clamp(
+			Utilities::Math::to_percent(current_time,
+				mapset->stats.time.start_time,
+				mapset->stats.time.start_playing_time + mapset->stats.time.length)
+			, 0.0, 1.0);
 	}
 	void GameplayScreen::Logic::update_event_and_action(const int64_t& current_time) const
 	{
@@ -125,6 +134,14 @@ namespace Structures::Screen::Gameplay
 
 		//! Action
 		gameplay_screen->action_buffer.execute(current_time);
+	}
+	void GameplayScreen::Logic::check_finish(const int64_t& current_time)
+	{
+		const auto& mapset = gameplay_screen->mapset;
+		const auto current_music_time = current_time - mapset->general.start_music_delay;
+
+		if (current_music_time >= mapset->stats.time.start_playing_time + mapset->stats.time.length)
+			is_finished = true;
 	}
 	void GameplayScreen::Logic::pause()
 	{
@@ -162,7 +179,7 @@ namespace Structures::Screen::Gameplay
 		sync_audio(current_time);
 		update_event(current_time, events);
 		if (!is_started) return;
-		if (!is_paused())
+		if (!is_paused() && !is_finished)
 		{
 			update_timing(current_time);
 
@@ -171,6 +188,11 @@ namespace Structures::Screen::Gameplay
 			if (!update_object(current_time, click_left, click_right))
 				fail(current_time);
 		}
+		/*if (!is_finished)
+		{
+			check_finish(current_time);
+			if (is_finished) gameplay_screen->render.show_result(current_time);
+		}*/
 		update_render(current_time);
 		update_event_and_action(current_time);
 	}
@@ -203,7 +225,7 @@ namespace Structures::Screen::Gameplay
 		system.health.reset();
 
 		// out
-		is_started = false;
+		is_started = is_finished = false;
 		gameplay_screen->pause_screen.clean();
 	}
 	GameplayScreen::Logic::Logic(
@@ -225,7 +247,7 @@ namespace Structures::Screen::Gameplay
 	{
 	}
 
-	//! Core
+	//! Render
 	void GameplayScreen::Render::clean(const bool exit)
 	{
 		Core::Resources::Layers::normal_background->clear();
@@ -241,10 +263,12 @@ namespace Structures::Screen::Gameplay
 			item.mapset.destroy();
 			item.health.destroy();
 			item.score.destroy();
+			item.progress.destroy();
 
 			mapset.reset();
 			health.reset();
 			score.reset();
+			progress.reset();
 		}
 	}
 	void GameplayScreen::Render::retry()
@@ -267,6 +291,22 @@ namespace Structures::Screen::Gameplay
 				&Core::Resources::Layers::storyboard->foreground);
 		}
 	}
+	void GameplayScreen::Render::show_result(const int64_t& current_time)
+	{
+		using namespace ::Config::Game::Render::Result;
+		result = std::make_shared<Result::Result>(*skin, gameplay_screen->logic.system.score, *score);
+		Core::Resources::Layers::foreground->render_buffer.add(result);
+
+		Core::Resources::Layers::foreground->visible = false;
+		Core::Resources::Layers::hud->visible = false;
+		Core::Resources::Layers::static_hud->visible = false;
+		Core::Resources::Layers::playground->visible = false;
+
+		auto& action_buffer = gameplay_screen->action_buffer;
+		action_buffer.data.emplace(current_time + DELAY, std::make_shared<Events::Action::Render::ChangeAction<float>>(
+			current_time + DELAY, current_time + DELAY + TIME_MOVE_IN_RESULT,
+			EASING_IN_RESULT, &result->offset.x, result->offset.x, 0 ));
+	}
 	GameplayScreen::Render::Render(
 		GameplayScreen* gameplay_screen,
 		const Memory& skin, const bool load_storyboard)
@@ -275,6 +315,9 @@ namespace Structures::Screen::Gameplay
 		// Setup
 		mapset = std::make_shared<Mapset::Render::Mapset>(skin, *gameplay_screen->mapset);
 		health = std::make_shared<Health::Render::Health>(skin, gameplay_screen->logic.system.health.get_health());
+		progress = std::make_shared<StaticPercentObject>(skin.find(Format::Skin::Image::progress),
+			::Config::Game::Render::Progress::get_full_size(), true, false,
+			::Config::Game::Render::Progress::ORIGIN, ::Config::Game::Render::Progress::get_pos());
 		score = std::make_shared<Score::Render::Score>(skin, gameplay_screen->logic.system.score.get_score(),
 			gameplay_screen->logic.system.score.accuracy.get_accuracy(),
 			gameplay_screen->logic.system.score.combo.get_current_combo());
@@ -283,6 +326,7 @@ namespace Structures::Screen::Gameplay
 		item.mapset = Core::Resources::Layers::playground->render_buffer.add(this->mapset);
 		item.health = Core::Resources::Layers::hud->render_buffer.add(this->health);
 		item.score = Core::Resources::Layers::hud->render_buffer.add(this->score);
+		item.progress = Core::Resources::Layers::hud->render_buffer.add(this->progress);
 
 		retry();
 	}

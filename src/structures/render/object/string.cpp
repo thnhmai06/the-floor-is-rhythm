@@ -29,13 +29,27 @@ namespace Structures::Render::Object
 				it->config.render_pos = { .x = 0, .y = 0 };
 			else
 			{
-				const auto& previous = std::get<std::shared_ptr<Object>>(data[chr-1]);
+				const auto& previous = std::get<std::shared_ptr<Object>>(data[chr - 1]);
 
-				it->config.render_pos =
+				if (!total_width.has_value())
 				{
-					.x = previous->config.render_pos.x + previous->get_sdl_dst_rect().w,
-					.y = previous->config.render_pos.y
-				};
+					it->config.render_pos =
+					{
+						.x = previous->config.render_pos.x + character_render_size.x,
+						.y = previous->config.render_pos.y
+					};
+				}
+				else
+				{
+					// chỗ này chắc chắn size > 1
+					const auto padding = (total_width.value() - character_render_size.x) / (string->size() - 1);
+
+					it->config.render_pos =
+					{
+						.x = padding * chr,
+						.y = previous->config.render_pos.y
+					};
+				}
 			}
 		}
 		while (data.size() > string->size()) data.pop_back();
@@ -77,11 +91,31 @@ namespace Structures::Render::Object
 		const Memory* skin,
 		const Alphabet* alphabet,
 		const SDL_FPoint& render_pos,
-		const SDL_FPoint& render_size,
+		const SDL_FPoint& character_render_size,
 		const SDL_FPoint& custom_origin_in_percent)
 		: string(string), skin(skin), alphabet(alphabet),
 		render_pos(render_pos), origin_point_in_percent(custom_origin_in_percent),
-		character_render_size(render_size)
+		character_render_size(character_render_size)
+	{
+	}
+
+
+	StaticHorizontalString::StaticHorizontalString(
+		std::string string, const Memory* skin,
+		const Alphabet* alphabet, const SDL_FPoint& render_pos,
+		const SDL_FPoint& character_render_size,
+		const Types::Render::OriginType& origin_type)
+		: HorizontalString(&value, skin, alphabet, render_pos, character_render_size, origin_type),
+		value(std::move(string))
+	{
+	}
+	StaticHorizontalString::StaticHorizontalString(
+		std::string string, const Memory* skin, 
+		const Alphabet* alphabet, const SDL_FPoint& render_pos, 
+		const SDL_FPoint& character_render_size,
+		const SDL_FPoint& custom_origin_in_percent)
+			: HorizontalString(&value, skin, alphabet, render_pos, character_render_size, custom_origin_in_percent),
+		value(std::move(string))
 	{
 	}
 }

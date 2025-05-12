@@ -1,6 +1,8 @@
 ﻿// ♪ https://youtu.be/i0fw1thgnK0 <3
 #pragma once
 #include <filesystem>
+
+#include "gameplay/result.h"
 #include "structures/audio/mixer.h"
 #include "structures/events/time/time.h"
 #include "structures/screen/gameplay/keystroke.h"
@@ -32,6 +34,7 @@ namespace Structures::Screen::Gameplay
 		protected:
 			GameplayScreen* gameplay_screen;
 			bool is_started = false;
+			bool is_finished = false;
 
 		private:
 			void sync_audio(const int64_t& current_time) const;
@@ -41,6 +44,7 @@ namespace Structures::Screen::Gameplay
 			bool update_score_and_health(const Types::Game::Gameplay::NoteScore& obj_score);
 			bool update_object(const int64_t& current_time, uint16_t& click_left, uint16_t& click_right);
 			void update_event_and_action(const int64_t& current_time) const;
+			void check_finish(const int64_t& current_time);
 
 		public:
 			struct Current
@@ -81,7 +85,7 @@ namespace Structures::Screen::Gameplay
 		{
 			struct
 			{
-				Structures::Render::Layer::Layer::Buffer::Item cursor, health, mapset, score;
+				Structures::Render::Layer::Layer::Buffer::Item cursor, health, mapset, score, progress, result;
 			} item;
 
 			const Memory* skin;
@@ -91,10 +95,13 @@ namespace Structures::Screen::Gameplay
 			std::shared_ptr<Health::Render::Health> health;
 			std::shared_ptr<Mapset::Render::Mapset> mapset;
 			std::shared_ptr<Score::Render::Score> score;
+			std::shared_ptr<StaticPercentObject> progress;
 			std::unique_ptr<Game::Beatmap::Event::EventObjects> storyboard;
+			std::shared_ptr<Result::Result> result;
 
 			void clean(bool exit = false);
 			void retry();
+			void show_result(const int64_t& current_time);
 
 			explicit Render(
 				GameplayScreen* gameplay_screen,
@@ -110,7 +117,6 @@ namespace Structures::Screen::Gameplay
 			Structures::Audio::MusicMemory* beatmap_music;
 			Structures::Audio::EffectMemory* beatmap_effect;
 			Structures::Audio::EffectMemory* skin_effect;
-
 
 			void check_and_play_sound(
 				const int64_t& current_time,

@@ -52,7 +52,7 @@ namespace Structures::Screen::Gameplay::Health
 		// ::Core::Health
 		bool Health::update(const Types::Game::Gameplay::NoteScore& note_score, const unsigned long& current_combo)
 		{
-			if (is_paused) return true;
+			if (*is_paused) return true;
 			value = std::clamp(value + hp_diff->get_gained_health(note_score, current_combo), 0.0f, 1.0f);
 			return *no_fail || !(value <= 0 && (note_score == Types::Game::Gameplay::NoteScore::Miss));
 		}

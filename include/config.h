@@ -133,6 +133,44 @@ namespace Config
 				constexpr int64_t TIME_FADE_IN = 700; // ms
 				constexpr int64_t TIME_FADE_OUT = TIME_FADE_IN; // ms
 			}
+			namespace Result
+			{
+				constexpr int64_t DELAY = 3000; // ms
+				constexpr auto EASING_IN_RESULT = Structures::Types::Render::EasingFunctionType::CubicOut;
+				constexpr int64_t TIME_MOVE_IN_RESULT = 1000; // ms
+
+
+				constexpr SDL_FPoint BACKGROUND_POS = { 0, 0 };
+				constexpr auto ORIGIN = Structures::Types::Render::OriginType::TopLeft;
+				constexpr auto ORIGIN_GRADE = Structures::Types::Render::OriginType::Centre;
+				SDL_FPoint get_score_pos();
+				SDL_FPoint get_accuracy_pos();
+				SDL_FPoint get_combo_pos();
+				SDL_FPoint get_perfect_image_pos();
+				SDL_FPoint get_good_image_pos();
+				SDL_FPoint get_bad_image_pos();
+				SDL_FPoint get_mis_image_pos();
+				SDL_FPoint get_perfect_count_pos();
+				SDL_FPoint get_good_count_pos();
+				SDL_FPoint get_bad_count_pos();
+				SDL_FPoint get_miss_count_pos();
+				SDL_FPoint get_full_combo_pos();
+				SDL_FPoint get_grade_pos();
+
+				float get_score_width();
+				float get_accuracy_width();
+				float get_combo_width();
+				float get_image_size();
+				float get_count_width();
+				SDL_FPoint get_full_combo_size();
+				float get_grade_size();
+			}
+			namespace Progress
+			{
+				constexpr auto ORIGIN = Structures::Types::Render::OriginType::BottomLeft;
+				SDL_FPoint get_pos();
+				SDL_FPoint get_full_size();
+			}
 		}
 		namespace KeyBinding
 		{

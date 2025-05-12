@@ -65,12 +65,14 @@ namespace Structures::Screen::Gameplay::Score
 				[[nodiscard]] const unsigned long* get_count_100() const { return &count_good; }
 				[[nodiscard]] const unsigned long* get_count_50() const { return &count_bad; }
 				[[nodiscard]] const unsigned long* get_count_miss() const { return &count_miss; }
+				[[nodiscard]] char get_grade() const;
 				[[nodiscard]] unsigned long get_elapsed_objects_num() const;
 			} accuracy;
 
 			void update(const Types::Game::Gameplay::NoteScore& note_score = Types::Game::Gameplay::NoteScore::Skip, const uint32_t& num = 1);
 			[[nodiscard]] const float* get_score() const;
 			[[nodiscard]] const float* get_mod_multiplier() const;
+			
 			Types::Game::Gameplay::NoteScore get_floor_score(
 				const Game::Beatmap::HitObjects::Floor& floor,
 				uint16_t& click_num,

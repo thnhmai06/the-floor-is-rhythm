@@ -195,6 +195,7 @@
     <ClInclude Include="include\structures\render\object\string.h" />
     <ClInclude Include="include\structures\screen\gameplay\health.h" />
     <ClInclude Include="include\structures\screen\gameplay\keystroke.h" />
+    <ClInclude Include="include\structures\screen\gameplay\result.h" />
     <ClInclude Include="include\structures\screen\gameplay\score.h" />
     <ClInclude Include="include\structures\screen\pausing.h" />
     <ClInclude Include="include\core\resources\audio.h" />
@@ -225,6 +226,7 @@
     <ClCompile Include="dependencies\easing\src\easing.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
+    <ClCompile Include="src\structures\screen\gameplay\result.cpp" />
     <ClCompile Include="src\config.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>

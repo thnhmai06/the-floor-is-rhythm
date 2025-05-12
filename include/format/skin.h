@@ -19,7 +19,7 @@ namespace Format::Skin
 		{
 			inline const std::string floor = "floor";
 			inline const std::string floor_overlay = "floor-overlay";
-			inline const std::unordered_map<Structures::Types::Game::Gameplay::NoteScore, std::string> hit = 
+			inline const std::unordered_map<Structures::Types::Game::Gameplay::NoteScore, std::string> hit =
 			{
 				{Structures::Types::Game::Gameplay::NoteScore::Miss, "hit0" },
 				{Structures::Types::Game::Gameplay::NoteScore::Bad, "hit50" },
@@ -63,6 +63,24 @@ namespace Format::Skin
 			inline const std::string pause_retry = "pause-retry";
 			inline const std::string pause_back = "pause-back";
 		}
+		namespace Result
+		{
+			using Structures::Types::Format::Skin::Alphabet;
+
+			static inline const std::string prefix = "result-";
+			inline Alphabet alphabet =
+			{
+				{'X', prefix + 'X'},
+				{'S', prefix + 'S'},
+				{'A', prefix + 'A'},
+				{'B', prefix + 'B'},
+				{'C', prefix + 'C'},
+				{'D', prefix + 'D'},
+			};
+			const std::string background = prefix + "background";
+			const std::string full_combo = prefix + "full-combo";
+		}
+		inline const std::string progress = "progress";
 
 		struct Namespace
 		{
@@ -78,11 +96,12 @@ namespace Format::Skin
 		inline const std::unordered_set<std::string_view> SUPPORT_EXTENSIONS = { ".wav", ".mp3", ".ogg" };
 
 		inline const auto fail_sound = "failsound";
+		inline const auto combo_break = "combobreak";
 	}
 
 	struct FolderNamespace
 	{
-		std::unordered_set<std::string> data {};
+		std::unordered_set<std::string> data{};
 
 		FolderNamespace();
 	};

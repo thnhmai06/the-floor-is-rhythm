@@ -74,9 +74,20 @@ namespace Structures::Screen::Gameplay::Score
 				count_perfect * static_cast<int16_t>(NoteScore::Perfect)
 				+ count_good * static_cast<int16_t>(NoteScore::Good)
 				+ count_bad * static_cast<int16_t>(NoteScore::Bad);
-				const unsigned long total_if_perfect =
+			const unsigned long total_if_perfect =
 				(count_perfect + count_good + count_bad + count_miss) * static_cast<int16_t>(NoteScore::Perfect);
 			accuracy = static_cast<float>(total) / static_cast<float>(total_if_perfect);
+		}
+		char Score::Accuracy::get_grade() const
+		{
+			// Dựa trên osu!mania: https://osu.ppy.sh/wiki/en/Gameplay/Grade#:~:text=accuracy%20under%2085.00%25-,osu!mania,-Grade
+
+			if (accuracy >= 1.0f) return 'X';
+			if (accuracy >= 0.95f) return 'S';
+			if (accuracy >= 0.9f) return 'A';
+			if (accuracy >= 0.8f) return 'B';
+			if (accuracy >= 0.7f) return 'C';
+			return 'D';
 		}
 
 		// Combo

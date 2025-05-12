@@ -31,6 +31,15 @@ namespace Format::Skin
 			data.insert(Pausing::pause_continue);
 			data.insert(Pausing::pause_retry);
 			data.insert(Pausing::pause_back);
+
+			// Result
+			data.insert(Result::background);
+			data.insert(Result::full_combo);
+			for (const auto& ch : Result::alphabet | std::views::values)
+				data.insert(ch);
+
+			// Progress
+			data.insert(progress);
 		}
 	}
 

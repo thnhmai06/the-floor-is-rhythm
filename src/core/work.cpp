@@ -16,7 +16,7 @@ namespace Core::Work
 		//{
 		Resources::Screens::gameplay_screen = std::make_unique<Structures::Screen::Gameplay::GameplayScreen>
 			(R"(D:\1511778 Camellia - Body F10ating in the Zero Gravity Space\Camellia - Body F10ating in the Zero Gravity Space (Orange_) [Nonsubmersible].tfd)", 
-				1, true, false, false);
+				1, true, true, true);
 
 		while (is_running)
 		{

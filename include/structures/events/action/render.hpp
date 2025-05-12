@@ -137,6 +137,36 @@ namespace Structures::Events::Action::Render
 
 	};
 
+	//! ChangeAction
+	template <typename NumberType>
+	struct ChangeAction : RenderAction<NumberType>
+	{
+		NumberType* target;
+
+		void update(const float& value_percent, const NumberType& from, const NumberType& to) override
+		{
+			*target = Utilities::Math::to_value(value_percent, from, to);
+		}
+
+		[[nodiscard]] bool is_valid(const int64_t& current_time) const override
+		{
+			return Action::is_valid(current_time) && target;
+		}
+
+		ChangeAction() = default;
+		ChangeAction(
+			const int64_t& start_time,
+			const int64_t& end_time,
+			const Time::Easing::EasingFunctionType& easing,
+			NumberType* target,
+			const NumberType& from,
+			const NumberType& to,
+			const std::vector<NumberType>& sequence = {})
+			: RenderAction<NumberType>(start_time, end_time, easing, std::weak_ptr<Structures::Render::Object::Object>(), from, to, sequence), target(target)
+		{
+		}
+	};
+
 	//! Fade
 	struct FadeAction : RenderAction<uint8_t>
 	{
