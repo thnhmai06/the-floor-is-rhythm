@@ -99,7 +99,6 @@ namespace Structures::Render::Object
 	{
 	}
 
-
 	StaticHorizontalString::StaticHorizontalString(
 		std::string string, const Memory* skin,
 		const Alphabet* alphabet, const SDL_FPoint& render_pos,

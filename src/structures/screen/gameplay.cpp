@@ -188,11 +188,12 @@ namespace Structures::Screen::Gameplay
 			if (!update_object(current_time, click_left, click_right))
 				fail(current_time);
 		}
-		/*if (!is_finished)
-		{
-			check_finish(current_time);
-			if (is_finished) gameplay_screen->render.show_result(current_time);
-		}*/
+		//if (!is_finished)
+		//{
+		//	//check_finish(current_time);
+		//	is_finished = true;
+		//	if (is_finished) gameplay_screen->render.show_result(current_time);
+		//}
 		update_render(current_time);
 		update_event_and_action(current_time);
 	}
@@ -295,15 +296,15 @@ namespace Structures::Screen::Gameplay
 	{
 		using namespace ::Config::Game::Render::Result;
 		result = std::make_shared<Result::Result>(*skin, gameplay_screen->logic.system.score, *score);
-		Core::Resources::Layers::foreground->render_buffer.add(result);
+		item.result = Core::Resources::Layers::foreground->render_buffer.add(result);
 
-		Core::Resources::Layers::foreground->visible = false;
+		Core::Resources::Layers::storyboard->visible = false;
 		Core::Resources::Layers::hud->visible = false;
 		Core::Resources::Layers::static_hud->visible = false;
 		Core::Resources::Layers::playground->visible = false;
 
-		auto& action_buffer = gameplay_screen->action_buffer;
-		action_buffer.data.emplace(current_time + DELAY, std::make_shared<Events::Action::Render::ChangeAction<float>>(
+		auto& [data] = gameplay_screen->action_buffer;
+		data.emplace(current_time + DELAY, std::make_shared<Events::Action::Render::ChangeAction<float>>(
 			current_time + DELAY, current_time + DELAY + TIME_MOVE_IN_RESULT,
 			EASING_IN_RESULT, &result->offset.x, result->offset.x, 0 ));
 	}

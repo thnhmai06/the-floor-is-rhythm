@@ -299,9 +299,9 @@ namespace Structures::Game::Beatmap
 				action_buffer.data.emplace(time, std::move(action));
 			// Đến cuối luôn có một action để biến mất
 			if (!cmd.empty())
-				action_buffer.data.emplace(end_time,
+				action_buffer.data.emplace(end_time + 1,
 					std::make_shared<Structures::Events::Action::Render::FadeAction>(
-						made_hide_command(animation, end_time)));
+						made_hide_command(animation, end_time + 1)));
 
 		}
 		EventObjects::EventObjects(
@@ -318,7 +318,7 @@ namespace Structures::Game::Beatmap
 				{
 				case Type::Objects::EventObjectType::Background:
 					//load_background_object(beatmap_root, renderer, action_buffer, *std::dynamic_pointer_cast<Objects::BackgroundObject>(object));
-					break;
+					break;;
 				case Type::Objects::EventObjectType::Video:
 					//TODO: Giải mã Video
 					break;

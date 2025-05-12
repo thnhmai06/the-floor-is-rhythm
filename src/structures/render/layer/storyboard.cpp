@@ -41,6 +41,7 @@ namespace Structures::Render::Layer
 	void StoryboardLayer::render()
 	{
 		//! Thứ tự: background -> fail -> pass -> foreground
+		if (!visible) return;
 
 		//! Render Texture
 		SDL_Texture* const current_target = SDL_GetRenderTarget(memory.renderer);

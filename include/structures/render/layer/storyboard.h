@@ -22,6 +22,7 @@ namespace Structures::Render::Layer
 
 	public:
 		TextureLayer background, fail, pass, foreground;
+		bool visible = true;
 
 		const bool& get_widescreen_mode() const;
 		//! Hạn chế dùng hàm này vì hàm này phải tạo lại texture (đã kiểm tra trùng lặp)

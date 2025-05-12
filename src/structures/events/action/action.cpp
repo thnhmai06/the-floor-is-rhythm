@@ -127,7 +127,7 @@ namespace Structures::Events::Action
 		if (finished || current_time < start_time) return;
 
 		started = true;
-		if (end_time < current_time)
+		if (end_time <= current_time)
 		{
 			finished = true;
 			return;

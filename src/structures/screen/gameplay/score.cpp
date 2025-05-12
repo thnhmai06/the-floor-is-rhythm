@@ -27,6 +27,7 @@ namespace Structures::Screen::Gameplay::Score
 			c_accuracy->zero_padding = Accuracy::DECIMAL_FORMAT;
 			c_accuracy->multiply = Accuracy::MULTIPLY;
 			c_accuracy->footer = Accuracy::FOOTER;
+			this->accuracy = c_accuracy;
 			data.emplace_back(std::move(c_accuracy));
 
 			// Combo

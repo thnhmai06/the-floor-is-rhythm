@@ -83,10 +83,10 @@ namespace Structures::Events::Action::Render
 		void execute(const int64_t& current_time) final
 		{
 			if (auto sequence_time = get_sequence_time();
-				current_time <= sequence_time.second)
+				current_time < sequence_time.second)
 				work(current_time);
 			else {
-				while (sequence_time.second < current_time)
+				while (sequence_time.second <= current_time)
 				{
 					if (next_sequence())
 					{
@@ -142,6 +142,11 @@ namespace Structures::Events::Action::Render
 	struct ChangeAction : RenderAction<NumberType>
 	{
 		NumberType* target;
+
+		[[nodiscard]] std::shared_ptr<Action> clone() const override
+		{
+			return std::make_shared<ChangeAction>(*this);
+		}
 
 		void update(const float& value_percent, const NumberType& from, const NumberType& to) override
 		{

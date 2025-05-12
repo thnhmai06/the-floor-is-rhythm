@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <SDL3/SDL_audio.h>
+#include "main.h"
 #include "structures/type.hpp"
 #include "structures/config.h"
 #include "utilities.hpp"
@@ -17,9 +18,10 @@ namespace Config
 
 			namespace Path
 			{
-				constexpr auto SKIN = "./assets";
-				constexpr auto CONFIG = "./config.ini";
-				constexpr auto BEATMAP = "./beatmap";
+				const fs::path BASE_PATH = SDL_GetBasePath();
+				const auto SKIN = BASE_PATH / "assets";
+				const auto CONFIG = BASE_PATH / "config.ini";
+				const auto BEATMAP = BASE_PATH / "beatmap";
 			}
 		}
 		namespace Audio

@@ -15,7 +15,7 @@ namespace Core::Work
 		//try
 		//{
 		Resources::Screens::gameplay_screen = std::make_unique<Structures::Screen::Gameplay::GameplayScreen>
-			(R"(D:\1511778 Camellia - Body F10ating in the Zero Gravity Space\Camellia - Body F10ating in the Zero Gravity Space (Orange_) [Nonsubmersible].tfd)", 
+			(R"(D:\Development\Code\cpp\Repositories\the-floor-is-rhythm\build\out\x64\Debug\beatmap\2258410 Kagetora. - UNPR3C3D3NT3D TRAV3L3R\Kagetora. - UNPR3C3D3NT3D TRAV3L3R (Ducky-) [F1N4L D3ST1N4T10N].tfd)", 
 				1, true, true, true);
 
 		while (is_running)
