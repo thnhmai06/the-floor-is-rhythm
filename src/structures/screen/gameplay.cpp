@@ -120,11 +120,10 @@ namespace Structures::Screen::Gameplay
 
 		gameplay_screen->render.mapset->set_current_pos(current_time);
 		gameplay_screen->render.mapset->set_render_range(current_time);
-		gameplay_screen->render.progress->percent = std::clamp(
+		gameplay_screen->render.progress->percent = 
 			Utilities::Math::to_percent(current_time,
 				mapset->stats.time.start_time,
-				mapset->stats.time.start_playing_time + mapset->stats.time.length)
-			, 0.0, 1.0);
+				mapset->stats.time.start_playing_time + mapset->stats.time.length);
 	}
 	void GameplayScreen::Logic::update_event_and_action(const int64_t& current_time) const
 	{

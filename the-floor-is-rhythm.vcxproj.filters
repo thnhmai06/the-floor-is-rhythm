@@ -42,22 +42,13 @@
     <ClCompile Include="src\structures\render\texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\work\render.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\structures\render\layer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\work\core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\structures\game\mapset\timing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\structures\render\object.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\work\convert\osu\mapset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\structures\game\mapset.cpp">
@@ -102,9 +93,6 @@
     <ClCompile Include="src\structures\screen\gameplay\score.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\work\convert\osu\beatmap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\structures\screen\gameplay\keystroke.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -136,6 +124,24 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\structures\screen\pausing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\structures\screen\gameplay\result.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\work\update.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\work\convert\osu\beatmap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\work\convert\osu\mapset.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\work.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -170,13 +176,7 @@
     <ClInclude Include="include\structures\render\texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\work\render.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\structures\render\layer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\work\core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\structures\game\mapset\timing.h">
@@ -192,9 +192,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\config.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\work\convert\osu\mapset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\structures\game\mapset.h">
@@ -215,16 +212,7 @@
     <ClInclude Include="include\utilities.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\work\render\textures.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\work\render\layer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\structures\screen\gameplay.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\work\screen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\structures\events\action\render.hpp">
@@ -237,9 +225,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\structures\events\action\action.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\work\audio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\structures\events\condition\playing.h">
@@ -258,9 +243,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\structures\render\object\number.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\work\convert\osu\beatmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\structures\screen\gameplay\keystroke.h">
@@ -294,6 +276,39 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\structures\screen\pausing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\resources\event.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\work\update.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structures\screen\gameplay\result.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\resources\audio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\work\convert\osu\beatmap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\work\convert\osu\mapset.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\work.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\resources\layer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\resources\screen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\resources\textures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

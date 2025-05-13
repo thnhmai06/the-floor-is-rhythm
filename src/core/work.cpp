@@ -15,13 +15,24 @@ namespace Core::Work
 		//try
 		//{
 		Resources::Screens::gameplay_screen = std::make_unique<Structures::Screen::Gameplay::GameplayScreen>
-			(R"(D:\Development\Code\cpp\Repositories\the-floor-is-rhythm\build\out\x64\Debug\beatmap\2258410 Kagetora. - UNPR3C3D3NT3D TRAV3L3R\Kagetora. - UNPR3C3D3NT3D TRAV3L3R (Ducky-) [F1N4L D3ST1N4T10N].tfd)", 
+			(R"(D:\Development\Code\cpp\Repositories\the-floor-is-rhythm\build\out\x64\Debug\beatmap\546820 YUC'e - Future Candy\YUC'e - Future Candy (Nathan) [Sugar Rush].tfd)", 
 				1, true, true, true);
 
 		while (is_running)
 		{
+			static bool need_print_latency = false;
 			if (const auto update_latency = Update::update();
-				update_latency > 20) SPDLOG_WARN("[Update] latency {}ms is very high!", update_latency);
+				update_latency > 20)
+			{
+				SPDLOG_WARN("Update latency: {}ms", update_latency);
+				need_print_latency = true;
+			}
+			else
+			{
+				if (need_print_latency) 
+					LOG_DEBUG("Update latency: {}ms", update_latency);
+				need_print_latency = false;
+			}
 		}
 
 		Resources::Screens::gameplay_screen.reset();

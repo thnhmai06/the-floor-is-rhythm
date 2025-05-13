@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <algorithm>
 #include <chrono>
 #include <map>
 #include <queue>
@@ -53,16 +54,18 @@ namespace Utilities
 
 		template <typename NumberType>
 		//! HÀM NÀY KHÔNG PHÙ HỢP CHO CẶP 2 SỐ
-		double to_percent(const NumberType& value, const NumberType& from, const NumberType& to)
+		double to_percent(const NumberType& value, const NumberType& from, const NumberType& to, const bool clamp = true)
 		{
 			if (from == to) return 1.0f;
-			return static_cast<double>(value - from) / static_cast<double>(to - from);
+			const auto res = static_cast<double>(value - from) / static_cast<double>(to - from);
+			return (!clamp) ? res : std::clamp(res, 0.0, 1.0);
 		}
 		template <typename NumberType>
 		//! HÀM NÀY KHÔNG PHÙ HỢP CHO CẶP 2 SỐ
-		NumberType to_value(const double& percent, const NumberType& from, const NumberType& to)
+		NumberType to_value(double percent, const NumberType& from, const NumberType& to, const bool clamp = true)
 		{
 			if (from == to) return to;
+			if (clamp) percent = std::clamp(percent, 0.0, 1.0);
 			return static_cast<NumberType>(from + (to - from) * percent);
 		}
 

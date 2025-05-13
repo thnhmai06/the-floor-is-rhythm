@@ -1,6 +1,7 @@
 #pragma once
 #include <format>
 #include <cerrno>
+#include <array>
 #include <stdexcept>
 #include <filesystem>
 #include <SDL3/SDL_error.h>
@@ -83,8 +84,15 @@ namespace Logging::Exceptions::FileExceptions
 {
 	struct File_Exception : std::runtime_error
 	{
-		explicit File_Exception(const std::filesystem::path& file_path, const std::string& message) :
-			std::runtime_error(format("{} ({}): {}", message, file_path.string(), strerror(errno))) {}
+		explicit File_Exception(const std::filesystem::path& file_path, const std::string& message)
+			: std::runtime_error(
+				[&]{
+					std::array<char, 256> err_buf{};
+					(void)strerror_s(err_buf.data(), err_buf.size(), errno);
+					return std::format("{} ({}): {}", message, file_path.string(), err_buf.data());
+				}())
+		{
+		}
 	};
 	struct File_Open_Failed : File_Exception
 	{
@@ -94,9 +102,10 @@ namespace Logging::Exceptions::FileExceptions
 	{
 		explicit File_Config_Failed(const std::filesystem::path& file_path, const int& line = -1) :
 			std::runtime_error(
-				(line == -1) 
+				(line == -1)
 				? format("Couldn't load config: {} (open failed). Use default config instead.", file_path.string())
-				: format("Couldn't load config: {} (line {}). Use default config instead.", file_path.string(), line)) {}
+				: format("Couldn't load config: {} (line {}). Use default config instead.", file_path.string(), line)) {
+		}
 	};
 }
 namespace Logging::Exceptions::FormatExceptions

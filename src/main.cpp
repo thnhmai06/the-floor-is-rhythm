@@ -1,4 +1,5 @@
-﻿#include "main.h" // Header
+﻿#pragma comment(linker, "/ENTRY:mainCRTStartup") // TODO: Hỗ trợ hàm main cái Window app
+#include "main.h" // Header
 #include "core/manager.h"
 #include "core/work.h"
 #include "core/work/convert/osu/beatmap.h"
@@ -7,7 +8,7 @@ static int32_t run()
 {
 	using namespace Core::Work;
 
-	//Convert::Osu::convert_beatmap(R"(D:\2258410 Kagetora. - UNPR3C3D3NT3D TRAV3L3R.osz)");
+	//Convert::Osu::convert_beatmap(R"(D:\PROGRAM\osu!\Songs\546820 YUC'e - Future Candy)");
 	int32_t result = work();
 
 	return result;

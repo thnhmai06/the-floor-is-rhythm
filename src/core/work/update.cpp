@@ -44,11 +44,30 @@ namespace Core::Work
 			const auto previous_update_time = Resources::Event::runtime.get_time();
 			using namespace Update;
 
-			if (const auto event_latency = event();
-				event_latency > 20) SPDLOG_WARN("[Event] latency {}ms is very high!", event_latency);
+			static bool need_print_event_latency = false;
+			if (const auto event_latency = event(); event_latency > 20)
+			{
+				SPDLOG_WARN("Event latency: {}ms", event_latency);
+				need_print_event_latency = true;
+			} else
+			{
+				if (need_print_event_latency)
+					LOG_DEBUG("Event latency: {}ms", event_latency);
+				need_print_event_latency = false;
+			}
 
-			if (const auto render_latency = render();
-				render_latency > 20) SPDLOG_WARN("[Render] latency {}ms is very high!", render_latency);
+			static bool need_print_render_latency = false;
+			if (const auto render_latency = render(); render_latency > 20)
+			{
+				SPDLOG_WARN("Render latency: {}ms", render_latency);
+				need_print_render_latency = true;
+			}
+			else
+			{
+				if (need_print_render_latency)
+					LOG_DEBUG("Render latency: is {}ms", render_latency);
+				need_print_render_latency = false;
+			}
 
 			return Resources::Event::runtime.get_time() - previous_update_time;
 		}
