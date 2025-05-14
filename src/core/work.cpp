@@ -3,8 +3,8 @@
 #include "main.h"
 #include "logging/logger.h"
 #include "core/resources/screen.h"
-#include "core/resources/event.h"
 #include "core/work/update.h"
+#include "core/work/convert/osu/mapset.h"
 
 namespace Core::Work
 {
@@ -15,7 +15,7 @@ namespace Core::Work
 		//try
 		//{
 		Resources::Screens::gameplay_screen = std::make_unique<Structures::Screen::Gameplay::GameplayScreen>
-			(R"(D:\Development\Code\cpp\Repositories\the-floor-is-rhythm\build\out\x64\Debug\beatmap\546820 YUC'e - Future Candy\YUC'e - Future Candy (Nathan) [Sugar Rush].tfd)", 
+			(R"(D:\Development\Code\cpp\Repositories\the-floor-is-rhythm\build\out\x64\Debug\beatmap\1881706 Sad Keyboard Guy, sleepless & Myntian - Alter__Strife feat vallyexe\test.tfd)", 
 				1, true, true, true);
 
 		while (is_running)

@@ -9,8 +9,8 @@ namespace Core::Resources
 	{
 		using namespace Structures::Render::Layer;
 
-		inline std::unique_ptr<Layer> normal_background; // background bình thường
-		inline std::unique_ptr<StoryboardLayer> storyboard;
+		inline std::unique_ptr<Layer> background; // background bình thường
+		inline std::unique_ptr<Storyboard> storyboard;
 		inline std::unique_ptr<Layer> playground;
 		inline std::unique_ptr<Layer> hud;
 		inline std::unique_ptr<Layer> static_hud;
@@ -18,8 +18,8 @@ namespace Core::Resources
 
 		inline void init_all(SDL_Renderer* renderer)
 		{
-			normal_background = std::make_unique<Layer>();
-			storyboard = std::make_unique<StoryboardLayer>(renderer);
+			background = std::make_unique<Layer>();
+			storyboard = std::make_unique<Storyboard>(renderer);
 			playground = std::make_unique<Layer>(SDL_FPoint{ 0.5, 0.5 }); // giữa màn hình
 			hud = std::make_unique<Layer>();
 			static_hud = std::make_unique<Layer>(); // giữa màn hình
@@ -27,7 +27,7 @@ namespace Core::Resources
 		}
 		inline void render_all()
 		{
-			if (normal_background) normal_background->render();
+			if (background) background->render();
 			if (storyboard) storyboard->render();
 			if (playground) playground->render();
 			if (hud) hud->render();
@@ -36,7 +36,7 @@ namespace Core::Resources
 		}
 		inline void clear_all()
 		{
-			if (normal_background) normal_background->clear();
+			if (background) background->clear();
 			if (storyboard) storyboard->clear();
 			if (playground) playground->clear();
 			if (hud) hud->clear();

@@ -120,8 +120,8 @@ namespace Structures::Render::Layer
 	// ::
 	void Layer::render_object(std::shared_ptr<Object::Object>& object, const SDL_FPoint& offset)
 	{
-		if (!visible || object->config.color.a == 0) return;
-		if (!object->src.is_valid()) return;
+		if (!visible) return;
+		if (!object->config.visible || object->config.color.a == 0 || !object->src.is_valid()) return;
 
 		object->on_before_render();
 		object->config.render_pos += offset;
@@ -134,18 +134,23 @@ namespace Structures::Render::Layer
 		const SDL_FPoint render_origin_point = object->config.get_origin_point(true);
 
 		// https://stackoverflow.com/questions/24969783/is-it-safe-acceptable-to-call-sdl-settexturecolormod-every-frame-multiple-times
-		SDL_SetTextureBlendMode(sdl_texture, object->config.blend_mode);
-		SDL_SetTextureAlphaMod(sdl_texture, object->config.color.a);
-		SDL_SetTextureColorMod(sdl_texture, object->config.color.r, object->config.color.g, object->config.color.b);
+		if (!SDL_SetTextureBlendMode(sdl_texture, object->config.blend_mode))
+			LOG_ERROR(Logging::Exceptions::SDLExceptions::Render::SDL_Render_TextureSetBlendMode_Failed(object->src.get_name(), object->config.blend_mode));
+		if (!SDL_SetTextureAlphaMod(sdl_texture, object->config.color.a))
+			LOG_ERROR(Logging::Exceptions::SDLExceptions::Render::SDL_Render_TextureSetAlphaMod_Failed(object->src.get_name(), object->config.color.a));
+		if (!SDL_SetTextureColorMod(sdl_texture, object->config.color.r, object->config.color.g, object->config.color.b))
+			LOG_ERROR(Logging::Exceptions::SDLExceptions::Render::SDL_Render_TextureSetColor_Failed(object->src.get_name(), object->config.color));
+
 		if (!SDL_RenderTextureRotated(object->src.memory->renderer, sdl_texture, &src_rect,
 			&dst_rect, object->config.angle, &render_origin_point, object->config.flip_mode.get_mode()))
-			LOG_ERROR(Logging::Exceptions::SDLExceptions::Texture::SDL_Texture_Render_Failed(object->src.get_name()));
+			LOG_ERROR(Logging::Exceptions::SDLExceptions::Render::SDL_Render_RenderTexture_Failed(object->src.get_name()));
 		put_object_out_layer(object);
 		object->config.render_pos -= offset;
 		object->on_after_render();
 	}
 	void Layer::render_collection(std::shared_ptr<Object::Collection>& collection, const SDL_FPoint& bonus_offset)
 	{
+		if (!visible) return;
 		if (!collection->visible) return;
 
 		collection->on_before_render();
@@ -201,7 +206,7 @@ namespace Structures::Render::Layer
 		object->config.render_pos /= pixel;
 		object->config.scale /= pixel;
 	}
-	void TextureLayer::render_no_change_back_target(const bool clear)
+	void TextureLayer::render_no_back_target(const bool clear)
 	{
 		if (!visible || render_buffer.data.empty()) return;
 
@@ -214,7 +219,7 @@ namespace Structures::Render::Layer
 		if (!visible || render_buffer.data.empty()) return;
 
 		SDL_Texture* const current_target = SDL_GetRenderTarget(target_texture.memory->renderer);
-		render_no_change_back_target();
+		render_no_back_target();
 		SDL_SetRenderTarget(target_texture.memory->renderer, current_target);
 	}
 	void TextureLayer::clear()

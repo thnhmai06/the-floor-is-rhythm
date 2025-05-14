@@ -71,7 +71,7 @@ namespace Structures::Screen::Gameplay
 			[[nodiscard]] const bool& is_paused() const;
 			void pause();
 			void resume();
-			void fail(const int64_t& current_time) const;
+			void fail() const;
 			void retry();
 			void make_time_step(const Events::Event::Input::SdlEvents& events);
 

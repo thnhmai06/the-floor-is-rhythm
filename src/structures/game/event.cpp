@@ -1,6 +1,7 @@
 ﻿#include "structures/game/event.h" // Header
 #include "structures/events/action/render.hpp"
 #include "structures/events/condition/playing.h"
+#include "structures/render/layer/storyboard.h"
 #include "structures/render/object/animation.h"
 
 namespace fs = std::filesystem;
@@ -9,6 +10,8 @@ namespace Structures::Game::Beatmap
 {
 	namespace Event
 	{
+		using namespace Structures::Events::Action::Render;
+
 		static Structures::Events::Action::Buffer::CONTAINER load_commands(
 			const std::weak_ptr<Render::Object::Object>& target_object,
 			const Commands::Commands& commands,
@@ -26,7 +29,7 @@ namespace Structures::Game::Beatmap
 				{
 					if (const auto& fade = std::dynamic_pointer_cast<Commands::FadeCommand>(command))
 					{
-						auto action = std::make_shared<Structures::Events::Action::Render::FadeAction>(target_object, *fade);
+						auto action = std::make_shared<FadeAction>(target_object, *fade);
 						actions.emplace(fade->startTime, std::move(action));
 					}
 				}
@@ -36,7 +39,7 @@ namespace Structures::Game::Beatmap
 				{
 					if (const auto& move = std::dynamic_pointer_cast<Commands::MoveCommand>(command))
 					{
-						auto action = std::make_shared<Structures::Events::Action::Render::MoveAction>(target_object, *move);
+						auto action = std::make_shared<MoveAction>(target_object, *move);
 						actions.emplace(move->startTime, std::move(action));
 					}
 				}
@@ -46,7 +49,7 @@ namespace Structures::Game::Beatmap
 				{
 					if (const auto& move = std::dynamic_pointer_cast<Commands::MoveXCommand>(command))
 					{
-						auto action = std::make_shared<Structures::Events::Action::Render::MoveXAction>(target_object, *move);
+						auto action = std::make_shared<MoveXAction>(target_object, *move);
 						actions.emplace(move->startTime, std::move(action));
 					}
 				}
@@ -56,7 +59,7 @@ namespace Structures::Game::Beatmap
 				{
 					if (const auto& move = std::dynamic_pointer_cast<Commands::MoveYCommand>(command))
 					{
-						auto action = std::make_shared<Structures::Events::Action::Render::MoveYAction>(target_object, *move);
+						auto action = std::make_shared<MoveYAction>(target_object, *move);
 						actions.emplace(move->startTime, std::move(action));
 					}
 				}
@@ -66,7 +69,7 @@ namespace Structures::Game::Beatmap
 				{
 					if (const auto& scale = std::dynamic_pointer_cast<Commands::ScaleCommand>(command))
 					{
-						auto action = std::make_shared<Structures::Events::Action::Render::ScaleAction>(target_object, *scale);
+						auto action = std::make_shared<ScaleAction>(target_object, *scale);
 						actions.emplace(scale->startTime, std::move(action));
 					}
 				}
@@ -76,7 +79,7 @@ namespace Structures::Game::Beatmap
 				{
 					if (const auto& scale = std::dynamic_pointer_cast<Commands::VectorScaleCommand>(command))
 					{
-						auto action = std::make_shared<Structures::Events::Action::Render::ScaleAction>(target_object, *scale);
+						auto action = std::make_shared<ScaleAction>(target_object, *scale);
 						actions.emplace(scale->startTime, std::move(action));
 					}
 				}
@@ -86,7 +89,7 @@ namespace Structures::Game::Beatmap
 				{
 					if (const auto& rotate = std::dynamic_pointer_cast<Commands::RotateCommand>(command))
 					{
-						auto action = std::make_shared<Structures::Events::Action::Render::RotateAction>(target_object, *rotate);
+						auto action = std::make_shared<RotateAction>(target_object, *rotate);
 						actions.emplace(rotate->startTime, std::move(action));
 					}
 				}
@@ -96,7 +99,7 @@ namespace Structures::Game::Beatmap
 				{
 					if (const auto& color = std::dynamic_pointer_cast<Commands::ColorCommand>(command))
 					{
-						auto action = std::make_shared<Structures::Events::Action::Render::ColorAction>(target_object, *color);
+						auto action = std::make_shared<ColorAction>(target_object, *color);
 						actions.emplace(color->startTime, std::move(action));
 					}
 				}
@@ -106,7 +109,7 @@ namespace Structures::Game::Beatmap
 				{
 					if (const auto& parameter = std::dynamic_pointer_cast<Commands::ParameterCommand>(command))
 					{
-						auto action = std::make_shared<Structures::Events::Action::Render::ParameterAction>(target_object, *parameter);
+						auto action = std::make_shared<ParameterAction>(target_object, *parameter);
 						actions.emplace(parameter->startTime, std::move(action));
 					}
 				}
@@ -140,12 +143,12 @@ namespace Structures::Game::Beatmap
 			return actions;
 		}
 
-		static Structures::Events::Action::Render::FadeAction made_show_command(std::weak_ptr<Render::Object::Object> target_object, const int64_t& time)
+		static FadeAction made_show_command(std::weak_ptr<Render::Object::Object> target_object, const int64_t& time)
 		{
 			return { time, time, Structures::Events::Time::Easing::EasingFunctionType::Linear, std::move(target_object),
 				Render::Object::SDL_MAX_ALPHA, Render::Object::SDL_MAX_ALPHA };
 		}
-		static Structures::Events::Action::Render::FadeAction made_hide_command(std::weak_ptr<Render::Object::Object> target_object, const int64_t& time)
+		static FadeAction made_hide_command(std::weak_ptr<Render::Object::Object> target_object, const int64_t& time)
 		{
 			return { time, time, Structures::Events::Time::Easing::EasingFunctionType::Linear, std::move(target_object), 0, 0 };
 		}
@@ -163,15 +166,14 @@ namespace Structures::Game::Beatmap
 			return normal;
 		}
 
-		void EventObjects::submit_to_buffer(
-			Render::Layer::Layer* normal,
-			Render::Layer::Layer* background, Render::Layer::Layer* fail, Render::Layer::Layer* pass, Render::Layer::Layer* foreground) const
+		void EventObjects::submit_to_buffer(Render::Layer::Layer::Buffer& background_buffer, Render::Layer::Layer::Buffer& storyboard_buffer) const
 		{
-			normal->render_buffer.add(this->normal);
-			background->render_buffer.add(this->background);
-			fail->render_buffer.add(this->fail);
-			pass->render_buffer.add(this->pass);
-			foreground->render_buffer.add(this->foreground);
+			background_buffer.add(normal);
+
+			storyboard_buffer.add(background);
+			storyboard_buffer.add(fail);
+			storyboard_buffer.add(pass);
+			storyboard_buffer.add(foreground);
 		}
 		void EventObjects::load_background_object(
 			const fs::path& beatmap_root, SDL_Renderer* renderer,
@@ -193,7 +195,7 @@ namespace Structures::Game::Beatmap
 			normal->data.emplace_back(background);
 
 			//! Action
-			auto action = std::make_shared<Structures::Events::Action::Render::FadeAction>(
+			auto action = std::make_shared<FadeAction>(
 				object.startTime, object.startTime, EasingFunctionType::Linear, background,
 				Render::Object::SDL_MAX_ALPHA, Render::Object::SDL_MAX_ALPHA);
 			action_buffer.data.emplace(object.startTime, std::move(action));
@@ -221,30 +223,71 @@ namespace Structures::Game::Beatmap
 			auto cmd = load_commands(sprite, *object.commands, action_buffer, event_buffer);
 			int64_t start_time = (cmd.empty() ? 0 : cmd.begin()->first);
 			int64_t end_time = (cmd.empty() ? 0 : cmd.begin()->second->end_time);
-			std::optional<SDL_FPoint> start_pos;
+			std::optional<SDL_FPoint> start_move;
+			std::optional<SDL_FPoint> start_scale;
+			std::optional<uint8_t> start_fade;
+			std::optional<float> start_rotate;
+			std::optional<Color> start_color;
 			for (auto& [time, action] : cmd)
 			{
 				start_time = std::min(start_time, time);
 				end_time = std::max(end_time, action->end_time);
 
-				if (!start_pos.has_value())
+				if (!start_move.has_value())
 				{
-					if (const auto it = std::dynamic_pointer_cast<Structures::Events::Action::Render::MoveAction>(action))
+					if (const auto move = std::dynamic_pointer_cast<MoveAction>(action))
 					{
-						start_pos = it->from;
+						start_move = move->from;
+					}
+				}
+				if (!start_scale.has_value())
+				{
+					if (const auto scale = std::dynamic_pointer_cast<ScaleAction>(action))
+					{
+						start_scale = scale->from;
+					}
+				}
+				if (!start_fade.has_value())
+				{
+					if (const auto fade = std::dynamic_pointer_cast<FadeAction>(action))
+					{
+						start_fade = fade->from;
+					}
+				}
+				if (!start_rotate.has_value())
+				{
+					if (const auto rotate = std::dynamic_pointer_cast<RotateAction>(action))
+					{
+						start_rotate = rotate->from;
+					}
+				}
+				if (!start_color)
+				{
+					if (const auto color = std::dynamic_pointer_cast<ColorAction>(action))
+					{
+						start_color = color->from;
 					}
 				}
 			}
 			// Căn chỉnh đúng vị trí xuất hiện khi có move command trong lệnh
 			// ref: https://discord.com/channels/188630481301012481/1097318920991559880/1372195997043785789 - osu why?
-			if (start_pos.has_value()) sprite->config.render_pos = start_pos.value();
+			if (start_move.has_value()) sprite->config.render_pos = start_move.value();
+			if (start_scale.has_value()) sprite->config.scale = start_scale.value();
+			if (start_fade.has_value()) sprite->config.color.a = start_fade.value();
+			if (start_rotate.has_value()) sprite->config.angle = start_rotate.value();
+			if (start_color.has_value())
+			{
+				sprite->config.color.r = start_color->r;
+				sprite->config.color.g = start_color->g;
+				sprite->config.color.b = start_color->b;
+			}
 
 			// Chỉ hiện khi object đến lúc
 			sprite->config.color.a = 0;
 			if (!cmd.empty())
 			{
 				action_buffer.data.emplace(start_time,
-					std::make_shared<Structures::Events::Action::Render::FadeAction>(
+					std::make_shared<FadeAction>(
 						made_show_command(sprite, start_time)));
 			}
 			// Phần Command
@@ -252,9 +295,11 @@ namespace Structures::Game::Beatmap
 				action_buffer.data.emplace(time, std::move(action));
 			// Đến cuối luôn có một action để biến mất
 			if (!cmd.empty())
+			{
 				action_buffer.data.emplace(end_time,
-					std::make_shared<Structures::Events::Action::Render::FadeAction>(
+					std::make_shared<FadeAction>(
 						made_hide_command(sprite, end_time)));
+			}
 		}
 		void EventObjects::load_animation_object(
 			const fs::path& beatmap_root,
@@ -270,7 +315,7 @@ namespace Structures::Game::Beatmap
 
 			//! Object
 			const auto parent = file.parent_path();
-			// Trường hợp ".jpg" không hợp lệ trong đây nên phải check has extension
+			// Trường hợp file chỉ mỗi ".jpg" không hợp lệ trong đây nên phải check has extension
 			const std::string stem = (file.has_extension()) ? file.stem().string() : "";
 			const std::string extension = (file.has_extension()) ? file.extension().string() : file.stem().string();
 			std::vector<Render::Texture::Memory::Item> frames;
@@ -294,30 +339,71 @@ namespace Structures::Game::Beatmap
 			auto cmd = load_commands(animation, *object.commands, action_buffer, event_buffer);
 			int64_t start_time = (cmd.empty() ? 0 : cmd.begin()->first);
 			int64_t end_time = (cmd.empty() ? 0 : cmd.begin()->second->end_time);
-			std::optional<SDL_FPoint> start_pos;
+			std::optional<SDL_FPoint> start_move;
+			std::optional<SDL_FPoint> start_scale;
+			std::optional<uint8_t> start_fade;
+			std::optional<float> start_rotate;
+			std::optional<Color> start_color;
 			for (auto& [time, action] : cmd)
 			{
 				start_time = std::min(start_time, time);
 				end_time = std::max(end_time, action->end_time);
 
-				if (!start_pos.has_value())
+				if (!start_move.has_value())
 				{
-					if (const auto it = std::dynamic_pointer_cast<Structures::Events::Action::Render::MoveAction>(action))
+					if (const auto move = std::dynamic_pointer_cast<MoveAction>(action))
 					{
-						start_pos = it->from;
+						start_move = move->from;
+					}
+				}
+				if (!start_scale.has_value())
+				{
+					if (const auto scale = std::dynamic_pointer_cast<ScaleAction>(action))
+					{
+						start_scale = scale->from;
+					}
+				}
+				if (!start_fade.has_value())
+				{
+					if (const auto fade = std::dynamic_pointer_cast<FadeAction>(action))
+					{
+						start_fade = fade->from;
+					}
+				}
+				if (!start_rotate.has_value())
+				{
+					if (const auto rotate = std::dynamic_pointer_cast<RotateAction>(action))
+					{
+						start_rotate = rotate->from;
+					}
+				}
+				if (!start_color)
+				{
+					if (const auto color = std::dynamic_pointer_cast<ColorAction>(action))
+					{
+						start_color = color->from;
 					}
 				}
 			}
 			// Căn chỉnh đúng vị trí xuất hiện khi có move command trong lệnh
 			// ref: https://discord.com/channels/188630481301012481/1097318920991559880/1372195997043785789 - osu why?
-			if (start_pos.has_value()) animation->config.render_pos = start_pos.value();
+			if (start_move.has_value()) animation->config.render_pos = start_move.value();
+			if (start_scale.has_value()) animation->config.scale = start_scale.value();
+			if (start_fade.has_value()) animation->config.color.a = start_fade.value();
+			if (start_rotate.has_value()) animation->config.angle = start_rotate.value();
+			if (start_color.has_value())
+			{
+				animation->config.color.r = start_color->r;
+				animation->config.color.g = start_color->g;
+				animation->config.color.b = start_color->b;
+			}
 
 			// Chỉ hiện khi object đến lúc
 			animation->config.color.a = 0;
 			if (!cmd.empty())
 			{
 				action_buffer.data.emplace(start_time,
-					std::make_shared<Structures::Events::Action::Render::FadeAction>(
+					std::make_shared<FadeAction>(
 						made_show_command(animation, start_time)));
 			}
 			// Phần Command
@@ -325,10 +411,11 @@ namespace Structures::Game::Beatmap
 				action_buffer.data.emplace(time, std::move(action));
 			// Đến cuối luôn có một action để biến mất
 			if (!cmd.empty())
-				action_buffer.data.emplace(end_time + 1,
-					std::make_shared<Structures::Events::Action::Render::FadeAction>(
-						made_hide_command(animation, end_time + 1)));
-
+			{
+				action_buffer.data.emplace(end_time,
+					std::make_shared<FadeAction>(
+						made_hide_command(animation, end_time)));
+			}
 		}
 		EventObjects::EventObjects(
 			const OsuParser::Beatmap::Objects::Event::Events& events,
@@ -344,7 +431,7 @@ namespace Structures::Game::Beatmap
 				{
 				case Type::Objects::EventObjectType::Background:
 					//load_background_object(beatmap_root, renderer, action_buffer, *std::dynamic_pointer_cast<Objects::BackgroundObject>(object));
-					break;;
+					break;
 				case Type::Objects::EventObjectType::Video:
 					//TODO: Giải mã Video
 					break;

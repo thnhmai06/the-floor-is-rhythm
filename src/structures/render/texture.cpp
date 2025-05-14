@@ -16,11 +16,11 @@ namespace Structures::Render::Texture
 		if (!override && data.contains(name)) return {};
 		SDL_Texture* texture = IMG_LoadTexture(this->renderer, file_path.string().c_str());
 		if (!texture)
-			LOG_ERROR(Logging::Exceptions::SDLExceptions::Texture::SDL_Texture_Load_Failed(file_path));
+			LOG_ERROR(Logging::Exceptions::SDLExceptions::Render::SDL_Render_LoadTexture_Failed(file_path));
 
 		// Nếu dùng STB_Image
 		/*if (!texture)
-			THROW_ERROR(Logging::Exceptions::SDLExceptions::Texture::IMG_LoadTexture_Failed(file_path));
+			THROW_ERROR(Logging::Exceptions::SDLExceptions::Render::IMG_LoadTexture_Failed(file_path));
 
 		int32_t w, h, channels;
 		unsigned char* image = stbi_load(file_path, &w, &h, &channels, desired_channels);
@@ -31,7 +31,7 @@ namespace Structures::Render::Texture
 		if (!SDL_UpdateTexture(texture, nullptr, image, w * desired_channels))
 		{
 			stbi_image_free(image);
-			THROW_ERROR(Logging::Exceptions::SDLExceptions::Texture::SDL_UpdateTexture_Failed(file_path));
+			THROW_ERROR(Logging::Exceptions::SDLExceptions::Render::SDL_UpdateTexture_Failed(file_path));
 		}
 		stbi_image_free(image);*/
 
@@ -87,14 +87,14 @@ namespace Structures::Render::Texture
 	{
 		if (const auto it = data.find(name); it != data.end())
 			return { it, this };
-		if (!no_log_not_found) LOG_ERROR(Logging::Exceptions::SDLExceptions::Texture::SDL_Texture_NotFound(name));
+		if (!no_log_not_found) LOG_ERROR(Logging::Exceptions::SDLExceptions::Render::SDL_Render_Texture_NotFound(name));
 		return {};
 	}
 	Memory::Item Memory::create_new(const std::string& name, const SDL_Point& size, const bool override)
 	{
 		const auto texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, size.x, size.y);
 		if (!texture)
-			LOG_ERROR(Logging::Exceptions::SDLExceptions::Texture::SDL_Texture_Load_Failed(name));
+			LOG_ERROR(Logging::Exceptions::SDLExceptions::Render::SDL_Render_LoadTexture_Failed(name));
 
 		return load(texture, name, override);
 	}
@@ -168,7 +168,7 @@ namespace Structures::Render::Texture
 		if (!is_valid()) return;
 
 		if (!SDL_RenderTexture(memory->renderer, item->second, src_rect, dst_rect))
-			LOG_ERROR(Logging::Exceptions::SDLExceptions::Texture::SDL_Texture_Render_Failed(get_name()));
+			LOG_ERROR(Logging::Exceptions::SDLExceptions::Render::SDL_Render_RenderTexture_Failed(get_name()));
 	}
 	void Memory::Item::clear() const
 	{

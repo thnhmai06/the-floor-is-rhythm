@@ -5,6 +5,8 @@
 #include <stdexcept>
 #include <filesystem>
 #include <SDL3/SDL_error.h>
+#include <SDL3/SDL_blendmode.h>
+#include <SDL3/SDL_pixels.h>
 
 using std::format;
 
@@ -14,38 +16,50 @@ namespace Logging::Exceptions::SDLExceptions
 	{
 		explicit SDL_Exception(const std::string& message) : std::runtime_error(format("{} ({})", message, SDL_GetError())) {}
 	};
-	namespace Video
+	namespace System
 	{
-		struct SDL_Video_InitSDL_Failed : SDL_Exception
+		struct SDL_System_InitSDL_Failed : SDL_Exception
 		{
-			explicit SDL_Video_InitSDL_Failed() : SDL_Exception("Initializing SDL failed") {}
+			explicit SDL_System_InitSDL_Failed() : SDL_Exception("Initializing SDL failed") {}
 		};
-		struct SDL_Video_CreateWindow_Failed : SDL_Exception
+		struct SDL_System_CreateWindow_Failed : SDL_Exception
 		{
-			explicit SDL_Video_CreateWindow_Failed() : SDL_Exception("Couldn't create window") {}
+			explicit SDL_System_CreateWindow_Failed() : SDL_Exception("Couldn't create window") {}
 		};
-		struct SDL_Video_CreateRenderer_Failed : SDL_Exception
+		struct SDL_System_CreateRenderer_Failed : SDL_Exception
 		{
-			explicit SDL_Video_CreateRenderer_Failed() : SDL_Exception("Couldn't create SDL renderer") {}
+			explicit SDL_System_CreateRenderer_Failed() : SDL_Exception("Couldn't create SDL renderer") {}
 		};
 	}
-	namespace Texture
+	namespace Render
 	{
-		struct SDL_Texture_Create_Failed : SDL_Exception
+		struct SDL_Render_CreateTexture_Failed : SDL_Exception
 		{
-			explicit SDL_Texture_Create_Failed(const std::string& name) : SDL_Exception(format("Couldn't create texture: {}", name)) {}
+			explicit SDL_Render_CreateTexture_Failed(const std::string& name) : SDL_Exception(format("Couldn't create texture: {}", name)) {}
 		};
-		struct SDL_Texture_Load_Failed : SDL_Exception
+		struct SDL_Render_LoadTexture_Failed : SDL_Exception
 		{
-			explicit SDL_Texture_Load_Failed(const std::filesystem::path& file_path) : SDL_Exception(format("Couldn't load texture: {}", file_path.string())) {}
+			explicit SDL_Render_LoadTexture_Failed(const std::filesystem::path& file_path) : SDL_Exception(format("Couldn't load texture: {}", file_path.string())) {}
 		};
-		struct SDL_Texture_Render_Failed : SDL_Exception
+		struct SDL_Render_RenderTexture_Failed : SDL_Exception
 		{
-			explicit SDL_Texture_Render_Failed(const std::string& name) : SDL_Exception(format("Couldn't render texture: {}", name)) {}
+			explicit SDL_Render_RenderTexture_Failed(const std::string& name) : SDL_Exception(format("Couldn't render texture: {}", name)) {}
 		};
-		struct SDL_Texture_NotFound : SDL_Exception
+		struct SDL_Render_Texture_NotFound : SDL_Exception
 		{
-			explicit SDL_Texture_NotFound(const std::string& name) : SDL_Exception(format("Texture not found: {}", name)) {}
+			explicit SDL_Render_Texture_NotFound(const std::string& name) : SDL_Exception(format("Texture not found: {}", name)) {}
+		};
+		struct SDL_Render_TextureSetBlendMode_Failed : SDL_Exception
+		{
+			explicit SDL_Render_TextureSetBlendMode_Failed(const std::string& name, const SDL_BlendMode& mode) : SDL_Exception(format("Texture {}: Couldn't set blend mode {}", name, mode)) {}
+		};
+		struct SDL_Render_TextureSetAlphaMod_Failed : SDL_Exception
+		{
+			explicit SDL_Render_TextureSetAlphaMod_Failed(const std::string& name, const uint8_t& value) : SDL_Exception(format("Texture {}: Couldn't set alpha {}", name, value)) {}
+		};
+		struct SDL_Render_TextureSetColor_Failed : SDL_Exception
+		{
+			explicit SDL_Render_TextureSetColor_Failed(const std::string& name, const SDL_Color& color) : SDL_Exception(format("Texture {}: Couldn't set color {},{},{}", name, color.r, color.g, color.b)) {}
 		};
 	}
 	namespace Audio
@@ -86,7 +100,7 @@ namespace Logging::Exceptions::FileExceptions
 	{
 		explicit File_Exception(const std::filesystem::path& file_path, const std::string& message)
 			: std::runtime_error(
-				[&]{
+				[&] {
 					std::array<char, 256> err_buf{};
 					(void)strerror_s(err_buf.data(), err_buf.size(), errno);
 					return std::format("{} ({}): {}", message, file_path.string(), err_buf.data());
@@ -107,6 +121,11 @@ namespace Logging::Exceptions::FileExceptions
 				: format("Couldn't load config: {} (line {}). Use default config instead.", file_path.string(), line)) {
 		}
 	};
+	struct File_Copy_Failed : File_Exception
+	{
+		explicit File_Copy_Failed(const std::filesystem::path& file_path) : File_Exception(file_path, "Couldn't copy: ") {}
+	};
+
 }
 namespace Logging::Exceptions::FormatExceptions
 {

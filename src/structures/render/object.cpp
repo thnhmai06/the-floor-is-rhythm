@@ -162,7 +162,7 @@ namespace Structures::Render::Object
 	void ReactObject::check_event(const Events::Event::Input::MouseEvents& events) const
 	{
 		if (!on_event) return;
-		if (!allow_hide && (!visible || config.color.a == 0)) return;
+		if (!allow_hide && (!config.visible || config.color.a == 0)) return;
 		for (const auto& event : events)
 		{
 			if (const SDL_FPoint pos = { .x = event.x, .y = event.y };

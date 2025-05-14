@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "structures/events/action/action.h"
 #include "structures/events/time/time.h"
 #include "structures/render/layer.h"
@@ -12,6 +12,9 @@ namespace Structures::Game::Beatmap
 		using namespace OsuParser::Beatmap::Objects::Event;
 
 		using Events = Event::Events;
+
+		//! Chú ý: Lưu trữ EventObjects trong quá trình chơi
+		//! để buffer có thể sử dụng các objects được
 		struct EventObjects final
 		{
 		private:
@@ -41,9 +44,7 @@ namespace Structures::Game::Beatmap
 			std::shared_ptr<Render::Object::Collection> foreground = std::make_shared<Render::Object::Collection>();
 
 			std::shared_ptr<Render::Object::Collection>& pick_layer(const Type::Objects::Args::Layer::ImageLayer& layer);
-			void submit_to_buffer(Render::Layer::Layer* normal, Render::Layer::Layer* background,
-				Render::Layer::Layer* fail, Render::Layer::Layer* pass,
-				Render::Layer::Layer* foreground) const;
+			void submit_to_buffer(Render::Layer::Layer::Buffer& background_buffer, Render::Layer::Layer::Buffer& storyboard_buffer) const;
 
 			explicit EventObjects(
 				const OsuParser::Beatmap::Objects::Event::Events& events,

@@ -1,4 +1,4 @@
-﻿#pragma comment(linker, "/ENTRY:mainCRTStartup") // TODO: Hỗ trợ hàm main cái Window app
+﻿#pragma comment(linker, "/ENTRY:mainCRTStartup")
 extern "C"
 {
 	using DWORD = unsigned long;
@@ -15,7 +15,7 @@ static int32_t run()
 {
 	using namespace Core::Work;
 
-	//Convert::Osu::convert_beatmap(R"(D:\PROGRAM\osu!\Songs\546820 YUC'e - Future Candy)");
+	//Convert::Osu::convert_beatmap(R"(D:\Development\Code\cpp\Repositories\the-floor-is-rhythm\build\out\x64\Debug\beatmap\1881706 Sad Keyboard Guy, sleepless & Myntian - Alter__Strife feat vallyexe)");
 	int32_t result = work();
 
 	return result;

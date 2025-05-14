@@ -72,6 +72,8 @@ namespace Structures::Render::Layer
 		virtual ~Layer() = default;
 	};
 
+	//! Chú ý: Khi dùng TextureLayer cần chú ý đến việc
+	//! cộng màu (ADD Blend mode) vì phụ thuộc lớp dưới
 	struct TextureLayer : Layer
 	{
 		Memory::Item target_texture;
@@ -84,7 +86,10 @@ namespace Structures::Render::Layer
 		void put_object_out_layer(std::shared_ptr<Object::Object>& object) override;
 
 	public:
-		void render_no_change_back_target(bool clear = false);
+		void render_no_back_target(bool clear = false);
+		//! Chú ý: Bạn có quên clear texture trước
+		//! khi render không? Hàm này ko có clear trước
+		//! đâu nhen :3
 		void render() override;
 		void clear() override;
 

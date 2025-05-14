@@ -19,7 +19,7 @@ namespace Core::Manager
 			if (DEBUG) LOG_INFO("Game is running on Debug mode!");
 
 			if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS))
-				THROW_CRITICAL(Logging::Exceptions::SDLExceptions::Video::SDL_Video_InitSDL_Failed());
+				THROW_CRITICAL(Logging::Exceptions::SDLExceptions::System::SDL_System_InitSDL_Failed());
 		}
 		void quit()
 		{
@@ -63,7 +63,7 @@ namespace Core::Manager
 				flags);
 
 			if (!window)
-				THROW_CRITICAL(Logging::Exceptions::SDLExceptions::Video::SDL_Video_CreateWindow_Failed());
+				THROW_CRITICAL(Logging::Exceptions::SDLExceptions::System::SDL_System_CreateWindow_Failed());
 		}
 		void quit()
 		{
@@ -76,7 +76,7 @@ namespace Core::Manager
 		{
 			renderer = SDL_CreateRenderer(window, nullptr);
 			if (!renderer)
-				THROW_CRITICAL(Logging::Exceptions::SDLExceptions::Video::SDL_Video_CreateRenderer_Failed());
+				THROW_CRITICAL(Logging::Exceptions::SDLExceptions::System::SDL_System_CreateRenderer_Failed());
 
 			SPDLOG_INFO("GPU Driver: {}", SDL_GetCurrentVideoDriver());
 			SPDLOG_INFO("Renderer: {}", SDL_GetRendererName(renderer));

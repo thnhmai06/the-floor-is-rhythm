@@ -4,6 +4,8 @@
 #include <filesystem>
 #include "format/file.h"
 #include "core/work/convert/osu/mapset.h"
+#include "logging/exceptions.h"
+#include "logging/logger.h"
 
 namespace fs = std::filesystem;
 
@@ -27,7 +29,16 @@ namespace Core::Work::Convert::Osu
 		{
 			auto dest_path = output / path.filename();
 			if (path != dest_path)
-				fs::copy(path, dest_path, fs::copy_options::recursive | fs::copy_options::overwrite_existing);
+			{
+				try
+				{
+					fs::copy(path, dest_path, fs::copy_options::recursive | fs::copy_options::overwrite_existing);
+				} catch (...) 
+				{
+					LOG_ERROR(Logging::Exceptions::FileExceptions::File_Copy_Failed(path));
+					return;
+				}
+			}
 			for (auto&& entry : fs::recursive_directory_iterator(dest_path))
 			{
 				if (fs::is_regular_file(entry))

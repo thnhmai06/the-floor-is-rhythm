@@ -6,8 +6,8 @@ namespace Structures::Render::Layer
 	using namespace ::Config::Game::Render;
 	using namespace Utilities::Math::FPoint;
 
-	const bool& StoryboardLayer::get_widescreen_mode() const { return widescreen; }
-	void StoryboardLayer::resize(const bool widescreen, const bool force)
+	const bool& Storyboard::get_widescreen_mode() const { return widescreen; }
+	void Storyboard::resize(const bool widescreen, const bool force)
 	{
 		if (!force && widescreen == this->widescreen) return;
 		this->widescreen = widescreen;
@@ -30,57 +30,40 @@ namespace Structures::Render::Layer
 		const auto texture_size = to_integer_point(grid_size * final_scale);
 		grid_origin *= final_scale;
 
-		background.camera.get_camera_origin() = fail.camera.get_camera_origin() =
-			pass.camera.get_camera_origin() = foreground.camera.get_camera_origin() = grid_origin;
-		background.grid_size = fail.grid_size = pass.grid_size = foreground.grid_size = grid_size;
-		memory.create_new(name_background, texture_size);
-		memory.create_new(name_fail, texture_size);
-		memory.create_new(name_pass, texture_size);
-		memory.create_new(name_foreground, texture_size);
+		layer.camera.get_camera_origin() = grid_origin;
+		layer.grid_size = grid_size;
+		memory.create_new(name_texture, texture_size);
 	}
-	void StoryboardLayer::render()
+	void Storyboard::render()
 	{
+		//! CHÚ Ý: KHÔNG TÁCH TEXTURE LAYER RA LÀM 4 LAYER KHÁC NHAU - NHƯ VẬY SẼ
+		//! LÀM HỎNG ADD BLEND MODE!
 		//! Thứ tự: background -> fail -> pass -> foreground
-		if (!visible) return;
 
-		//! Render Texture
-		SDL_Texture* const current_target = SDL_GetRenderTarget(memory.renderer);
-		background.render_no_change_back_target(true);
-		fail.render_no_change_back_target(true);
-		pass.render_no_change_back_target(true);
-		foreground.render_no_change_back_target(true);
-		SDL_SetRenderTarget(memory.renderer, current_target);
+		//! Render về mặt Texture
+		layer.target_texture.clear();
+		layer.render();
 
 		//! Render chính
-		// Letter Box, căn giữa
-		const auto texture = background.target_texture.get_size();
+		const auto texture = layer.target_texture.get_size();
 		SDL_Point window_int; SDL_GetCurrentRenderOutputSize(memory.renderer, &window_int.x, &window_int.y);
 		const SDL_FPoint window = to_float_point(window_int);
-
+		// Letter Box, căn giữa
 		const auto [scale_x, scale_y] = window / texture;
 		const auto final_scale = std::min(scale_x, scale_y);
 		const SDL_FPoint dst_size = texture * final_scale;
 		const SDL_FPoint dst_pos = -Utilities::Math::centre(dst_size, window);
 		const SDL_FRect dst_rect = Utilities::Render::merge_pos_size(dst_pos, dst_size);
-		background.target_texture.render(nullptr, &dst_rect);
-		fail.target_texture.render(nullptr, &dst_rect);
-		pass.target_texture.render(nullptr, &dst_rect);
-		foreground.target_texture.render(nullptr, &dst_rect);
+		layer.target_texture.render(nullptr, &dst_rect);
 	}
-	void StoryboardLayer::clear()
+	void Storyboard::clear()
 	{
-		background.clear();
-		fail.clear();
-		pass.clear();
-		foreground.clear();
+		layer.clear();
 	}
-	StoryboardLayer::StoryboardLayer(SDL_Renderer* renderer)
+	Storyboard::Storyboard(SDL_Renderer* renderer)
 		: memory(renderer),
 		//! Layers
-		background(memory.create_new(name_background, { 1, 1 }), { 0, 0 }),
-		fail(memory.create_new(name_fail, {1, 1}), { 0, 0 }),
-		pass(memory.create_new(name_pass, {1, 1}), { 0, 0 }),
-		foreground(memory.create_new(name_foreground, {1, 1}), { 0, 0 })
+		layer(memory.create_new(name_texture, { 1, 1 }), { 0, 0 })
 	{
 		resize(widescreen, true);
 	}

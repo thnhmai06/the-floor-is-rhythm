@@ -158,7 +158,7 @@ namespace Structures::Screen::Gameplay
 			Structures::Audio::Bus<Types::Audio::Music>::resume();
 		system.timer.resume();
 	}
-	void GameplayScreen::Logic::fail(const int64_t& current_time) const
+	void GameplayScreen::Logic::fail() const
 	{
 		gameplay_screen->pause_screen.make_fail();
 
@@ -186,7 +186,7 @@ namespace Structures::Screen::Gameplay
 			auto click_left = system.key_stroke.get_recently_pressed_left();
 			auto click_right = system.key_stroke.get_recently_pressed_right();
 			if (!update_object(current_time, click_left, click_right))
-				fail(current_time);
+				fail();
 		}
 		//if (!is_finished)
 		//{
@@ -251,7 +251,7 @@ namespace Structures::Screen::Gameplay
 	//! Render
 	void GameplayScreen::Render::clean(const bool exit)
 	{
-		Core::Resources::Layers::normal_background->clear();
+		Core::Resources::Layers::background->clear();
 		Core::Resources::Layers::storyboard->clear();
 		storyboard.reset();
 
@@ -287,9 +287,8 @@ namespace Structures::Screen::Gameplay
 				gameplay_screen->mapset->path.parent_path(), &gameplay_screen->logic.system.timer,
 				gameplay_screen->storyboard_buffer, &gameplay_screen->event_buffer);
 			storyboard->submit_to_buffer(
-				Core::Resources::Layers::normal_background.get(), &Core::Resources::Layers::storyboard->background,
-				&Core::Resources::Layers::storyboard->fail, &Core::Resources::Layers::storyboard->pass,
-				&Core::Resources::Layers::storyboard->foreground);
+				Core::Resources::Layers::background->render_buffer, 
+				Core::Resources::Layers::storyboard->layer.render_buffer);
 		}
 	}
 	void GameplayScreen::Render::show_result(const int64_t& current_time)
@@ -298,7 +297,7 @@ namespace Structures::Screen::Gameplay
 		result = std::make_shared<Result::Result>(*skin, gameplay_screen->logic.system.score, *score);
 		item.result = Core::Resources::Layers::foreground->render_buffer.add(result);
 
-		Core::Resources::Layers::storyboard->visible = false;
+		Core::Resources::Layers::storyboard->layer.visible = false;
 		Core::Resources::Layers::hud->visible = false;
 		Core::Resources::Layers::static_hud->visible = false;
 		Core::Resources::Layers::playground->visible = false;

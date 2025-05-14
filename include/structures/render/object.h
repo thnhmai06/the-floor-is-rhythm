@@ -41,6 +41,7 @@ namespace Structures::Render::Object
 			SDL_FPoint render_pos; // chính là dst_rect với character_render_size nguyên gốc (muốn đổi character_render_size hãy ra ngoài Object tìm set_render_size())
 			float angle = 0.0f; // theo chiều kim đồng hồ, tính bằng độ (degree), chỉ xoay hình được on_before_render ra chứ không thay đổi vị trí gốc (hitbox vẫn giữ nguyên)
 			SDL_Color color = { 255, 255, 255, SDL_MAX_ALPHA }; // chỉ ảnh hưởng hình được on_before_render ra (cũng tương tự như angle)
+			bool visible = true;
 			struct FlipMode
 			{
 				bool horizontal = false; // ngang
@@ -63,7 +64,6 @@ namespace Structures::Render::Object
 		Memory::Item src;
 		SDL_FRect src_rect_in_percent = { 0, 0, 1, 1 }; // cũng là sdl src_rect, nhưng ở % so với gốc
 		Config config;
-		bool visible = true;
 
 		[[nodiscard]] SDL_FRect get_sdl_src_rect() const; // CẨN THẬN NHẦM LẪN KHI LẤY previous_render_size -> cần dùng get_sdl_dst_rect()
 		[[nodiscard]] SDL_FRect get_sdl_dst_rect() const;
