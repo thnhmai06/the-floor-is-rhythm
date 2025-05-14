@@ -1,4 +1,11 @@
 ﻿#pragma comment(linker, "/ENTRY:mainCRTStartup") // TODO: Hỗ trợ hàm main cái Window app
+extern "C"
+{
+	using DWORD = unsigned long;
+
+	__declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+}
 #include "main.h" // Header
 #include "core/manager.h"
 #include "core/work.h"
@@ -24,6 +31,6 @@ int32_t main(const int32_t argc, char* argv[])
 	Core::Manager::init();
 	const int32_t result = run();
 	Core::Manager::quit();
-
+	
 	return result;
 }

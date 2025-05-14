@@ -182,6 +182,8 @@ namespace Structures::Events::Action::Render
 		if (target_object.expired()) return;
 		const auto it = target_object.lock();
 		if (!it) return;
+		if (const auto [time_start, time_end] = get_sequence_time(); 
+			time_start == time_end) return; // không reset, vì nếu ko có endTime thì coi như là Vĩnh viễn
 
 		switch (get_current_value().second)
 		{
