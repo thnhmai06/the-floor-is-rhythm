@@ -96,11 +96,15 @@
     <LibraryPath>.\dependencies\SDL_mixer-build\lib;.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib\manual-link;.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib;$(LibraryPath)</LibraryPath>
     <IncludePath>.\include;$(IncludePath)</IncludePath>
     <SourcePath>$(SourcePath)</SourcePath>
+    <OutDir>$(SolutionDir)build\out\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build\obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LibraryPath>.\dependencies\SDL_mixer-build\lib;.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib\manual-link;.\vcpkg_installed\$(PlatformTarget)-windows\$(PlatformTarget)-windows\lib;$(LibraryPath)</LibraryPath>
     <IncludePath>.\include;$(IncludePath)</IncludePath>
     <SourcePath>$(SourcePath)</SourcePath>
+    <OutDir>$(SolutionDir)build\out\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build\obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnableManifest>true</VcpkgEnableManifest>

@@ -24,7 +24,8 @@ namespace Structures::Screen::Gameplay
 		bool no_fail = false;
 		bool auto_play = false;
 		Events::Event::Buffer event_buffer;
-		Events::Action::Buffer action_buffer;
+		Events::Action::Buffer storyboard_buffer;
+		Events::Action::Buffer gameplay_buffer;
 		Pausing::PauseScreen pause_screen;
 
 	public:

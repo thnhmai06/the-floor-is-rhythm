@@ -17,7 +17,7 @@ namespace Structures::Events::Action
 	void Buffer::execute(const int64_t& current_time)
 	{
 		if (data.empty()) return;
-
+		
 		auto it = data.begin();
 		while (it != data.end() && it->first <= current_time)
 		{
@@ -45,6 +45,7 @@ namespace Structures::Events::Action
 	CallbackAction::CallbackAction(const int64_t& start_time, std::function<void(const int64_t& current_time)> callback)
 		: callback(std::move(callback))
 	{
+		this->start_time = start_time;
 	}
 
 	//! LoopAction

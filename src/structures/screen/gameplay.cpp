@@ -128,11 +128,12 @@ namespace Structures::Screen::Gameplay
 	void GameplayScreen::Logic::update_event_and_action(const int64_t& current_time) const
 	{
 		//! Event
-		gameplay_screen->render.cursor->check_and_add_score_shown(gameplay_screen->event_buffer, gameplay_screen->action_buffer, current_time);
+		gameplay_screen->render.cursor->check_and_add_score_shown(gameplay_screen->event_buffer, gameplay_screen->gameplay_buffer, current_time);
 		// event Hitsound đã được thực thi ở hàm Audio::check_and_play_sound (khi đang update_object)
 
 		//! Action
-		gameplay_screen->action_buffer.execute(current_time);
+		gameplay_screen->storyboard_buffer.execute(current_time);
+		gameplay_screen->gameplay_buffer.execute(current_time);
 	}
 	void GameplayScreen::Logic::check_finish(const int64_t& current_time)
 	{
@@ -284,7 +285,7 @@ namespace Structures::Screen::Gameplay
 			storyboard = std::make_unique<Game::Beatmap::Event::EventObjects>(
 				gameplay_screen->mapset->events, renderer,
 				gameplay_screen->mapset->path.parent_path(), &gameplay_screen->logic.system.timer,
-				gameplay_screen->action_buffer, &gameplay_screen->event_buffer);
+				gameplay_screen->storyboard_buffer, &gameplay_screen->event_buffer);
 			storyboard->submit_to_buffer(
 				Core::Resources::Layers::normal_background.get(), &Core::Resources::Layers::storyboard->background,
 				&Core::Resources::Layers::storyboard->fail, &Core::Resources::Layers::storyboard->pass,
@@ -302,7 +303,7 @@ namespace Structures::Screen::Gameplay
 		Core::Resources::Layers::static_hud->visible = false;
 		Core::Resources::Layers::playground->visible = false;
 
-		auto& [data] = gameplay_screen->action_buffer;
+		auto& [data] = gameplay_screen->storyboard_buffer;
 		data.emplace(current_time + DELAY, std::make_shared<Events::Action::Render::ChangeAction<float>>(
 			current_time + DELAY, current_time + DELAY + TIME_MOVE_IN_RESULT,
 			EASING_IN_RESULT, &result->offset.x, result->offset.x, 0 ));
@@ -394,7 +395,7 @@ namespace Structures::Screen::Gameplay
 	void GameplayScreen::retry()
 	{
 		event_buffer.clear();
-		action_buffer.data.clear();
+		storyboard_buffer.data.clear();
 
 		audio.retry();
 		render.retry();

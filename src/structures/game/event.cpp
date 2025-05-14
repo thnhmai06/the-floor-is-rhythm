@@ -221,13 +221,26 @@ namespace Structures::Game::Beatmap
 			auto cmd = load_commands(sprite, *object.commands, action_buffer, event_buffer);
 			int64_t start_time = (cmd.empty() ? 0 : cmd.begin()->first);
 			int64_t end_time = (cmd.empty() ? 0 : cmd.begin()->second->end_time);
+			std::optional<SDL_FPoint> start_pos;
 			for (auto& [time, action] : cmd)
 			{
 				start_time = std::min(start_time, time);
 				end_time = std::max(end_time, action->end_time);
+
+				if (!start_pos.has_value())
+				{
+					if (const auto it = std::dynamic_pointer_cast<Structures::Events::Action::Render::MoveAction>(action))
+					{
+						start_pos = it->from;
+					}
+				}
 			}
+			// Căn chỉnh đúng vị trí xuất hiện khi có move command trong lệnh
+			// ref: https://discord.com/channels/188630481301012481/1097318920991559880/1372195997043785789 - osu why?
+			if (start_pos.has_value()) sprite->config.render_pos = start_pos.value();
+
 			// Chỉ hiện khi object đến lúc
- 			sprite->config.color.a = 0;
+			sprite->config.color.a = 0;
 			if (!cmd.empty())
 			{
 				action_buffer.data.emplace(start_time,
@@ -281,11 +294,24 @@ namespace Structures::Game::Beatmap
 			auto cmd = load_commands(animation, *object.commands, action_buffer, event_buffer);
 			int64_t start_time = (cmd.empty() ? 0 : cmd.begin()->first);
 			int64_t end_time = (cmd.empty() ? 0 : cmd.begin()->second->end_time);
+			std::optional<SDL_FPoint> start_pos;
 			for (auto& [time, action] : cmd)
 			{
 				start_time = std::min(start_time, time);
 				end_time = std::max(end_time, action->end_time);
+
+				if (!start_pos.has_value())
+				{
+					if (const auto it = std::dynamic_pointer_cast<Structures::Events::Action::Render::MoveAction>(action))
+					{
+						start_pos = it->from;
+					}
+				}
 			}
+			// Căn chỉnh đúng vị trí xuất hiện khi có move command trong lệnh
+			// ref: https://discord.com/channels/188630481301012481/1097318920991559880/1372195997043785789 - osu why?
+			if (start_pos.has_value()) animation->config.render_pos = start_pos.value();
+
 			// Chỉ hiện khi object đến lúc
 			animation->config.color.a = 0;
 			if (!cmd.empty())
