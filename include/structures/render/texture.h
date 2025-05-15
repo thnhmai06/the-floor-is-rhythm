@@ -44,7 +44,7 @@ namespace Structures::Render::Texture
 		};
 
 		[[nodiscard]] const CONTAINER* get_data() const;
-		Item load(const std::filesystem::path& file_path, const std::string& name, bool override = true);
+		Item load(std::filesystem::path file_path, const std::string& name, bool override = true);
 		Item load(SDL_Texture* texture, const std::string& name, bool override = true);
 		std::unordered_set<std::string> load(
 			const std::filesystem::path& folder_path, const std::filesystem::path& root_folder, 

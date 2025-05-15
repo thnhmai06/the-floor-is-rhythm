@@ -1,4 +1,7 @@
 ﻿#include "structures/game/event.h" // Header
+
+#include <ranges>
+
 #include "structures/events/action/render.hpp"
 #include "structures/events/condition/playing.h"
 #include "structures/render/layer/storyboard.h"
@@ -228,11 +231,14 @@ namespace Structures::Game::Beatmap
 			std::optional<uint8_t> start_fade;
 			std::optional<float> start_rotate;
 			std::optional<Color> start_color;
+			bool start_horizontal = false, start_vertical = false, start_additive = false;
 			for (auto& [time, action] : cmd)
 			{
 				start_time = std::min(start_time, time);
 				end_time = std::max(end_time, action->end_time);
-
+			}
+			for (auto& action : cmd | std::views::values)
+			{
 				if (!start_pos_x.has_value())
 				{
 					if (const auto move = std::dynamic_pointer_cast<MoveAction>(action))
@@ -262,13 +268,6 @@ namespace Structures::Game::Beatmap
 						start_scale = scale->from;
 					}
 				}
-				if (!start_fade.has_value())
-				{
-					if (const auto fade = std::dynamic_pointer_cast<FadeAction>(action))
-					{
-						start_fade = fade->from;
-					}
-				}
 				if (!start_rotate.has_value())
 				{
 					if (const auto rotate = std::dynamic_pointer_cast<RotateAction>(action))
@@ -276,15 +275,32 @@ namespace Structures::Game::Beatmap
 						start_rotate = rotate->from;
 					}
 				}
-				if (!start_color)
+				if (!start_color.has_value())
 				{
 					if (const auto color = std::dynamic_pointer_cast<ColorAction>(action))
 					{
 						start_color = color->from;
 					}
 				}
+				if (const auto parameter = std::dynamic_pointer_cast<ParameterAction>(action);
+					parameter && parameter->start_time == start_time)
+				{
+					switch (parameter->to)
+					{
+					case Parameter::Horizontal:
+						start_horizontal = true;
+						break;
+					case Parameter::Vertical:
+						start_vertical = true;
+						break;
+					case Parameter::AdditiveColour:
+						start_additive = true;
+						break;
+					}
+				}
 			}
-			// Căn chỉnh đúng vị trí xuất hiện khi có move command trong lệnh
+
+			// Căn chỉnh đúng với trạng thái đầu tiên xuất hiện
 			// ref: https://discord.com/channels/188630481301012481/1097318920991559880/1372195997043785789 - osu why?
 			if (start_pos_x.has_value()) sprite->config.render_pos.x = start_pos_x.value();
 			if (start_pos_y.has_value()) sprite->config.render_pos.y = start_pos_y.value();
@@ -297,6 +313,9 @@ namespace Structures::Game::Beatmap
 				sprite->config.color.g = start_color->g;
 				sprite->config.color.b = start_color->b;
 			}
+			if (start_horizontal) sprite->config.flip_mode.horizontal = true;
+			if (start_vertical) sprite->config.flip_mode.vertical = true;
+			if (start_additive) sprite->config.blend_mode = SDL_BLENDMODE_ADD;
 
 			// Chỉ hiện khi object đến lúc
 			sprite->config.color.a = 0;
@@ -357,14 +376,16 @@ namespace Structures::Game::Beatmap
 			int64_t end_time = (cmd.empty() ? 0 : cmd.begin()->second->end_time);
 			std::optional<float> start_pos_x, start_pos_y;
 			std::optional<SDL_FPoint> start_scale;
-			std::optional<uint8_t> start_fade;
 			std::optional<float> start_rotate;
 			std::optional<Color> start_color;
+			bool start_horizontal = false, start_vertical = false, start_additive = false;
 			for (auto& [time, action] : cmd)
 			{
 				start_time = std::min(start_time, time);
 				end_time = std::max(end_time, action->end_time);
-
+			}
+			for (auto& action : cmd | std::views::values)
+			{
 				if (!start_pos_x.has_value())
 				{
 					if (const auto move = std::dynamic_pointer_cast<MoveAction>(action))
@@ -394,13 +415,6 @@ namespace Structures::Game::Beatmap
 						start_scale = scale->from;
 					}
 				}
-				if (!start_fade.has_value())
-				{
-					if (const auto fade = std::dynamic_pointer_cast<FadeAction>(action))
-					{
-						start_fade = fade->from;
-					}
-				}
 				if (!start_rotate.has_value())
 				{
 					if (const auto rotate = std::dynamic_pointer_cast<RotateAction>(action))
@@ -408,20 +422,36 @@ namespace Structures::Game::Beatmap
 						start_rotate = rotate->from;
 					}
 				}
-				if (!start_color)
+				if (!start_color.has_value())
 				{
 					if (const auto color = std::dynamic_pointer_cast<ColorAction>(action))
 					{
 						start_color = color->from;
 					}
 				}
+				if (const auto parameter = std::dynamic_pointer_cast<ParameterAction>(action);
+					parameter && parameter->start_time == start_time)
+				{
+					switch (parameter->to)
+					{
+					case Parameter::Horizontal:
+						start_horizontal = true;
+						break;
+					case Parameter::Vertical:
+						start_vertical = true;
+						break;
+					case Parameter::AdditiveColour:
+						start_additive = true;
+						break;
+					}
+				}
 			}
-			// Căn chỉnh đúng vị trí xuất hiện khi có move command trong lệnh
+
+			// Căn chỉnh đúng với trạng thái đầu tiên xuất hiện
 			// ref: https://discord.com/channels/188630481301012481/1097318920991559880/1372195997043785789 - osu why?
 			if (start_pos_x.has_value()) animation->config.render_pos.x = start_pos_x.value();
 			if (start_pos_y.has_value()) animation->config.render_pos.y = start_pos_y.value();
 			if (start_scale.has_value()) animation->config.scale = start_scale.value();
-			if (start_fade.has_value()) animation->config.color.a = start_fade.value();
 			if (start_rotate.has_value()) animation->config.angle = start_rotate.value();
 			if (start_color.has_value())
 			{
@@ -429,6 +459,9 @@ namespace Structures::Game::Beatmap
 				animation->config.color.g = start_color->g;
 				animation->config.color.b = start_color->b;
 			}
+			if (start_horizontal) animation->config.flip_mode.horizontal = true;
+			if (start_vertical) animation->config.flip_mode.vertical = true;
+			if (start_additive) animation->config.blend_mode = SDL_BLENDMODE_ADD;
 
 			// Chỉ hiện khi object đến lúc
 			animation->config.color.a = 0;

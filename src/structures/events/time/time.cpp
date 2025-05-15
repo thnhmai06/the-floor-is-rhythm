@@ -16,7 +16,13 @@ namespace Structures::Events::Time
 
 		const Uint64 crr_tick_value = current_tick.value_or(get_current_tick());
 		const auto passed_time = crr_tick_value - start_tick - total_paused_ticks;
-		return start_time + static_cast<int64_t>(passed_time);
+		const auto res = start_time + static_cast<int64_t>(passed_time);
+		last_get_time = res;
+		return res;
+	}
+	int64_t Timer::get_last_get_time() noexcept
+	{
+		return last_get_time.value_or(get_time());
 	}
 	void Timer::pause(const std::optional<Uint64>& current_tick)
 	{
@@ -41,6 +47,7 @@ namespace Structures::Events::Time
 		this->total_paused_ticks = 0;
 		this->paused_tick = this->start_tick;
 		this->paused = false;
+		this->last_get_time = std::nullopt;
 		if (!auto_start) pause(start_tick);
 	}
 	Timer::Timer(

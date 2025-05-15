@@ -7,7 +7,7 @@ namespace Structures::Render::Object
 	struct AnimationObject : Object
 	{
 	protected:
-		std::optional<int64_t> last_frame_time = 0;
+		std::optional<int64_t> last_frame_time;
 		long long current_frame = 0;
 
 		void update(const int64_t& current_time);

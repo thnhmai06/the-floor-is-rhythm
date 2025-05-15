@@ -14,10 +14,13 @@ namespace Structures::Events::Event
 		{
 			time = static_cast<int64_t>(std::round(floor.time));
 
-			const auto& timing_point = mapset.timing_points.data.lower_bound(floor.time)->second;
+			auto timing_point = mapset.timing_points.data.lower_bound(floor.time);
+			if (timing_point == mapset.timing_points.data.end())
+				timing_point = Utilities::Container::get_last_element_iterator(mapset.timing_points.data);
 			used_sample_set = hit_sample->get_used_sample_set(*hit_sound, 
-				timing_point.sample.set, mapset.general.sample_set);
-			used_audio = Game::Beatmap::Hitsound::get_hit_sound_filename(*hit_sound, *hit_sample, timing_point.sample, mapset.general.sample_set, beatmap_effect);
+				timing_point->second.sample.set, mapset.general.sample_set);
+			used_audio = Game::Beatmap::Hitsound::get_hit_sound_filename(*hit_sound, *hit_sample, 
+				timing_point->second.sample, mapset.general.sample_set, beatmap_effect);
 		}
 
 		//! Passing

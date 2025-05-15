@@ -15,9 +15,9 @@ namespace Core::Work
 
 		//try
 		//{
-		//Convert::Osu::convert_beatmap(R"(D:\Development\Code\cpp\Repositories\the-floor-is-rhythm\build\out\x64\Debug\beatmap\1881706 Sad Keyboard Guy, sleepless & Myntian - Alter__Strife feat vallyexe)");
+		Convert::Osu::convert_beatmap(R"(D:\PROGRAM\osu!\Songs\2287992 Camellia - Operation_ Zenithfall)");
 		Resources::Screens::gameplay_screen = std::make_unique<Structures::Screen::Gameplay::GameplayScreen>
-			(R"(D:\Development\Code\cpp\Repositories\the-floor-is-rhythm\build\out\x64\Debug\beatmap\1511778 Camellia - Body F10ating in the Zero Gravity Space\Camellia - Body F10ating in the Zero Gravity Space (Orange_) [Nonsubmersible].tfd)", 
+			(R"(D:\Development\Code\cpp\Repositories\the-floor-is-rhythm\build\out\x64\Debug\beatmap\2287992 Camellia - Operation_ Zenithfall\Camellia - Operation Zenithfall (Mir) [Final Mission].tfd)", 
 				1, true, true, true);
 
 		while (is_running)

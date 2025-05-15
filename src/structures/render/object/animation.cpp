@@ -15,13 +15,16 @@ namespace Structures::Render::Object
 				current_frame = std::clamp(current_frame + frame_elapsed, 0LL, frame_count - 1);
 			else
 				current_frame = Utilities::Math::circle_mod(current_frame + frame_elapsed, frame_count);
+			last_frame_time.value() += frame_elapsed * frame_delay;
+		} else
+		{
+			last_frame_time = current_time;
 		}
-		last_frame_time = current_time;
 		src = frames.at(current_frame);
 	}
 	void AnimationObject::on_before_render()
 	{
-		update(timer->get_time());
+		update(timer->get_last_get_time());
 	}
 	AnimationObject::AnimationObject(
 		Events::Time::Timer* timer,

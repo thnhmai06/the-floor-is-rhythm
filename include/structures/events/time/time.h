@@ -14,6 +14,7 @@ namespace Structures::Events::Time
 		Uint64 total_paused_ticks = 0;
 		Uint64 paused_tick = 0;
 		bool paused = false;
+		std::optional<int64_t> last_get_time;
 
 		void create_pause_snapshot(const std::optional<Uint64>& current_tick = std::nullopt);
 
@@ -26,6 +27,7 @@ namespace Structures::Events::Time
 
 		[[nodiscard]] const bool& is_paused() const;
 		[[nodiscard]] int64_t get_time(const std::optional<Uint64>& current_tick = std::nullopt) noexcept;
+		[[nodiscard]] int64_t get_last_get_time() noexcept;
 		void pause(const std::optional<Uint64>& current_tick = std::nullopt);
 		void resume();
 		void reset(

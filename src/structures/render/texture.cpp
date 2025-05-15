@@ -11,31 +11,17 @@ namespace Structures::Render::Texture
 	//! Memory
 	// ::
 	const Memory::CONTAINER* Memory::get_data() const { return &data; }
-	Memory::Item Memory::load(const std::filesystem::path& file_path, const std::string& name, const bool override)
+	Memory::Item Memory::load(std::filesystem::path file_path, const std::string& name, const bool override)
 	{
 		if (!override && data.contains(name)) return {};
+		file_path = Utilities::Path::normalize_path(file_path);
+
 		SDL_Texture* texture = IMG_LoadTexture(this->renderer, file_path.string().c_str());
 		if (!texture)
 		{
 			LOG_ERROR(Logging::Exceptions::SDLExceptions::Render::SDL_Render_LoadTexture_Failed(file_path));
 			return {};
 		}
-		// Nếu dùng STB_Image
-		/*if (!texture)
-			THROW_ERROR(Logging::Exceptions::SDLExceptions::Render::IMG_LoadTexture_Failed(file_path));
-
-		int32_t w, h, channels;
-		unsigned char* image = stbi_load(file_path, &w, &h, &channels, desired_channels);
-		if (!image)
-			THROW_ERROR(STBI_Logging::Exceptions::Image::STBI_LoadImage_Failed(file_path));
-		SDL_Texture* texture = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STATIC, w, h);
-
-		if (!SDL_UpdateTexture(texture, nullptr, image, w * desired_channels))
-		{
-			stbi_image_free(image);
-			THROW_ERROR(Logging::Exceptions::SDLExceptions::Render::SDL_UpdateTexture_Failed(file_path));
-		}
-		stbi_image_free(image);*/
 
 		return load(texture, name, override);
 	}
