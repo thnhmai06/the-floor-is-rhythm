@@ -16,8 +16,10 @@ namespace Structures::Render::Texture
 		if (!override && data.contains(name)) return {};
 		SDL_Texture* texture = IMG_LoadTexture(this->renderer, file_path.string().c_str());
 		if (!texture)
+		{
 			LOG_ERROR(Logging::Exceptions::SDLExceptions::Render::SDL_Render_LoadTexture_Failed(file_path));
-
+			return {};
+		}
 		// Nếu dùng STB_Image
 		/*if (!texture)
 			THROW_ERROR(Logging::Exceptions::SDLExceptions::Render::IMG_LoadTexture_Failed(file_path));
@@ -43,7 +45,6 @@ namespace Structures::Render::Texture
 		if (data.contains(name))
 			SDL_DestroyTexture(data[name]);
 
-		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 		SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
 		const auto& item = data.insert_or_assign(name, texture).first;
 		return { item, this };
@@ -90,11 +91,15 @@ namespace Structures::Render::Texture
 		if (!no_log_not_found) LOG_ERROR(Logging::Exceptions::SDLExceptions::Render::SDL_Render_Texture_NotFound(name));
 		return {};
 	}
-	Memory::Item Memory::create_new(const std::string& name, const SDL_Point& size, const bool override)
+	Memory::Item Memory::create_new(const std::string& name, const SDL_Point& size, const bool override, 
+		const SDL_PixelFormat& format, const SDL_TextureAccess& access)
 	{
-		const auto texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, size.x, size.y);
+		const auto texture = SDL_CreateTexture(renderer, format, access, size.x, size.y);
 		if (!texture)
+		{
 			LOG_ERROR(Logging::Exceptions::SDLExceptions::Render::SDL_Render_LoadTexture_Failed(name));
+			return {};
+		}
 
 		return load(texture, name, override);
 	}
