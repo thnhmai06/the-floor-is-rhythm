@@ -1,9 +1,12 @@
 ﻿#pragma once
 #include <algorithm>
+#include <filesystem>
 #include <chrono>
 #include <map>
 #include <queue>
 #include <SDL3/SDL_rect.h>
+
+namespace fs = std::filesystem;
 
 namespace Utilities
 {
@@ -106,6 +109,11 @@ namespace Utilities
 	{
 		std::string trim(std::string str, bool only_trim_right = false);
 		std::vector<std::string> split(const std::string& input, char delimiter = ',', bool only_two_part = false);
+	}
+	namespace Path
+	{
+		fs::path normalize_path(fs::path path);
+		fs::path make_valid_long_path(fs::path path);
 	}
 	namespace Render
 	{

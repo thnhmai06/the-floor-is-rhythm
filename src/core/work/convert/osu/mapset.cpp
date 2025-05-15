@@ -144,9 +144,11 @@ namespace Core::Work::Convert::Osu
 		return result;
 	}
 
-	void convert_mapset(const std::filesystem::path& file, const std::filesystem::path& output)
+	void convert_mapset(std::filesystem::path path, const std::filesystem::path& output)
 	{
-		const Beatmap beatmap(file.string());
+		path = Utilities::Path::normalize_path(path);
+
+		const Beatmap beatmap(path.string());
 		std::ofstream writer(output);
 		if (!writer)
 			THROW_ERROR(Logging::Exceptions::FileExceptions::File_Open_Failed(output));

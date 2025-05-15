@@ -4,18 +4,20 @@
 #include "logging/logger.h"
 #include "core/resources/screen.h"
 #include "core/work/update.h"
+#include "core/work/convert/osu/beatmap.h"
 #include "core/work/convert/osu/mapset.h"
 
 namespace Core::Work
 {
-	int32_t work()
+	int32_t run()
 	{
 		int32_t result = EXIT_SUCCESS;
 
 		//try
 		//{
+		//Convert::Osu::convert_beatmap(R"(D:\Development\Code\cpp\Repositories\the-floor-is-rhythm\build\out\x64\Debug\beatmap\1881706 Sad Keyboard Guy, sleepless & Myntian - Alter__Strife feat vallyexe)");
 		Resources::Screens::gameplay_screen = std::make_unique<Structures::Screen::Gameplay::GameplayScreen>
-			(R"(D:\Development\Code\cpp\Repositories\the-floor-is-rhythm\build\out\x64\Debug\beatmap\1881706 Sad Keyboard Guy, sleepless & Myntian - Alter__Strife feat vallyexe\test.tfd)", 
+			(R"(D:\Development\Code\cpp\Repositories\the-floor-is-rhythm\build\out\x64\Debug\beatmap\1511778 Camellia - Body F10ating in the Zero Gravity Space\Camellia - Body F10ating in the Zero Gravity Space (Orange_) [Nonsubmersible].tfd)", 
 				1, true, true, true);
 
 		while (is_running)

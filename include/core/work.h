@@ -3,5 +3,5 @@
 
 namespace Core::Work
 {
-	int32_t work();
+	int32_t run();
 }

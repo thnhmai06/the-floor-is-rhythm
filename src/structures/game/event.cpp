@@ -223,7 +223,7 @@ namespace Structures::Game::Beatmap
 			auto cmd = load_commands(sprite, *object.commands, action_buffer, event_buffer);
 			int64_t start_time = (cmd.empty() ? 0 : cmd.begin()->first);
 			int64_t end_time = (cmd.empty() ? 0 : cmd.begin()->second->end_time);
-			std::optional<SDL_FPoint> start_move;
+			std::optional<float> start_pos_x, start_pos_y;
 			std::optional<SDL_FPoint> start_scale;
 			std::optional<uint8_t> start_fade;
 			std::optional<float> start_rotate;
@@ -233,11 +233,26 @@ namespace Structures::Game::Beatmap
 				start_time = std::min(start_time, time);
 				end_time = std::max(end_time, action->end_time);
 
-				if (!start_move.has_value())
+				if (!start_pos_x.has_value())
 				{
 					if (const auto move = std::dynamic_pointer_cast<MoveAction>(action))
 					{
-						start_move = move->from;
+						start_pos_x = move->from.x;
+					}
+					if (const auto move_x = std::dynamic_pointer_cast<MoveXAction>(action))
+					{
+						start_pos_x = move_x->from;
+					}
+				}
+				if (!start_pos_y.has_value())
+				{
+					if (const auto move = std::dynamic_pointer_cast<MoveAction>(action))
+					{
+						start_pos_y = move->from.y;
+					}
+					if (const auto move_y = std::dynamic_pointer_cast<MoveYAction>(action))
+					{
+						start_pos_y = move_y->from;
 					}
 				}
 				if (!start_scale.has_value())
@@ -271,7 +286,8 @@ namespace Structures::Game::Beatmap
 			}
 			// Căn chỉnh đúng vị trí xuất hiện khi có move command trong lệnh
 			// ref: https://discord.com/channels/188630481301012481/1097318920991559880/1372195997043785789 - osu why?
-			if (start_move.has_value()) sprite->config.render_pos = start_move.value();
+			if (start_pos_x.has_value()) sprite->config.render_pos.x = start_pos_x.value();
+			if (start_pos_y.has_value()) sprite->config.render_pos.y = start_pos_y.value();
 			if (start_scale.has_value()) sprite->config.scale = start_scale.value();
 			if (start_fade.has_value()) sprite->config.color.a = start_fade.value();
 			if (start_rotate.has_value()) sprite->config.angle = start_rotate.value();
@@ -339,7 +355,7 @@ namespace Structures::Game::Beatmap
 			auto cmd = load_commands(animation, *object.commands, action_buffer, event_buffer);
 			int64_t start_time = (cmd.empty() ? 0 : cmd.begin()->first);
 			int64_t end_time = (cmd.empty() ? 0 : cmd.begin()->second->end_time);
-			std::optional<SDL_FPoint> start_move;
+			std::optional<float> start_pos_x, start_pos_y;
 			std::optional<SDL_FPoint> start_scale;
 			std::optional<uint8_t> start_fade;
 			std::optional<float> start_rotate;
@@ -349,11 +365,26 @@ namespace Structures::Game::Beatmap
 				start_time = std::min(start_time, time);
 				end_time = std::max(end_time, action->end_time);
 
-				if (!start_move.has_value())
+				if (!start_pos_x.has_value())
 				{
 					if (const auto move = std::dynamic_pointer_cast<MoveAction>(action))
 					{
-						start_move = move->from;
+						start_pos_x = move->from.x;
+					}
+					if (const auto move_x = std::dynamic_pointer_cast<MoveXAction>(action))
+					{
+						start_pos_x = move_x->from;
+					}
+				}
+				if (!start_pos_y.has_value())
+				{
+					if (const auto move = std::dynamic_pointer_cast<MoveAction>(action))
+					{
+						start_pos_y = move->from.y;
+					}
+					if (const auto move_y = std::dynamic_pointer_cast<MoveYAction>(action))
+					{
+						start_pos_y = move_y->from;
 					}
 				}
 				if (!start_scale.has_value())
@@ -387,7 +418,8 @@ namespace Structures::Game::Beatmap
 			}
 			// Căn chỉnh đúng vị trí xuất hiện khi có move command trong lệnh
 			// ref: https://discord.com/channels/188630481301012481/1097318920991559880/1372195997043785789 - osu why?
-			if (start_move.has_value()) animation->config.render_pos = start_move.value();
+			if (start_pos_x.has_value()) animation->config.render_pos.x = start_pos_x.value();
+			if (start_pos_y.has_value()) animation->config.render_pos.y = start_pos_y.value();
 			if (start_scale.has_value()) animation->config.scale = start_scale.value();
 			if (start_fade.has_value()) animation->config.color.a = start_fade.value();
 			if (start_rotate.has_value()) animation->config.angle = start_rotate.value();

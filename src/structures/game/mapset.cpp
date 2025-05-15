@@ -101,7 +101,7 @@ namespace Structures::Game::Beatmap
 		{
 			if (entry.path().extension() == Format::File::Osu::STORYBOARD_EXTENSION) 
 			{
-				osb_path = entry.path();
+				osb_path = Utilities::Path::make_valid_long_path(entry.path());
 				break;
 			}
 		}
@@ -126,11 +126,12 @@ namespace Structures::Game::Beatmap
 
 		return ss.str();
 	}
-	Mapset::Mapset(const std::filesystem::path& path, const bool load_storyboard_file)
-	: path(path)
+	Mapset::Mapset(const fs::path& path, const bool load_storyboard_file)
+	: path(Utilities::Path::make_valid_long_path(path))
 	{
-		std::ifstream reader(path);
-		if (!reader) THROW_ERROR(Logging::Exceptions::FileExceptions::File_Open_Failed(path));
+		std::ifstream reader(this->path);
+		if (!reader) 
+			THROW_ERROR(Logging::Exceptions::FileExceptions::File_Open_Failed(this->path));
 		auto sections = read_content(reader);
 		reader.close();
 		parse(sections);

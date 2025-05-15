@@ -198,6 +198,25 @@ namespace Utilities
 			return result;
 		}
 	}
+	namespace Path
+	{
+		fs::path normalize_path(fs::path path)
+		{
+			path = make_valid_long_path(path);
+
+			return path;
+		}
+		fs::path make_valid_long_path(fs::path path)
+		{
+#ifdef _WIN32
+			const std::wstring prefix = L"\\\\?\\";
+			if (const auto path_str = path.wstring(); 
+				!path_str.starts_with(prefix) && path_str.length() >= 260)
+				path = fs::path{ prefix + std::filesystem::absolute(path).wstring() };
+#endif
+			return path;
+		}
+	}
 	namespace Render
 	{
 		SDL_FRect merge_pos_size(const SDL_FPoint& pos, const SDL_FPoint& size)

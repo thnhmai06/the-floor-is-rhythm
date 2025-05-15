@@ -57,6 +57,6 @@ namespace Structures::Game::Beatmap
 		void load_storyboard_file();
 
 	public:
-		explicit Mapset(const std::filesystem::path& path, bool load_storyboard_file = false);
+		explicit Mapset(const fs::path& path, bool load_storyboard_file = false);
 	};
 }
