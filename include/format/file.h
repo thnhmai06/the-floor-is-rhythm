@@ -52,6 +52,7 @@ namespace Format::File
 				constexpr std::string_view HEADER = "[Difficulty]";
 				constexpr std::string_view HP = "HPDrainRate";
 				constexpr std::string_view OD = "OverallDifficulty";
+				constexpr std::string_view VC = "Velocity";
 			}
 			namespace HitObjects
 			{

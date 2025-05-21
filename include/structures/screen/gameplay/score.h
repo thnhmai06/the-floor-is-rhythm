@@ -1,19 +1,19 @@
 #pragma once
 #include "structures/game/mapset.h"
-#include "structures/render/object.h"
-#include "structures/render/object/number.hpp"
+#include "engine/render/object.h"
+#include "engine/render/object/number.h"
 
 namespace Structures::Screen::Gameplay::Score
 {
 	namespace Render
 	{
-		using namespace Structures::Render::Object;
+		using namespace Engine::Render::Object;
 
 		struct Score : Collection
 		{
-			std::weak_ptr<HorizontalNumber<float>> score;
-			std::weak_ptr<HorizontalNumber<float>> accuracy;
-			std::weak_ptr<HorizontalNumber<unsigned long>> combo;
+			std::shared_ptr<HorizontalNumber<float>> score;
+			std::shared_ptr<HorizontalNumber<float>> accuracy;
+			std::shared_ptr<HorizontalNumber<unsigned long>> combo;
 
 			Score(const Memory& skin, const float* score, const float* accuracy, const unsigned long* combo);
 		};
@@ -25,7 +25,7 @@ namespace Structures::Screen::Gameplay::Score
 		protected:
 			const Game::Beatmap::Mapset* mapset;
 			float score = 0;
-			const float* mod_multiplier;
+			const float* score_multiplier;
 
 		public:
 			class Combo
@@ -54,7 +54,7 @@ namespace Structures::Screen::Gameplay::Score
 				unsigned long count_miss = 0;
 
 			private:
-				void update(const Types::Game::Gameplay::NoteScore& score, const unsigned long& num = 1);
+				void update(const Core::Type::Game::Gameplay::NoteScore& score, const unsigned long& num = 1);
 				void reset();
 
 				friend Score;
@@ -69,17 +69,17 @@ namespace Structures::Screen::Gameplay::Score
 				[[nodiscard]] unsigned long get_elapsed_objects_num() const;
 			} accuracy;
 
-			void update(const Types::Game::Gameplay::NoteScore& note_score = Types::Game::Gameplay::NoteScore::Skip, const uint32_t& num = 1);
+			void update(const Core::Type::Game::Gameplay::NoteScore& note_score = Core::Type::Game::Gameplay::NoteScore::Skip, const uint32_t& num = 1);
 			[[nodiscard]] const float* get_score() const;
-			[[nodiscard]] const float* get_mod_multiplier() const;
+			[[nodiscard]] const float* get_score_multiplier() const;
 			
-			Types::Game::Gameplay::NoteScore get_floor_score(
+			Core::Type::Game::Gameplay::NoteScore get_floor_score(
 				const Game::Beatmap::HitObjects::Floor& floor,
 				uint16_t& click_num,
-				const int64_t& current_time) const;
+				const int64_t& click_time) const;
 			void reset();
 
-			explicit Score(const Game::Beatmap::Mapset& mapset, const float* mod_multiplier);
+			explicit Score(const Game::Beatmap::Mapset& mapset, const float* score_multiplier);
 		};
 	}
 }

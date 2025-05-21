@@ -1,12 +1,7 @@
 #include "core/manager.h" // Header
+#include "config.h"
 #include "main.h"
-#include "logging/exceptions.h"
 #include "logging/logger.h"
-#include "core/resources/textures.h"
-#include "core/resources/audio.h"
-#include "core/resources/layer.h"
-#include "core/resources/screen.h"
-#include "core/resources/event.h"
 
 //! Manager
 namespace Core::Manager
@@ -19,7 +14,7 @@ namespace Core::Manager
 			if (DEBUG) LOG_INFO("Game is running on Debug mode!");
 
 			if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS))
-				THROW_CRITICAL(Logging::Exceptions::SDLExceptions::System::SDL_System_InitSDL_Failed());
+				THROW_CRITICAL(Logging::Exceptions::Engine::System::SDL_System_InitSDL_Failed());
 		}
 		void quit()
 		{
@@ -63,7 +58,7 @@ namespace Core::Manager
 				flags);
 
 			if (!window)
-				THROW_CRITICAL(Logging::Exceptions::SDLExceptions::System::SDL_System_CreateWindow_Failed());
+				THROW_CRITICAL(Logging::Exceptions::Engine::System::SDL_System_CreateWindow_Failed());
 		}
 		void quit()
 		{
@@ -76,7 +71,7 @@ namespace Core::Manager
 		{
 			renderer = SDL_CreateRenderer(window, nullptr);
 			if (!renderer)
-				THROW_CRITICAL(Logging::Exceptions::SDLExceptions::System::SDL_System_CreateRenderer_Failed());
+				THROW_CRITICAL(Logging::Exceptions::Engine::System::SDL_System_CreateRenderer_Failed());
 
 			SPDLOG_INFO("GPU Driver: {}", SDL_GetCurrentVideoDriver());
 			SPDLOG_INFO("Renderer: {}", SDL_GetRendererName(renderer));
@@ -93,68 +88,38 @@ namespace Core::Manager
 			using namespace ::Config::Game::Audio;
 
 			SDL_AudioSpec spec{ AUDIO_FORMAT, CHANNELS_STEREO, SAMPLE_FREQUENCY };
-			mixer = std::make_unique<Structures::Audio::Mixer>(spec, ::Config::user_config->audio.volume, MAX_CHANNELS);
-		}
-		void quit()
-		{
-			if (mixer)
-			{
-				Structures::Audio::Mixer::quit();
-				mixer.reset();
-			}
+			mixer = std::make_unique<Engine::Audio::Mixer>(
+				MIX_INIT_MP3 | MIX_INIT_OGG | MIX_INIT_WAVPACK, spec,
+				::Config::user_config->audio.volume.master, ::Config::user_config->audio.volume.music, 
+				::Config::user_config->audio.volume.effect, MAX_CHANNELS);
 		}
 	}
-	namespace Resources
+	namespace Skin
 	{
-		using namespace Core::Resources;
-
-		static void load()
+		void load()
 		{
-			const fs::path skin_path = SDL_GetBasePath() / fs::path(::Config::Game::General::Path::SKIN);
+			texture = std::make_shared<Engine::Render::Texture::Memory>(renderer);
+			effect = std::make_shared<Engine::Audio::Memory::EffectMemory>();
 
-			Textures::skin->load(skin_path, skin_path, true, false);
-			Audio::Skin::effect.load(skin_path, skin_path, false);
-		}
-		static void free()
-		{
-			Textures::skin->free_all();
-			Audio::Skin::effect.free_all();
-
-			Textures::skin.reset();
-		}
-
-		void init()
-		{
-			Textures::init_all(renderer);
-			Layers::init_all(renderer);
-			load();
-		}
-		void quit()
-		{
-			free();
-			Layers::clear_all();
-			Textures::clear_all();
+			texture->load(::Config::Game::General::Path::SKIN, ::Config::Game::General::Path::SKIN, true, false);
+			effect->load(::Config::Game::General::Path::SKIN, ::Config::Game::General::Path::SKIN, false);
 		}
 	}
 
 	void init()
 	{
 		System::init();
-		Resources::Event::runtime.resume();
 		Config::init();
 		Window::init();
 		Renderer::init();
 		Mixer::init();
-		Resources::init();
+		Skin::load();
 	}
 	void quit()
 	{
-		Resources::init();
-		Mixer::quit();
 		Renderer::quit();
 		Window::quit();
 		Config::quit();
-		Resources::Event::runtime.pause();
 		System::quit();
 	}
 }

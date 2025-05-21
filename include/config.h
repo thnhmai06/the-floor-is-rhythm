@@ -1,9 +1,9 @@
 ﻿#pragma once
 #include <SDL3/SDL_audio.h>
 #include "main.h"
-#include "structures/type.hpp"
 #include "structures/config.h"
-#include "utilities.hpp"
+#include "utilities.h"
+#include "engine/events/action/render.h"
 
 namespace Config
 {
@@ -14,7 +14,8 @@ namespace Config
 		namespace General
 		{
 			constexpr auto NAME = "The Floor is Rhythm!";
-			constexpr int64_t DELAY_RESUME = 500; // ms
+			constexpr int64_t PAUSE_LOCK = 1000; // ms
+			constexpr unsigned long COMBO_BREAK_SOUND_AFTER = 10; // notes
 
 			namespace Path
 			{
@@ -34,27 +35,27 @@ namespace Config
 		}
 		namespace Render
 		{
+			using Engine::Render::OriginType;
+			using Engine::Events::Timing::Easing::Easing;
+
 			constexpr SDL_FPoint STORYBOARD_GRID_SIZE = { .x = 640, .y = 480 };
 			constexpr SDL_FPoint STORYBOARD_GRID_WIDESCREEN_SIZE = { .x = 854, .y = STORYBOARD_GRID_SIZE.y };
 			using Utilities::Math::FPoint::operator/;
 			const SDL_FPoint STORYBOARD_GRID_CENTRE = Utilities::Math::centre({ .x = 0, .y = 0 }, STORYBOARD_GRID_SIZE);
 			const SDL_FPoint STORYBOARD_GRID_WIDESCREEN_CENTRE = Utilities::Math::centre({ .x = 0, .y = 0 }, STORYBOARD_GRID_WIDESCREEN_SIZE);
 
-			constexpr SDL_FPoint DEFAULT_POS = { .x = 0, .y = 0 };
-			namespace Camera
-			{
-				constexpr SDL_FPoint DEFAULT_POS = Render::DEFAULT_POS;
-			}
+			constexpr SDL_FPoint DEFAULT_OBJECT_POS = { .x = 0, .y = 0 };
+			
 			namespace HitObject
 			{
 				float get_size();
-				constexpr auto ORIGIN = Structures::Types::Render::OriginType::Centre;
-				constexpr SDL_Color DON = { 235, 69, 44, 255 };
-				constexpr SDL_Color KAT = { 67, 142, 172, 255 };
+				constexpr auto ORIGIN = OriginType::Centre;
+				constexpr Engine::Events::Action::Render::Color DON = { 235, 69, 44 };
+				constexpr Engine::Events::Action::Render::Color KAT = { 67, 142, 172 };
 			}
 			namespace Cursor
 			{
-				constexpr auto ORIGIN = Structures::Types::Render::OriginType::Centre;
+				constexpr auto ORIGIN = OriginType::Centre;
 				SDL_FPoint get_pos();
 
 				namespace NoteScore
@@ -65,7 +66,7 @@ namespace Config
 					}
 					// start
 					constexpr int64_t TIME_FADE_IN = 150; // ms
-					constexpr auto EASING_IN = Structures::Types::Render::EasingFunctionType::QuintOut;
+					constexpr auto EASING_IN = Easing::QuintOut;
 					inline SDL_FPoint get_start_pos()
 					{
 						const auto cursor_pos = get_pos();
@@ -88,16 +89,16 @@ namespace Config
 			{
 				SDL_FPoint get_size();
 				constexpr SDL_FPoint POS = { .x = 0, .y = 0 };
-				constexpr auto ORIGIN = Structures::Types::Render::OriginType::TopLeft;
+				constexpr auto ORIGIN = OriginType::TopLeft;
 
 				constexpr int64_t CHANGE_TIME = 200; // ms
-				constexpr auto EASING = Structures::Types::Render::EasingFunctionType::QuartOut;
+				constexpr auto EASING = Easing::QuintOut;
 			}
 			namespace Score
 			{
 				constexpr float ratio = 44.0f / 68.0f;
 				SDL_FPoint get_pos();
-				constexpr auto ORIGIN = Structures::Types::Render::OriginType::TopRight;
+				constexpr auto ORIGIN = OriginType::TopRight;
 				SDL_FPoint get_character_size();
 				constexpr uint8_t ZERO_PADDING = 7; // Max Score = 1m có 7 chữ số
 				constexpr uint8_t DECIMAL_FORMAT = 0; // không có số thập phân
@@ -105,7 +106,7 @@ namespace Config
 				namespace Accuracy
 				{
 					SDL_FPoint get_pos();
-					constexpr auto ORIGIN = Structures::Types::Render::OriginType::TopRight;
+					constexpr auto ORIGIN = OriginType::TopRight;
 					SDL_FPoint get_character_size();
 					constexpr uint8_t ZERO_PADDING = 2; // thường ở phạm vi xx%
 					constexpr uint8_t DECIMAL_FORMAT = 2; // 2 chữ số thập phân
@@ -116,7 +117,7 @@ namespace Config
 				namespace Combo
 				{
 					SDL_FPoint get_pos();
-					constexpr auto ORIGIN = Structures::Types::Render::OriginType::BottomLeft;
+					constexpr auto ORIGIN = OriginType::BottomLeft;
 					SDL_FPoint get_character_size();
 					constexpr auto FOOTER = "x";
 
@@ -124,27 +125,27 @@ namespace Config
 			}
 			namespace Pausing
 			{
-				constexpr auto ORIGIN_CONTINUE = Structures::Types::Render::OriginType::Centre;
-				constexpr auto ORIGIN_RETRY = Structures::Types::Render::OriginType::Centre;
-				constexpr auto ORIGIN_BACK = Structures::Types::Render::OriginType::Centre;
+				constexpr auto ORIGIN_CONTINUE = OriginType::Centre;
+				constexpr auto ORIGIN_RETRY = OriginType::Centre;
+				constexpr auto ORIGIN_BACK = OriginType::Centre;
 				SDL_FPoint get_button_size();
 				SDL_FPoint get_continue_pos();
 				SDL_FPoint get_retry_pos();
 				SDL_FPoint get_back_pos();
 
-				constexpr int64_t TIME_FADE_IN = 700; // ms
+				constexpr int64_t TIME_FADE_IN = 500; // ms
 				constexpr int64_t TIME_FADE_OUT = TIME_FADE_IN; // ms
 			}
 			namespace Result
 			{
 				constexpr int64_t DELAY = 3000; // ms
-				constexpr auto EASING_IN_RESULT = Structures::Types::Render::EasingFunctionType::CubicOut;
+				constexpr auto EASING_IN_RESULT = Easing::CubicOut;
 				constexpr int64_t TIME_MOVE_IN_RESULT = 1000; // ms
 
 
 				constexpr SDL_FPoint BACKGROUND_POS = { 0, 0 };
-				constexpr auto ORIGIN = Structures::Types::Render::OriginType::TopLeft;
-				constexpr auto ORIGIN_GRADE = Structures::Types::Render::OriginType::Centre;
+				constexpr auto ORIGIN = OriginType::TopLeft;
+				constexpr auto ORIGIN_GRADE = OriginType::Centre;
 				SDL_FPoint get_score_pos();
 				SDL_FPoint get_accuracy_pos();
 				SDL_FPoint get_combo_pos();
@@ -169,7 +170,7 @@ namespace Config
 			}
 			namespace Progress
 			{
-				constexpr auto ORIGIN = Structures::Types::Render::OriginType::BottomLeft;
+				constexpr auto ORIGIN = OriginType::BottomLeft;
 				SDL_FPoint get_pos();
 				SDL_FPoint get_full_size();
 			}

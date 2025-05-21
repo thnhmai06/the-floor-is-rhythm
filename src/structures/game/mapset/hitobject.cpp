@@ -4,7 +4,7 @@
 #include "logging/logger.h"
 #include "logging/exceptions.h"
 #include "format/file.h"
-#include "utilities.hpp"
+#include "utilities.h"
 
 namespace Structures::Game::Beatmap::HitObjects
 {
@@ -13,15 +13,15 @@ namespace Structures::Game::Beatmap::HitObjects
 	//! Floor
 	void Floor::read(const std::vector<std::string>& contents)
 	{
-		time = std::stof(contents[0]);
+		time = std::stoi(contents[0]);
 		is_kat = contents[1] == "1";
-		hit_sound.read(std::stoi(contents[2]));
+		additions.read(std::stoi(contents[2]));
 		hit_sample.read(contents[3]);
 	}
 	std::string Floor::to_string() const
 	{
 		std::stringstream ss;
-		ss << time << AND << is_kat << AND << hit_sound.to_int() << AND << hit_sample.to_string();
+		ss << time << AND << is_kat << AND << additions.to_int() << AND << hit_sample.to_string();
 		return ss.str();
 	}
 
@@ -39,7 +39,7 @@ namespace Structures::Game::Beatmap::HitObjects
 			const auto contents = Utilities::String::split(line, AND);
 			if (contents.size() < Floor::MINIMUM_NUM_CONTENT)
 			{
-				LOG_WARNING(Logging::Exceptions::FormatExceptions::HitObjects::Format_HitObjects_NotEnoughContent(line));
+				LOG_WARNING(Logging::Exceptions::Format::HitObjects::Format_HitObjects_NotEnoughContent(line));
 				continue;
 			}
 

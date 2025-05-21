@@ -1,4 +1,6 @@
 ﻿#include "structures/screen/gameplay/keystroke.h" // Header
+#include <ranges>
+#include "structures/events/condition/external/pressed.h"
 
 namespace Structures::Screen::Gameplay::KeyStroke
 {
@@ -18,14 +20,16 @@ namespace Structures::Screen::Gameplay::KeyStroke
 		const uint8_t& KeyCounter::get_recently_pressed_num() const { return recently_pressed_num; }
 		const unsigned long& KeyCounter::get_count() const { return count; }
 		const bool& KeyCounter::get_is_hold() const { return is_hold; }
-		void KeyCounter::update(const KeyboardEvents& events)
+		void KeyCounter::update(const Engine::Events::Event::External::Buffer::TypeViewer& events)
 		{
 			reset(true);
-			for (const auto& event : events)
+			for (const auto& event : events | std::views::values)
 			{
-				if (event.scancode != target) continue;
-				is_hold = event.repeat; // nếu thả ra, sẽ có event KeyUp để cập nhật
-				if (event.down && !event.repeat)
+				const auto& key_event = event.key;
+
+				if (key_event.scancode != target) continue;
+				is_hold = key_event.repeat; // nếu thả ra, sẽ có event KeyUp để cập nhật
+				if (key_event.down && !key_event.repeat)
 				{
 					recently_pressed_num++;
 					count++;
@@ -56,15 +60,30 @@ namespace Structures::Screen::Gameplay::KeyStroke
 		{
 			return r1.get_recently_pressed_num() + r2.get_recently_pressed_num();
 		}
-		void Keystroke::update(const KeyboardEvents& events)
+		void Keystroke::update()
 		{
-			l1.update(events);  l2.update(events);
-			r1.update(events);  r2.update(events);
+			if (const auto locked_timer = Utilities::Pointer::check_weak(timer))
+			{
+				const auto current_time = locked_timer->get_last_point();
+				const auto condition = std::make_shared<Events::Condition::External::External::KeyPressCondition>(
+					std::unordered_set{l1.target, l2.target, r1.target, r2.target}, current_time);
+
+				auto raw = buffer->search(condition);
+				raw[SDL_EVENT_KEY_DOWN].merge(raw[SDL_EVENT_KEY_UP]);
+				const auto& events = raw[SDL_EVENT_KEY_DOWN];
+
+				l1.update(events);  l2.update(events);
+				r1.update(events);  r2.update(events);
+			}
 		}
 		void Keystroke::reset(const bool only_recently_pressed_num)
 		{
 			l1.reset(only_recently_pressed_num); l2.reset(only_recently_pressed_num);
 			r1.reset(only_recently_pressed_num); r2.reset(only_recently_pressed_num);
+		}
+		Keystroke::Keystroke(const Engine::Events::Event::External::Buffer& buffer, std::weak_ptr<const Engine::Events::Timing::Timer> timer)
+			: buffer(&buffer), timer(std::move(timer))
+		{
 		}
 	}
 }

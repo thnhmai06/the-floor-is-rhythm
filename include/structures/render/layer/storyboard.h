@@ -1,8 +1,11 @@
 ﻿#pragma once
-#include "structures/render/layer.h"
+#include "engine/render/layer.h"
 
 namespace Structures::Render::Layer
 {
+	using Engine::Render::Texture::Memory;
+	using Engine::Render::Layer::TextureLayer;
+
 	// Đây là Layer đặc biệt, khác hoàn toàn so với Layer thường.
 	// Để đơn giản và gọn nhẹ, ta sẽ không thêm mấy cái thành phần
 	// render của engine mà sẽ sử dụng trực tiếp SDL Render System.

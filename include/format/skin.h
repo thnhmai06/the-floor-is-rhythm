@@ -3,14 +3,13 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
-#include "structures/type.hpp"
+#include "core/type.h"
+#include "engine/render/type.h"
 
 namespace Format::Skin
 {
 	namespace Image
 	{
-		inline const std::unordered_set<std::string_view> SUPPORT_EXTENSIONS = { ".png", ".jpg" };
-
 		namespace Cursor
 		{
 			inline const std::string body = "cursor";
@@ -19,12 +18,12 @@ namespace Format::Skin
 		{
 			inline const std::string floor = "floor";
 			inline const std::string floor_overlay = "floor-overlay";
-			inline const std::unordered_map<Structures::Types::Game::Gameplay::NoteScore, std::string> hit =
+			inline const std::unordered_map<Core::Type::Game::Gameplay::NoteScore, std::string> hit =
 			{
-				{Structures::Types::Game::Gameplay::NoteScore::Miss, "hit0" },
-				{Structures::Types::Game::Gameplay::NoteScore::Bad, "hit50" },
-				{Structures::Types::Game::Gameplay::NoteScore::Good, "hit100" },
-				{Structures::Types::Game::Gameplay::NoteScore::Perfect, "hit300"}
+				{Core::Type::Game::Gameplay::NoteScore::Miss, "hit0" },
+				{Core::Type::Game::Gameplay::NoteScore::Bad, "hit50" },
+				{Core::Type::Game::Gameplay::NoteScore::Good, "hit100" },
+				{Core::Type::Game::Gameplay::NoteScore::Perfect, "hit300"}
 			};
 		}
 		namespace HealthBar
@@ -34,7 +33,7 @@ namespace Format::Skin
 		}
 		namespace Score
 		{
-			using Structures::Types::Format::Skin::Alphabet;
+			using Engine::Render::Object::Alphabet;
 
 			static inline const std::string prefix = "score-";
 			inline Alphabet alphabet =
@@ -65,7 +64,7 @@ namespace Format::Skin
 		}
 		namespace Result
 		{
-			using Structures::Types::Format::Skin::Alphabet;
+			using Engine::Render::Object::Alphabet;
 
 			static inline const std::string prefix = "result-";
 			inline Alphabet alphabet =
@@ -93,8 +92,6 @@ namespace Format::Skin
 
 	namespace Sound
 	{
-		inline const std::unordered_set<std::string_view> SUPPORT_EXTENSIONS = { ".wav", ".mp3", ".ogg" };
-
 		inline const auto fail_sound = "failsound";
 		inline const auto combo_break = "combobreak";
 	}

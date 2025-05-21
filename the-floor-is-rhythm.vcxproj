@@ -158,7 +158,7 @@
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
-      <BrowseInformation>true</BrowseInformation>
+      <BrowseInformation>false</BrowseInformation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -191,8 +191,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\config.h" />
-    <ClInclude Include="include\core\resources\event.h" />
-    <ClInclude Include="include\core\work\update.h" />
+    <ClInclude Include="include\engine\audio\type.h" />
+    <ClInclude Include="include\engine\events\action\audio.h" />
+    <ClInclude Include="include\engine\events\action\base.h" />
+    <ClInclude Include="include\engine\events\type.h" />
+    <ClInclude Include="include\engine\render\config.h" />
+    <ClInclude Include="include\engine\render\object\interactive.h" />
+    <ClInclude Include="include\engine\render\type.h" />
+    <ClInclude Include="include\engine\structures.h" />
     <ClInclude Include="include\format\file.h" />
     <ClInclude Include="include\format\skin.h" />
     <ClInclude Include="include\logging\exceptions.h" />
@@ -200,80 +206,103 @@
     <ClInclude Include="include\logging\logger.h" />
     <ClInclude Include="include\main.h" />
     <ClInclude Include="include\structures\config.h" />
-    <ClInclude Include="include\structures\events\action\audio.h" />
-    <ClInclude Include="include\structures\events\event\playing.h" />
-    <ClInclude Include="include\structures\events\time\easing.hpp" />
-    <ClInclude Include="include\structures\events\action\action.h" />
-    <ClInclude Include="include\structures\events\condition\condition.h" />
-    <ClInclude Include="include\structures\events\event\input.h" />
-    <ClInclude Include="include\structures\events\condition\playing.h" />
-    <ClInclude Include="include\structures\events\time\time.h" />
-    <ClInclude Include="include\structures\events\event\event.h" />
+    <ClInclude Include="include\structures\events\condition\external\pressed.h" />
+    <ClInclude Include="include\structures\events\event\internal\gameplay.h" />
+    <ClInclude Include="include\engine\events\timing\easing.h" />
+    <ClInclude Include="include\engine\events\action.h" />
+    <ClInclude Include="include\engine\events\condition.h" />
+    <ClInclude Include="include\structures\events\condition\internal\gameplay.h" />
+    <ClInclude Include="include\engine\events\timing\time.h" />
+    <ClInclude Include="include\engine\events\event.h" />
     <ClInclude Include="include\structures\game\event.h" />
     <ClInclude Include="include\structures\render\layer\storyboard.h" />
-    <ClInclude Include="include\structures\render\object\animation.h" />
-    <ClInclude Include="include\structures\render\object\number.hpp" />
-    <ClInclude Include="include\structures\render\object\percent.h" />
-    <ClInclude Include="include\structures\render\object\string.h" />
+    <ClInclude Include="include\engine\render\object\animation.h" />
+    <ClInclude Include="include\engine\render\object\number.h" />
+    <ClInclude Include="include\engine\render\object\percent.h" />
+    <ClInclude Include="include\engine\render\object\string.h" />
+    <ClInclude Include="include\structures\render\object\clickable.h" />
     <ClInclude Include="include\structures\screen\gameplay\health.h" />
     <ClInclude Include="include\structures\screen\gameplay\keystroke.h" />
     <ClInclude Include="include\structures\screen\gameplay\result.h" />
     <ClInclude Include="include\structures\screen\gameplay\score.h" />
-    <ClInclude Include="include\structures\screen\pausing.h" />
-    <ClInclude Include="include\core\resources\audio.h" />
-    <ClInclude Include="include\core\work\convert\osu\beatmap.h" />
-    <ClInclude Include="include\core\work\convert\osu\mapset.h" />
+    <ClInclude Include="include\structures\screen\gameplay\pausing.h" />
+    <ClInclude Include="include\core\task\convert\osu\beatmap.h" />
+    <ClInclude Include="include\core\task\convert\osu\mapset.h" />
     <ClInclude Include="include\structures\game\mapset.h" />
-    <ClInclude Include="include\structures\events\action\render.hpp" />
-    <ClInclude Include="include\structures\audio\buses.h" />
-    <ClInclude Include="include\structures\audio\memory.h" />
-    <ClInclude Include="include\structures\audio\mixer.h" />
+    <ClInclude Include="include\engine\events\action\render.h" />
+    <ClInclude Include="include\engine\audio\buses.h" />
+    <ClInclude Include="include\engine\audio\memory.h" />
+    <ClInclude Include="include\engine\audio\mixer.h" />
     <ClInclude Include="include\structures\game\mapset\hitobject.h" />
     <ClInclude Include="include\structures\game\mapset\hitsound.h" />
     <ClInclude Include="include\structures\game\mapset\metadata.h" />
     <ClInclude Include="include\structures\game\mapset\timing.h" />
-    <ClInclude Include="include\structures\render\layer.h" />
+    <ClInclude Include="include\engine\render\layer.h" />
     <ClInclude Include="include\structures\screen\gameplay\cursor.h" />
     <ClInclude Include="include\structures\screen\gameplay\mapset.h" />
-    <ClInclude Include="include\structures\render\object.h" />
-    <ClInclude Include="include\structures\render\texture.h" />
+    <ClInclude Include="include\engine\render\object.h" />
+    <ClInclude Include="include\engine\render\texture.h" />
     <ClInclude Include="include\structures\screen\gameplay.h" />
-    <ClInclude Include="include\structures\type.hpp" />
-    <ClInclude Include="include\utilities.hpp" />
+    <ClInclude Include="include\engine\screen\screen.h" />
+    <ClInclude Include="include\core\type.h" />
+    <ClInclude Include="include\structures\template.h" />
+    <ClInclude Include="include\utilities.h" />
     <ClInclude Include="include\core\manager.h" />
-    <ClInclude Include="include\core\work.h" />
-    <ClInclude Include="include\core\resources\layer.h" />
-    <ClInclude Include="include\core\resources\screen.h" />
-    <ClInclude Include="include\core\resources\textures.h" />
     <ClCompile Include="dependencies\easing\src\easing.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\screen\gameplay\result.cpp" />
-    <ClCompile Include="src\config.cpp">
+    <ClCompile Include="src\engine\events\action\audio.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\core\work\update.cpp">
+    <ClCompile Include="src\engine\events\type.cpp">
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\engine\render\config.cpp">
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\engine\screen\screen.cpp">
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\core\type.cpp">
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\engine\events\action\base.cpp">
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\engine\events\condition.cpp">
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\engine\events\event.cpp">
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\engine\render\object\interactive.cpp">
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\structures\events\condition\external\pressed.cpp">
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\structures\render\object\clickable.cpp">
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\structures\screen\gameplay\result.cpp">
+      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\config.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\structures\config.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\events\event\event.cpp">
-      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
-    </ClCompile>
     <ClCompile Include="src\structures\game\event.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\render\object\animation.cpp">
+    <ClCompile Include="src\engine\render\object\animation.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\structures\render\layer\storyboard.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\events\action\audio.cpp">
-      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
-    </ClCompile>
-    <ClCompile Include="src\structures\events\event\playing.cpp">
+    <ClCompile Include="src\structures\events\event\internal\gameplay.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\structures\screen\gameplay\keystroke.cpp">
@@ -291,49 +320,49 @@
     <ClCompile Include="src\main.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\events\action\action.cpp">
+    <ClCompile Include="src\engine\events\action.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\events\action\render.cpp">
+    <ClCompile Include="src\engine\events\action\render.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\events\condition\playing.cpp">
+    <ClCompile Include="src\structures\events\condition\internal\gameplay.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\events\time\time.cpp">
+    <ClCompile Include="src\engine\events\timing\time.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\render\object\percent.cpp">
+    <ClCompile Include="src\engine\render\object\percent.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\render\object\string.cpp">
+    <ClCompile Include="src\engine\render\object\string.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\structures\screen\gameplay\health.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\screen\pausing.cpp">
+    <ClCompile Include="src\structures\screen\gameplay\pausing.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\utilities.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\core\work\convert\osu\beatmap.cpp">
+    <ClCompile Include="src\core\task\convert\osu\beatmap.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\core\work\convert\osu\mapset.cpp">
+    <ClCompile Include="src\core\task\convert\osu\mapset.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\structures\game\mapset.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\audio\buses.cpp">
+    <ClCompile Include="src\engine\audio\buses.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\audio\memory.cpp">
+    <ClCompile Include="src\engine\audio\memory.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\audio\mixer.cpp">
+    <ClCompile Include="src\engine\audio\mixer.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\structures\game\mapset\hitobject.cpp">
@@ -348,7 +377,7 @@
     <ClCompile Include="src\structures\game\mapset\timing.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\render\layer.cpp">
+    <ClCompile Include="src\engine\render\layer.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\structures\screen\gameplay\cursor.cpp">
@@ -357,19 +386,16 @@
     <ClCompile Include="src\structures\screen\gameplay\mapset.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\render\object.cpp">
+    <ClCompile Include="src\engine\render\object.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\structures\screen\gameplay.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="src\structures\render\texture.cpp">
+    <ClCompile Include="src\engine\render\texture.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
     <ClCompile Include="src\core\manager.cpp">
-      <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
-    </ClCompile>
-    <ClCompile Include="src\core\work.cpp">
       <ObjectFileName>$(IntDir)%(RelativeDir)%(Filename).obj</ObjectFileName>
     </ClCompile>
   </ItemGroup>

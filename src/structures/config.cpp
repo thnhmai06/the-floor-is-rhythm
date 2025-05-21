@@ -158,7 +158,7 @@ namespace Structures::Config
 
 		if (const auto line = reader.ParseError() != 0)
 		{
-			LOG_ERROR(Logging::Exceptions::FileExceptions::File_Config_Failed(file_path, line));
+			LOG_ERROR(Logging::Exceptions::File::File_Config_Failed(file_path, line));
 			return;
 		}
 
@@ -185,7 +185,7 @@ namespace Structures::Config
 
 		if (!writer)
 		{
-			LOG_ERROR(Logging::Exceptions::FileExceptions::File_Open_Failed(file_path));
+			LOG_ERROR(Logging::Exceptions::File::File_Open_Failed(file_path));
 			return;
 		}
 

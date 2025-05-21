@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include <functional>
 #include <filesystem>
 #include "structures/config.h"
 #include "structures/game/mapset/metadata.h"

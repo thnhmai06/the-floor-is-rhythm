@@ -1,12 +1,8 @@
 ﻿#include "structures/game/mapset.h" // Header
 #include <osu!parser/Parser/Beatmap.hpp>
-#include <fstream>
-#include <ranges>
-#include <unordered_map>
 #include "format/file.h"
 #include "logging/exceptions.h"
 #include "logging/logger.h"
-#include "utilities.hpp"
 
 namespace Structures::Game::Beatmap
 {
@@ -59,7 +55,7 @@ namespace Structures::Game::Beatmap
 	{
 		std::ifstream reader(file);
 		if (!reader)
-			THROW_ERROR(Logging::Exceptions::FileExceptions::File_Open_Failed(file));
+			THROW_ERROR(Logging::Exceptions::File::File_Open_Failed(file));
 		auto sections = read_content(reader);
 		reader.close();
 
@@ -107,7 +103,7 @@ namespace Structures::Game::Beatmap
 		}
 
 		if (osb_path.empty()) return;
-		OsuParser::Beatmap::Beatmap storyboard{ osb_path.string() };
+		OsuParser::Beatmap::Beatmap storyboard{ osb_path.string(), true };
 		for (auto& event : storyboard.Events.objects)
 			events.objects.push_back(event);
 	}
@@ -131,7 +127,7 @@ namespace Structures::Game::Beatmap
 	{
 		std::ifstream reader(this->path);
 		if (!reader) 
-			THROW_ERROR(Logging::Exceptions::FileExceptions::File_Open_Failed(this->path));
+			THROW_ERROR(Logging::Exceptions::File::File_Open_Failed(this->path));
 		auto sections = read_content(reader);
 		reader.close();
 		parse(sections);

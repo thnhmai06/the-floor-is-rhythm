@@ -1,4 +1,6 @@
 #pragma once
+#include "engine/audio/memory.h"
+#include "engine/render/texture.h"
 
 namespace Core::Manager
 {
@@ -25,12 +27,13 @@ namespace Core::Manager
 	namespace Mixer
 	{
 		void init();
-		void quit();
 	}
-	namespace Resources
+	namespace Skin
 	{
-		void init();
-		void quit();
+		inline std::shared_ptr<Engine::Render::Texture::Memory> texture;
+		inline std::shared_ptr<Engine::Audio::Memory::EffectMemory> effect;
+
+		void load();
 	}
 
 	void init();

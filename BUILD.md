@@ -37,7 +37,7 @@ cd the-floor-is-rhythm
 3. Mở file `.sln` trong thư mục dự án.
 4. Chọn cấu hình **Release** hoặc **Debug**.
 5. Chọn **Build -> Build Solution (`Ctrl + Shift + B`)**.
-6. Sau khi build xong, file chương trình sẽ ở 📁 `bin`.
+6. Sau khi build xong, file chương trình sẽ ở 📁 `build/out`.
 
 ---
 
@@ -46,7 +46,7 @@ cd the-floor-is-rhythm
    ```sh
    msbuild
    ```
-- Sau khi build xong, file chương trình sẽ ở 📁 `bin`.
+- Sau khi build xong, file chương trình sẽ ở 📁 `build/out`.
 
 ---
 

@@ -18,13 +18,13 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\audio\buses.cpp">
+    <ClCompile Include="src\engine\audio\buses.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\audio\memory.cpp">
+    <ClCompile Include="src\engine\audio\memory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\audio\mixer.cpp">
+    <ClCompile Include="src\engine\audio\mixer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\logging\logger.cpp">
@@ -39,16 +39,16 @@
     <ClCompile Include="src\structures\game\mapset\hitobject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\render\texture.cpp">
+    <ClCompile Include="src\engine\render\texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\render\layer.cpp">
+    <ClCompile Include="src\engine\render\layer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\structures\game\mapset\timing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\render\object.cpp">
+    <ClCompile Include="src\engine\render\object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\structures\game\mapset.cpp">
@@ -66,28 +66,22 @@
     <ClCompile Include="src\structures\screen\gameplay.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\events\time\time.cpp">
+    <ClCompile Include="src\engine\events\timing\time.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\events\action\render.cpp">
+    <ClCompile Include="src\engine\events\action\render.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\events\action\action.cpp">
+    <ClCompile Include="src\engine\events\action.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dependencies\easing\src\easing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\events\condition\playing.cpp">
+    <ClCompile Include="src\structures\events\condition\internal\gameplay.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\structures\screen\gameplay\health.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\structures\render\object\percent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\structures\render\object\string.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\structures\screen\gameplay\score.cpp">
@@ -96,19 +90,10 @@
     <ClCompile Include="src\structures\screen\gameplay\keystroke.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\events\event\playing.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\structures\events\action\audio.cpp">
+    <ClCompile Include="src\structures\events\event\internal\gameplay.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\structures\render\layer\storyboard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\structures\render\object\animation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\structures\events\event\event.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\structures\game\event.cpp">
@@ -123,25 +108,67 @@
     <ClCompile Include="src\config.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\structures\screen\pausing.cpp">
+    <ClCompile Include="src\structures\screen\gameplay\pausing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\structures\screen\gameplay\result.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\work\update.cpp">
+    <ClCompile Include="src\core\task\update.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\work\convert\osu\beatmap.cpp">
+    <ClCompile Include="src\core\task\convert\osu\beatmap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\work\convert\osu\mapset.cpp">
+    <ClCompile Include="src\core\task\convert\osu\mapset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\core\manager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\work.cpp">
+    <ClCompile Include="src\core\task.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\events\event.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\render\object\interactive.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\render\object\animation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\render\object\percent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\render\object\string.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\events\action\base.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\type.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\events\condition.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\structures\render\object\clickable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\screen\screen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\events\type.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\render\config.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\structures\events\condition\external\pressed.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\events\action\audio.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -152,13 +179,13 @@
     <ClInclude Include="include\logging\exceptions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\audio\mixer.h">
+    <ClInclude Include="include\engine\audio\mixer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\audio\buses.h">
+    <ClInclude Include="include\engine\audio\buses.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\audio\memory.h">
+    <ClInclude Include="include\engine\audio\memory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\structures\game\mapset\hitsound.h">
@@ -173,19 +200,16 @@
     <ClInclude Include="include\main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\render\texture.h">
+    <ClInclude Include="include\engine\render\texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\render\layer.h">
+    <ClInclude Include="include\engine\render\layer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\structures\game\mapset\timing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\type.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\structures\render\object.h">
+    <ClInclude Include="include\engine\render\object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\logging\info.h">
@@ -209,64 +233,37 @@
     <ClInclude Include="include\structures\screen\gameplay\mapset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\utilities.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\structures\screen\gameplay.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\events\action\render.hpp">
+    <ClInclude Include="include\engine\events\timing\time.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\events\time\time.h">
+    <ClInclude Include="include\engine\events\action.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\events\event\input.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\structures\events\action\action.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\structures\events\condition\playing.h">
+    <ClInclude Include="include\structures\events\condition\internal\gameplay.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\structures\screen\gameplay\health.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\render\object\percent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\structures\screen\gameplay\score.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\structures\render\object\string.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\structures\render\object\number.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\structures\screen\gameplay\keystroke.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\events\time\easing.hpp">
+    <ClInclude Include="include\engine\events\event.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\events\event\event.h">
+    <ClInclude Include="include\engine\events\condition.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\events\condition\condition.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\structures\events\event\playing.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\structures\events\action\audio.h">
+    <ClInclude Include="include\structures\events\event\internal\gameplay.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\structures\render\layer\storyboard.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\structures\render\object\animation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\structures\game\event.h">
@@ -275,40 +272,85 @@
     <ClInclude Include="include\structures\config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\structures\screen\pausing.h">
+    <ClInclude Include="include\structures\screen\gameplay\pausing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\core\resources\event.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\core\work\update.h">
+    <ClInclude Include="include\core\task\update.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\structures\screen\gameplay\result.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\core\resources\audio.h">
+    <ClInclude Include="include\core\task\convert\osu\beatmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\core\work\convert\osu\beatmap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\core\work\convert\osu\mapset.h">
+    <ClInclude Include="include\core\task\convert\osu\mapset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\core\manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\core\work.h">
+    <ClInclude Include="include\core\task.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\core\resources\layer.h">
+    <ClInclude Include="include\engine\screen\screen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\core\resources\screen.h">
+    <ClInclude Include="include\engine\audio\type.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\core\resources\textures.h">
+    <ClInclude Include="include\engine\render\type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\engine\events\type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\engine\render\object\interactive.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\engine\structures.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\engine\events\timing\easing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\engine\render\object\animation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\engine\render\object\number.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\engine\render\object\percent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\engine\render\object\string.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\engine\events\action\render.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\utilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\engine\events\action\base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structures\template.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structures\render\object\clickable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\engine\render\config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structures\events\condition\external\pressed.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\engine\events\action\audio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

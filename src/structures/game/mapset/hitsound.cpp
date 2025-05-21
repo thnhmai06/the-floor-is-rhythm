@@ -1,7 +1,7 @@
 ﻿#include "structures/game/mapset/hitsound.h" // Header
 #include <bitset>
 #include "format/file.h"
-#include "utilities.hpp"
+#include "utilities.h"
 
 namespace Structures::Game::Beatmap::Hitsound
 {
@@ -41,7 +41,7 @@ namespace Structures::Game::Beatmap::Hitsound
 		bitmap[static_cast<uint8_t>(Addition::Finish)] = finish;
 		bitmap[static_cast<uint8_t>(Addition::Clap)] = clap;
 
-		return bitmap.to_ulong();
+		return static_cast<int32_t>(bitmap.to_ulong());
 	}
 	size_t Additions::operator()(const Additions& hs) const
 	{
@@ -64,11 +64,11 @@ namespace Structures::Game::Beatmap::Hitsound
 	//! HitSample
 	std::pair<SampleSetType, SampleSet>
 		HitSample::get_used_sample_set(
-			const Addition& additions,
+			const Addition& addition,
 			const SampleSet& timing_sample_type,
 			const SampleSet& mapset_sample_type) const
 	{
-		const auto used_sample_set = (additions == Addition::Normal) ? SampleSetType::Normal : SampleSetType::Addition;
+		const auto used_sample_set = (addition == Addition::Normal) ? SampleSetType::Normal : SampleSetType::Addition;
 		SampleSet used_hit_sample;
 
 		if (used_sample_set == SampleSetType::Normal)
@@ -126,7 +126,7 @@ namespace Structures::Game::Beatmap::Hitsound
 		normal_set = static_cast<SampleSet>(std::stoi(list[0]));
 		addition_set = static_cast<SampleSet>(std::stoi(list[1]));
 		index = std::stoi(list[2]);
-		volume = std::stoi(list[3]);
+		volume.percent = std::stod(list[3]);
 		if (list.size() > 4) file_name = list[4];
 	}
 	std::string HitSample::to_string() const
@@ -138,7 +138,7 @@ namespace Structures::Game::Beatmap::Hitsound
 		result.push_back(Format::File::Floor::Mapset::HitObjects::HitSample::AND);
 		result.append(std::to_string(index));
 		result.push_back(Format::File::Floor::Mapset::HitObjects::HitSample::AND);
-		result.append(std::to_string(static_cast<uint32_t>(volume)));
+		result.append(std::to_string(volume.percent));
 		result.push_back(Format::File::Floor::Mapset::HitObjects::HitSample::AND);
 		if (!file_name.empty()) result.append(file_name);
 		return result;
@@ -154,15 +154,16 @@ namespace Structures::Game::Beatmap::Hitsound
 		normal_set = static_cast<SampleSet>(hs.NormalSet);
 		addition_set = static_cast<SampleSet>(hs.AdditionSet);
 		index = hs.Index;
-		volume = std::round(Utilities::Math::to_value(static_cast<float>(hs.Volume) / 100.0f, 0, MIX_MAX_VOLUME));
+		volume.percent = static_cast<double>(hs.Volume);
 		file_name = hs.Filename;
 		return *this;
 	}
 	HitSample::HitSample(
 		const SampleSet& normal_set, const SampleSet& addition_set,
-		const int32_t& index, const uint8_t& volume, std::string file_name)
-		: normal_set(normal_set), addition_set(addition_set), index(index), volume(volume), file_name(std::move(file_name))
+		const int32_t& index, const double& volume, std::string file_name)
+		: normal_set(normal_set), addition_set(addition_set), index(index), file_name(std::move(file_name))
 	{
+		this->volume.percent = volume;
 	}
 	HitSample::HitSample(const std::string& hitsample_str) { read(hitsample_str); }
 
@@ -181,7 +182,7 @@ namespace Structures::Game::Beatmap::Hitsound
 	std::string get_hit_sound_filename(
 		const Addition& addition, const HitSample& hit_sample,
 		const TimingSample& timing_sample, const SampleSet& mapset_sample,
-		const Audio::EffectMemory& beatmap_effect)
+		const Engine::Audio::Memory::EffectMemory& beatmap_effect)
 	{
 		if (!hit_sample.file_name.empty())
 		{
@@ -208,7 +209,7 @@ namespace Structures::Game::Beatmap::Hitsound
 	std::vector<std::string> get_hit_sound_filename(
 		const Additions& additions, const HitSample& hit_sample,
 		const TimingSample& timing_sample, const SampleSet& mapset_sample,
-		const Audio::EffectMemory& beatmap_effect)
+		const Engine::Audio::Memory::EffectMemory& beatmap_effect)
 	{
 		std::vector<std::string> result;
 		result.push_back(get_hit_sound_filename(Addition::Normal, hit_sample, timing_sample, mapset_sample, beatmap_effect)); //! âm thanh normal luôn được phát
@@ -220,10 +221,10 @@ namespace Structures::Game::Beatmap::Hitsound
 			result.push_back(get_hit_sound_filename(Addition::Clap, hit_sample, timing_sample, mapset_sample, beatmap_effect));
 		return result;
 	}
-	uint8_t get_hit_sample_volume(const HitSample& hit_sample, const TimingSample& timing_sample)
+	double get_hit_sample_volume(const HitSample& hit_sample, const TimingSample& timing_sample)
 	{
-		if (hit_sample.volume == 0)
-			return timing_sample.volume;
-		return hit_sample.volume;
+		if (Utilities::Math::is_equal(hit_sample.volume.percent, 0))
+			return timing_sample.volume.percent;
+		return hit_sample.volume.percent;
 	}
 }

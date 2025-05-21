@@ -3,7 +3,7 @@
 #include <spdlog/sinks/ansicolor_sink.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <vector>
-#include "utilities.hpp"
+#include "utilities.h"
 
 void Logging::Logger::init(const std::string& name, const spdlog::level::level_enum level, const uint32_t num_backtrace)
 {

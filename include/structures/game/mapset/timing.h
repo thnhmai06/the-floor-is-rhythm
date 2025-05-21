@@ -35,13 +35,12 @@ namespace Structures::Game::Beatmap::TimingPoints
 		std::multimap<int64_t, TimingPos> timing_pos;
 
 	public:
-		using CONTAINER = std::multimap<int64_t, TimingPoint>;
+		using Container = std::multimap<int64_t, TimingPoint>;
 
-		CONTAINER data;
+		Container data;
 
 		void read(const std::vector<std::string>& contents) override;
 		[[nodiscard]] std::string to_string() const override;
-		[[nodiscard]] float get_object_pos(const float& current_time) const;
 
 		TimingPoints() = default;
 		explicit TimingPoints(const std::vector<std::string>& contents);

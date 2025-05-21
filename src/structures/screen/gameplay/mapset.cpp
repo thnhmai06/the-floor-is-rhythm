@@ -3,8 +3,6 @@
 #include <ranges>
 #include "format/skin.h"
 #include "config.h"
-#include "utilities.hpp"
-#include "logging/logger.h"
 #include "structures/game/mapset/hitobject.h"
 
 namespace Structures::Screen::Gameplay::Mapset
@@ -14,102 +12,95 @@ namespace Structures::Screen::Gameplay::Mapset
 		namespace Components
 		{
 			//! Floor
+			void Floor::add_animation(
+				Engine::Events::Action::Buffer& game_buffer,
+				const std::pair<const Engine::Events::Timing::Time, const SDL_FPoint>& from,
+				const std::pair<const Engine::Events::Timing::Time, const SDL_FPoint>& to)
+			{
+				using Utilities::Math::FPoint::operator-;
+
+				const auto fade = std::make_shared<Engine::Events::Action::Render::FadeAction>(
+					from.first, from.first, Engine::Events::Timing::Easing::Easing::Linear, config, 1, 1);
+				const auto move = std::make_shared<Engine::Events::Action::Render::MoveAction>(
+					from.first, to.first, Engine::Events::Timing::Easing::Easing::Linear,
+					config, Utilities::Math::FPoint::to_float_point(0, 0), from.second - to.second); // vì trừ bên ngoài thành ngược lại
+
+				game_buffer.submit(fade);
+				game_buffer.submit(move);
+			}
 			Floor::Floor(
-				const Game::Beatmap::HitObjects::Floor* floor,
+				const Game::Beatmap::HitObjects::Floor& floor,
 				const Memory& memory,
-				const SDL_FPoint& centre_pos)
-				: object(floor)
+				Engine::Events::Action::Buffer& game_buffer,
+				const std::pair<const Engine::Events::Timing::Time, const SDL_FPoint>& from,
+				const std::pair<const Engine::Events::Timing::Time, const SDL_FPoint>& to)
+				: object(&floor)
 			{
 				// Object
 				const auto texture = memory.find(Format::Skin::Image::HitObject::floor);
-				auto r_floor = std::make_shared<Object>(texture, Types::Render::OriginType::Centre, centre_pos);
+				auto r_floor = std::make_shared<Object>(texture, Engine::Render::OriginType::Centre, from.second);
 				r_floor->set_render_size(::Config::Game::Render::HitObject::get_size());
-				r_floor->config.color = (floor->is_kat) ? ::Config::Game::Render::HitObject::KAT : ::Config::Game::Render::HitObject::DON;
+				r_floor->config.color = (floor.is_kat) ? ::Config::Game::Render::HitObject::KAT : ::Config::Game::Render::HitObject::DON;
 
 				// Overlay
 				auto r_overlay = std::make_shared<Object>(
 					memory.find(Format::Skin::Image::HitObject::floor_overlay),
-					Types::Render::OriginType::Centre, centre_pos);
+					Engine::Render::OriginType::Centre, from.second);
 				r_overlay->set_render_size(::Config::Game::Render::HitObject::get_size());
 
 				data.emplace_back(std::move(r_floor));
 				data.emplace_back(std::move(r_overlay));
+
+				config.alpha.percent = 0;
+				add_animation(game_buffer, from, to);
 			}
 		}
 
-
 		//! Mapset
-		void Mapset::on_before_render()
-		{
-			using Utilities::Math::FPoint::operator*;
-			using Utilities::Math::FPoint::operator-;
-			right->offset = -offset * 2; // trừ bù
-		}
-		const Mapset::RenderScripts* Mapset::get_render_scripts() const
-		{
-			return &render_script;
-		}
-		void Mapset::set_render_range(const int64_t& current_time)
-		{
-			constexpr int64_t render_time_range = 5000; // 5s, tạm thời là vậy
-			const auto begin_time = current_time;
-			const auto end_time = current_time + render_time_range;
-
-			if (render_script.empty()) return;
-
-			auto begin_item = render_script.lower_bound(begin_time);
-			auto end_item = render_script.upper_bound(end_time);
-			if (end_item == render_script.end()) end_item = Utilities::Container::get_last_element_iterator(render_script);
-			else if (end_item != render_script.begin()) --end_item;
-
-			left->render_range.clear();
-			right->render_range.clear();
-
-			if (begin_item == render_script.end()) return;
-			const auto& begin_script = begin_item->second;
-			const auto& end_script = end_item->second;
-
-			left->render_range.emplace_back(begin_script.left_index, end_script.left_index);
-			right->render_range.emplace_back(begin_script.right_index, end_script.right_index);
-		}
-		void Mapset::set_current_pos(const int64_t& current_time)
-		{
-			offset.x = timing_points->get_object_pos(static_cast<float>(current_time));
-		}
-		Mapset::Mapset(const Memory& memory, const Game::Beatmap::Mapset& mapset)
+		const Mapset::RenderScripts& Mapset::get_scripts() const { return render_scripts; }
+		Mapset::Mapset(
+			const Memory& skin,
+			Engine::Events::Action::Buffer& game_actions,
+			const Game::Beatmap::Mapset& mapset)
 			: timing_points(&mapset.timing_points)
 		{
-			left = std::make_shared<Collection>();
-			data.emplace_back(left);
-			right = std::make_shared<Collection>();
-			data.emplace_back(right);
+			static constexpr SDL_FPoint centre_pos = { 0, 0 };
 
-			for (const auto& obj : mapset.hit_objects.data | std::views::values)
+			auto timing_point = timing_points->data.begin();
+			const auto& velocity_diff = mapset.calculated_difficulty->velocity;
+			auto object = mapset.hit_objects.data.begin();
+
+			while (object != mapset.hit_objects.data.end())
 			{
-				SDL_FPoint pos = {.x = timing_points->get_object_pos(obj.time), .y = 0 };
-				if (!obj.is_kat) pos.x *= -1;
-				auto r_obj = std::make_shared<Components::Floor>(&obj, memory, pos);
+				// Cập nhật timing point
+				float timing_velocity = 1;
+				float beat_length = 60.0f / 180.0f;
+				while (timing_point != timing_points->data.end() && timing_point->first < object->first)
+				{
+					++timing_point;
+					if (timing_point == timing_points->data.end()) break;
+					if (timing_point->second.inherited)
+						timing_velocity = timing_point->second.get_velocity();
+					else beat_length = timing_point->second.beat_length;
+				}
 
-				if (obj.is_kat)
-				{
-					const auto left_index = left->data.empty() ? 0 : left->data.size() - 1;
-					right->data.emplace_back(r_obj);
-					render_script.emplace_hint(
-						Utilities::Container::get_last_element_iterator(render_script),
-						obj.time, RenderScript{ .r_obj = r_obj, .is_kat = obj.is_kat,
-							.left_index = left_index,
-							.right_index = right->data.size() - 1 });
-				}
-				else
-				{
-					const auto right_index = right->data.empty() ? 0 : right->data.size() - 1;
-					left->data.emplace_back(r_obj);
-					render_script.emplace_hint(
-						Utilities::Container::get_last_element_iterator(render_script),
-						obj.time, RenderScript{ .r_obj = r_obj, .is_kat = obj.is_kat,
-							.left_index = left->data.size() - 1,
-							.right_index = right_index });
-				}
+				// Xác định vị trí, thời điểm
+				using Utilities::Math::FPoint::operator/, Utilities::Math::FPoint::operator*;
+				const auto distance = Utilities::Math::FPoint::to_float_point(::Config::user_config->graphic.window_size) / 2 * 1.5f; // cho xuất hiện từ trước
+				const auto travel_x_time = distance.x / velocity_diff.get_one_pixel_time(timing_velocity, beat_length);
+				const auto start_time = object->first - static_cast<Engine::Events::Timing::Time>(std::round(travel_x_time));
+				SDL_FPoint start_pos = centre_pos;
+				if (!object->second.is_kat)
+					start_pos.x -= distance.x;
+				else start_pos.x += distance.x;
+
+				auto r_obj = std::make_shared<Components::Floor>(
+					object->second, skin, game_actions,
+					std::make_pair(start_time, start_pos),
+					std::make_pair(object->first, centre_pos));
+				data.emplace_back(r_obj);
+				render_scripts.emplace(&object->second, r_obj);
+				++object;
 			}
 		}
 	}

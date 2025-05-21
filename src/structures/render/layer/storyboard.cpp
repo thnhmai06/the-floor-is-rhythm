@@ -5,6 +5,7 @@ namespace Structures::Render::Layer
 {
 	using namespace ::Config::Game::Render;
 	using namespace Utilities::Math::FPoint;
+	using Engine::Render::Object::Object;
 
 	const bool& Storyboard::get_widescreen_mode() const { return widescreen; }
 	void Storyboard::resize(const bool widescreen, const bool force)
@@ -12,7 +13,7 @@ namespace Structures::Render::Layer
 		if (!force && widescreen == this->widescreen) return;
 		this->widescreen = widescreen;
 		SDL_Point window_size;
-		Object::Object::Config::OriginPoint grid_origin;
+		Engine::Render::Config::OriginPoint grid_origin;
 		SDL_FPoint grid_size;
 		SDL_GetCurrentRenderOutputSize(memory.renderer, &window_size.x, &window_size.y);
 		if (!widescreen)
@@ -30,7 +31,7 @@ namespace Structures::Render::Layer
 		const auto texture_size = to_integer_point(grid_size * final_scale);
 		grid_origin *= final_scale;
 
-		layer.camera.get_camera_origin() = grid_origin;
+		layer.config->render_pos = grid_origin;
 		layer.grid_size = grid_size;
 		memory.create_new(name_texture, texture_size);
 	}

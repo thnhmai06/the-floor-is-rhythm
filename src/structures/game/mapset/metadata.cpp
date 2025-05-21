@@ -1,5 +1,5 @@
 ﻿#include "structures/game/mapset/metadata.h" // Header
-#include "utilities.hpp"
+#include "utilities.h"
 #include "config.h"
 #include "format/file.h"
 
@@ -29,7 +29,7 @@ namespace Structures::Game::Beatmap::Metadata
 			else if (content[0] == Format::File::Floor::Mapset::General::WIDESCREEN_STORYBOARD)
 				widescreen_storyboard = std::stoi(content[1]);
 			else if (content[0] == Format::File::Floor::Mapset::General::SAMPLE_SET)
-				sample_set = static_cast<Types::Game::HitSound::SampleSet>(std::stoi(content[1]));
+				sample_set = static_cast<Core::Type::Game::HitSound::SampleSet>(std::stoi(content[1]));
 		}
 	}
 	std::string General::to_string() const
@@ -111,6 +111,8 @@ namespace Structures::Game::Beatmap::Metadata
 				hp = std::stof(content.back());
 			else if (content.front() == Format::File::Floor::Mapset::Difficulty::OD)
 				od = std::stof(content.back());
+			else if (content.front() == Format::File::Floor::Mapset::Difficulty::VC)
+				vc = std::stof(content.back());
 		}
 	}
 	std::string Difficulty::to_string() const
@@ -121,13 +123,14 @@ namespace Structures::Game::Beatmap::Metadata
 		std::stringstream writer;
 		writer << HEADER << '\n';
 		writer << HP << SEPARATOR << hp << '\n';
-		writer << OD << SEPARATOR << od;
+		writer << OD << SEPARATOR << od << '\n';
+		writer << VC << SEPARATOR << vc;
 
 		return writer.str();
 	}
 	CalculatedDifficulty Difficulty::calculate() const
 	{
-		return CalculatedDifficulty(*this);
+		return { *this };
 	}
 	Difficulty::Difficulty(const std::vector<std::string>& contents) { Difficulty::read(contents); }
 
@@ -149,10 +152,10 @@ namespace Structures::Game::Beatmap::Metadata
 	{
 		return ::Config::Game::Difficulty::OD::Base::MISS;
 	}
-	Types::Game::Gameplay::NoteScore CalculatedDifficulty::OverallDifficulty::get_score(
+	Core::Type::Game::Gameplay::NoteScore CalculatedDifficulty::OverallDifficulty::get_score(
 		const bool is_clicked, const int64_t& current_time, const int64_t& hit_object_time) const
 	{
-		using Types::Game::Gameplay::NoteScore;
+		using Core::Type::Game::Gameplay::NoteScore;
 
 		const auto perfect_range = get_perfect();
 		const auto good_range = get_good();
@@ -172,7 +175,7 @@ namespace Structures::Game::Beatmap::Metadata
 			return NoteScore::Bad;
 		return NoteScore::Miss;
 	}
-	CalculatedDifficulty::OverallDifficulty::OverallDifficulty(const float* value) : value(value)
+	CalculatedDifficulty::OverallDifficulty::OverallDifficulty(const float& value) : value(&value)
 	{
 	}
 
@@ -184,9 +187,9 @@ namespace Structures::Game::Beatmap::Metadata
 			return BASE - EASIER_MULTIPLY * (5 - *value);
 		return BASE + HARDER_MULTIPLY * (*value - 5);
 	}
-	float CalculatedDifficulty::HPDrainRate::get_gained_health(const Types::Game::Gameplay::NoteScore& note_score, const unsigned long& current_combo) const
+	float CalculatedDifficulty::HPDrainRate::get_gained_health(const Core::Type::Game::Gameplay::NoteScore& note_score, const unsigned long& current_combo) const
 	{
-		using Types::Game::Gameplay::NoteScore;
+		using Core::Type::Game::Gameplay::NoteScore;
 
 		const auto drain = get_drain_rate();
 		if (note_score == NoteScore::Skip) return drain; // bỏ qua
@@ -204,17 +207,39 @@ namespace Structures::Game::Beatmap::Metadata
 		if (current_combo <= 10) return (drain * note_multiply - drain) + (drain * 0.2f * static_cast<float>(current_combo - 5) / 5);
 		return (drain * note_multiply - drain) + (drain * 0.2f); // 0.2 => safe for 100 (0.8)
 	}
-	CalculatedDifficulty::HPDrainRate::HPDrainRate(const float* value) : value(value)
+	CalculatedDifficulty::HPDrainRate::HPDrainRate(const float& value) : value(&value)
+	{
+	}
+
+	// ::Velocity
+	double CalculatedDifficulty::Velocity::get_real_velocity(const float& timing_velocity) const
+	{
+		return *value * timing_velocity;
+	}
+	double CalculatedDifficulty::Velocity::get_one_beat_length_pixel(const float& timing_velocity) const
+	{
+		return ::Config::Game::Difficulty::Velocity::BASE_ONE_BEAT_PIXEL_LENGTH / get_real_velocity(timing_velocity);
+	}
+	double CalculatedDifficulty::Velocity::get_one_ms_pixel(const float& timing_velocity, const float& timing_beat_length) const
+	{
+		return get_one_beat_length_pixel(timing_velocity) / timing_beat_length;
+	}
+	double CalculatedDifficulty::Velocity::get_one_pixel_time(const float& timing_velocity, const float& timing_beat_length) const
+	{
+		return 1 / get_one_ms_pixel(timing_velocity, timing_beat_length);
+	}
+	CalculatedDifficulty::Velocity::Velocity(const float& value)
+		: value(&value)
 	{
 	}
 
 	//::
 	CalculatedDifficulty::CalculatedDifficulty(const Difficulty& basic)
-		: Difficulty(basic), overall_difficulty(&od), hp_drain_rate(&hp)
+		: Difficulty(basic), overall_difficulty(od), hp_drain_rate(hp), velocity(vc)
 	{
 	}
 	CalculatedDifficulty::CalculatedDifficulty(const std::vector<std::string>& contents)
-		: Difficulty(contents), overall_difficulty(&od), hp_drain_rate(&hp)
+		: Difficulty(contents), overall_difficulty(od), hp_drain_rate(hp), velocity(vc)
 	{
 	}
 }

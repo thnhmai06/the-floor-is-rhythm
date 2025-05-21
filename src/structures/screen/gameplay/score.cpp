@@ -8,34 +8,29 @@ namespace Structures::Screen::Gameplay::Score
 	{
 		Score::Score(const Memory& skin, const float* score, const float* accuracy, const unsigned long* combo)
 		{
-			data.reserve(3);
-
 			using namespace ::Config::Game::Render::Score;
 
 			// Score
-			auto c_score = std::make_shared<HorizontalNumber<float>>(
+			this->score = std::make_shared<HorizontalNumber<float>>(
 				score, &skin, &Format::Skin::Image::Score::alphabet, get_pos(), get_character_size(), ORIGIN);
-			c_score->zero_padding = ZERO_PADDING; // Max Score = 1m có 7 chữ số
-			c_score->decimal_format = DECIMAL_FORMAT;
-			this->score = c_score;
-			data.emplace_back(std::move(c_score));
+			this->score->zero_padding = ZERO_PADDING; // Max Score = 1m có 7 chữ số
+			this->score->decimal_format = DECIMAL_FORMAT;
+			data.emplace_back(this->score);
 
 			// Accuracy
-			auto c_accuracy = std::make_shared<HorizontalNumber<float>>(
+			this->accuracy = std::make_shared<HorizontalNumber<float>>(
 				accuracy, &skin, &Format::Skin::Image::Score::alphabet, Accuracy::get_pos(), Accuracy::get_character_size(), Accuracy::ORIGIN);
-			c_accuracy->decimal_format = Accuracy::ZERO_PADDING;
-			c_accuracy->zero_padding = Accuracy::DECIMAL_FORMAT;
-			c_accuracy->multiply = Accuracy::MULTIPLY;
-			c_accuracy->footer = Accuracy::FOOTER;
-			this->accuracy = c_accuracy;
-			data.emplace_back(std::move(c_accuracy));
+			this->accuracy->decimal_format = Accuracy::ZERO_PADDING;
+			this->accuracy->zero_padding = Accuracy::DECIMAL_FORMAT;
+			this->accuracy->multiply = Accuracy::MULTIPLY;
+			this->accuracy->footer = Accuracy::FOOTER;
+			data.emplace_back(this->accuracy);
 
 			// Combo
-			auto c_combo = std::make_shared<HorizontalNumber<unsigned long>>(
+			this->combo = std::make_shared<HorizontalNumber<unsigned long>>(
 				combo, &skin, &Format::Skin::Image::Score::alphabet, Combo::get_pos(), Combo::get_character_size(), Combo::ORIGIN);
-			c_combo->footer = Combo::FOOTER;
-			this->combo = c_combo;
-			data.emplace_back(std::move(c_combo));
+			this->combo->footer = Combo::FOOTER;
+			data.emplace_back(this->combo);
 		}
 	}
 
@@ -51,10 +46,10 @@ namespace Structures::Screen::Gameplay::Score
 		{
 			return count_perfect + count_good + count_bad + count_miss;
 		}
-		void Score::Accuracy::update(const Types::Game::Gameplay::NoteScore& score, const unsigned long& num)
+		void Score::Accuracy::update(const Core::Type::Game::Gameplay::NoteScore& score, const unsigned long& num)
 		{
 			// Thêm count
-			using Types::Game::Gameplay::NoteScore;
+			using Core::Type::Game::Gameplay::NoteScore;
 			switch (score)
 			{
 			case NoteScore::Perfect: count_perfect += num; break;
@@ -106,20 +101,20 @@ namespace Structures::Screen::Gameplay::Score
 		}
 
 		// Score
-		Types::Game::Gameplay::NoteScore Score::get_floor_score(
+		Core::Type::Game::Gameplay::NoteScore Score::get_floor_score(
 			const Game::Beatmap::HitObjects::Floor& floor,
 			uint16_t& click_num,
-			const int64_t& current_time) const
+			const int64_t& click_time) const
 		{
 			const auto range_bad = mapset->calculated_difficulty->overall_difficulty.get_bad();
 			const auto range_miss = Game::Beatmap::Metadata::CalculatedDifficulty::OverallDifficulty::get_miss();
 
-			if (static_cast<float>(current_time) < static_cast<float>(floor.time) - range_miss) // chưa đến
-				return Types::Game::Gameplay::NoteScore::Skip;
-			if (static_cast<float>(current_time) > static_cast<float>(floor.time) + range_bad) // quá muộn
-				return Types::Game::Gameplay::NoteScore::Miss;
+			if (static_cast<float>(click_time) < static_cast<float>(floor.time) - range_miss) // chưa đến
+				return Core::Type::Game::Gameplay::NoteScore::Skip;
+			if (static_cast<float>(click_time) > static_cast<float>(floor.time) + range_bad) // quá muộn
+				return Core::Type::Game::Gameplay::NoteScore::Miss;
 
-			const auto score = mapset->calculated_difficulty->overall_difficulty.get_score(click_num > 0, current_time, floor.time);
+			const auto score = mapset->calculated_difficulty->overall_difficulty.get_score(click_num > 0, click_time, floor.time);
 			click_num--;
 			return score;
 		}
@@ -129,20 +124,20 @@ namespace Structures::Screen::Gameplay::Score
 			combo.reset(true);
 			accuracy.reset();
 		}
-		void Score::update(const Types::Game::Gameplay::NoteScore& note_score, const uint32_t& num)
+		void Score::update(const Core::Type::Game::Gameplay::NoteScore& note_score, const uint32_t& num)
 		{
 			// Cập nhật thuộc tính
 			const auto& stats = mapset->stats;
-			if (note_score != Types::Game::Gameplay::NoteScore::Skip)
+			if (note_score != Core::Type::Game::Gameplay::NoteScore::Skip)
 			{
 				accuracy.update(note_score, num);
-				if (note_score == Types::Game::Gameplay::NoteScore::Miss)
+				if (note_score == Core::Type::Game::Gameplay::NoteScore::Miss)
 					combo.reset();
 				else combo.add_combo(num);
 			}
 
 			// Tính điểm
-			// Score = ((700000 * max_combo / total_combo) + (300000 * accuracy ^ 10 * elapsed_objects / total_objects)) * mod_multiplier
+			// Score = ((700000 * max_combo / total_combo) + (300000 * accuracy ^ 10 * elapsed_objects / total_objects)) * score_multiplier
 			constexpr float BASE_COMBO = 700000;
 			constexpr float BASE_ACCURACY = 300000;
 
@@ -150,12 +145,12 @@ namespace Structures::Screen::Gameplay::Score
 			const float combo_score = BASE_COMBO * static_cast<float>(*combo.get_max_combo()) / static_cast<float>(stats.count.total_combo);
 			const float accuracy_score = BASE_ACCURACY * std::powf(*accuracy.get_accuracy(), 10) * elapsed_objects / static_cast<float>(stats.get_total_objects_num());
 			const float score_no_multiplier = combo_score + accuracy_score;
-			this->score = score_no_multiplier * *mod_multiplier;
+			this->score = score_no_multiplier * *score_multiplier;
 		}
 		const float* Score::get_score() const { return &score; }
-		const float* Score::get_mod_multiplier() const { return mod_multiplier; }
-		Score::Score(const Game::Beatmap::Mapset& mapset, const float* mod_multiplier)
-			: mapset(&mapset), mod_multiplier(mod_multiplier)
+		const float* Score::get_score_multiplier() const { return score_multiplier; }
+		Score::Score(const Game::Beatmap::Mapset& mapset, const float* score_multiplier)
+			: mapset(&mapset), score_multiplier(score_multiplier)
 		{
 		}
 	}

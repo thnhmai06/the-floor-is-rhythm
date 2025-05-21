@@ -1,4 +1,4 @@
-#include "utilities.hpp" // Header
+#include "utilities.h" // Header
 #include <cmath>
 #include <iomanip>
 #include <numbers>
@@ -7,12 +7,12 @@ namespace Utilities
 {
 	namespace Math
 	{
-		bool is_equal(const float& variable, const float& value, const float& epsilon)
+		bool is_equal(const double& variable, const double& value, const double& epsilon)
 		{
 			return abs(variable - value) <= epsilon;
 		}
 
-		bool is_integer(const float& value, const float& epsilon)
+		bool is_integer(const double& value, const double& epsilon)
 		{
 			return is_equal(std::floor(value), value, epsilon);
 		}
@@ -27,14 +27,14 @@ namespace Utilities
 			return { .x = centre(size.x, window_size.x), .y = centre(size.y, window_size.y) };
 		}
 
-		float degree_to_radian(const float& degree)
+		double degree_to_radian(const double& degree)
 		{
-			return degree * std::numbers::pi_v<float> / 180.0f;
+			return degree * std::numbers::pi_v<float> / 180.0;
 		}
 
-		float radian_to_degree(const float& radian)
+		double radian_to_degree(const double& radian)
 		{
-			return radian * 180.0f / std::numbers::pi_v<float>;
+			return radian * 180.0 / std::numbers::pi_v<float>;
 		}
 
 		double round(const double& value, const uint8_t& precision_num)
@@ -142,6 +142,10 @@ namespace Utilities
 			{
 				return SDL_FPoint{ .x = static_cast<float>(point.x), .y = static_cast<float>(point.y) };
 			}
+			SDL_FPoint to_float_point(const double& x, const double& y)
+			{
+				return SDL_FPoint(static_cast<float>(x), static_cast<float>(y));
+			}
 		}
 	}
 	namespace Time
@@ -237,6 +241,10 @@ namespace Utilities
 		{
 			return Math::in_range(rect.x, rect.x + rect.w, point.x)
 				&& Math::in_range(rect.y, rect.y + rect.h, point.y);
+		}
+		SDL_Color to_sdl_color(const Engine::Render::Color& color, const uint8_t& alpha)
+		{
+			return { color.r, color.g, color.b, alpha };
 		}
 	}
 }

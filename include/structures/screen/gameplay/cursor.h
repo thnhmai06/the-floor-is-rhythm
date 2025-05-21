@@ -1,13 +1,14 @@
 ﻿#pragma once
-#include "structures/events/action/action.h"
-#include "structures/events/event/event.h"
-#include "structures/render/object.h"
+#include "core/type.h"
+#include "engine/events/action.h"
+#include "engine/events/event.h"
+#include "engine/render/object.h"
 
 namespace Structures::Screen::Gameplay::Cursor
 {
 	namespace Render
 	{
-		using namespace Structures::Render::Object;
+		using namespace Engine::Render::Object;
 
 		namespace Components
 		{
@@ -15,10 +16,13 @@ namespace Structures::Screen::Gameplay::Cursor
 			{
 				int64_t end_time;
 
-				static void add_animation(const std::weak_ptr<NoteScore>& object, Events::Action::Buffer& action_buffer, const int64_t& time_earned);
+				static void add_animation(
+					const std::weak_ptr<NoteScore>& object, 
+					Engine::Events::Action::Buffer& action_buffer, 
+					const int64_t& earned_time);
 
 				explicit NoteScore(const Memory& skin,
-					const Types::Game::Gameplay::NoteScore& score);
+					const Core::Type::Game::Gameplay::NoteScore& score);
 			};
 			
 		}
@@ -26,16 +30,18 @@ namespace Structures::Screen::Gameplay::Cursor
 		struct Cursor : Collection
 		{
 		protected:
+			std::shared_ptr<Object> cursor;
 			std::shared_ptr<Collection> note_scores;
 
 		public:
+			std::weak_ptr<const Engine::Events::Timing::Timer> timer;
 			const Memory* skin;
-			std::shared_ptr<Object> body;
-			std::list<std::shared_ptr<Components::NoteScore>> note_score_list;
 
-			void check_and_add_score_shown(const Events::Event::Buffer& event_buffer, Events::Action::Buffer& action_buffer, const int64_t& current_time);
+			void check_and_add_score_shown(
+				const Engine::Events::Event::Internal::Buffer::TypeViewer& scoring_events,
+				Engine::Events::Action::Buffer& action_buffer) const;
 
-			explicit Cursor(const Memory& skin);
+			explicit Cursor(const Memory& skin, std::weak_ptr<const Engine::Events::Timing::Timer> timer);
 		};
 	}
 }

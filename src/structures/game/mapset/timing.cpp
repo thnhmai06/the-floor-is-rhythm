@@ -5,7 +5,7 @@
 #include "logging/logger.h"
 #include "logging/exceptions.h"
 #include "format/file.h"
-#include "utilities.hpp"
+#include "utilities.h"
 
 using namespace Format::File::Floor::Mapset::TimingPoints;
 using Format::File::Floor::Mapset::AND;
@@ -19,7 +19,7 @@ namespace Structures::Game::Beatmap::TimingPoints
 		beat_length = std::stof(content[1]);
 		sample.set = static_cast<Hitsound::SampleSet>(std::stoi(content[2]));
 		sample.index = std::stoi(content[3]);
-		sample.volume = std::stoi(content[4]);
+		sample.volume.percent = std::stod(content[4]);
 		inherited = (beat_length < 0);
 		kiai = std::stoi(content[5]);
 	}
@@ -28,19 +28,8 @@ namespace Structures::Game::Beatmap::TimingPoints
 	{
 		std::stringstream writer;
 		writer << time << AND << beat_length << AND << static_cast<int32_t>(sample.set)
-			<< AND << sample.index << AND << static_cast<int32_t>(sample.volume) << AND << kiai;
+			<< AND << sample.index << AND << sample.volume.percent << AND << kiai;
 		return writer.str();
-	}
-	float TimingPoints::get_object_pos(const float& current_time) const
-	{
-		auto current_timing = timing_pos.upper_bound(current_time);
-		if (current_timing == timing_pos.begin()) return 0.0f;
-		if (current_timing == timing_pos.end()) current_timing = Utilities::Container::get_last_element_iterator(timing_pos);
-		else --current_timing;
-
-		const float time_elapsed = current_time - current_timing->first;
-		const auto& [pos, beat_length, velocity] = current_timing->second;
-		return pos + ::Config::Game::Difficulty::Velocity::BASE_ONE_BEAT_PIXEL_LENGTH * velocity * time_elapsed / beat_length;
 	}
 	TimingPoint::TimingPoint(const std::vector<std::string>& content)
 	{
@@ -56,7 +45,7 @@ namespace Structures::Game::Beatmap::TimingPoints
 			const auto content = Utilities::String::split(line, AND);
 			if (content.size() < TimingPoint::MINIMUM_NUM_CONTENT)
 			{
-				LOG_WARNING(Logging::Exceptions::FormatExceptions::TimingPoints::Format_TimingPoints_NotEnoughContent(line));
+				LOG_WARNING(Logging::Exceptions::Format::TimingPoints::Format_TimingPoints_NotEnoughContent(line));
 				continue;
 			}
 

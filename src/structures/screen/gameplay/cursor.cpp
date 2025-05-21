@@ -1,8 +1,8 @@
 ﻿#include "structures/screen/gameplay/cursor.h" // Header
 #include "format/skin.h"
 #include "config.h"
-#include "structures/events/action/render.hpp"
-#include "structures/events/event/playing.h"
+#include "engine/events/action/render.h"
+#include "structures/events/event/internal/gameplay.h"
 
 namespace Structures::Screen::Gameplay::Cursor
 {
@@ -13,80 +13,92 @@ namespace Structures::Screen::Gameplay::Cursor
 		{
 			NoteScore::NoteScore(
 				const Memory& skin,
-				const Types::Game::Gameplay::NoteScore& score)
+				const Core::Type::Game::Gameplay::NoteScore& score)
 				: Object(skin.find(Format::Skin::Image::HitObject::hit.at(score)), ORIGIN)
 			{
-				config.color.a = 0;
+				config.alpha.percent = 0;
 				set_render_size(::Config::Game::Render::Cursor::NoteScore::get_size());
 			}
 
 			void NoteScore::add_animation(
 				const std::weak_ptr<NoteScore>& object,
-				Events::Action::Buffer& action_buffer, const int64_t& time_earned)
+				Engine::Events::Action::Buffer& action_buffer,
+				const int64_t& earned_time)
 			{
 				using namespace NoteScore;
 
 				const auto it = object.lock();
-				const int64_t full_appear_moment = time_earned + TIME_FADE_IN;
+				const int64_t full_appear_moment = earned_time + TIME_FADE_IN;
 				const int64_t disappear_moment = full_appear_moment + TIME_STAY;
 				it->end_time = disappear_moment + TIME_FADE_OUT;
 
-				auto fade_in = std::make_shared<Events::Action::Render::FadeAction>(
-					time_earned, full_appear_moment, EASING_IN, object, 0, SDL_MAX_ALPHA);
-				auto move_in = std::make_shared<Events::Action::Render::MoveAction>(
-					time_earned, full_appear_moment, EASING_IN, object, get_start_pos(), get_end_pos());
-				auto fade_out = std::make_shared<Events::Action::Render::FadeAction>(
-					disappear_moment, it->end_time, EASING_OUT, object, SDL_MAX_ALPHA, 0);
-				auto move_out = std::make_shared<Events::Action::Render::MoveAction>(
-					disappear_moment, it->end_time, EASING_OUT, object, get_end_pos(), get_start_pos());
-				action_buffer.data.emplace(time_earned, fade_in);
-				action_buffer.data.emplace(time_earned, move_in);
-				action_buffer.data.emplace(disappear_moment, fade_out);
-				action_buffer.data.emplace(disappear_moment, move_out);
+				const auto fade_in = std::make_shared<Engine::Events::Action::Render::FadeAction>(
+					earned_time, full_appear_moment, EASING_IN, object.lock()->config, 0, 1);
+				const auto move_in = std::make_shared<Engine::Events::Action::Render::MoveAction>(
+					earned_time, full_appear_moment, EASING_IN, object.lock()->config, get_start_pos(), get_end_pos());
+				const auto fade_out = std::make_shared<Engine::Events::Action::Render::FadeAction>(
+					disappear_moment, it->end_time, EASING_OUT, object.lock()->config, 1, 0);
+				const auto move_out = std::make_shared<Engine::Events::Action::Render::MoveAction>(
+					disappear_moment, it->end_time, EASING_OUT, object.lock()->config, get_end_pos(), get_start_pos());
+				action_buffer.submit(fade_in);
+				action_buffer.submit(move_in);
+				action_buffer.submit(fade_out);
+				action_buffer.submit(move_out);
 			}
 		}
 
-		void Cursor::check_and_add_score_shown(const Events::Event::Buffer& event_buffer, Events::Action::Buffer& action_buffer, const int64_t& current_time)
+		void Cursor::check_and_add_score_shown(
+			const Engine::Events::Event::Internal::Buffer::TypeViewer& scoring_events,
+			Engine::Events::Action::Buffer& action_buffer) const
 		{
-			auto item = note_score_list.begin();
-			while (item != note_score_list.end())
+			if (const auto locked_timer = Utilities::Pointer::check_weak(timer))
 			{
-				if ((*item)->end_time <= current_time)
-				{
-					item->reset();
-					item = note_score_list.erase(item);
-				}
-				else ++item;
-			}
+				const auto current_time = locked_timer->get_last_point();
 
-			const auto events = event_buffer.search({ Types::Event::EventID::Scoring }, current_time);
-			if (events.empty()) return;
-			for (const auto& [time, event] : events.at(Types::Event::EventID::Scoring))
-			{
-				if (event.expired()) continue;
-				const auto& event_ptr = event.lock();
-				if (!event_ptr) continue;
-				if (const auto it = std::dynamic_pointer_cast<Events::Event::Playing::Scoring>(event_ptr))
+				auto item = note_scores->data.begin();
+				while (item != note_scores->data.end())
 				{
-					if (it->score == Types::Game::Gameplay::NoteScore::Skip) continue;
-					auto object = note_score_list.emplace_back(std::make_shared<Components::NoteScore>(*skin, it->score));
-					Components::NoteScore::add_animation(object, action_buffer, time);
+					if (const auto ptr = std::get_if<std::shared_ptr<Object>>(&*item))
+					{
+						if (auto it = std::dynamic_pointer_cast<Components::NoteScore>(*ptr))
+						{
+							if (it->end_time <= current_time)
+							{
+								it.reset();
+								item = note_scores->data.erase(item);
+							}
+							else ++item;
+						}
+						else ++item;
+					}
+					else ++item;
+				}
+
+				for (const auto& [time, event] : scoring_events)
+				{
+					if (const auto event_ptr = Utilities::Pointer::check_weak(event))
+					{
+						if (const auto it = std::dynamic_pointer_cast<const Events::Event::Internal::Gameplay::Scoring>(event_ptr))
+						{
+							if (it->score == Core::Type::Game::Gameplay::NoteScore::Skip) continue;
+
+							auto object = std::make_shared<Components::NoteScore>(*skin, it->score);
+							note_scores->data.emplace_back(object);
+							Components::NoteScore::add_animation(object, action_buffer, time);
+						}
+					}
 				}
 			}
-
-			note_scores->data.clear();
-			for (const auto& note_score : note_score_list)
-				note_scores->data.emplace_back(note_score);
 		}
-		Cursor::Cursor(const Memory& skin)
-			: Collection(), skin(&skin)
+		Cursor::Cursor(const Memory& skin, std::weak_ptr<const Engine::Events::Timing::Timer> timer)
+			: Collection(), timer(std::move(timer)), skin(&skin)
 		{
 			using namespace Components;
 
 			//! Body
-			body = std::make_shared<Object>(skin.find(Format::Skin::Image::Cursor::body), ORIGIN, get_pos());
-			body->set_render_size(::Config::user_config->gameplay.cursor.get_pixel_size());
-			data.emplace_back(body);
+			cursor = std::make_shared<Object>(skin.find(Format::Skin::Image::Cursor::body), ORIGIN, get_pos());
+			cursor->set_render_size(::Config::user_config->gameplay.cursor.get_pixel_size());
+			data.emplace_back(cursor);
 
 			//! Note Scores
 			note_scores = std::make_shared<Collection>();

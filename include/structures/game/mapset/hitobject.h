@@ -10,9 +10,9 @@ namespace Structures::Game::Beatmap::HitObjects
 	{
 		static constexpr int32_t MINIMUM_NUM_CONTENT = 4;
 
-		float time = 0;
+		int64_t time = 0;
 		bool is_kat;
-		Hitsound::Additions hit_sound{};
+		Hitsound::Additions additions{};
 		Hitsound::HitSample hit_sample{};
 
 		void read(const std::vector<std::string>& contents) override;
@@ -24,9 +24,9 @@ namespace Structures::Game::Beatmap::HitObjects
 
 	struct HitObjects : Config::Section
 	{
-		using CONTAINER = std::map<float, Floor>;
+		using Container = std::map<int64_t, Floor>;
 
-		CONTAINER data;
+		Container data;
 
 		void read(const std::vector<std::string>& lines) override;
 		[[nodiscard]] std::string to_string() const override;
