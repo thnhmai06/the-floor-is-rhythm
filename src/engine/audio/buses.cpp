@@ -24,6 +24,7 @@ namespace Engine::Audio::Bus
 		if (!music.parent || music.item == music.parent->items.end()) return;
 
 		if (has_song_playing()) stop();
+		set_volume(volume.percent);
 		if (!Mix_PlayMusic(music.item->second, 0))
 		{
 			LOG_ERROR(Logging::Exceptions::Engine::Audio::SDL_Audio_PlayMusic_Failed(music.item->first));
@@ -66,7 +67,7 @@ namespace Engine::Audio::Bus
 	}
 	Bus<Music>::Bus(const double& volume)
 	{
-		this->volume.percent = std::clamp(volume, 0.0, 1.0);
+		set_volume(volume);
 	}
 
 	//! Bus<Effects>
@@ -149,7 +150,7 @@ namespace Engine::Audio::Bus
 	}
 	Bus<Effect>::Bus(const double& volume)
 	{
-		this->volume.percent = std::clamp(volume, 0.0, 1.0);
 		sound_volume.parent = &this->volume;
+		set_volume(volume);
 	}
 }

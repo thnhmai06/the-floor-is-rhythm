@@ -148,12 +148,14 @@ namespace Structures::Screen::Gameplay
 	}
 	GameplayScreen::Render::Layers::Layers()
 	{
-		background = std::make_unique<Engine::Render::Layer::Layer>();
+		using Utilities::Math::FPoint::operator/;
+
+		background = std::make_unique<Engine::Render::Layer::Layer>(Utilities::Math::FPoint::to_float_point(::Config::user_config->graphic.window_size) / 2);
 		storyboard = std::make_unique<Layer::Storyboard>(renderer);
-		playground = std::make_unique<Engine::Render::Layer::Layer>();
-		hud = std::make_unique<Engine::Render::Layer::Layer>();
-		sticky_hud = std::make_unique<Engine::Render::Layer::Layer>();
-		foreground = std::make_unique<Engine::Render::Layer::Layer>();
+		playground = std::make_unique<Engine::Render::Layer::Layer>(Utilities::Math::FPoint::to_float_point(::Config::user_config->graphic.window_size) / 2);
+		hud = std::make_unique<Engine::Render::Layer::Layer>(Utilities::Math::FPoint::to_float_point(::Config::user_config->graphic.window_size) / 2);
+		sticky_hud = std::make_unique<Engine::Render::Layer::Layer>(Utilities::Math::FPoint::to_float_point(::Config::user_config->graphic.window_size) / 2);
+		foreground = std::make_unique<Engine::Render::Layer::Layer>(Utilities::Math::FPoint::to_float_point(::Config::user_config->graphic.window_size) / 2);
 	}
 	// ::
 	void GameplayScreen::Render::new_play()
@@ -350,7 +352,7 @@ namespace Structures::Screen::Gameplay
 	//! Screen
 	void GameplayScreen::pause(const bool fail)
 	{
-		if (paused || (pause_lock && !fail)) return;
+		if (pause_lock && !fail) return;
 		audio.pause(fail);
 		render.pause(fail);
 		timer->pause();
@@ -360,7 +362,7 @@ namespace Structures::Screen::Gameplay
 	}
 	void GameplayScreen::resume()
 	{
-		if (!paused || no_resume) return;
+		if (no_resume) return;
 		audio.resume();
 		render.resume();
 		timer->resume();
@@ -384,12 +386,12 @@ namespace Structures::Screen::Gameplay
 	}
 	void GameplayScreen::update(Engine::Screen::Stack& screens_stack)
 	{
-		const auto current_time = timer->make_point();
 		if (!started)
 		{
 			resume();
 			started = true;
 		}
+		const auto current_time = timer->make_point();
 		events.internal.clear_old(current_time);
 
 		system.update();

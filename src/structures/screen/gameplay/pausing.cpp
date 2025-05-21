@@ -39,9 +39,7 @@ namespace Structures::Screen::Pausing
 	}
 	void Pausing::resume()
 	{
-		const auto& timer = action_buffer->timer.lock();
-		const auto current_time = timer->get_last_point();
-
+		const auto current_time = SDL_GetTicks();
 		action_buffer->submit(std::make_shared<FadeAction>(current_time, current_time + TIME_FADE_IN, Easing::CircOut, config, 1, 0));
 	}
 

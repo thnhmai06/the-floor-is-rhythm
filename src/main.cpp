@@ -18,8 +18,8 @@ int32_t main(const int32_t argc, char* argv[])
 		if (strcmp(argv[i], "--debug") == 0) DEBUG = true;
 	}
 
-	constexpr auto beatmap_path = R"(D:\PROGRAM\osu!\Songs\2287992 Camellia - Operation_ Zenithfall)";
-	constexpr auto mapset_path = R"(D:\Development\Code\cpp\Repositories\the-floor-is-rhythm\build\out\x64\Debug\beatmap\2287992 Camellia - Operation_ Zenithfall\Camellia - Operation Zenithfall (Mir) [Final Mission].tfd)";
+	constexpr auto beatmap_path = R"(D:\2258410 Kagetora. - UNPR3C3D3NT3D TRAV3L3R.osz)";
+	constexpr auto mapset_path = R"(D:\Development\Code\cpp\Repositories\the-floor-is-rhythm\build\out\x64\Debug\beatmap\2258410 Kagetora - UNPR3C3D3NT3D TRAV3L3R\Kagetora. - UNPR3C3D3NT3D TRAV3L3R (Ducky-) [F1N4L D3ST1N4T10N].tfd)";
 
 	Core::Manager::init();
 	Engine::Screen::Stack screen_stack;
