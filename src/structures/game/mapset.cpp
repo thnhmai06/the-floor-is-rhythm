@@ -107,7 +107,7 @@ namespace Structures::Game::Beatmap
 		}
 
 		if (osb_path.empty()) return;
-		OsuParser::Beatmap::Beatmap storyboard{ osb_path.string() };
+		OsuParser::Beatmap::Beatmap storyboard{ osb_path.string(), true };
 		for (auto& event : storyboard.Events.objects)
 			events.objects.push_back(event);
 	}

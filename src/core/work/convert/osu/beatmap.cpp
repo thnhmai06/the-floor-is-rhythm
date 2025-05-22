@@ -1,5 +1,4 @@
 ﻿#include "core/work/convert/osu/beatmap.h" // Header
-#include <algorithm>
 #include <bit7z/bitarchivereader.hpp>
 #include <spdlog/spdlog.h>
 #include <filesystem>
@@ -31,21 +30,21 @@ namespace Core::Work::Convert::Osu
 		}
 		if (fs::is_directory(path))
 		{
-			const auto valid_name = path.filename().string();;
-
+			const auto valid_name = path.filename().string();
 			auto dest_path = output / path.filename();
-			if (path != dest_path)
+
+			try
 			{
-				try
-				{
+				if (!exists(output)) fs::create_directory(output);
+				if (path != dest_path)
 					fs::copy(path, dest_path, fs::copy_options::recursive | fs::copy_options::overwrite_existing);
-				}
-				catch (...)
-				{
-					LOG_ERROR(Logging::Exceptions::FileExceptions::File_Copy_Failed(path));
-					return;
-				}
 			}
+			catch (...)
+			{
+				LOG_ERROR(Logging::Exceptions::FileExceptions::File_Copy_Failed(path));
+				return;
+			}
+
 			for (auto&& entry : fs::recursive_directory_iterator(dest_path))
 			{
 				auto entry_path = Utilities::Path::normalize_path(entry.path());
