@@ -23,8 +23,12 @@ Tùy vào độ chính xác mà sẽ ảnh hưởng đến điểm tương ứng
 | <img src="assets/score-8.png" height="60px" width="35px"/><img src="assets/score-2.png" height="60px" width="35px"/><img src="assets/score-dot.png" height="60px" width="35px"/><img src="assets/score-1.png" height="60px" width="35px"/><img src="assets/score-5.png" height="60px" width="35px"/><img src="assets/score-percent.png" height="60px" width="35px"/> | Accuracy | Độ chính xác của bạn, accuracy càng cao, điểm càng cao. |
 | <img src="assets/score-7.png" height="60px" width="35px"/><img src="assets/score-2.png" height="60px" width="35px"/><img src="assets/score-7.png" height="60px" width="35px"/><img src="assets/score-x.png" height="60px" width="35px"/> | Combo | Combo hiện tại của bạn, combo tối đa càng cao, điểm càng cao. |
 
-## Build chương trình
+## Đóng góp
 Hướng dẫn build có ở trong file [Hướng dẫn BUILD](BUILD.md).
+
+Lưu ý:
+- Hiện tại game đang tiếp tục phát triển và đây chưa phải là bản chính thức cuối cùng (Đây mới chỉ là demo thôi).
+- Hiện tại mình đang tiếp tục phát triển ở branch [future](https://github.com/thnhmai06/the-floor-is-rhythm/tree/future) và đang tách engine ra thành repo mới...
 
 ## Cấu trúc mã nguồn
 Project gồm có 2 thư mục chính - `include` (chứa file header) và `src` (chứa mã nguồn). Gồm:
