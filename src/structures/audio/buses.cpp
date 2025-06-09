@@ -1,5 +1,6 @@
 ﻿#include "structures/audio/buses.h" // Header
 #include "structures/type.hpp"
+#include "config.h"
 #include "logging/logger.h"
 #include "logging/exceptions.h"
 #include "utilities.hpp"
@@ -30,6 +31,7 @@ namespace Structures::Audio
 			LOG_ERROR(Logging::Exceptions::SDLExceptions::Audio::SDL_Audio_PlayMusic_Failed(music.item->first));
 			return;
 		}
+		set_volume(::Config::user_config->audio.volume.music);
 		if (pause)
 		{
 			Bus::pause();
